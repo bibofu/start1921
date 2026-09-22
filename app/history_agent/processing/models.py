@@ -12,7 +12,7 @@ class StructureEntry(BaseModel):
     title: str
     pdf_page_start: int = Field(ge=1)
     pdf_page_end: int = Field(ge=1)
-    source: Literal["pdf_outline", "year_heading", "document_root"]
+    source: Literal["pdf_outline", "year_heading", "body_heading", "document_root"]
 
 
 class ChunkRecord(BaseModel):

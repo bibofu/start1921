@@ -133,6 +133,29 @@ def test_existing_parenthesized_year_heading_remains_supported() -> None:
     assert [(entry.title, entry.pdf_page_start) for entry in entries] == [("1956年", 20)]
 
 
+def test_year_heading_without_year_character_keeps_the_1965_boundary() -> None:
+    entries = infer_year_structure(
+        document_id="fixture",
+        pages=_pages(
+            {
+                458: "1964年六十岁\n1月1日晚，观看演出。",
+                514: "1842\n1965六十一岁\n1月1日下午，出席会议。",
+                515: "1965年1月\n1843\n1月5日出席会议。",
+                516: "1966六十二岁时仍然工作。\n1967年的回忆中提及六十三岁。",
+                562: "1966年六十二岁\n1月1日活动。",
+            }
+        ),
+        page_count=607,
+    )
+
+    assert [(entry.title, entry.pdf_page_start, entry.pdf_page_end) for entry in entries] == [
+        ("1964年", 458, 513),
+        ("1965年", 514, 561),
+        ("1966年", 562, 607),
+    ]
+    assert section_path_for_page(entries, 515) == ["1965年"]
+
+
 def test_valid_semantic_bookmarks_keep_priority(work_path: Path) -> None:
     path = work_path / "fixture.pdf"
     _pdf(path, [[1, "1920年", 2], [1, "1921年", 5], [2, "中国共产党的成立", 6]])
@@ -148,4 +171,48 @@ def test_valid_semantic_bookmarks_keep_priority(work_path: Path) -> None:
         ("1920年", 2, "pdf_outline"),
         ("1921年", 5, "pdf_outline"),
         ("中国共产党的成立", 6, "pdf_outline"),
+    ]
+
+
+def test_afterword_is_a_separate_section_before_scanner_appendices() -> None:
+    entries = infer_year_structure(
+        document_id="fixture",
+        pages=_pages(
+            {
+                667: "1974年七十岁\n1月活动。",
+                749: "1974年12月\n2077\n年底迁居。",
+                750: "2078\n后\n记\n分段撰写者：\n某编者：1963年1月至1974年12月。",
+                751: "后记\n2079\n中央档案馆提供了本书使用的档案材料。",
+                752: "[General Inf or nati on]\n书名=年谱\n页数=3413\nSS号=12493501",
+                753: "封面\n书名\n版权\n前言\n目录\n1957年\n1958年\n1959年\n后记",
+            }
+        ),
+        page_count=753,
+    )
+
+    assert [
+        (entry.title, entry.pdf_page_start, entry.pdf_page_end, entry.source) for entry in entries
+    ] == [
+        ("1974年", 667, 749, "year_heading"),
+        ("后记", 750, 751, "body_heading"),
+    ]
+    assert section_path_for_page(entries, 750) == ["后记"]
+    assert section_path_for_page(entries, 752) == []
+
+
+def test_last_year_stops_before_barcode_cover_and_scanner_metadata() -> None:
+    entries = infer_year_structure(
+        document_id="fixture",
+        pages=_pages(
+            {
+                623: "1956年五十二岁\n1月活动。",
+                688: "1956年12月\n1333\n12月底致电张经武。",
+                689: "ISBN978-7-5073-2768-7\n9\n787507327687\n定价：240.00元（上、中、下）",
+                690: "[General Information]\n书名：年谱\n页数：1333\nSS号:12493860",
+            }
+        ),
+        page_count=690,
+    )
+    assert [(entry.title, entry.pdf_page_start, entry.pdf_page_end) for entry in entries] == [
+        ("1956年", 623, 688)
     ]

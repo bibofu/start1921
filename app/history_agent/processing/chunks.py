@@ -17,6 +17,8 @@ from history_agent.processing.cleaning import (
     CLEANER_VERSION,
     clean_page_text,
     detect_repeated_marginal_lines,
+    is_barcode_cover_page,
+    is_scan_metadata_page,
     is_table_of_contents_page,
 )
 from history_agent.processing.models import (
@@ -341,12 +343,14 @@ def build_document_chunks(
         pdf_page: record
         for pdf_page, record in extracted_pages.items()
         if not is_table_of_contents_page(record.normalized_text)
+        and not is_scan_metadata_page(record.normalized_text)
+        and not is_barcode_cover_page(record.normalized_text)
     }
     entries = structure_for_document(
         document_id=document_id,
         title=str(document["title"]),
         source_path=project_root / str(document["relative_path"]),
-        pages=pages,
+        pages=extracted_pages,
         page_count=int(document["page_count"]),
     )
     repeated_lines = detect_repeated_marginal_lines(pages)

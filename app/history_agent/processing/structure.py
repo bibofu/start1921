@@ -7,10 +7,15 @@ from pathlib import Path
 import pymupdf
 
 from history_agent.extraction.models import PageRecord
+from history_agent.processing.cleaning import (
+    is_barcode_cover_page,
+    is_scan_metadata_page,
+    is_table_of_contents_page,
+)
 from history_agent.processing.models import StructureEntry
 
 YEAR_HEADING = re.compile(
-    r"(?:\[周恩来年谱\])?\s*((?:18|19)\d{2})\s*年\s*"
+    r"(?:\[周恩来年谱\])?\s*((?:18|19)\d{2})\s*年?\s*"
     r"(?:[（(][^）)]{1,12}岁[）)]|[〇零一二三四五六七八九十百两\d\s]{1,12}岁|诞生)"
 )
 BARE_YEAR = re.compile(r"(?:18|19)\d{2}\s*年")
@@ -80,6 +85,17 @@ def extract_outline_structure(
 def infer_year_structure(
     *, document_id: str, pages: dict[int, PageRecord], page_count: int
 ) -> list[StructureEntry]:
+    excluded_pages = {
+        page
+        for page, record in pages.items()
+        if is_scan_metadata_page(record.normalized_text)
+        or is_table_of_contents_page(record.normalized_text)
+        or is_barcode_cover_page(record.normalized_text)
+    }
+    pages = {page: record for page, record in pages.items() if page not in excluded_pages}
+    content_end = page_count
+    while content_end in excluded_pages:
+        content_end -= 1
     starts: list[tuple[str, int]] = []
     seen: set[str] = set()
     for pdf_page, record in sorted(pages.items()):
@@ -89,6 +105,10 @@ def infer_year_structure(
             for current, following in zip(lines, lines[1:], strict=False)
         ):
             continue
+        heading_lines = [line for line in lines[:3] if not PAGE_LABEL.fullmatch(line)]
+        if starts and (heading_lines[:1] == ["后记"] or heading_lines[:2] == ["后", "记"]):
+            starts.append(("后记", pdf_page))
+            break
         for index, line in enumerate(lines):
             if line.count(".") >= 3 or "……" in line:
                 continue
@@ -106,7 +126,7 @@ def infer_year_structure(
                 break
     entries: list[StructureEntry] = []
     for index, (title, start_page) in enumerate(starts):
-        end_page = starts[index + 1][1] - 1 if index + 1 < len(starts) else page_count
+        end_page = starts[index + 1][1] - 1 if index + 1 < len(starts) else content_end
         entries.append(
             StructureEntry(
                 entry_id=_entry_id(document_id, 1, title, start_page),
@@ -115,7 +135,7 @@ def infer_year_structure(
                 title=title,
                 pdf_page_start=start_page,
                 pdf_page_end=max(start_page, end_page),
-                source="year_heading",
+                source="body_heading" if title == "后记" else "year_heading",
             )
         )
     return entries

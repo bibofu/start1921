@@ -91,3 +91,50 @@ def test_vector_year_filter_keeps_research_scope_constraint() -> None:
         query_year_range=[1956, 1956], include_out_of_scope=True,
     )
     assert not expanded.must_not
+
+
+def test_chunks_exclude_scan_appendices_and_preserve_afterword_section(work_path: Path) -> None:
+    texts = [
+        "目\n录\n1964年\n（1786）\n1965年\n（1842）\n1966年\n（1890）",
+        "1964年六十岁\n1月1日邓小平参加会议，讨论当年的工作计划，并提出具体意见。",
+        "1965六十一岁\n1月1日邓小平出席会议，讨论社会主义教育运动问题。",
+        "后\n记\n本书由中共中央文献研究室组织编写，多个档案馆提供了相关材料。",
+        "[General Inf or nati on]\n书名=邓小平年谱\n页数=3413\nSS号=12493501",
+        "封面\n书名\n版权\n前言\n目录\n1964年\n1965年\n1966年\n后记",
+    ]
+    with pymupdf.open() as pdf:
+        for _ in texts:
+            pdf.new_page()
+        pdf.save(work_path / "fixture.pdf")
+    pages_dir = work_path / "pages"
+    pages_dir.mkdir()
+    records = [
+        build_page_record(
+            document_id="fixture", file_sha256="hash", pdf_page=page,
+            text=text, image_object_count=0, run_id="test",
+        )
+        for page, text in enumerate(texts, 1)
+    ]
+    (pages_dir / "fixture.jsonl").write_text(
+        "\n".join(record.model_dump_json() for record in records), encoding="utf-8"
+    )
+    chunks_dir = work_path / "chunks"
+    result = build_document_chunks(
+        document={
+            "document_id": "fixture", "title": "邓小平年谱", "relative_path": "fixture.pdf",
+            "filename": "fixture.pdf", "page_count": 6, "sha256": "hash",
+            "creators_json": "[]", "source_type": "chronology", "edition": None,
+            "volume": None, "verification_status": "checked",
+        },
+        project_root=work_path, pages_dir=pages_dir, ocr_dir=work_path / "ocr",
+        chunks_dir=chunks_dir, structure_dir=work_path / "structure",
+        aliases={"邓小平": []}, research_start=1921, research_end=1978,
+    )
+    chunks = [
+        json.loads(line)
+        for line in (chunks_dir / "fixture.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert result.effective_pages == 3
+    assert [(row["pdf_page_start"], row["section_path"]) for row in chunks] == [
+        (2, ["1964年"]), (3, ["1965年"]), (4, ["后记"]),
+    ]
