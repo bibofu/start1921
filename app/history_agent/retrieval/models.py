@@ -76,6 +76,25 @@ class SearchHit(BaseModel):
     rrf_score: float | None = None
 
 
+class RetrievalTraceDrop(BaseModel):
+    chunk_id: str
+    reason: str
+
+
+class RetrievalStageTrace(BaseModel):
+    """A snapshot of an executed retrieval stage, in that stage's actual order."""
+
+    stage: str
+    query: str
+    hits: list[SearchHit]
+    elapsed_ms: float | None = Field(default=None, ge=0)
+    input_count: int | None = Field(default=None, ge=0)
+    requested_k: int | None = Field(default=None, ge=1)
+    notes: list[str] = Field(default_factory=list)
+    dropped: list[RetrievalTraceDrop] = Field(default_factory=list)
+    status: Literal["ok", "failed"] = "ok"
+
+
 class SearchResponse(BaseModel):
     query: str
     query_intent: str
@@ -90,3 +109,4 @@ class SearchResponse(BaseModel):
     degraded_components: list[str] = Field(default_factory=list)
     coverage_gaps: list[str] = Field(default_factory=list)
     rag_framework: Literal["native", "llamaindex"] = "native"
+    trace: list[RetrievalStageTrace] | None = None

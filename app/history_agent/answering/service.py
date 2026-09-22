@@ -1007,6 +1007,15 @@ async def _aretrieve_context(
         settings.person_aliases_path,
     )
     retrieval_limit = _retrieval_limit(request, execution)
+    observer = getattr(runtime, "record_retrieval", None)
+    capture_trace = bool(getattr(runtime, "capture_retrieval_trace", False))
+
+    def observed_search(**kwargs: Any) -> SearchResponse:
+        result = search_hybrid_index(**kwargs, capture_trace=True)
+        if callable(observer):
+            observer("retrieval_round", result)
+        return result
+
     workflow_result = await run_retrieval_workflow(
         settings=settings,
         request=request,
@@ -1015,7 +1024,7 @@ async def _aretrieve_context(
         additional_queries=list(execution.additional_queries),
         retrieval_plan=execution.retrieval_plan,
         retrieval_limit=retrieval_limit,
-        search_backend=search_hybrid_index,
+        search_backend=observed_search if capture_trace else search_hybrid_index,
         assess_retrieval=assess_retrieval,
         merge_retrieval=_merge_retrieval_rounds,
         runtime=runtime,
@@ -1033,6 +1042,9 @@ async def _aretrieve_context(
         budget,
     )
     retrieval = timeline_filter.retrieval
+    if capture_trace and callable(observer):
+        observer("after_reflection", original_retrieval)
+        observer("after_timeline_filter", retrieval)
     keyword_backed = [hit for hit in retrieval.hits if hit.keyword_rank is not None]
     unsupported_entity = _unsupported_leading_entity(request.question, original_retrieval.hits)
     keyword_unavailable = "keyword" in retrieval.degraded_components

@@ -4,10 +4,18 @@ import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from time import perf_counter
+from typing import Literal
 
 from history_agent.errors import RetrievalError
-from history_agent.retrieval.keyword import YEAR, search_keyword_index
-from history_agent.retrieval.models import RetrievalPlan, SearchHit, SearchResponse
+from history_agent.retrieval.keyword import YEAR, has_explicit_year_range, search_keyword_index
+from history_agent.retrieval.models import (
+    RetrievalPlan,
+    RetrievalStageTrace,
+    RetrievalTraceDrop,
+    SearchHit,
+    SearchResponse,
+)
 from history_agent.retrieval.vector import search_vector_index
 
 RRF_K = 60
@@ -67,6 +75,61 @@ CPC_CONGRESS_RANGE = re.compile(
     r"中共(?:第)?(?P<end>[一二三四五六七八九十]{1,3})大"
 )
 logger = logging.getLogger(__name__)
+
+
+def _stage_start(trace: list[RetrievalStageTrace] | None) -> float:
+    return perf_counter() if trace is not None else 0.0
+
+
+def _record_stage(
+    trace: list[RetrievalStageTrace] | None,
+    *,
+    stage: str,
+    query: str,
+    hits: list[SearchHit],
+    started: float,
+    before: list[SearchHit] | None = None,
+    reason: str = "filtered",
+    notes: list[str] | None = None,
+    requested_k: int | None = None,
+    status: Literal["ok", "failed"] = "ok",
+) -> None:
+    if trace is None:
+        return
+    elapsed_ms = max(0.0, (perf_counter() - started) * 1000)
+    retained = {hit.chunk_id for hit in hits}
+    trace.append(
+        RetrievalStageTrace(
+            stage=stage,
+            query=query,
+            hits=[
+                hit.model_copy(deep=True, update={"rank": rank})
+                for rank, hit in enumerate(hits, start=1)
+            ],
+            elapsed_ms=round(elapsed_ms, 3),
+            input_count=len(before) if before is not None else None,
+            requested_k=requested_k,
+            notes=notes or [],
+            dropped=[
+                RetrievalTraceDrop(chunk_id=hit.chunk_id, reason=reason)
+                for hit in before or []
+                if hit.chunk_id not in retained
+            ],
+            status=status,
+        )
+    )
+
+
+def _rrf_snapshot(hits: list[SearchHit], scores: dict[str, float]) -> list[SearchHit]:
+    return [
+        hit.model_copy(
+            update={"score": round(scores[hit.chunk_id], 8),
+                    "rrf_score": round(scores[hit.chunk_id], 8)}
+        )
+        for hit in sorted(
+            hits, key=lambda item: (-scores[item.chunk_id], item.pdf_page_start, item.chunk_id)
+        )
+    ]
 
 
 def cpc_congress_ordinals(query: str) -> list[str]:
@@ -298,9 +361,11 @@ def fuse_search_responses(
     *,
     top_k: int,
     coverage: str = "auto",
+    trace: list[RetrievalStageTrace] | None = None,
 ) -> SearchResponse:
     """Fuse keyword and semantic rankings with reciprocal-rank fusion."""
 
+    started = _stage_start(trace)
     by_chunk: dict[str, SearchHit] = {}
     scores: dict[str, float] = {}
     for hit in keyword.hits:
@@ -324,6 +389,14 @@ def fuse_search_responses(
         existing.vector_score = hit.score
         scores[hit.chunk_id] += 1.0 / (RRF_K + hit.rank)
 
+    if trace is not None:
+        _record_stage(
+            trace, stage="rrf_fusion", query=keyword.query,
+            hits=_rrf_snapshot(list(by_chunk.values()), scores), started=started,
+            before=[*keyword.hits, *vector.hits],
+            notes=["Reciprocal-rank fusion by chunk ID; no source bonus or model reranker."],
+        )
+    started = _stage_start(trace)
     for chunk_id, hit in by_chunk.items():
         scores[chunk_id] += _source_bonus(
             keyword.query_intent,
@@ -342,13 +415,25 @@ def fuse_search_responses(
             hit.chunk_id,
         ),
     )
+    _record_stage(
+        trace, stage="rule_ranking", query=keyword.query, hits=ranked, started=started,
+        before=list(by_chunk.values()),
+        notes=["Intent/source preference bonus applied to RRF; this is not a model reranker."],
+    )
+    started = _stage_start(trace)
     query_people = keyword.query_people
     if not query_people and any(marker in keyword.query for marker in CAREER_QUERY_MARKERS):
         match = CAREER_LEADING_PERSON.search(keyword.query.strip())
         query_people = [match.group("person")] if match is not None else []
+    before = ranked
     ranked = _career_relevant_hits(ranked, query=keyword.query, query_people=query_people)
+    _record_stage(
+        trace, stage="career_filter", query=keyword.query, hits=ranked, started=started,
+        before=before, reason="no_direct_person_role_change",
+    )
     # A page may yield several adjacent chunks. One result per physical page gives
     # the answer layer a broader, less repetitive evidence set.
+    started = _stage_start(trace)
     preferred_ids = {hit.chunk_id for hit in _best_congress_hits(ranked, keyword.query)}
     unique_by_page: dict[tuple[str, int], SearchHit] = {}
     for hit in ranked:
@@ -359,10 +444,22 @@ def fuse_search_responses(
         ):
             unique_by_page[page_key] = hit
     unique_pages = sorted(unique_by_page.values(), key=lambda hit: ranked.index(hit))
+    _record_stage(
+        trace, stage="page_deduplication", query=keyword.query,
+        hits=unique_pages, started=started, before=ranked, reason="same_document_pdf_page",
+        notes=["Congress evidence preference can replace an earlier chunk from the same page."],
+    )
 
+    started = _stage_start(trace)
     congress_covered = _select_with_congress_coverage(
         unique_pages, query=keyword.query, top_k=top_k
     )
+    _record_stage(
+        trace, stage="congress_coverage", query=keyword.query,
+        hits=congress_covered, started=started, before=unique_pages,
+        reason="outside_congress_coverage_selection",
+    )
+    started = _stage_start(trace)
     selected = _select_with_temporal_coverage(
         congress_covered,
         query=keyword.query,
@@ -372,6 +469,11 @@ def fuse_search_responses(
     )
     for rank, hit in enumerate(selected, start=1):
         hit.rank = rank
+    _record_stage(
+        trace, stage="final", query=keyword.query, hits=selected, started=started,
+        before=congress_covered, reason="outside_coverage_or_top_k", requested_k=top_k,
+        notes=[f"Temporal coverage policy: {coverage}; final result selection."],
+    )
 
     return SearchResponse(
         query=keyword.query,
@@ -384,6 +486,7 @@ def fuse_search_responses(
         include_out_of_scope=keyword.include_out_of_scope,
         hits=selected,
         retrieval_mode="hybrid_rrf",
+        trace=trace,
     )
 
 
@@ -394,7 +497,9 @@ def _single_branch_response(
     failed: str,
     top_k: int,
     coverage: str,
+    trace: list[RetrievalStageTrace] | None = None,
 ) -> SearchResponse:
+    started = _stage_start(trace)
     hits: list[SearchHit] = []
     for hit in response.hits:
         updates: dict[str, object] = {
@@ -406,7 +511,14 @@ def _single_branch_response(
     if not query_people and any(marker in response.query for marker in CAREER_QUERY_MARKERS):
         match = CAREER_LEADING_PERSON.search(response.query.strip())
         query_people = [match.group("person")] if match is not None else []
+    before = hits
     hits = _career_relevant_hits(hits, query=response.query, query_people=query_people)
+    _record_stage(
+        trace, stage="career_filter", query=response.query, hits=hits, started=started,
+        before=before, reason="no_direct_person_role_change",
+        notes=[f"Only {branch} available; no RRF, source bonus or page deduplication executed."],
+    )
+    started = _stage_start(trace)
     selected = _select_with_temporal_coverage(
         hits,
         query=response.query,
@@ -416,12 +528,18 @@ def _single_branch_response(
     )
     for rank, hit in enumerate(selected, start=1):
         hit.rank = rank
+    _record_stage(
+        trace, stage="final", query=response.query, hits=selected, started=started,
+        before=hits, reason="outside_coverage_or_top_k", requested_k=top_k,
+        notes=[f"Temporal coverage policy: {coverage}; degraded {branch}-only selection."],
+    )
     return response.model_copy(
         update={
             "hits": selected,
             "query_people": query_people,
             "retrieval_mode": f"{branch}_only",
             "degraded_components": [failed],
+            "trace": trace,
         }
     )
 
@@ -437,56 +555,137 @@ def _search_one(
     document_ids: list[str] | None,
     include_out_of_scope: bool,
     plan: RetrievalPlan | None,
+    candidate_k: int | None = None,
+    capture_trace: bool = False,
 ) -> SearchResponse:
     congress_count = len(cpc_congress_ordinals(query))
-    candidate_k = min(100, max(30, top_k * 4, congress_count * 12))
+    branch_k = (
+        candidate_k if candidate_k is not None
+        else min(100, max(30, top_k * 4, congress_count * 12))
+    )
     search_query = expand_query(query)
+    keyword_trace: list[RetrievalStageTrace] | None = [] if capture_trace else None
+    vector_trace: list[RetrievalStageTrace] | None = [] if capture_trace else None
     keyword: SearchResponse | None = None
     vector: SearchResponse | None = None
     keyword_error: Exception | None = None
     vector_error: Exception | None = None
 
     def keyword_branch() -> SearchResponse:
-        result = search_keyword_index(
-            index_path=keyword_index_path,
-            query=search_query,
-            aliases_path=aliases_path,
-            top_k=candidate_k,
-            document_ids=document_ids,
-            include_out_of_scope=include_out_of_scope,
-            plan=plan,
+        started = _stage_start(keyword_trace)
+        try:
+            result = search_keyword_index(
+                index_path=keyword_index_path,
+                query=search_query,
+                aliases_path=aliases_path,
+                top_k=branch_k,
+                document_ids=document_ids,
+                include_out_of_scope=include_out_of_scope,
+                plan=plan,
+            )
+        except Exception as exc:
+            _record_stage(
+                keyword_trace, stage="keyword_candidates", query=search_query, hits=[],
+                started=started, requested_k=branch_k, status="failed",
+                notes=[f"Backend failed: {type(exc).__name__}"],
+            )
+            raise
+        _record_stage(
+            keyword_trace, stage="keyword_candidates", query=search_query,
+            hits=result.hits, started=started, requested_k=branch_k,
+            notes=["Backend-returned keyword order includes existing BM25/source rules."],
         )
         congress_hits: list[SearchHit] = []
         if congress_count >= 2:
             for ordinal in cpc_congress_ordinals(query):
                 formal_name = f"中国共产党第{ordinal}次全国代表大会"
-                targeted = search_keyword_index(
-                    index_path=keyword_index_path,
-                    query=formal_name,
-                    aliases_path=aliases_path,
-                    top_k=24,
-                    document_ids=document_ids,
-                    include_out_of_scope=include_out_of_scope,
-                    section_path_contains=f"第{ordinal}次全国代表大会",
-                    plan=plan,
+                targeted_k = min(24, candidate_k) if candidate_k is not None else 24
+                started = _stage_start(keyword_trace)
+                try:
+                    targeted = search_keyword_index(
+                        index_path=keyword_index_path,
+                        query=formal_name,
+                        aliases_path=aliases_path,
+                        top_k=targeted_k,
+                        document_ids=document_ids,
+                        include_out_of_scope=include_out_of_scope,
+                        section_path_contains=f"第{ordinal}次全国代表大会",
+                        plan=plan,
+                    )
+                except Exception as exc:
+                    _record_stage(
+                        keyword_trace, stage="keyword_targeted_candidates", query=formal_name,
+                        hits=[], started=started, requested_k=targeted_k, status="failed",
+                        notes=[f"Extra congress lookup failed: {type(exc).__name__}"],
+                    )
+                    raise
+                _record_stage(
+                    keyword_trace, stage="keyword_targeted_candidates", query=formal_name,
+                    hits=targeted.hits, started=started, requested_k=targeted_k,
+                    notes=[
+                        f"Additional congress lookup beyond main candidate_k={branch_k}; "
+                        f"section filter: 第{ordinal}次全国代表大会.",
+                    ],
                 )
                 best_hits = _best_congress_hits(targeted.hits, query)
                 if best_hits:
                     congress_hits.append(best_hits[0])
+            started = _stage_start(keyword_trace)
+            before = [*congress_hits, *result.hits]
             result = _prepend_congress_keyword_hits(result, congress_hits)
+            if candidate_k is not None:
+                result = result.model_copy(update={"hits": result.hits[:candidate_k]})
+            _record_stage(
+                keyword_trace, stage="keyword_candidates_augmented", query=search_query,
+                hits=result.hits, started=started, before=before,
+                reason="outside_augmented_candidate_budget", requested_k=candidate_k,
+                notes=[
+                    "Prepended one selected hit per congress and merged duplicate chunk IDs.",
+                    f"Extra keyword lookups: {congress_count}; "
+                    f"requested hits per extra lookup: {targeted_k}.",
+                    "Fixed candidate_k caps the augmented branch output; "
+                    "it does not cap the sum of main and congress backend requests."
+                    if candidate_k is not None else
+                    "Legacy congress expansion can exceed the main branch candidate budget.",
+                ],
+            )
         return result
 
     def vector_branch() -> SearchResponse:
-        return search_vector_index(
-            index_path=vector_index_path,
-            model_cache_dir=model_cache_dir,
-            aliases_path=aliases_path,
-            query=search_query,
-            top_k=candidate_k,
-            document_ids=document_ids,
-            include_out_of_scope=include_out_of_scope,
-            plan=plan,
+        started = _stage_start(vector_trace)
+        try:
+            result = search_vector_index(
+                index_path=vector_index_path,
+                model_cache_dir=model_cache_dir,
+                aliases_path=aliases_path,
+                query=search_query,
+                top_k=branch_k,
+                document_ids=document_ids,
+                include_out_of_scope=include_out_of_scope,
+                plan=plan,
+            )
+        except Exception as exc:
+            _record_stage(
+                vector_trace, stage="vector_candidates", query=search_query, hits=[],
+                started=started, requested_k=branch_k, status="failed",
+                notes=[f"Backend failed: {type(exc).__name__}"],
+            )
+            raise
+        notes = ["Backend-returned vector order; internal candidates are not exposed here."]
+        if (
+            result.query_years and result.query_intent == "timeline"
+            and not (bool(plan and plan.query_year_range) or has_explicit_year_range(search_query))
+        ):
+            notes.append(
+                "Native vector backend internally requests "
+                f"{min(500, max(100, branch_k * 20))} points for exact-year heading preference "
+                f"before returning at most {branch_k}; internal ranking is unobserved."
+            )
+        _record_stage(
+            vector_trace, stage="vector_candidates", query=search_query,
+            hits=result.hits, started=started, requested_k=branch_k, notes=notes,
         )
+        return result
 
     with ThreadPoolExecutor(max_workers=2, thread_name_prefix="retrieval") as executor:
         keyword_future = executor.submit(keyword_branch)
@@ -508,15 +707,18 @@ def _search_one(
                 extra={"context": {"error": type(exc).__name__}},
             )
     coverage = plan.coverage if plan is not None else "auto"
+    trace = [*(keyword_trace or []), *(vector_trace or [])] if capture_trace else None
     if keyword is not None and vector is not None:
-        return fuse_search_responses(keyword, vector, top_k=top_k, coverage=coverage)
+        return fuse_search_responses(keyword, vector, top_k=top_k, coverage=coverage, trace=trace)
     if keyword is not None:
         return _single_branch_response(
-            keyword, branch="keyword", failed="vector", top_k=top_k, coverage=coverage
+            keyword, branch="keyword", failed="vector", top_k=top_k, coverage=coverage,
+            trace=trace,
         )
     if vector is not None:
         return _single_branch_response(
-            vector, branch="vector", failed="keyword", top_k=top_k, coverage=coverage
+            vector, branch="vector", failed="keyword", top_k=top_k, coverage=coverage,
+            trace=trace,
         )
     cause = vector_error or keyword_error
     raise RetrievalError("Keyword and vector retrieval are both unavailable.") from cause
@@ -528,7 +730,9 @@ def _fuse_query_variants(
     query: str,
     top_k: int,
     plan: RetrievalPlan,
+    trace: list[RetrievalStageTrace] | None = None,
 ) -> SearchResponse:
+    started = _stage_start(trace)
     by_chunk: dict[str, SearchHit] = {}
     scores: dict[str, float] = {}
     for response in responses:
@@ -548,11 +752,26 @@ def _fuse_query_variants(
         by_chunk.values(),
         key=lambda hit: (-scores[hit.chunk_id], hit.pdf_page_start, hit.chunk_id),
     )
+    if trace is not None:
+        _record_stage(
+            trace, stage="variants_rrf_fusion", query=query,
+            hits=_rrf_snapshot(ranked, scores), started=started,
+            before=[hit for response in responses for hit in response.hits],
+            notes=["RRF over each query's already-selected results, not raw branch candidates."],
+        )
+    started = _stage_start(trace)
     query_people = responses[0].query_people or plan.query_people
     if not query_people and any(marker in query for marker in CAREER_QUERY_MARKERS):
         person_match = CAREER_LEADING_PERSON.search(query.strip())
         query_people = [person_match.group("person")] if person_match is not None else []
+    before = ranked
     ranked = _career_relevant_hits(ranked, query=query, query_people=query_people)
+    _record_stage(
+        trace, stage="variants_career_filter", query=query,
+        hits=_rrf_snapshot(ranked, scores) if trace is not None else ranked,
+        started=started, before=before, reason="no_direct_person_role_change",
+    )
+    started = _stage_start(trace)
     unique_pages: list[SearchHit] = []
     pages: set[tuple[str, int]] = set()
     for hit in ranked:
@@ -560,6 +779,12 @@ def _fuse_query_variants(
         if page not in pages:
             pages.add(page)
             unique_pages.append(hit)
+    _record_stage(
+        trace, stage="variants_page_deduplication", query=query,
+        hits=_rrf_snapshot(unique_pages, scores) if trace is not None else unique_pages,
+        started=started, before=ranked, reason="same_document_pdf_page",
+    )
+    started = _stage_start(trace)
     if plan.coverage == "per_item":
         reserved: list[SearchHit] = []
         reserved_ids: set[str] = set()
@@ -583,6 +808,15 @@ def _fuse_query_variants(
         hit.rank = rank
         hit.rrf_score = round(scores[hit.chunk_id], 8)
         hit.score = hit.rrf_score
+    _record_stage(
+        trace, stage="final", query=query, hits=selected, started=started,
+        before=unique_pages, reason="outside_coverage_or_top_k", requested_k=top_k,
+        notes=[
+            f"Query-variant merge coverage policy: {plan.coverage}; final retrieval selection.",
+            "Per-item reservations may reintroduce a same-page chunk from a query result."
+            if plan.coverage == "per_item" else "No per-item reservations applied.",
+        ],
+    )
     degraded = sorted(
         {component for response in responses for component in response.degraded_components}
     )
@@ -608,6 +842,7 @@ def _fuse_query_variants(
         retrieval_mode="planned_hybrid_rrf",
         degraded_components=degraded,
         coverage_gaps=coverage_gaps,
+        trace=trace,
     )
 
 
@@ -623,7 +858,20 @@ def search_hybrid_index(
     include_out_of_scope: bool = False,
     plan: RetrievalPlan | None = None,
     additional_queries: list[str] | None = None,
+    candidate_k: int | None = None,
+    capture_trace: bool = False,
 ) -> SearchResponse:
+    """Retrieve with optional fixed branch budgets and immutable stage snapshots.
+
+    candidate_k is per query and per main retrieval branch, not a global budget:
+    congress lookups and native exact-year vector overfetch are recorded in trace
+    notes when capture_trace is enabled. No prompt construction is traced here.
+    """
+    if candidate_k is not None and (
+        not isinstance(candidate_k, int) or isinstance(candidate_k, bool)
+        or not 1 <= candidate_k <= 100 or candidate_k < top_k
+    ):
+        raise RetrievalError("candidate_k must be an integer in 1..100 and >= top_k.")
     queries = list(dict.fromkeys([query, *(additional_queries or [])]))
     responses = [
         _search_one(
@@ -636,9 +884,27 @@ def search_hybrid_index(
             document_ids=document_ids,
             include_out_of_scope=include_out_of_scope,
             plan=plan,
+            candidate_k=candidate_k,
+            capture_trace=capture_trace,
         )
         for item in queries
     ]
+    trace = None
+    if capture_trace and len(responses) > 1:
+        trace = [
+            stage.model_copy(update={"stage": "query_final"})
+            if stage.stage == "final" else stage
+            for response in responses for stage in response.trace or []
+        ]
     if plan is not None and len(responses) > 1:
-        return _fuse_query_variants(responses, query=query, top_k=top_k, plan=plan)
+        return _fuse_query_variants(responses, query=query, top_k=top_k, plan=plan, trace=trace)
+    if trace is not None:
+        started = _stage_start(trace)
+        _record_stage(
+            trace, stage="final", query=query, hits=responses[0].hits,
+            started=started, requested_k=top_k,
+            notes=["No retrieval plan: additional queries executed but were not merged "
+                   "(existing production behavior); returning the primary query's results."],
+        )
+        return responses[0].model_copy(update={"query": query, "trace": trace})
     return responses[0].model_copy(update={"query": query})
