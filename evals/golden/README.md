@@ -1,12 +1,12 @@
 # Unified RAG Golden Benchmark
 
-本轮六题本地对照结果和交付状态见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，真实模型待确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
+六题真实模型结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
 ## v2设计与六题试点入口
 
 当前v2处于草案和工具验证阶段：`design_v2.json`有30个具体候选问题（20开发、10保留），`pilot_annotations.json`有6个开发试点（5可答、1拒答）及48条Agent暂定候选判断，全部人工复核仍为pending。**这不是已完成的30题正式Golden。** 保留题不进入当前调参和试点运行。
 
-设计、实际指标口径和 `pilot collect/score/compare`、`pilot_review build/import` 流程见 [DESIGN_V2.md](DESIGN_V2.md)。v2试点已支持证据组Recall、以K为分母的Precision和处理未知候选的MRR；nDCG尚未实现评分，正式人工指标待复核。默认无LLM，真实LLM实验尚未执行，外发问题和证据前须取得相应授权。
+设计、实际指标口径和 `pilot collect/score/compare`、`pilot_review build/import` 流程见 [DESIGN_V2.md](DESIGN_V2.md)。v2试点已支持证据组Recall、以K为分母的Precision和处理未知候选的MRR；nDCG尚未实现评分，正式人工指标待复核。默认运行无LLM；本次六题已在用户明确授权后完成真实LLM实验。
 
 **以下各节描述旧v1的12题数据集、`evaluation.golden`与 `eval golden` 命令；v1和v2试点的数据、指标及报告不能混用。**
 

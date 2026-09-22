@@ -1,0 +1,1691 @@
+{
+  "schema_version": 1,
+  "status": "agent_review_human_pending",
+  "reviewed_at": "2026-09-22T12:49:19.036445+00:00",
+  "capture_path": "data/reports/eval_pilot_v2/live_capture.json",
+  "capture_canonical_sha256": "4de743197bd1bd4e04d6514976cf02f4f903c102ebf0fe96efb393abb389e3bd",
+  "capture_file_sha256": "3202e07299fd554d08af88cc10edb1b30c6eedfa9c183ffcb7cf8713cac8fe16",
+  "source_sha256": "aecdc9dcf9438bf5d97a7ba62f3485a3397997304a46ee562ba968115fa72edd",
+  "base_annotation_sha256": "c66b79038fc69cf38364aad4cd5ba7d0c7257ff48f78cac14746b79523ff17d3",
+  "augmented_annotation_sha256": "975dd726aa266b6982d534c15963427f59fa90c79605c2188af08def31cd6cbb",
+  "new_judgments": 72,
+  "total_judgments": 120,
+  "rubric": {
+    "fact_coverage": "covered only counts as full; partial gets no fractional credit; current source-date conflict remains explicit",
+    "answer_span": "May join several passages or remove formatting; answer_span_is_verbatim distinguishes exact substrings from combined excerpts. Complete delivered answer is preserved alongside.",
+    "support": "Evaluate delivered answer against cited excerpts; source provenance alone does not establish entailment.",
+    "approval": "All judgments remain agent_review; no human approval was entered."
+  },
+  "cases": [
+    {
+      "case_id": "pilot_exact_deng_1952_appointment",
+      "fact_reviews": [
+        {
+          "status": "covered",
+          "answer_span": "1952年8月7日，邓小平被任命为**政务院副总理**[E1][E2]",
+          "cited_evidence_ids": [
+            "E1",
+            "E2"
+          ],
+          "support_status": "supported",
+          "reason": "时间、人物、任命和政务院副总理完整对应；E1脚注和E2直接任命句均支持。",
+          "fact_id": "appointed_vice_premier",
+          "answer_span_is_verbatim": true
+        }
+      ],
+      "forbidden_findings": [],
+      "constraint_findings": [],
+      "overall": "核心事实完整且引用支持；未误写为国务院副总理。应用删除一条资料限制句，最终核心内容不受影响。",
+      "judgments": [
+        {
+          "unit_id": "f339523441ae7ff0de261c97ec93fec6740ba61c85ec1731ef26c336db98ede0",
+          "relevance": 2,
+          "supported_groups": [
+            "appointment"
+          ],
+          "reason": "脚注明确列出1952年8月7日任命邓小平为政务院副总理，直接支持目标任命。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "5b6b80ba9b627043eb233fd59a728fa40f63d82b257ba041f87fd174e0cca9db",
+          "relevance": 2,
+          "supported_groups": [
+            "appointment"
+          ],
+          "reason": "裁剪片段仍保留8月7日任命邓小平为政务院副总理的原句，所属1952年文献段与E1交叉支持。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "9de7909bf1864e140f322caf535f9201c536bee9d585792b2b4d64bf5949da7c",
+          "relevance": 1,
+          "supported_groups": [],
+          "reason": "保留7月赴中央工作的调任背景，任命名单为四川政府人员，不能替代8月7日邓小平的任命。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "db8ba2af1b97e99b39010e3843d69c817407a1f654d6b654b49e703a9b89f428",
+          "relevance": 1,
+          "supported_groups": [],
+          "reason": "八月到中央后的党组任职与政务会议属于同期背景，未给出8月7日政务院副总理任命。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "9450875f5c7e0114fd7e56358991fd88c8edcd09ed3ebf8ff615b5f628ce51cb",
+          "relevance": 0,
+          "supported_groups": [],
+          "reason": "十二月西藏工委工作批示与目标任命无关。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "6c74b321af9bf21c40cea67f9b4a097cba194de962643648383420d1d21a5570",
+          "relevance": 0,
+          "supported_groups": [],
+          "reason": "三反五反和西南干部工作未涉及8月7日中央任命。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "279ee909fb22eb34fb9d16c752c3d646cff5d78e1181cc42f1ae9e62ca499399",
+          "relevance": 0,
+          "supported_groups": [],
+          "reason": "十月高校教师思想改造会议与目标日期及任命职务无关。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "dddce59fdeefea777bb82937e31731d693eabe2274d98fa3b54123b1b28a94f7",
+          "relevance": 0,
+          "supported_groups": [],
+          "reason": "十一月扩大会议和过渡计划讨论只有普通参会或收信提及，不支持八月任命。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "f9a6b3b49268916da560a0266c7748af725b01c6ba05999d90275b172085d796",
+          "relevance": 0,
+          "supported_groups": [],
+          "reason": "九月会议及黄炎培讲稿批示与目标任命无关。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        },
+        {
+          "unit_id": "8ffaf59c91b1fb8496dab192936ac89c1e9d22d1250d89f6d82e2434deefdca5",
+          "relevance": 0,
+          "supported_groups": [],
+          "reason": "八月大米贸易和军需等工作记录没有邓小平任命，普通名单出现不构成支持。",
+          "reviewer": "agent:root",
+          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
+          "basis": "agent_review"
+        }
+      ],
+      "delivered_answer": "根据现有证据，1952年8月7日，邓小平被任命为**政务院副总理**[E1][E2]。\n\n- **任命时间与职务**：1952年8月7日，中央人民政府第十七次会议任命邓小平为政务院副总理[E1]。《邓小平年谱》亦记载“8月7日中央人民政府任命邓小平为政务院副总理”[E2]。",
+      "delivered_citations": [
+        {
+          "evidence_id": "E1",
+          "document_id": "zhou_enlai_chronology_1949_1976",
+          "document": "周恩来年谱（1949—1976）",
+          "volume": "上、中、下卷",
+          "pdf_page": 550,
+          "pdf_page_end": null,
+          "section": [
+            "1952年"
+          ],
+          "quote": "……（三）建议邓小平担任副总理，并于八月来京主持一段时间的政务院工作。〔注〕（四）“三反”、“五反”已过，我可不再担任中央机关总党委书记，提议以安子文为第一书记、杨尚昆为第二书记、萧华为第三书记。本日，毛泽东批示同意。〔注〕一九五二年八月七日，中央人民政府第十七次会议任命邓小平为政务院副总理。【1952 年7 月13 日】△受权发表两项声明：（一）承认并严格执行一九二五年六月在日内瓦订立的、一九二九年八月以中国名义加入的《关于禁用毒气或类似毒品及细菌方法作战议定书》。（二）承认一九四九年八月在日内瓦以中国名义签字的《改善战地武装部队伤者病者境遇之公约》、《改善海上武装部队伤者病者及遇船难者境遇之公约》、《关于战俘待遇之公约》和《关于战时保护平民之公约》。【1952 年7 月14 日】△就李克农请示是否接受对方十三日提出的遣返我方八万三千名战俘的所谓新方案一事复电：",
+          "source_type": "chronology",
+          "verification_status": "metadata_checked",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1925,
+            1929,
+            1949,
+            1952
+          ]
+        },
+        {
+          "evidence_id": "E2",
+          "document_id": "deng_xiaoping_chronology_1904_1974_middle",
+          "document": "邓小平年谱（1904—1974）中卷",
+          "volume": "中卷",
+          "pdf_page": 420,
+          "pdf_page_end": null,
+          "section": [
+            "1952年"
+          ],
+          "quote": "……”8月7日中央人民政府任命邓小平为政务院副总理。8月8日出席中央人民政府委员会第十八次会议并作关于西南区工作情况的报告，提出加紧搞好西南工作，迎接全国计划经济建设。说：西南地区一九五二年工作，在抗美援朝、土地改革、镇压反革命三大运动取得胜利的基础上，又进行了爱国增产运动、工矿企业的民主改革运动、学校的民主改革运动。以后紧接着“三反”、“五反”运动，运动不但完成了，而且推动了其他重要工作的进行。结果证明：西南不是共产主义，而是真正的新民主主义社会，因为资本主义因素还有发展，资本家还能赚钱。“三反”、“五反”运动推动了工矿企业、工商业界及学校民主改革运动的进行，巩固了统一战线。",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1952
+          ]
+        }
+      ],
+      "human_review_status": "pending"
+    },
+    {
+      "case_id": "pilot_semantic_deng_1962_agriculture",
+      "annotation_status": "agent_review_human_pending",
+      "judgments": [
+        {
+          "unit_id": "101bd1a00a9ef0040cc66e39848c4bb32869a2367fb13201da9d19bf5bb3523a",
+          "relevance": 1,
+          "reason": "邓小平3月29日对恢复农业组织方式的判断，与7月观点有直接思想背景关系，但不是7月材料；日期限定未满足，不支持任何7月必要证据组。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "4cc60680655113da252043ead843136a6aea6c7c43504e39377a3a829b14a2ae",
+          "relevance": 0,
+          "reason": "实际为11月22日农村党支部及政权组织设置和干部管理，不是7月如何选择农业生产形式的标准；同有组织一词不能补足月份及议题错配。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "3aedeb76fda7efcb10895c38f930e7ee64ed9cb97037e2bce0bd25f6e071d70a",
+          "relevance": 2,
+          "reason": "7月正文明确有利恢复就用何种办法、形式要多样及不要千篇一律，完整支持实效和多样组；群众要求总有道理尚不满计另组所要求的群众愿意采用何种就采用何种，留人工复核。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "practical_recovery",
+            "diversity"
+          ]
+        },
+        {
+          "unit_id": "a882f49ede6b900dd5bdcf13a6bbe878bdac420459b42de935e1856731f3d98d",
+          "relevance": 0,
+          "reason": "1961年12月粮食征购、水利和群众运动讲话，既非1962年7月，也未谈该月选择农业生产组织形式的标准。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "6b708658b75b5a80fe27d76886577d6a8b8722acba21f8cd4732e7238e7a8ede",
+          "relevance": 1,
+          "reason": "7月31日转报陈云赞同农业集体经济决定草案的信，是本题同月政策背景；主要意见属于陈云、批示属于毛泽东，不支持邓小平三项原则。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "87de75bbcf71b9fef81e394c9d1f73b58d53b3016682451fe0c4ad747bd0e7f5",
+          "relevance": 1,
+          "reason": "包含7月2日讨论恢复农业的条目起始和6月下旬分田到户谈话，为相邻目标原文的来源线索；7月观点正文在下一页，不能把6月意见直接计作7月证据。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "11bcdc89751e8fc0168e9da05125c6397d2549f37f9b0c4b25912bb82f6b7777",
+          "relevance": 1,
+          "reason": "本实际提示片段仅保留讲话收入《怎样恢复农业生产》的出处线索及7月8日下一条开头；原页关于实效和群众意愿的正文已被裁掉，不能继承整页的直接支持标签。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "1af0f3de81084ae5e5b2e99e58d6977b5d36c85f36f234d3ab66b3b5c1ee9cab",
+          "relevance": 1,
+          "reason": "邓小平3月29日对恢复农业组织方式的判断，与7月观点有直接思想背景关系，但不是7月材料；日期限定未满足，不支持任何7月必要证据组。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "44e7869e2528346b6fd4bb129433e1e0095b7d6afdd4c27c22d5241775eb9de9",
+          "relevance": 1,
+          "reason": "同年7月毛泽东反对包产到户和中央文件起草是相同议题的背景；不能把毛泽东态度或共同参会名单当作邓小平判断原则。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "fac550c0418dcb6866c37e753fa216cd1e891766e4e4427319837e00c04194b4",
+          "relevance": 1,
+          "reason": "7月陈云致信赞同公社决定草案，邓小平批拟同意，是同月政策背景；信中文字不能转成邓小平关于选择组织形式的标准。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ac3094be823010b122da32832572069df11ce08faba1cde16875ec477d530d64",
+          "relevance": 0,
+          "reason": "实际为11月22日农村党支部及政权组织设置和干部管理，不是7月如何选择农业生产形式的标准；同有组织一词不能补足月份及议题错配。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ce50317e9a044d92f8f40c16eb21469f0ec39c5c462a91036b4ab9df242cfc81",
+          "relevance": 1,
+          "reason": "7月8日会议及陈云主张分田到户的背景，涉及同月同一争论；具体主张出自陈云而非邓小平，不支持其判断原则。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "42c6a5fbe5fd5a7b9ecf38b939c0075c52f0cbd1231abf1453ae7b5520028e4a",
+          "relevance": 2,
+          "reason": "7月正文明确有利恢复就用何种办法、形式要多样及不要千篇一律，完整支持实效和多样组；群众要求总有道理尚不满计另组所要求的群众愿意采用何种就采用何种，留人工复核。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "practical_recovery",
+            "diversity"
+          ]
+        },
+        {
+          "unit_id": "00ce33d4b34a7e5f3f85d324ce1af724f8712465aae754036098a50775f62b86",
+          "relevance": 0,
+          "reason": "1961年12月粮食征购、水利和群众运动讲话，既非1962年7月，也未谈该月选择农业生产组织形式的标准。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "e30c4b92d4b46acc6e99f99e17d3218fb2f336be670fb66b80381a7e186cf2f8",
+          "relevance": 1,
+          "reason": "7月31日转报陈云赞同农业集体经济决定草案的信，是本题同月政策背景；主要意见属于陈云、批示属于毛泽东，不支持邓小平三项原则。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "7d69c1bbf1f0332122404d05b7225398efd2139b398f8cacb7b3da5066fa25f7",
+          "relevance": 1,
+          "reason": "包含7月2日讨论恢复农业的条目起始和6月下旬分田到户谈话，为相邻目标原文的来源线索；7月观点正文在下一页，不能把6月意见直接计作7月证据。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        }
+      ],
+      "fact_reviews": [
+        {
+          "fact_id": "practical_standard",
+          "status": "covered",
+          "answer_span": "不管是黄猫、黑猫，在过渡时期，哪一种方法有利于恢复，就用哪一种方法。",
+          "cited_evidence_ids": [
+            "E7"
+          ],
+          "support_status": "supported",
+          "reason": "正文7月部分直接表达按能否恢复农业选择方法，E7保留该原文。简明结论另误挂3月E2，作为独立时间/引用缺陷记录，不抹去后文已覆盖的实效事实。",
+          "answer_span_is_verbatim": true
+        },
+        {
+          "fact_id": "respect_preference",
+          "status": "missing",
+          "answer_span": null,
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable",
+          "reason": "正文没有明确表达尊重群众愿意采用的形式。正文只提普遍存在和应研究分田/包产；不能将E7引用原文中未复述的群众要求、或召回整页386的群众意愿句，替正文补全。",
+          "answer_span_is_verbatim": false
+        },
+        {
+          "fact_id": "allow_diversity",
+          "status": "covered",
+          "answer_span": "要肯定，形式要多样。公社、大队为基础都可以，不要轻易否定一种。",
+          "cited_evidence_ids": [
+            "E7"
+          ],
+          "support_status": "supported",
+          "reason": "正文还明确写实事求是、不要千篇一律；E7直接支持，语义完整。",
+          "answer_span_is_verbatim": true
+        }
+      ],
+      "forbidden_findings": [
+        {
+          "claim": "邓小平要求全国只能采用一种固定的农业组织形式",
+          "violated": false,
+          "reason": "正文明确主张形式多样、反对千篇一律。"
+        }
+      ],
+      "constraint_findings": [
+        {
+          "constraint": "1962年7月时间限定与引用支持",
+          "status": "fail",
+          "answer_span": "1962年7月，邓小平判断农业生产组织形式的核心原则是：**哪种办法在哪些地方见效快，就用哪种办法，不要拘泥于形式**[E2]。",
+          "evidence_ids": [
+            "E2"
+          ],
+          "reason": "E2条目明确为1962年3月29日，不能直接证明该引语在7月；正文其后正确注明3月29日，但不能解除总结及资料限制的错挂。"
+        },
+        {
+          "constraint": "资料限制描述应准确",
+          "status": "fail",
+          "answer_span": "直接记载邓小平1962年7月对农业生产组织形式判断的材料主要是[E7]和[E2]",
+          "evidence_ids": [
+            "E2",
+            "E7"
+          ],
+          "reason": "E7确为7月；E2是3月，称两者都直接记载7月不成立。"
+        },
+        {
+          "constraint": "回答应覆盖题目必要观点",
+          "status": "fail",
+          "reason": "缺少群众选择原则；不需要补答未问及的7月9日后态度变化。"
+        }
+      ],
+      "process_findings": [
+        {
+          "stage": "context_selection",
+          "status": "evidence_lost",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "pdf_page": 386,
+          "production_unit_id": "12af8cb81be4e22dddf9111897534ca196563d18c73f2ec93a464a8e7ac967af",
+          "generation_unit_id": "11bcdc89751e8fc0168e9da05125c6397d2549f37f9b0c4b25912bb82f6b7777",
+          "production_text": "1962年7月大好形势，垮不了台。我们的人民是团结的，是相信党，相信毛主席能够领导大家克服困难好起来的。经济形势是不大好，情况还不能一下子改变过来，主要决定于农业的恢复。农业要恢复，主要是两个方面的政策，一是把农民的积极性调动起来，一是工业支援农业。调动农民的积极性，主要还得从生产关系上解决。生产关系究竞以什么形式为最好，恐怕要采取这样一种态度，就是哪种形式在哪个地方能够比较容易比较快地恢复和发展农业生产，就采取哪种形式：群众愿意采取哪种形式，就应该采取哪种形式，不合法的使它合法起来，就像四川话“黄猫、黑猫，只要捉住老鼠就是好猫”。现在看来，不论工业还是农业，非退一步不能前进。关于工业支援农业，第一，为农业服务的工业生产不能减弱，还要改善。第二，工业着重解决人民吃、穿、用的问题，减轻农业的负担。现在看来，我们可以找到一条在比较短的时间内恢复国民经济的道路。在谈到青年团的问题时指出：团一定要有自已的系统领导，要有自已的经常工作，包括于部问题，团也要管。团的编制别人不能动。以后，不仅青年团，各种群众组织，工会、妇联都是这样，党委不能随便乱增乱减编制。党对团的领导，要通过团的组织。各级党委要注意团的反映，忽略了这一点是不正确的。团对党是可以提意见的，应该提意见，这是合法的，是按照党章办事。各级党委要讨论团的工作，哪怕一年讨论一次两次也好，讨论得多一点更好。团的领导骨干应该加强，在整编期间，最好把各级团的力量调整--下。这篇讲话中关于国内形势的一部分已收入《邓小平文选》第一卷，题为《怎样恢复农业生产》。7月8日出席毛泽东主持召开的会议。毛泽东在会上介",
+          "generation_text": "……这篇讲话中关于国内形势的一部分已收入《邓小平文选》第一卷，题为《怎样恢复农业生产》。7月8日出席毛泽东主持召开的会议。毛泽东在会上介",
+          "lost_required_quote": "群众愿意采取哪种形式，就应该采取哪种形式",
+          "reason": "真实生成请求E1只保留出处说明与下一条开头，必要群众意愿原文未进入生成上下文。不能由同一页号推定提示中仍有证据。"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "required_facts_total": 3,
+        "covered": 2,
+        "partial": 0,
+        "missing": 1,
+        "contradicted": 0,
+        "strict_required_fact_recall": 0.6666666666666666,
+        "citation_support": "fail",
+        "source_constraint": "not_applicable",
+        "time_constraint": "fail",
+        "refusal": "not_applicable",
+        "generator_mode": "llm",
+        "llm_status": "used",
+        "reason": "两项观点有实际正文及E7支持；群众意愿缺失，3月E2被当作7月直接证据。判断为Agent暂定，未经人工Golden复核。"
+      },
+      "delivered_answer": "### 简明结论\n1962年7月，邓小平判断农业生产组织形式的核心原则是：**哪种办法在哪些地方见效快，就用哪种办法，不要拘泥于形式**[E2]。他倾向于**形式要多样，不要轻易否定某一种形式**，并赞成认真研究分田到户或包产到户[E7]。\n\n### 主要观点与依据\n\n**1. 原则性判断：不拘泥于形式，以见效快为准**\n- 1962年3月29日，邓小平在主持中共中央书记处会议、听取陈正人关于河南调查情况的汇报时，针对“恢复农业生产是依靠集体，还是依靠个人”的问题指出：**“原则是哪种办法在哪些地方见效快，就用哪种办法。不要拘泥于形式。”**[E2]\n\n**2. 7月间的具体判断：形式要多样，不轻易否定分田或包产到户**\n- 1962年7月，邓小平说：**“现在所有的形式中，农业是单干搞得好。不管是黄猫、黑猫，在过渡时期，哪一种方法有利于恢复，就用哪一种方法。”** 他赞成认真研究一下分田或者包产到户究竟存在什么问题，因为相当普遍；**“不要一口否定，不要在否定的前提下去搞。要肯定，形式要多样。公社、大队为基础都可以，不要轻易否定一种。”** 他还指出，现在大队是少数，小队也发生了问题，**“不如包产到户。分田到户也有好的。过渡时期，要多种多样。退的时期，退够才能进。总之，要实事求是，不要千篇一律，这几年就是千篇一律。”**[E7]\n\n**3. 对陈云意见的态度**\n- 1962年7月，邓小平提到：**“陈云同志作了调查，讲了些道理，意见提出是好的。”** 并说**“陈云同志也赞成多种多样，他提出分田单干允不允许？是否就是不好的？”**[E7]\n- 同年6月下旬，邓小平曾同陈云交换对分田到户的看法，认为：**“分田到户是一种方式，可以用各种各样的方式。”**[E10]\n\n### 资料限制\n现有证据中，直接记载邓小平1962年7月对农业生产组织形式判断的材料主要是[E7]和[E2]；[E3]显示7月8日毛泽东已表明反对包产到户的态度，但未直接记载邓小平在7月8日会议上的具体表态。关于邓小平在7月9日以后是否因毛泽东态度而调整其判断，现有证据未提供直接材料。",
+      "delivered_citations": [
+        {
+          "evidence_id": "E2",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 369,
+          "pdf_page_end": null,
+          "section": [
+            "1962年"
+          ],
+          "quote": "1962年3月外贸易管理、设立海关和金银外币管理的意见》。3月23日一4月18日出席全国政协三届三次会议。3月23目主持召开中共中央书记处会议，讨论中共中央给苏共中央和印尼共产党中央的复信稿。3月26日出席中共中央政治局会议，讨论周恩来准备在二届全国人大三次会议作的《政府工作报告》稿、一九六〇年国民经济计划执行情况和一九六一年国民经济主要统计指标等。3月27日一4月16日出席二届全国人大三次会议。3月28日阅商业部要求将此前调离的一部分局长、处长调回，以便早日把专业公司建立起来的请示报告，批示：“交组织部商调，凡非十分困难者，一律照调。”3月29日上午，主持召开中共中央书记处会议，听取陈正人（1）在河南调查情况的汇报，讨论河南、山东、河北由于引黄灌溉及其他水利设施不当所造成的后果和当前所要采取的补救措施。在陈正人汇报到恢复农业生产是依靠集体，还是依靠个人的问题时指出：原则是哪种办法在哪些地方见效快，就用哪种办法。不要拘泥于形式，……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1960,
+            1961,
+            1962
+          ]
+        },
+        {
+          "evidence_id": "E3",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 387,
+          "pdf_page_end": null,
+          "section": [
+            "1962年"
+          ],
+          "quote": "1962年7月绍河南、山东两省的夏收情况，说形势并不那么坏，建议刘少奇、周恩来、邓小平找河南、山东的同志谈谈，了解一下农村的形势。毛泽东表明了对包产到户的反对态度，指定陈伯达为中共中央起草一个关于巩固人民公社集体经济、发展农业生产的决定。九日、十日，和刘少奇、周恩来先后同刘建勋、谭启龙〔1〕谈话了解情况。7月9日下午，主持召开中共中央书记处会议，讨论七月下旬召开中央工作会议的准备工作。会议决定：成立九人起草委员会，由陈伯达主持起草中共中央关于巩固人民公社集体经济、发展农业生产的决定；由李先念主持起草市场物价、粮食和改进商业体制问题的文件。7月11日一13日和周恩来、林彪、彭真等听取孙志远、张连奎、王秉璋〔2）关于国防工业问题的汇报。十一日在听取孙志远汇报三机部所属企业的生产能力时指出：军工企业首先要定性质、定产品任务，定了以后，一定时间内不能改变。在谈到企业管理时指出：“工业七十条”明确规定了行政上由厂长负责，书记不干预日常事务……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1962
+          ]
+        },
+        {
+          "evidence_id": "E7",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 385,
+          "pdf_page_end": null,
+          "section": [
+            "1962年"
+          ],
+          "quote": "1962年7月说：恢复农业，群众相当多的提出分田，陈云同志作了调查，讲了些道理，意见提出是好的。现在所有的形式中，农业是单干搞得好。不管是黄猫、黑猫，在过渡时期，哪一种方法有利于恢复，就用哪一种方法。我赞成认真研究一下分田或者包产到户，究竟存在什么问题，因为相当普遍。你说不好，总要有答复。群众要求，总有道理。不要一口否定，不要在否定的前提下去搞。要肯定，形式要多样。公社、大队为基础都可以，不要轻易否定一种。但现在大队是少数，小队也发生了问题，不如包产到户。分田到户也有好的。过渡时期，要多种多样。退的时期，退够才能进。总之，要实事求是，不要千篇一律，这几年就是千篇一律。陈云同志也赞成多种多样，他提出分田单干允不允许？是否就是不好的？会上在彭真发言提出讲困难缺点到此为止，应转为积极方面时说：我倾向这样。7月3日出席中共中央政治局常委扩大会议，听取周恩来关于东北精简情况、全国粮食征购及大企业搞农副业等问题的汇报。7月5日、6日会见新西……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1962
+          ]
+        },
+        {
+          "evidence_id": "E10",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 384,
+          "pdf_page_end": null,
+          "section": [
+            "1962年"
+          ],
+          "quote": "1962年6月6月23日下午，主持召开中共中央书记处会议，讨论出席七月莫斯科争取裁军与和平世界大会的问题。6月26日下午，参加中阿两党会谈。在谈话中指出：捍卫马克思列宁主义、反对修正主义的斗争是曲折的、复杂的和长期的，所以在策略上更要注意。国际会议这个问题我们之所以提出，就是为了表示我们抓团结的旗帜。开会，一个是掌握团结的旗帜：一个是斗争的场所，是培养国际共产主义运动队伍的场所。我们应该利用这个场所。6月27日和刘少奇、彭真等同以卡博为团长的阿尔巴尼亚劳动党代表团会谈，就国际共运中反修正主义等问题交换看法。△主持召开中共中央书记处会议，讨论关于在莫斯科争取裁军与和平世界大会召开前举行共产党代表秘密协商会议问题致苏共中央的复信稿。6月下旬同陈云交换对分田到户的看法，认为：分田到户是一种方式，可以用各种各样的方式。7月2日下午，主持召开中共中央书记处会议，讨论干部平反、共青团工作、恢复农业等问题。在讨论于部平反问题时说：党内问题搞细……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1962
+          ]
+        }
+      ],
+      "human_review_status": "pending"
+    },
+    {
+      "case_id": "pilot_multievidence_zunyi_leadership",
+      "fact_reviews": [
+        {
+          "status": "covered",
+          "answer_span": "会议增选毛泽东为中央政治局常委；仍由最高军事首长朱德、周恩来为军事指挥者，周恩来为党内委托的对于指挥军事下最后决心的负责者；取消长征前成立的“三人团”",
+          "cited_evidence_ids": [
+            "E2",
+            "E4"
+          ],
+          "support_status": "supported",
+          "reason": "正文分散覆盖全部必要子事实。实际引用E2党史483及E4邓年谱上123均明确支持；句中另挂的E5不能作为遵义会议证据，应与有效E2/E4分开评价。",
+          "fact_id": "meeting_membership",
+          "answer_span_is_verbatim": false
+        },
+        {
+          "status": "covered",
+          "answer_span": "会后2月5日中央政治局常委分工，决定由张闻天代替博古负中央总的责任，毛泽东为周恩来在军事指挥上的帮助者[E2][E3]。",
+          "cited_evidence_ids": [
+            "E2",
+            "E3"
+          ],
+          "support_status": "supported_by_E2_E3_partial",
+          "reason": "实际E2仍保留2月5日及毛泽东帮助周恩来的原文，完整支撑。E3邓谱124页开头承前，单独没有2月5日，不能给E3独立日期支持。被后处理删除的无引用标题不影响正文已有覆盖。",
+          "fact_id": "february_mao_role",
+          "answer_span_is_verbatim": true
+        },
+        {
+          "status": "partial",
+          "answer_span": "到三月下旬（渡乌江之前），中央决定由周恩来、毛泽东、王稼祥组成“三人团”（也称三人军事指挥小组），全权指挥军事[E3]。新的“三人团”以周恩来为团长，负责指挥全军的军事行动[E10]。",
+          "cited_evidence_ids": [
+            "E3",
+            "E10"
+          ],
+          "support_status": "members_leader_authority_supported_date_source_conflict",
+          "reason": "成员、周恩来团长、指挥全军三项被实际E3/E10支持；日期回答下旬，预标注据党史483为中旬。邓谱上124确写下旬，这是来源冲突，不能把本题暂定Golden当无争议真值，也不能判为无来源捏造。按当前复合事实只给partial；细日期正误待人工裁决。",
+          "fact_id": "march_group",
+          "answer_span_is_verbatim": false
+        }
+      ],
+      "forbidden_findings": [],
+      "constraint_findings": [
+        {
+          "status": "satisfied",
+          "reason": "正文区分遵义会议、2月5日分工、3月新团三个阶段，没有把新团移到遵义会议当场，也没有称毛泽东为团长。"
+        }
+      ],
+      "additional_claim_findings": [
+        {
+          "status": "contradicted",
+          "answer_span": "加强政治局对军委的领导：会议决定“关于作战方针，以及作战时间与地点的选择，军委必须在政治局会议上做报告”，以加强政治局对军委的领导[E5]。",
+          "cited_evidence_ids": [
+            "E5"
+          ],
+          "support_status": "wrong_event_attribution",
+          "reason": "此条位于“遵义会议对中央军事领导的调整”标题下，明确归入遵义会议。党史PDF480完整原文将该决定归于1934年12月31日晚至次日凌晨猴场会议，毛泽东年谱卷1 PDF451（实际context E17）亦明写1935年1月1日猴场会议。E5的生产最终检索片段与实际生成提示片段完全一致，均从“会议还决定”开始，说明会议主语在检索分片本身已缺失，不能归因于生成提示的quote裁剪。E5不能支持该事件归属；E17已给足辨别会议的证据而答案仍未纠错，因此错误还涉及跨证据综合。",
+          "verified_sources": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 480,
+              "quote": "12月31日晚至次日凌晨，中共中央在猴场召开政治局会议，作出《关于渡江后新的行动方针的决定》。"
+            },
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 451,
+              "quote": "1月1日出席在猴场召开的中共中央政治局会议。"
+            }
+          ]
+        },
+        {
+          "status": "presentation_defect",
+          "answer_span": "### 资料限制",
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable",
+          "reason": "最终答案以空标题结束；后处理removed_uncited_claims删掉原限制段，没有同步移除标题。"
+        }
+      ],
+      "source_disagreements": [
+        {
+          "topic": "新三人团成立的旬别",
+          "source_a": {
+            "document_id": "cpc_history_volume_1",
+            "pdf_page": 483,
+            "statement": "3月中旬"
+          },
+          "source_b": {
+            "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+            "pdf_page": 124,
+            "statement": "三月下旬（渡乌江之前）"
+          },
+          "status": "human_review_required",
+          "reason": "问题只要求3月，不应让未经人工裁决的旬别成为最终验收真值。保留当前标注，记录争议；模型作了单一断言而未说明来源差异。"
+        }
+      ],
+      "pipeline_findings": [
+        {
+          "stage": "generation_context_selection",
+          "reason": "党史483检索原片段含3月中旬/成员，实际提示片段在“博古任总政治部…”截断，漏掉该页末尾新团成立时间及成员；仅按页命中会高估模型所见证据。"
+        },
+        {
+          "stage": "retrieval_chunk_boundary_and_cross_evidence_synthesis",
+          "reason": "党史480的生产最终检索片段与实际E5提示文本一致，均从“会议还决定”开始，属于分片及上下文衔接缺失，不能归因于quote裁剪。这与E2党史483确被quote裁掉页尾新团时间/成员不同。实际另一组提示E17完整包含猴场会议主语及同一决定，答案仍未据此纠错，因此不能只归因为缺乏证据。"
+        },
+        {
+          "stage": "final_synthesis",
+          "reason": "最后一个generation_context hits为空，属于中间结果合成上下文，不可按空原文检索集计零分；应保留上游真实片段及合成来源链。"
+        }
+      ],
+      "overall": {
+        "status": "needs_revision",
+        "required_facts_fully_covered": 2,
+        "required_facts_total": 3,
+        "required_facts_partial": 1,
+        "required_fact_coverage_is_provisional": true,
+        "summary": "核心三个阶段的人员/权限基本正确，但额外把猴场会议决定错归遵义会议，且新三人团旬别存在未披露来源冲突，不宜整体判通过。"
+      },
+      "judgments": [
+        {
+          "unit_id": "d202d73462b216446ff9595901270f86db83ab20d8311c3375c98083b75f84b0",
+          "relevance": 1,
+          "reason": "旧三人团成员及其政治军事分工的背景，可解释被取消的原机构；没有三个目标阶段的完整决定。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "25ae6840416ecf21b80877dff40fdd04c1adf1d0c8fb4343e844a3f8999649ac",
+          "relevance": 2,
+          "reason": "实际裁剪片段完整保留遵义组织调整和2月5日毛为周军事帮助者；在博古职务处截断，缺3月成员信息。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "meeting_adjustment",
+            "february_division"
+          ]
+        },
+        {
+          "unit_id": "2115af98475c1b54b71a236ed561ce81109c65a86a79d8d95fb22186a2bce892",
+          "relevance": 2,
+          "reason": "直接写毛为周帮助者及新三人团成员、全权指挥军事；2月日期承前缺5日，3月写下旬与预标注中旬有争议，未写团长，不补满证据组。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "2932a38955063ee8e55c386dd63766bcc38776daf05a414dd41822ba54373554",
+          "relevance": 2,
+          "reason": "明确1月15—17日遵义会议、增选毛常委、取消旧三人团、朱德周恩来指挥及周最后决心责任。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "meeting_adjustment"
+          ]
+        },
+        {
+          "unit_id": "799826d16b451721116c2a7aa5e3ed12a1eca21bbfcc026c228af0bf08c8c037",
+          "relevance": 1,
+          "reason": "完整页表明该决定属于猴场会议，是前置军事领导调整背景；该检索分片本身缺主语，生产最终命中与实际提示文本一致，不能支持遵义会议作出该决定。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "81fa33f228ba0e6f7e357db2179b01a15a7bbade4dbfc28ddd58af797c911d35",
+          "relevance": 0,
+          "reason": "1954—1955年国防委员会、军委和地方书记处机构安排，不是1935年目标阶段。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "fc48650721fb45942219737f9d67df333047b181ab0ff0191de342ad46863bea",
+          "relevance": 0,
+          "reason": "1935年10月底至11月分工及西北军委成立，不对应1—3月三个阶段。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "32a5deb5297392409f5e69c9c1cedec9729a90da4471345c87428f4cf02107e9",
+          "relevance": 0,
+          "reason": "1935年2月5日对苏区中央分局的游击战争指示，不是中央政治局常委军事分工。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8fcee065daaaa8c8355fbd5f8f48640ce5aa07b83c88fd96a99551d220773b77",
+          "relevance": 1,
+          "reason": "遵义会议军事路线争论的背景，未列组织调整结果或后续阶段人员权限。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "af5916cc6769f0def03748cf634e1ce165031254a2d9e6fde920f51e820556e6",
+          "relevance": 2,
+          "reason": "跨页续句明确新三人团以周恩来为团长，负责指挥全军军事行动；成员和时间需另证。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "march_authority"
+          ]
+        },
+        {
+          "unit_id": "210f801b9c04394476142a394fa8ab25e616a085d07ebdcc05d57c515cfd284d",
+          "relevance": 1,
+          "reason": "遵义会议与会报告和反围剿失利责任讨论，未提供目标组织调整完整决定。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "c36bace236415bcaea6ea63a776d186ef90bfbbef637ac2384125d535f41f2d1",
+          "relevance": 1,
+          "reason": "1935年5月会理会议维护遵义后政治军事领导团结，属后续背景；不直接证三个阶段任职安排。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "879bafd16d8e6872c16dfb0b45bc95c40dabd6057e952520e7c401502c67189d",
+          "relevance": 0,
+          "reason": "1971年军委办公会议和专案组，与1935年三阶段无关。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "545a0fabba992e4d852350fa3aedae1e0d2d51121c5ca7eb48cd6231adbfd4a3",
+          "relevance": 0,
+          "reason": "1951年党委组织、朝鲜谈判及三反通知，不支持1935年军权变化。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "38e68a2498135725ffac33ddc72525ba05d2cfa464c457209bcdda89070dc153",
+          "relevance": 1,
+          "reason": "博古遵义会议后被撤消总负责人职务及王明路线背景，相关但不含目标军事分工完整决定。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "56b09e3e2a56b41bd6256193f7d16dd3e414bcb088c8d4bce7b2af171f98181c",
+          "relevance": 0,
+          "reason": "1951年政府系统党委与军委总党委及转业建设，不对应1935年目标。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "b2c155b63182ef3d0a59d0ddf7bdffabdc93717ed04d53687b81a018fa73cb3f",
+          "relevance": 1,
+          "reason": "明确猴场会议军委向政治局报告的先行制度背景，尤其可防把其错归遵义；不是遵义会议调整本身。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "9b70e3ac52250f2ceb3dd2a92938022b5566368a0af72a1326522be7b1986a99",
+          "relevance": 0,
+          "reason": "文革1967年军事管制三支两军，不对应1935年三人团。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "53add9b80334580bc12b645d4fcf5f04a0ef7e7f9b5251e7a26193475a1bb7aa",
+          "relevance": 1,
+          "reason": "1943年回顾遵义集中解决军事路线，支持背景意义而没有人员权限完整决定。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "3d2a798092e84c224c19447f38548cbee5b5ce2de5e4d9c36328dcfc51e7eec0",
+          "relevance": 0,
+          "reason": "1949年上海军管接管机构和新政协准备，不对应1935年军事领导。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "e8a3b0b352a65e136adb2e21561a8a8a925955cb48e16a9066265ec8fac0b105",
+          "relevance": 1,
+          "reason": "遵义军事报告、批评博古李德及讨论经过，提供决定背景但无完整组织调整结果。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "d829c4a19c0fba1075cb12c6ce7db876d0f5b868a8919a68298d23321f6e6003",
+          "relevance": 0,
+          "reason": "1949年南下渡江部署和华东局人事，不对应1935年。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a6db3c1a7667c31c7653f811e5f0eac7519be6a1079383b7c8f5d86241bafaa9",
+          "relevance": 0,
+          "reason": "1951年航空工业、后勤及朝鲜和平建议，不对应1935年。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "636df045a4ecf9839887b2bf3dc80f254eb410af82b2ce64eedebcb7ff126527",
+          "relevance": 0,
+          "reason": "四渡赤水及军事行动经过，没有三阶段中央领导人事或权限调整，不能支撑本题组织分工。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        }
+      ],
+      "human_review_status": "pending",
+      "judgment_coverage": {
+        "target": "all exact generation_context spans plus last production stage top5",
+        "new_units": 24,
+        "unknown_units": 0,
+        "preserves_existing_labels": true
+      },
+      "delivered_answer": "### 简明结论\n\n遵义会议取消了长征前成立的“三人团”，实际上剥夺了博古、李德的最高军事指挥权，但仍由朱德、周恩来作为最高军事首长负责军事指挥，周恩来为党内委托的对于指挥军事下最后决心的负责者[E2][E4][E5]。会后2月5日中央政治局常委分工，决定由张闻天代替博古负中央总的责任，毛泽东为周恩来在军事指挥上的帮助者[E2][E3]。3月成立的新“三人团”由周恩来、毛泽东、王稼祥组成，以周恩来为团长，全权指挥军事[E3][E10]。\n\n### 遵义会议对中央军事领导的调整\n\n- **取消“三人团”，剥夺博古、李德军事指挥权**：遵义会议取消长征前成立的“三人团”，实际上剥夺了博古、李德的最高军事指挥权[E2][E4][E5]。\n- **军事指挥者安排**：仍由最高军事首长朱德、周恩来为军事指挥者，周恩来为党内委托的对于指挥军事下最后决心的负责者[E2][E4]。\n- **加强政治局对军委的领导**：会议决定“关于作战方针，以及作战时间与地点的选择，军委必须在政治局会议上做报告”，以加强政治局对军委的领导[E5]。\n- **毛泽东进入中央政治局常委**：会议增选毛泽东为中央政治局常委[E2][E4]。\n- **会议集中解决军事路线**：据毛泽东1943年回顾，遵义会议“只集中解决军事路线，因为中央在长征中，军事领导是中心问题。当时军事领导的解决差不多等于政治路线的解决”[E19]。\n\n- **张闻天代替博古负中央总的责任**：在川滇黔交界的一个鸡鸣三省的村子，中央政治局常委分工，根据毛泽东的提议，决定由张闻天代替博古负中央总的责任[E2][E3]。\n- **毛泽东成为周恩来军事指挥上的帮助者**：决定以毛泽东为周恩来在军事指挥上的帮助者[E2][E3]。\n- **博古改任总政治部代理主任**：博古任总政治部代理主任[E2][E3]。\n\n### 3月成立新“三人团”\n\n- **成立背景**：3月10日中央负责人在狗坝召开会议讨论进攻打鼓新场的计划，经毛泽东说服决定放弃；随后毛泽东鉴于作战情况瞬息万变、指挥需要集中，提议成立新“三人团”全权指挥军事[E3]。\n- **成立时间与成员**：到三月下旬（渡乌江之前），中央决定由周恩来、毛泽东、王稼祥组成“三人团”（也称三人军事指挥小组），全权指挥军事[E3]。\n- **团长与职权**：新的“三人团”以周恩来为团长，负责指挥全军的军事行动；在战争环境中，这是中央最重要的领导机构[E10]。\n\n### 资料限制",
+      "delivered_citations": [
+        {
+          "evidence_id": "E2",
+          "document_id": "cpc_history_volume_1",
+          "document": "中国共产党历史 第一卷（1921—1949）",
+          "volume": "第一卷",
+          "pdf_page": 483,
+          "pdf_page_end": null,
+          "section": [
+            "上 册",
+            "第三编 党在土地革命战争时期（1927年8月—1937年7月）",
+            "第十二章 遵义会议和红军长征的胜利",
+            "一、实现伟大转折的遵义会议"
+          ],
+          "quote": "……决议总结了在同国民党军第十九路军建立抗日统一战线问题上的经验教训，指出博古、李德等根本不了解在政治上利用第十九路军事变是粉碎第五次“围剿”的重要关键之一，没有在军事上采取与之直接配合的方针，失去了一个宝贵的机会。遵义会议根据变化了的情况，改变黎平会议先以黔北为中心、再去川南创建根据地的决议，决定红军渡过长江在成都之西南或西北地区建立根据地。会后，又根据敌情的变化，决定中央红军在川滇黔三省广大地区创造新的根据地。遵义会议改组了中央领导机构，选举毛泽东为中央政治局常委；决定常委中再进行适当的分工；取消在长征前成立的“三人团”，仍由最高军事首长朱德、周恩来为军事指挥者，而周恩来是党内委托的对于指挥军事下最后决心的负责者。此后，在红军转战途中，2月5日在川滇黔交界的一个鸡鸣三省的村子，中央政治局常委分工，根据毛泽东的提议，决定由张闻天代替博古负中央总的责任（习惯上也称之为总书记）；决定以毛泽东为周恩来在军事指挥上的帮助者，博古任总政治部……",
+          "source_type": "official_history",
+          "verification_status": "metadata_checked",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1927,
+            1937
+          ]
+        },
+        {
+          "evidence_id": "E3",
+          "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+          "document": "邓小平年谱（1904—1974）上卷",
+          "volume": "上卷",
+          "pdf_page": 124,
+          "pdf_page_end": null,
+          "section": [
+            "1935年"
+          ],
+          "quote": "1935年2月共中央政治局常委在此召开会议，决定由张闻天接替博古负总的责任，毛泽东为周恩来在军事指挥上的帮助者，博古任总政治部代理主任。2月9日随军委纵队到达扎西。中共中央政治局在此召开会议，决定利用敌人主力和注意力都集中在川南一线、黔北相对空虚的时机，回师东进，再渡赤水，重占遵义。3月10日中共中央负责人在狗坝〔1）召开会议，讨论进攻打鼓新场的计划。经毛泽东说服，决定放弃该计划。随后，毛泽东鉴于作战情况瞬息万变，指挥需要集中，提议成立新“三人团”全权指挥军事。到三月下旬（渡乌江之前），中央决定由周恩来、毛泽东、王稼祥组成“三人团”（也称三人军事指挥小组），全权指挥军事。3月16日晚一17日随军委纵队在茅台及其附近地区西渡赤水河（三渡赤水）。3月20日随军委纵队进入四川古蔺县境内。二十一日至二十二日，中央红军从二郎滩、九溪口、太平渡东渡赤水河（四渡赤水）。3月28日随军委纵队从白腊坎附近突破国民党“追剿”军的封锁线，进至乌江北岸……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1935
+          ]
+        },
+        {
+          "evidence_id": "E4",
+          "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+          "document": "邓小平年谱（1904—1974）上卷",
+          "volume": "上卷",
+          "pdf_page": 123,
+          "pdf_page_end": null,
+          "section": [
+            "1935年"
+          ],
+          "quote": "1935年三十一岁1月9日随军委纵队进驻遵义。1月15日一17日参加在遵义召开的中共中央政治局扩大会议（后通称为遵义会议），并担任会议的记录。会上，博古作关于反对第五次“围剿”的总结报告，周恩来作副报告，张闻天（并代表毛泽东、王稼祥）作反“左”倾军事错误的报告，毛泽东作长篇发言。会议改组中央领导机构，增选毛泽东为中央政治局常委，取消“三人团”，取消博古、李德的最高军事指挥权，决定由中革军委主要负责人朱德、周恩来指挥军事，周恩来为党内委托的对于指挥军事下最后决心的负责者。会议决议指出，红军第五次反“围剿”的失败以及退出苏区后遭到的严重损失，主要原因是博古和李德军事指挥上犯了严重错误。决议肯定毛泽东等关于红军作战的基本原则。遵义会议结束了王明“左”倾冒险主义在中共中央的统治，确立了以毛泽东为代表的新的中央的领导。1月19日随军委纵队离开遵义北上。1月26日随军委纵队到达土城。2月5日随军委纵队到达川滇黔边界的鸡鸣三省村。中",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1935
+          ]
+        },
+        {
+          "evidence_id": "E5",
+          "document_id": "cpc_history_volume_1",
+          "document": "中国共产党历史 第一卷（1921—1949）",
+          "volume": "第一卷",
+          "pdf_page": 480,
+          "pdf_page_end": null,
+          "section": [
+            "上 册",
+            "第三编 党在土地革命战争时期（1927年8月—1937年7月）",
+            "第十二章 遵义会议和红军长征的胜利",
+            "一、实现伟大转折的遵义会议"
+          ],
+          "quote": "会议还决定，“关于作战方针，以及作战时间与地点的选择，军委必须在政治局会议上做报告”，以加强政治局对军委的领导。这个决定，实际上剥夺了博古、李德的军事指挥权。会后，红军渡过乌江，",
+          "source_type": "official_history",
+          "verification_status": "metadata_checked",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1927,
+            1937
+          ]
+        },
+        {
+          "evidence_id": "E10",
+          "document_id": "cpc_history_volume_1",
+          "document": "中国共产党历史 第一卷（1921—1949）",
+          "volume": "第一卷",
+          "pdf_page": 484,
+          "pdf_page_end": null,
+          "section": [
+            "上 册",
+            "第三编 党在土地革命战争时期（1927年8月—1937年7月）",
+            "第十二章 遵义会议和红军长征的胜利",
+            "一、实现伟大转折的遵义会议"
+          ],
+          "quote": "的新的“三人团”，以周恩来为团长，负责指挥全军的军事行动。在战争环境中，这是中央最重要的领导机构。在紧急的战争形势下举行的遵义会议，没有全面地讨论政治路线方面的问题。这时，要就多年来党的工作中所有重大问题的是非展开讨论，是不可能的。中共中央对这些问题取得一致的正确认识，需要有一个过程。因此，会议决议只是一般地肯定中央的政治路线，也没有探讨造成军事指挥错误的深刻的政治原因。但是，遵义会议明确地回答了红军的战略战术方面的是非问题，指出博古、李德军事指挥上的错误，同时改变中央的领导特别是军事领导，解决了党内所面临的最迫切的组织问题和军事问题，结束了“左”倾教条主义错误在中央的统治，确立了毛泽东在中共中央和红军的领导地位。而这些成果，又是在中国共产党同共产国际中断联系的情况下独立自主地取得的。这次会议，在极端危急的历史关头，挽救了党，挽救了红军，挽救了中国革命。从此，中国共产党能够在以毛泽东为代表的马克思主义正确路线领导下，克服重重困难……",
+          "source_type": "official_history",
+          "verification_status": "metadata_checked",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1927,
+            1935,
+            1937
+          ]
+        },
+        {
+          "evidence_id": "E19",
+          "document_id": "mao_zedong_chronology_volume_2",
+          "document": "毛泽东年谱 第2卷（1937.07-1945.08）",
+          "volume": "第2卷",
+          "pdf_page": 487,
+          "pdf_page_end": null,
+          "section": [
+            "1943年"
+          ],
+          "quote": "义会议以后的路线和遵义会议以前的路线，是马列主义和非马列主义的区别。遵义会议前被诬为机会主义者的，今天已变为主要领导者。但这个码头仍是四中全会、五中全会选出的中央。这是一个矛盾，已经忍耐了多少年，从前年九月会议到现在又忍耐了两年，我还要求同志们再忍耐一下，不忙解决这个问题。遵义会议只集中解决军事路线，因为中央在长征中，军事领导是中心问题。当时军事领导的解决差不多等于政治路线的解决。一九三七年十二月会议时，由千王明的回国，进攻中央路线，结果中断了遵义会议以后的中央路线。十二月会议我是孤立的，我只对持久战、游击战为主、统一战线中独立自主原则是坚持到底的。六届六中全会，我对王明的＂一切经过统一战线”等是作了否定的结论的，但当时没有发表。六中全会的很好的条件是王稼祥带回了共产国际的指示。前年九月会议，提到抗战时期党的路线问题，王明坚决不承认路线错误。我说不说路线错误也可以，但有四个原则错误，即（一）速胜论，（二）运动战，（三）对……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1937,
+            1943
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "pilot_negative_cppcc_1949",
+      "fact_reviews": [
+        {
+          "status": "covered",
+          "answer_span": "毛泽东：1949年10月9日出席中国人民政治协商会议第一届全国委员会第一次会议，当选为全国政协主席[E6]。",
+          "cited_evidence_ids": [
+            "E6"
+          ],
+          "support_status": "supported",
+          "reason": "实际E6毛泽东年谱4卷12页有10月9日、会议名称及当选主席，主语由年谱语境确定。E2另独立明确主席毛泽东。",
+          "fact_id": "mao_chair",
+          "answer_span_is_verbatim": false
+        },
+        {
+          "status": "covered",
+          "answer_span": "结论：不是。1949年10月9日，毛泽东当选为全国政协主席，周恩来当选为全国政协副主席，二人职务不同[E2][E6]。周恩来为副主席之一[E2]。",
+          "cited_evidence_ids": [
+            "E2",
+            "E6"
+          ],
+          "support_status": "supported_jointly_date_not_in_E2_alone",
+          "reason": "E2周恩来年谱437完整区分第一届政协全国委员会主席毛泽东、副主席周恩来等人；E6给出10月9日第一届全国委员会第一次会议并列该名单开头。联合支持同一次选举的职务区分；E2自己截断在“会议选举产生”，不含10月9日，不能说它独立提供日期。E6没有副主席谓语，不能说它独立支持周恩来职务。",
+          "fact_id": "zhou_vice_chair",
+          "answer_span_is_verbatim": false
+        }
+      ],
+      "forbidden_findings": [],
+      "constraint_findings": [
+        {
+          "status": "satisfied",
+          "reason": "明确否定共同当选主席并区分毛主席、周副主席；正确的否定句不是命中禁止断言。"
+        }
+      ],
+      "additional_claim_findings": [
+        {
+          "status": "supported",
+          "answer_span": "周恩来后来代理全国政协主席是在1949年11月25日中共中央政治局会议的决定中，即毛泽东预定12月访问苏联期间，由周恩来代理全国政协主席[E4][E5]。",
+          "cited_evidence_ids": [
+            "E4",
+            "E5"
+          ],
+          "support_status": "supported",
+          "reason": "E4周谱441及E5毛谱54均明确11月25日决定毛访苏期间周代理全国政协主席。回答区分代理与10月9日当选，没有跨时间混淆。"
+        }
+      ],
+      "source_disagreements": [],
+      "pipeline_findings": [
+        {
+          "stage": "generation_context_selection",
+          "reason": "实际上下文未含毛谱13跨页续句，但检索到周谱437的明确主席/副主席名单构成替代证据；不能仅因指定页13缺失就判答案无证据。日期和职务需通过E6/E2联合核验。"
+        }
+      ],
+      "overall": {
+        "status": "provisional_pass",
+        "required_facts_fully_covered": 2,
+        "required_facts_total": 2,
+        "required_facts_partial": 0,
+        "required_fact_coverage_is_provisional": true,
+        "summary": "两项必要事实完整，引用联合支持主席/副主席区别，补充代理身份有来源。待人工Golden复核。"
+      },
+      "judgments": [
+        {
+          "unit_id": "7e3839d7bafde0d52bf9c4bd60a9e2a8f25d0fd46c32c8427dd7b45b731e171c",
+          "relevance": 1,
+          "reason": "9月27、29日政协全体会议执行主席等邻近层级职务背景，不是10月9日全国委员会主席选举。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "66e3e8c40b6f1251c1176d3bbefff5280533e5f5e828992e2a8b8be54fd92d4e",
+          "relevance": 2,
+          "reason": "明确第一届全国委员会主席毛泽东、副主席周恩来及完整名单，替代副主席续句；片段无10月9日，不独立补满含日期的起始组。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "list_continuation"
+          ]
+        },
+        {
+          "unit_id": "1ac5b66042a0191d228a32a73fb6bfa6ac3baf4bf7f2b3ea03692b651a572374",
+          "relevance": 1,
+          "reason": "9月21日大会主席团成员及制度背景，能解释主席团与全国委员会主席不同，不支持10月9日任职结论。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a98b61e60bb26cbdbeaa476260ac35d4acdd101e86b797bceefb9b7c041b506a",
+          "relevance": 1,
+          "reason": "11月25日决定周代理全国政协主席，帮助区分后续代理与原选举，但不证明10月9日副主席。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "27ce51e6a9ebc3977cc85653ebaf41fa63522e23f4ee00a6fac84e1b12b185f8",
+          "relevance": 1,
+          "reason": "11月25日决定毛出国期间周代理全国政协主席，属于可辨析的背景，非10月9日选举。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "fd24ed49e2516eea8da9a4865f63f75973593b0c51c566b11a79ae047ca5fd05",
+          "relevance": 2,
+          "reason": "明确10月9日首届全国委员会第一次会议毛当选主席及周等名单开头；转脚注前未出现副主席谓语。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "chair_and_list_start"
+          ]
+        },
+        {
+          "unit_id": "754ced9e9da952881f6d6246dd4006112ac66643ec0a70efea183ccf402465ee",
+          "relevance": 0,
+          "reason": "宴请罗申及干部脚注，不提供10月9日政协职务选举。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "2e7cfebd757b9d0498f62856a2d342050e0d71f1877c80a683bd394c68d7dfcd",
+          "relevance": 0,
+          "reason": "1969年周为全国政协主席的治丧安排，不能反推1949年；时间错配干扰。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "23bfc22276c69ad54f5224d32a066d7dd387c3b223a94f8d135b90dd4a1550f9",
+          "relevance": 0,
+          "reason": "1974年名单、贺龙平反及国庆招待会，没有1949年10月9日职务区别。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "688b14d65d1b1adf2e11e075c1692a3dc60a7ac0f995ae2896ee09884330dbda",
+          "relevance": 0,
+          "reason": "1949年10月政府机构任命名单及海军新疆，不是全国政协主席副主席选举。",
+          "reviewer": "agent:live_eval_multievidence",
+          "reviewed_at": "2026-09-22T12:46:45.580690+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        }
+      ],
+      "human_review_status": "pending",
+      "judgment_coverage": {
+        "target": "all exact generation_context spans plus last production stage top5",
+        "new_units": 10,
+        "unknown_units": 0,
+        "preserves_existing_labels": true
+      },
+      "delivered_answer": "**结论：不是。** 1949年10月9日，毛泽东当选为全国政协主席，周恩来当选为全国政协副主席，二人职务不同[E2][E6]。\n\n**具体职务区分：**\n\n- **毛泽东**：1949年10月9日出席中国人民政治协商会议第一届全国委员会第一次会议，当选为**全国政协主席**[E6]。\n- **周恩来**：同一会议选举产生第一届政协全国委员会，周恩来为**副主席**之一（其余副主席为李济深、沈钧儒、郭沫若、陈叔通）[E2]。\n\n**补充说明：**\n\n周恩来后来代理全国政协主席是在1949年11月25日中共中央政治局会议的决定中，即毛泽东预定12月访问苏联期间，由周恩来代理全国政协主席[E4][E5]。这并非10月9日的选举结果。",
+      "delivered_citations": [
+        {
+          "evidence_id": "E2",
+          "document_id": "zhou_enlai_chronology_1949_1976",
+          "document": "周恩来年谱（1949—1976）",
+          "volume": "上、中、下卷",
+          "pdf_page": 437,
+          "pdf_page_end": null,
+          "section": [
+            "1949年"
+          ],
+          "quote": "……会议选举产生第一届政协全国委员会主席毛泽东，副主席周恩来、李济深、沈钧儒、郭沫若、陈叔通，秘书长李维汉，以及常务委员们。△所拟《中国人民政治协商会议全国委员会工作条例（草案）》完稿。《工作条例（草案）》确定分设政治法律、财政经济、文化教育、外交、国防、民族事务、华侨事务、宗教事务等八个工作组，开展研讨和审议工作。毛泽东审阅后批：“即刻付印。”【1949 年10 月10 日】△以外交部长名义电复前国民党政府驻法国大使馆暨驻巴黎总领事馆全体人员，欢迎他们宣告脱离国民党，听候人民政府接管，号召在国外的一切前国民党政府使领馆人员效法，并宣布对所有这种脱离反动政府的有功人员，“本部均将量才录用，使能对于祖国有所贡献”。【1949 年10 月11 日】△赴中国民主建国会领导人黄炎培〔注〕家长谈，劝说黄出任政务院副总理兼轻工业部部长，并协商民建其它领导人在政府中的任职问题。说：在新政府任职，不同于在旧社会做官，现在是人民的政府，是为人民服务。……",
+          "source_type": "chronology",
+          "verification_status": "metadata_checked",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1949
+          ]
+        },
+        {
+          "evidence_id": "E4",
+          "document_id": "zhou_enlai_chronology_1949_1976",
+          "document": "周恩来年谱（1949—1976）",
+          "volume": "上、中、下卷",
+          "pdf_page": 441,
+          "pdf_page_end": null,
+          "section": [
+            "1949年"
+          ],
+          "quote": "……【1949 年11 月23 日】△电复阿尔巴尼亚部长会议主席兼外交部长恩维尔·霍查，欢迎中阿两国立即建立外交关系。【1949 年11 月25 日】△出席毛泽东主持的中共中央政治局会议。会议决定：毛泽东自十二月前往苏联访问期间，刘少奇代理中共中央主席、中央人民政府主席，朱德代理中央军委主席，周恩来代理全国政协主席。△主持政务院第七次政务会议。在讨论政务院及其所属机关工作人员任免暂行办法时说：工作人员任免应该由会议决定。政务院各部门任免工作人员后，呈请政务院备案，不需呈请政务院总理批准。【1949 年11 月28 日】△主持政务院第八次政务会议。在讨论通过省、市、县各界人民代表会议的三个组织通则（草案）时指出：解放初期实行军事管制，对反动派实行专政；另一方面，还要依靠群众。依靠群众的积极性和创造性，这才有根。用什么方式来发动群众的积极性呢？用组织的方式，普选。没有普选的地区，便是各界人民代表会议。",
+          "source_type": "chronology",
+          "verification_status": "metadata_checked",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1949
+          ]
+        },
+        {
+          "evidence_id": "E5",
+          "document_id": "mao_zedong_chronology_volume_4",
+          "document": "毛泽东年谱 第4卷（1949.10-1952.12）",
+          "volume": "第4卷",
+          "pdf_page": 54,
+          "pdf_page_end": null,
+          "section": [
+            "1949年（10月-12月）"
+          ],
+          "quote": "11 月25 日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、董必武、林伯渠出席，饶漱石、李富春(1) 、薄一波、聂荣臻列席。会议决定：毛泽东定千十二月初访问苏联，在毛泽东出国期间，中共中央委员会主席及中央人民政府主席由刘少奇代理；人民革命军事委员会主席由朱德代理；全国政协主席由周恩来代理。会议指定陈云、薄一波、李富春、饶漱石、邓子恢拟定预算问题预案。同日致电贺龙：”据周士第(2)等来电，主张早日发动向胡宗南进攻，我意待你在西北局会议完毕，回到十八兵团再行发动进攻为适宜。”同日复电林彪、谭政、萧克并告刘伯承、邓小平：“二十三日电悉。如刘、邓需要，同意你们意见以七个师交刘、邓指挥入川作战。”同日为答谢越南民主共和国来电祝贺中华人民共和国成立，复电胡志明，指出：“中越两国同处反帝国主义斗争前线，随着两国人民解放斗争的胜利发展，两民族的友谊必将日臻亲密。”11 月26 日就各地修机场的经费问题，批示聂荣臻、刘亚楼(3):“各……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1949,
+            1950
+          ]
+        },
+        {
+          "evidence_id": "E6",
+          "document_id": "mao_zedong_chronology_volume_4",
+          "document": "毛泽东年谱 第4卷（1949.10-1952.12）",
+          "volume": "第4卷",
+          "pdf_page": 12,
+          "pdf_page_end": null,
+          "section": [
+            "1949年（10月-12月）"
+          ],
+          "quote": "……”同日薄一波C 1)在中共中央华北局常委扩大会议讨论和平解放绥远(2) 问题时，传达毛泽东指示：“以我之人，加傅[3) 之,人，兴我之政。”10 月9 日出席中国人民政治协商会议第一届全国委员会第一次会议，当选为全国政协主席，周恩来、李济深、沈钧儒、(1) 薄一波，当时任中共中央华北局第一书记、政务院财政经济委员会副主任兼财政部部长、中国人民解放军华北军区政治委员。1951 年12 月又任中央节约检查委员会主任。(2) 绥远，省名。1954 年6 月撤销，原辖地区划归内蒙古自治区。(3)傅，指傅作义，原国民党军将领，1949 年1 月率部在北平接受和平改编，并对董其武率部在绥远起义作出了贡献。当时任中央人民政府委员、全国政协委员。1949 年10 月日、12 月．又先后任水利部部长，绥远省军政委员会主席、中国人民解放军绥远省军区司令员。",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "pymupdf_text_layer"
+          ],
+          "year_mentions": [
+            1949,
+            1951,
+            1954
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "pilot_constraint_deng_1973_march",
+      "annotation_status": "agent_review_human_pending",
+      "judgments": [
+        {
+          "unit_id": "9021560ff051b323970f3b42093c33b94e03ff2fec87ca4660ade8df65f335d0",
+          "relevance": 0,
+          "reason": "1969年住所监管和拖拉机修配厂劳动安排，与1973年3月恢复副总理及国务院工作安排的时间、性质均不同。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "4661141ba10120e64dfa283000bda4e1a6c99bb2fe00d43bb1d5ca081ed80812",
+          "relevance": 0,
+          "reason": "1973年12月总参谋长及军区工作事项，属于另一月份和职务，不能支撑3月恢复副总理和国务院工作。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "5d4353b623bc0524c1f9632ff3af7ca6804fcbb4065f16d914a99f6726a0e372",
+          "relevance": 0,
+          "reason": "来自中卷且为1952年政府党组岗位和政务院工作，违反限定下卷及1973年3月两项约束。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "507a0fea924ec2ebcf6cd9067678281f72f67b93ac2a92bfc0f91c1bebed13d9",
+          "relevance": 2,
+          "reason": "指定下卷的实际片段保留3月9日审稿、中央决定恢复党的组织生活和副总理职务、国务院分配适当工作及次日发出，完整支持恢复决定组。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "restoration_decision"
+          ]
+        },
+        {
+          "unit_id": "315f5188afa3308ee7ab796d3ac84f314fa8f61b603d2f7cdc08bbbcd2e43fd9",
+          "relevance": 2,
+          "reason": "指定下卷的实际片段保留3月29日晚政治局会议，国务院业务组、以副总理身份参加外事、重要政策列席政治局均完整；支持工作安排组。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": [
+            "work_assignment"
+          ]
+        },
+        {
+          "unit_id": "d749fbd10a491eca8c2027c544e2bb57e7ea42f4b82de435d01dc409e6ff4b4b",
+          "relevance": 0,
+          "reason": "来自上卷且为1927年拟回国名单和中央秘书长工作，来源、时间、具体决定均不满足本题。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ccf0738452d73235de125e0a0cf83380a3e175b7b18ff79a424efcfcc972fb34",
+          "relevance": 0,
+          "reason": "1968年全会政治处理和本人请求保留党籍、分配工作，不是1973年3月中央恢复职务与安排工作决定。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8ba116833a0f1c89006a97f6094dd2f8870e5f003e26cfdc836664f3c388926e",
+          "relevance": 1,
+          "reason": "指定下卷4月宣布恢复组织生活及副总理职务、接待外宾，是3月决定的后续执行背景；不能把4月活动当3月决定，也不覆盖完整证据组。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "95deb87dcf3660d26306bcad3799fbff99f50c4bd0aef64832e0f08e396015df",
+          "relevance": 1,
+          "reason": "指定下卷后续讲话明确回顾今年三月恢复组织生活及副总理职务的文件，部分支持3月恢复；未包括适当工作和具体安排，故不满计证据组。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "fd7b97be3ee9a9cb257c99d8066fd7cc47f0b77c30ae2895666b89d5bb89010c",
+          "relevance": 0,
+          "reason": "1969年住所监管和拖拉机修配厂劳动安排，与1973年3月恢复副总理及国务院工作安排的时间、性质均不同。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "84a1beb761531c3da6bebfc8aea4c4f170a8af3d0580e4f367429177d90361fc",
+          "relevance": 0,
+          "reason": "1973年12月总参谋长及军区工作事项，属于另一月份和职务，不能支撑3月恢复副总理和国务院工作。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "db8ba2af1b97e99b39010e3843d69c817407a1f654d6b654b49e703a9b89f428",
+          "relevance": 0,
+          "reason": "来自中卷且为1952年政府党组岗位和政务院工作，违反限定下卷及1973年3月两项约束。",
+          "reviewer": "agent:live_eval_review",
+          "reviewed_at": "2026-09-22T12:45:27.654477+00:00",
+          "basis": "agent_review",
+          "supported_groups": []
+        }
+      ],
+      "fact_reviews": [
+        {
+          "fact_id": "restore_status",
+          "status": "partial",
+          "answer_span": "3月9日毛泽东审阅周恩来本日报送的中共中央《关于恢复邓小平同志的党的组织生活和国务院副总理的职务的决定》稿，批示：“同意。",
+          "cited_evidence_ids": [
+            "E1"
+          ],
+          "support_status": "supported_partial_claim",
+          "reason": "提到恢复党组织生活和副总理的决定稿及同意，但未陈述国务院分配适当工作的完整决定内容；虽然E1实际引用含全句，也不能替最终答案补足。",
+          "answer_span_is_verbatim": true
+        },
+        {
+          "fact_id": "state_council_work",
+          "status": "missing",
+          "answer_span": null,
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable",
+          "reason": "最终回答没有国务院业务组或以副总理身份参加外事活动。实际E3引文有完整句，但正文只摘取无关的附件送阅开头。",
+          "answer_span_is_verbatim": false
+        },
+        {
+          "fact_id": "attend_policy_discussion",
+          "status": "missing",
+          "answer_span": null,
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable",
+          "reason": "最终回答未表达有关重要政策问题列席政治局会议讨论；E3引文拥有该句不等于正文覆盖。",
+          "answer_span_is_verbatim": false
+        }
+      ],
+      "forbidden_findings": [
+        {
+          "claim": "1973年3月任命邓小平为国务院总理",
+          "violated": false,
+          "reason": "最终回答未声称其任国务院总理。"
+        }
+      ],
+      "constraint_findings": [
+        {
+          "constraint": "只依据指定下卷",
+          "status": "fail",
+          "answer_span": "在讨论从在苏联学习的党员中抽调人员回国工作的问题时，决定由邓小平拟一名单。 [E4]",
+          "evidence_ids": [
+            "E4"
+          ],
+          "reason": "E4来自上卷PDF44，不满足只依据下卷；该条又属于1927年。"
+        },
+        {
+          "constraint": "1973年3月的决定",
+          "status": "fail",
+          "answer_span": "1972年12月12月18日周恩来致信纪登奎〔1）、汪东兴，提出：邓小平曾要求做点工作，请你们也考虑一下，主席也曾提过几次。 [E2]",
+          "evidence_ids": [
+            "E2",
+            "E4",
+            "E5"
+          ],
+          "reason": "最终正文混入1972年12月建议、1927年工作及1968年处理争议，未分别回答3月恢复和安排工作的决定。"
+        },
+        {
+          "constraint": "答复应提供决定内容",
+          "status": "fail",
+          "answer_span": "1973年3月附件〔1〕送邓小平本人阅提意见。 [E3]",
+          "evidence_ids": [
+            "E3"
+          ],
+          "reason": "摘取附件说明而不是同片段的3月29日晚决定；不足以完成问题。"
+        }
+      ],
+      "process_findings": [
+        {
+          "stage": "query_understanding",
+          "status": "constraint_mismatch",
+          "observed_start_year": 1904,
+          "observed_end_year": 1974,
+          "expected_year": 1973,
+          "reason": "最终有效query_plan为1904—1974，与书名覆盖年一致；未保持问题要求1973年3月。仅据轨迹定位时间解析/计划整合环节，未凭此确定责任在外部planner还是本地规则。"
+        },
+        {
+          "stage": "generation_validation_and_fallback",
+          "status": "failed_generation",
+          "llm_error_code": "timeline_year_repair_ambiguous_timeline_years",
+          "reason": "API已调用，但最终输出被年代表述检查降级为extractive；必要证据644与645都已进入真实生成提示，因此缺失不是召回不到证据。最终交付应以降级正文评分，而不能用中间草稿替代。"
+        },
+        {
+          "kind": "local_synthetic_reproduction_no_external_calls",
+          "input_plan": {
+            "intent": "general",
+            "retrieval_route": "hybrid",
+            "normalized_question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？",
+            "search_queries": [
+              "邓小平 1973年3月 恢复副总理 工作安排"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "document",
+                "text": "《邓小平年谱（1904—1974）》下卷",
+                "canonical": "《邓小平年谱（1904—1974）》下卷"
+              }
+            ],
+            "start_year": 1973,
+            "end_year": 1973,
+            "coverage": "relevance",
+            "constraints": [
+              "1973年3月",
+              "只依据《邓小平年谱（1904—1974）》下卷"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "question_year_range": [
+            1904,
+            1974
+          ],
+          "guarded_plan": {
+            "intent": "general",
+            "retrieval_route": "hybrid",
+            "normalized_question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？",
+            "search_queries": [],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "document",
+                "text": "《邓小平年谱（1904—1974）》下卷",
+                "canonical": "《邓小平年谱（1904—1974）》下卷"
+              }
+            ],
+            "start_year": 1904,
+            "end_year": 1974,
+            "coverage": "relevance",
+            "constraints": [
+              "只依据《邓小平年谱（1904—1974）》下卷"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "retrieval_plan": {
+            "query_intent": "general",
+            "query_years": [],
+            "query_year_range": [
+              1904,
+              1974
+            ],
+            "query_people": [
+              "邓小平"
+            ],
+            "coverage": "relevance"
+          },
+          "code_references": [
+            "app/history_agent/answering/query_understanding.py:134",
+            "app/history_agent/answering/query_understanding.py:174",
+            "app/history_agent/answering/query_understanding.py:415"
+          ],
+          "reason": "本地guard用问题所有年份min/max覆盖正确的1973边界；随后用year not in tuple判断，将1973当作不允许年份，删去含1973的搜索query和约束。query_execution的RetrievalPlan只传年份、人物、意图、覆盖；书目约束未变成document_ids硬过滤。",
+          "limitation": "这是对本地规则的可复现证明；捕获中未保存原始planner响应，不能断言DeepSeek原始输出的年份一定正确或一定错误。"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "required_facts_total": 3,
+        "covered": 0,
+        "partial": 1,
+        "missing": 2,
+        "contradicted": 0,
+        "strict_required_fact_recall": 0.0,
+        "citation_support": "supported_but_mostly_irrelevant",
+        "source_constraint": "fail",
+        "time_constraint": "fail",
+        "refusal": "not_applicable",
+        "generator_mode": "extractive",
+        "llm_status": "fallback",
+        "reason": "实际交付是失败降级的片段列表；只有恢复决定部分信息，具体工作安排缺失，且引用上卷和多个题目外时期。判断为Agent暂定，未经人工Golden复核。"
+      },
+      "delivered_answer": "根据当前本地资料，检索到以下可核验线索：\n\n- 3月9日毛泽东审阅周恩来本日报送的中共中央《关于恢复邓小平同志的党的组织生活和国务院副总理的职务的决定》稿，批示：“同意。 [E1]\n- 1972年12月12月18日周恩来致信纪登奎〔1）、汪东兴，提出：邓小平曾要求做点工作，请你们也考虑一下，主席也曾提过几次。 [E2]\n- 1973年3月附件〔1〕送邓小平本人阅提意见。 [E3]\n- 在讨论从在苏联学习的党员中抽调人员回国工作的问题时，决定由邓小平拟一名单。 [E4]\n- 会上，印发了邓小平专案组提交的《党内另一个最大的走资本主义道路的当权派邓小平的主要罪行》的报告。 [E5]",
+      "delivered_citations": [
+        {
+          "evidence_id": "E1",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 644,
+          "pdf_page_end": null,
+          "section": [
+            "1973年"
+          ],
+          "quote": "……3月9日毛泽东审阅周恩来本日报送的中共中央《关于恢复邓小平同志的党的组织生活和国务院副总理的职务的决定》稿，批示：“同意。”周恩来在报告中说：“关于恢复邓小平同志的国务院副总理职务问题，政治局会议几次讨论过，并在主席处开会时报告过。邓小平同志已回北京。为在全国树立这样一位高级标兵，政治局认为需要中央作出一个决定，一直发到县团级党委。”《决定》稿说：“一九七二年八月十四日，在邓小平同志写给主席的一封信上，毛主席作了重要批示。中央政治局认真讨论了毛主席的批示和邓小平同志的问题。遵照批示精神，中央决定：恢复邓小平同志的党的组织生活，恢复他的国务院副总理的职务，由国务院分配他担任适当的工作。”此件次日发出。3月13日致信汪东兴：“遵示详细看了《我的自述》的摘要，觉得不用再有什么增加或减少的段落。在几段的文字上，改动了一些语句，大体上是和我原来写的东西符合的。这些改动如不妥当，即照摘要的原文，我也觉得是可以的，不会有什么不同的意见。现将两……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1972,
+            1973
+          ]
+        },
+        {
+          "evidence_id": "E2",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 641,
+          "pdf_page_end": null,
+          "section": [
+            "1972年"
+          ],
+          "quote": "1972年12月12月18日周恩来致信纪登奎〔1）、汪东兴，提出：邓小平曾要求做点工作，请你们也考虑一下，主席也曾提过几次。二十七日，纪登奎、汪东兴就安排邓小平重新工作事复信周恩来，提出：邓仍任副总理，分配适当工作。周恩来阅后表示：邓事待请示主席后定。〔1]纪登奎，当时任中共中央政治局候补委员、中央组织宣传组副组长、中央军委办公会议成员。",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1972
+          ]
+        },
+        {
+          "evidence_id": "E3",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 645,
+          "pdf_page_end": null,
+          "section": [
+            "1973年"
+          ],
+          "quote": "1973年3月附件〔1〕送邓小平本人阅提意见。3月中下旬见受周恩来委托来看望的邓颖超。了解到周恩来患癌症及检查治疗情况。3月28日晚十时，应约赴玉泉山同周恩来、李先念、江青谈话。第二天，周恩来就邓小平的情况写信告诉毛泽东：“他的精神、身体都好。二十九、三十两日下午和晚上，等候主席通知至主席处开政治局会，到时当约小平同志同来见主席。”3月29日下午三时，和周恩来到毛泽东处谈话。同毛泽东见面握手时，毛泽东说：“努力工作，保护身体。”毛泽东问起这些年是怎么过来的，回答说：“等待。”这是两人分别六年后的第一次会面。△晚九时，根据毛泽东的意见，周恩来主持召开中共中央政治局会议，邓小平参加。会议决定：邓小平正式参加国务院业务组工作，并以国务院副总理身份参加外事活动：有关重要政策问题，邓小平列席政治局会议参加讨论。三十日，周恩来致信毛泽东，报告政治局会议所议上述事项，毛泽东批示同意。邓小平正式恢复国务院副总理工作。4月1日下午，周恩来召集中央……",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1968,
+            1972,
+            1973
+          ]
+        },
+        {
+          "evidence_id": "E4",
+          "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+          "document": "邓小平年谱（1904—1974）上卷",
+          "volume": "上卷",
+          "pdf_page": 44,
+          "pdf_page_end": null,
+          "section": [
+            "1927年"
+          ],
+          "quote": "……在讨论从在苏联学习的党员中抽调人员回国工作的问题时，决定由邓小平拟一名单。年底担任中共中央秘书长，协助周恩来等中央领导人处理中央日常工作，主要管理中央机关的文书、机要、交通、财务、各种会议安排等，负责起草对一些省区的指示等文件，并继续为中央的会议作记录。",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1927
+          ]
+        },
+        {
+          "evidence_id": "E5",
+          "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+          "document": "邓小平年谱（1904—1974）下卷",
+          "volume": "下卷",
+          "pdf_page": 618,
+          "pdf_page_end": null,
+          "section": [
+            "1968年"
+          ],
+          "quote": "……会上，印发了邓小平专案组提交的《党内另一个最大的走资本主义道路的当权派邓小平的主要罪行》的报告。林彪、江青、康生、谢富治等人在全会分组会上对邓小平大加指责，并要求开除邓小平的党籍。在十月十三日全会开幕会上，毛泽东在讲话中说：邓小平这个人，我总是替他说一点话，就是鉴于他在抗日战争跟解放战争中间都是打了敌人的，又没有查出他的别的历史问题来。在十月三十一日全会闭幕会上，毛泽东在讲话中说：邓小平，大家要开除他，我对这一点还有一点保留。我觉得这个人嘛，总要使他跟刘少奇有点区别，事实上是有些区别。我这个人的思想恐怕有点保守，不合你们的口味，替邓小平讲几句好话。11月4日致信汪东兴，表示：我最大的希望是，能够继续留在党内，做一个普通党员。如果可能的话，请党分配给我一个小小的工作，或参加力所能及的劳动。此信经周恩来、陈伯达、康生、江青等传阅后，退回汪东兴处，没有再送毛泽东和林彪。",
+          "source_type": "chronology",
+          "verification_status": "edition_labeled",
+          "extraction_methods": [
+            "ocr"
+          ],
+          "year_mentions": [
+            1968
+          ]
+        }
+      ],
+      "human_review_status": "pending"
+    },
+    {
+      "case_id": "pilot_refusal_out_of_scope_2024",
+      "fact_reviews": [],
+      "forbidden_findings": [],
+      "constraint_findings": [
+        {
+          "type": "scope_explanation_missing",
+          "severity": "minor",
+          "answer_span": "现有本地资料中没有检索到足以回答这个问题的证据。",
+          "reason": "正确拒绝编造2024行程且没有历史引用，但没有明确说明项目研究范围为1921—1978；经两轮检索才拒答。"
+        }
+      ],
+      "refusal_review": {
+        "no_fabricated_itinerary": true,
+        "no_irrelevant_citation": true,
+        "explicit_scope_explanation": false,
+        "safety_outcome": "safe_refusal",
+        "full_rubric_pass": false
+      },
+      "overall": "安全拒答成立，范围说明和提前路由仍欠缺。",
+      "judgments": [],
+      "delivered_answer": "现有本地资料中没有检索到足以回答这个问题的证据。",
+      "delivered_citations": [],
+      "human_review_status": "pending"
+    }
+  ]
+}
