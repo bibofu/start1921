@@ -166,6 +166,32 @@ def test_canonical_members_cannot_manufacture_joint_evidence(work_path: Path) ->
     assert result.total == 0
 
 
+def test_intersections_use_only_remaining_available_sources(work_path: Path) -> None:
+    database, _ = _prepare_timeline(work_path)
+    with database.connect() as connection:
+        connection.execute(
+            "UPDATE document_files SET is_present = 0 WHERE document_id = 'lin_biao_chronology'"
+        )
+
+    result = get_person_intersections(
+        database, person_id="zhou_enlai", other_person_id="lin_biao"
+    )
+    assert result.co_mention_total == 1
+    assert result.total == 1
+    assert result.events[0].event.event_id == "event_zhou_message"
+    assert len(result.events[0].joint_evidence) == 1
+    assert result.events[0].event.evidence[0].document_id == "zhou_enlai_chronology_1949_1976"
+
+    with database.connect() as connection:
+        connection.execute("UPDATE documents SET enabled = 0")
+    empty = get_person_intersections(
+        database, person_id="zhou_enlai", other_person_id="lin_biao"
+    )
+    assert empty.co_mention_total == 0
+    assert empty.total == 0
+    assert empty.events == []
+
+
 def test_joint_pagination_crosses_candidate_batch_boundary(work_path: Path) -> None:
     database = _prepare_database(work_path)
     for index in range(202):

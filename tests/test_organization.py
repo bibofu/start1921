@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 from history_agent.config import Settings
 from history_agent.db import Database
@@ -45,6 +46,15 @@ def _database(work_path: Path) -> Database:
                 expected_page_count, notes, created_at, updated_at
             ) VALUES ('zhou_chronology', '周恩来年谱', '[]', 'chronology', NULL, '上卷',
                       '[]', 'verified', 1, 'none', 100, NULL, 'now', 'now')
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO document_files (
+                document_id, relative_path, filename, sha256, size_bytes, page_count,
+                modified_at, is_encrypted, first_seen_at, last_seen_at
+            ) VALUES ('zhou_chronology', 'zhou.pdf', 'zhou.pdf', 'hash',
+                      100, 100, 'now', 0, 'now', 'now')
             """
         )
     return database
@@ -129,3 +139,74 @@ def test_relationship_api_filters_research_range(work_path: Path) -> None:
     assert client.get(
         "/api/people/zhou_enlai/relationships", params={"at": "1980"}
     ).status_code == 422
+
+
+@pytest.mark.parametrize("withdrawal", ["missing", "disabled"])
+def test_relationships_withdraw_unavailable_sources_without_deleting_records(
+    work_path: Path, withdrawal: str,
+) -> None:
+    database = _database(work_path)
+    _save_appointment(database)
+    extract_organization_relationships(database)
+    assert get_organization_relationships(database, person_id="zhou_enlai").total == 1
+
+    with database.connect() as connection:
+        if withdrawal == "missing":
+            connection.execute("UPDATE document_files SET is_present = 0")
+        else:
+            connection.execute("UPDATE documents SET enabled = 0")
+
+    result = get_organization_relationships(database, person_id="zhou_enlai")
+    assert result.total == 0
+    assert result.relationships == []
+    with database.connect() as connection:
+        assert connection.execute("SELECT COUNT(*) FROM person_relationships").fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT review_status FROM person_relationships"
+        ).fetchone()[0] == "unreviewed"
+
+
+def test_relationships_keep_available_alternative_evidence(work_path: Path) -> None:
+    database = _database(work_path)
+    _save_appointment(database)
+    extract_organization_relationships(database)
+    with database.connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO documents (
+                document_id, title, creators_json, source_type, source_series_json,
+                verification_status, enabled, ocr_strategy, created_at, updated_at
+            ) VALUES ('other_source', '另一来源', '[]', 'chronology', '[]',
+                      'verified', 1, 'none', 'now', 'now')
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO document_files (
+                document_id, relative_path, filename, sha256, size_bytes, page_count,
+                modified_at, is_encrypted, first_seen_at, last_seen_at
+            ) VALUES ('other_source', 'other.pdf', 'other.pdf', 'other-hash',
+                      100, 100, 'now', 0, 'now', 'now')
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO evidence_records (
+                evidence_id, document_id, pdf_page_start, pdf_page_end,
+                quote, extraction_methods_json, created_at
+            ) SELECT 'other_evidence', 'other_source', 10, 10,
+                     quote, extraction_methods_json, 'now'
+              FROM evidence_records WHERE evidence_id = 'evidence_appointment'
+            """
+        )
+        connection.execute(
+            "INSERT INTO relationship_evidence "
+            "SELECT relationship_id, 'other_evidence' FROM person_relationships"
+        )
+        connection.execute(
+            "UPDATE document_files SET is_present = 0 WHERE document_id = 'zhou_chronology'"
+        )
+
+    result = get_organization_relationships(database, person_id="zhou_enlai")
+    assert result.total == 1
+    assert [item.evidence_id for item in result.relationships[0].evidence] == ["other_evidence"]

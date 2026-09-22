@@ -224,6 +224,48 @@
       "notes": "人物时间线、会议和人物交集的重点资料。"
     },
     {
+      "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+      "filename": "邓小平年谱.1904-1974 上.pdf",
+      "title": "邓小平年谱（1904—1974）上卷",
+      "creators": ["中共中央文献研究室"],
+      "source_type": "chronology",
+      "edition": "中央文献出版社上中下三册本（出版年及版次待核）",
+      "volume": "上卷",
+      "verification_status": "edition_labeled",
+      "enabled": true,
+      "ocr_strategy": "full_required",
+      "expected_page_count": 655,
+      "notes": "2026-09-22 新增；已核对扉页编者、书名和出版社。扫描件无文字层，全文 OCR 后入库；保留物理页码和原始书签，1921 年前材料默认不参与检索。"
+    },
+    {
+      "document_id": "deng_xiaoping_chronology_1904_1974_middle",
+      "filename": "邓小平年谱(1904-1974)中.pdf",
+      "title": "邓小平年谱（1904—1974）中卷",
+      "creators": ["中共中央文献研究室"],
+      "source_type": "chronology",
+      "edition": "上中下三册本地扫描文件（版权页版本待核）",
+      "volume": "中卷",
+      "verification_status": "edition_labeled",
+      "enabled": true,
+      "ocr_strategy": "full_required",
+      "expected_page_count": 690,
+      "notes": "2026-09-22 新增；已核对封面编者及中卷标示，目录覆盖 1947—1956 年。扫描件无文字层，全文 OCR 后入库；保留物理页码和原始书签。"
+    },
+    {
+      "document_id": "deng_xiaoping_chronology_1904_1974_lower",
+      "filename": "邓小平年谱.1904-1974 下.pdf",
+      "title": "邓小平年谱（1904—1974）下卷",
+      "creators": ["中共中央文献研究室"],
+      "source_type": "chronology",
+      "edition": "中央文献出版社上中下三册本（出版年及版次待核）",
+      "volume": "下卷",
+      "verification_status": "edition_labeled",
+      "enabled": true,
+      "ocr_strategy": "full_required",
+      "expected_page_count": 753,
+      "notes": "2026-09-22 新增；已核对扉页编者、书名和出版社。扫描件无文字层，全文 OCR 后入库；保留物理页码和原始书签。"
+    },
+    {
       "document_id": "lin_biao_chronology",
       "filename": "林彪年谱.pdf",
       "title": "林彪年谱",
@@ -233,10 +275,10 @@
       "source_type": "chronology",
       "edition": "本地文件版本待核",
       "verification_status": "source_pending",
-      "enabled": true,
+      "enabled": false,
       "ocr_strategy": "partial_if_needed",
       "expected_page_count": 1545,
-      "notes": "存在少量字符映射异常；规范化文本必须保留替换记录。"
+      "notes": "2026-09-22 原 PDF 已从本地文档库移除，停用并保留历史登记。存在少量字符映射异常；规范化文本必须保留替换记录。"
     },
     {
       "document_id": "deng_xiaoping_selected_works",
@@ -249,10 +291,10 @@
       "edition": "全三卷合订本地文件",
       "volume": "第一至第三卷",
       "verification_status": "metadata_checked",
-      "enabled": true,
+      "enabled": false,
       "ocr_strategy": "partial_required",
       "expected_page_count": 1367,
-      "notes": "大部分页面有文字层，部分区段需要 OCR；1978 年后的篇目默认不参与回答。"
+      "notes": "2026-09-22 原 PDF 已从本地文档库移除，停用并保留历史登记。大部分页面有文字层，部分区段需要 OCR；1978 年后的篇目默认不参与回答。"
     },
     {
       "document_id": "red_star_over_china",

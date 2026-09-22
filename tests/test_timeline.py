@@ -53,6 +53,15 @@ def _prepare_database(work_path: Path) -> Database:
                 """,
                 (document_id, title),
             )
+        connection.execute(
+            """
+            INSERT INTO document_files (
+                document_id, relative_path, filename, sha256, size_bytes, page_count,
+                modified_at, is_encrypted, first_seen_at, last_seen_at
+            ) SELECT document_id, document_id || '.pdf', document_id || '.pdf',
+                     document_id, 100, 100, 'now', 0, 'now', 'now' FROM documents
+            """
+        )
     return database
 
 
@@ -348,6 +357,88 @@ def test_timeline_rejects_invalid_person_and_status(work_path: Path) -> None:
             person_id="zhou_enlai",
             review_statuses=["rejected"],
         )
+
+
+@pytest.mark.parametrize("withdrawal", ["missing", "disabled", "not_current"])
+def test_timeline_withdrawn_source_restores_only_available_members(
+    work_path: Path, withdrawal: str,
+) -> None:
+    database, canonical_id = _prepare_timeline(work_path)
+    with database.connect() as connection:
+        original_counts = tuple(
+            connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in ("historical_events", "canonical_events", "evidence_records")
+        )
+        if withdrawal == "disabled":
+            connection.execute(
+                "UPDATE documents SET enabled = 0 WHERE document_id = 'lin_biao_chronology'"
+            )
+        else:
+            column = "is_present" if withdrawal == "missing" else "is_current"
+            connection.execute(
+                f"UPDATE document_files SET {column} = 0 "
+                "WHERE document_id = 'lin_biao_chronology'"
+            )
+        # An old registered file must not make the missing current file usable.
+        connection.execute(
+            """
+            INSERT INTO document_files (
+                document_id, relative_path, filename, sha256, size_bytes, page_count,
+                modified_at, is_encrypted, first_seen_at, last_seen_at, is_current, is_present
+            ) VALUES ('lin_biao_chronology', 'old.pdf', 'old.pdf', 'old-hash',
+                      100, 100, 'now', 0, 'now', 'now', 0, 1)
+            """
+        )
+
+    timeline = get_person_timeline(database, person_id="zhou_enlai", limit=1)
+
+    assert timeline.total == 2
+    assert timeline.has_more
+    assert timeline.events[0].event_id == "event_zhou_message"
+    assert timeline.events[0].record_kind == "source"
+    assert timeline.events[0].source_event_ids == ["event_zhou_message"]
+    assert timeline.events[0].field_variants == {}
+    assert {item.document_id for item in timeline.events[0].evidence} == {
+        "zhou_enlai_chronology_1949_1976"
+    }
+    with database.connect() as connection:
+        assert tuple(
+            connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in ("historical_events", "canonical_events", "evidence_records")
+        ) == original_counts
+        assert connection.execute(
+            "SELECT review_status FROM historical_events WHERE event_id = 'event_lin_message'"
+        ).fetchone()[0] == "unreviewed"
+        assert connection.execute(
+            "SELECT is_active FROM canonical_events WHERE canonical_event_id = ?",
+            (canonical_id,),
+        ).fetchone()[0] == 1
+        connection.execute("UPDATE documents SET enabled = 0")
+
+    empty = get_person_timeline(database, person_id="zhou_enlai")
+    assert empty.total == 0
+    assert empty.events == []
+    assert not empty.has_more
+
+
+def test_timeline_filters_unavailable_evidence_from_source_event(work_path: Path) -> None:
+    database, _ = _prepare_timeline(work_path)
+    with database.connect() as connection:
+        connection.execute(
+            "INSERT INTO event_evidence "
+            "VALUES ('event_standalone_meeting', 'evidence_event_lin_message')"
+        )
+        connection.execute(
+            "UPDATE document_files SET is_present = 0 WHERE document_id = 'lin_biao_chronology'"
+        )
+
+    timeline = get_person_timeline(
+        database, person_id="zhou_enlai", event_types=["meeting"]
+    )
+    assert timeline.total == 1
+    assert [item.evidence_id for item in timeline.events[0].evidence] == [
+        "evidence_event_standalone_meeting"
+    ]
 
 
 def test_timeline_api_contract_and_research_range(work_path: Path) -> None:

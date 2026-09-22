@@ -10,8 +10,17 @@ from history_agent.extraction.models import PageRecord
 from history_agent.processing.models import StructureEntry
 
 YEAR_HEADING = re.compile(
-    r"(?:\[周恩来年谱\])?\s*((?:18|19)\d{2})\s*年\s*[（(][^）)]{1,12}岁[）)]"
+    r"(?:\[周恩来年谱\])?\s*((?:18|19)\d{2})\s*年\s*"
+    r"(?:[（(][^）)]{1,12}岁[）)]|[〇零一二三四五六七八九十百两\d\s]{1,12}岁|诞生)"
 )
+BARE_YEAR = re.compile(r"(?:18|19)\d{2}\s*年")
+PAGE_LABEL = re.compile(r"[（(]?\d+[）)]?")
+FRONT_MATTER_TITLES = {"封面", "封底", "书名", "扉页", "版权", "版权页", "前言", "目录"}
+
+
+def _outline_label(title: str) -> str:
+    # Some scanned PDFs append NUL to every bookmark, including page-number labels.
+    return title.replace("\x00", "").strip()
 
 
 def _entry_id(document_id: str, level: int, title: str, page: int) -> str:
@@ -32,6 +41,21 @@ def extract_outline_structure(
         for level, title, page in raw_entries
         if str(title).strip() and 1 <= int(page) <= page_count
     ]
+    if any(current[2] > following[2] for current, following in zip(valid, valid[1:], strict=False)):
+        # Ranges cannot be trusted when the tree jumps backwards (for example,
+        # every year bookmark in a scanned chronology pointing at the cover).
+        return []
+    years = [
+        (_outline_label(title), page)
+        for _, title, page in valid
+        if BARE_YEAR.fullmatch(_outline_label(title))
+    ]
+    if len({title for title, _ in years}) > 1 and len({page for _, page in years}) == 1:
+        return []
+    valid = [entry for entry in valid if not PAGE_LABEL.fullmatch(_outline_label(entry[1]))]
+    if not valid or all(_outline_label(title) in FRONT_MATTER_TITLES for _, title, _ in valid):
+        # Cover/contents bookmarks alone do not describe the body of the book.
+        return []
     entries: list[StructureEntry] = []
     for index, (level, title, start_page) in enumerate(valid):
         end_page = page_count
@@ -59,10 +83,23 @@ def infer_year_structure(
     starts: list[tuple[str, int]] = []
     seen: set[str] = set()
     for pdf_page, record in sorted(pages.items()):
-        for line in record.normalized_text.splitlines():
+        lines = [line.strip() for line in record.normalized_text.splitlines() if line.strip()]
+        if any(re.sub(r"\s+", "", line) == "目录" for line in lines) or any(
+            current == "目" and following == "录"
+            for current, following in zip(lines, lines[1:], strict=False)
+        ):
+            continue
+        for index, line in enumerate(lines):
             if line.count(".") >= 3 or "……" in line:
                 continue
-            match = YEAR_HEADING.search(line.strip())
+            next_line = lines[index + 1] if index + 1 < len(lines) else ""
+            if BARE_YEAR.fullmatch(line) and next_line:
+                # OCR can split one printed heading into its year and age columns.
+                line = f"{line} {next_line}"
+            match = YEAR_HEADING.fullmatch(line)
+            if match and PAGE_LABEL.fullmatch(next_line):
+                # A heading followed by only a page reference is a contents entry.
+                continue
             if match and match.group(1) not in seen:
                 seen.add(match.group(1))
                 starts.append((f"{match.group(1)}年", pdf_page))

@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from history_agent.db import Database
 from history_agent.errors import ResearchDataError
+from history_agent.research.availability import available_document_sql
 from history_agent.research.models import (
     DateCertainty,
     DatePrecision,
@@ -398,6 +399,7 @@ def get_organization_relationships(
             JOIN evidence_records er ON er.evidence_id = re.evidence_id
             JOIN documents d ON d.document_id = er.document_id
             WHERE r.subject_person_id = ?
+              AND {available_document_sql("er.document_id")}
               AND r.relation_type IN ({_placeholders(selected_types)})
               AND r.review_status IN ({_placeholders(selected_statuses)})
               AND r.organization_name IS NOT NULL

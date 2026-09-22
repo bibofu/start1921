@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from history_agent.db import Database
 from history_agent.errors import ResearchDataError
+from history_agent.research.availability import available_document_sql, available_event_sql
 from history_agent.research.models import ReviewStatus, TemporalPoint
 
 TimelineRecordKind = Literal["canonical", "source"]
@@ -196,6 +197,7 @@ def _event_filters(
             else f"{alias}.review_status != 'rejected'"
         ),
         f"{alias}.review_status IN ({_placeholders(review_statuses)})",
+        available_event_sql(alias, canonical=alias in {"c", "active_c"}),
     ]
     parameters: list[object] = list(review_statuses)
     if start_year is not None:
@@ -414,6 +416,7 @@ def _load_evidence(
             JOIN evidence_records er ON er.evidence_id = ce.evidence_id
             JOIN documents d ON d.document_id = er.document_id
             WHERE ce.canonical_event_id IN ({_placeholders(canonical_ids)})
+              AND {available_document_sql("er.document_id")}
             ORDER BY ce.canonical_event_id, {subject_order}
                      er.document_id, er.pdf_page_start,
                      er.evidence_id
@@ -431,6 +434,7 @@ def _load_evidence(
             JOIN evidence_records er ON er.evidence_id = ee.evidence_id
             JOIN documents d ON d.document_id = er.document_id
             WHERE ee.event_id IN ({_placeholders(source_ids)})
+              AND {available_document_sql("er.document_id")}
             ORDER BY ee.event_id, er.document_id, er.pdf_page_start, er.evidence_id
             """,
             source_ids,

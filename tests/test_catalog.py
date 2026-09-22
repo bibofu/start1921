@@ -24,9 +24,17 @@ def test_catalog_rejects_duplicate_document_ids(work_path: Path) -> None:
         load_catalog(path)
 
 
-def test_project_catalog_has_sixteen_unique_documents() -> None:
+def test_project_catalog_tracks_current_and_retired_documents() -> None:
     root = Path(__file__).resolve().parents[1]
     catalog = load_catalog(root / "config" / "corpus_catalog.json")
 
-    assert len(catalog.documents) == 16
-    assert len({document.document_id for document in catalog.documents}) == 16
+    assert len(catalog.documents) == 19
+    assert len({document.document_id for document in catalog.documents}) == 19
+    enabled_ids = {document.document_id for document in catalog.documents if document.enabled}
+    assert len(enabled_ids) == 17
+    assert {
+        "deng_xiaoping_chronology_1904_1974_upper",
+        "deng_xiaoping_chronology_1904_1974_middle",
+        "deng_xiaoping_chronology_1904_1974_lower",
+    }.issubset(enabled_ids)
+    assert not {"lin_biao_chronology", "deng_xiaoping_selected_works"} & enabled_ids
