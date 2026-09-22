@@ -1,5 +1,7 @@
 # Unified RAG Golden Benchmark
 
+本轮六题本地对照结果和交付状态见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，真实模型待确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
+
 ## v2设计与六题试点入口
 
 当前v2处于草案和工具验证阶段：`design_v2.json`有30个具体候选问题（20开发、10保留），`pilot_annotations.json`有6个开发试点（5可答、1拒答）及48条Agent暂定候选判断，全部人工复核仍为pending。**这不是已完成的30题正式Golden。** 保留题不进入当前调参和试点运行。
