@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "rubric_version": "explicit-answer-review-v1",
+  "capture_sha256": "4de743197bd1bd4e04d6514976cf02f4f903c102ebf0fe96efb393abb389e3bd",
+  "cases": [
+    {
+      "case_id": "pilot_exact_deng_1952_appointment",
+      "case_definition_sha256": "3973e913609efba37ad561d4a753be36976ac467ba4598e33aa1f8af64fd4610",
+      "answer_sha256": "c6d799fc2e38596b1b705032d13b89d3c243fb085bd03245ab48182b3c8d7615",
+      "basis": "agent_review",
+      "reviewer": "agent:root_answer_rubric_migration",
+      "reviewed_at": "2026-09-23T06:49:35.364547+00:00",
+      "facts": [
+        {
+          "fact_id": "appointed_vice_premier",
+          "status": "covered",
+          "reason": "时间、人物、任命和政务院副总理完整对应；E1脚注和E2直接任命句均支持。",
+          "answer_excerpt": "1952年8月7日，邓小平被任命为**政务院副总理**[E1][E2]",
+          "cited_evidence_ids": [
+            "E1",
+            "E2"
+          ],
+          "support_status": "supported"
+        }
+      ],
+      "dimensions": {
+        "citation_support": {
+          "status": "pass",
+          "reason": "任命时间、人物和政务院职务由实际E1/E2支持。"
+        },
+        "source_constraint": {
+          "status": "not_applicable",
+          "reason": "该题无独立来源限制。"
+        },
+        "time_constraint": {
+          "status": "pass",
+          "reason": "明确回答1952年8月7日。"
+        },
+        "routing": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "safe_refusal": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "scope_explanation": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        }
+      }
+    },
+    {
+      "case_id": "pilot_semantic_deng_1962_agriculture",
+      "case_definition_sha256": "14ee4ceb3fe07da3c2c73acfc8b6f233a1e9b2c3370fa80900ca1141fa36ac60",
+      "answer_sha256": "45d2df9371e835370c97ef434a82cb20cdf471e672ee25cd5d6951da7f24916a",
+      "basis": "agent_review",
+      "reviewer": "agent:root_answer_rubric_migration",
+      "reviewed_at": "2026-09-23T06:49:35.364547+00:00",
+      "facts": [
+        {
+          "fact_id": "practical_standard",
+          "status": "covered",
+          "reason": "正文7月部分直接表达按能否恢复农业选择方法，E7保留该原文。简明结论另误挂3月E2，作为独立时间/引用缺陷记录，不抹去后文已覆盖的实效事实。",
+          "answer_excerpt": "不管是黄猫、黑猫，在过渡时期，哪一种方法有利于恢复，就用哪一种方法。",
+          "cited_evidence_ids": [
+            "E7"
+          ],
+          "support_status": "supported"
+        },
+        {
+          "fact_id": "respect_preference",
+          "status": "missing",
+          "reason": "正文没有明确表达尊重群众愿意采用的形式。正文只提普遍存在和应研究分田/包产；不能将E7引用原文中未复述的群众要求、或召回整页386的群众意愿句，替正文补全。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable"
+        },
+        {
+          "fact_id": "allow_diversity",
+          "status": "covered",
+          "reason": "正文还明确写实事求是、不要千篇一律；E7直接支持，语义完整。",
+          "answer_excerpt": "要肯定，形式要多样。公社、大队为基础都可以，不要轻易否定一种。",
+          "cited_evidence_ids": [
+            "E7"
+          ],
+          "support_status": "supported"
+        }
+      ],
+      "dimensions": {
+        "citation_support": {
+          "status": "fail",
+          "reason": "将3月29日E2作为7月直接材料；E7所支持的其他观点分别保留。"
+        },
+        "source_constraint": {
+          "status": "not_applicable",
+          "reason": "该题无独立来源限制。"
+        },
+        "time_constraint": {
+          "status": "fail",
+          "reason": "总结将3月观点归入7月，违反提问月份。"
+        },
+        "routing": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "safe_refusal": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "scope_explanation": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        }
+      }
+    },
+    {
+      "case_id": "pilot_multievidence_zunyi_leadership",
+      "case_definition_sha256": "ab031c6a90c3bde64464cd9ec1529148915590fb844588d673df89e509f911f4",
+      "answer_sha256": "8b8c6f50330a94e36a2d47febbc350ce1d55a70400570baf7069bcb8a526ed16",
+      "basis": "agent_review",
+      "reviewer": "agent:root_answer_rubric_migration",
+      "reviewed_at": "2026-09-23T06:49:35.365065+00:00",
+      "facts": [
+        {
+          "fact_id": "meeting_membership",
+          "status": "covered",
+          "reason": "正文分散覆盖全部必要子事实。实际引用E2党史483及E4邓年谱上123均明确支持；句中另挂的E5不能作为遵义会议证据，应与有效E2/E4分开评价。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [
+            "E2",
+            "E4"
+          ],
+          "support_status": "supported"
+        },
+        {
+          "fact_id": "february_mao_role",
+          "status": "covered",
+          "reason": "实际E2仍保留2月5日及毛泽东帮助周恩来的原文，完整支撑。E3邓谱124页开头承前，单独没有2月5日，不能给E3独立日期支持。被后处理删除的无引用标题不影响正文已有覆盖。",
+          "answer_excerpt": "会后2月5日中央政治局常委分工，决定由张闻天代替博古负中央总的责任，毛泽东为周恩来在军事指挥上的帮助者[E2][E3]。",
+          "cited_evidence_ids": [
+            "E2",
+            "E3"
+          ],
+          "support_status": "supported"
+        },
+        {
+          "fact_id": "march_group",
+          "status": "partial",
+          "reason": "成员、周恩来团长、指挥全军三项被实际E3/E10支持；日期回答下旬，预标注据党史483为中旬。邓谱上124确写下旬，这是来源冲突，不能把本题暂定Golden当无争议真值，也不能判为无来源捏造。按当前复合事实只给partial；细日期正误待人工裁决。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [
+            "E3",
+            "E10"
+          ],
+          "support_status": "partial"
+        }
+      ],
+      "dimensions": {
+        "citation_support": {
+          "status": "fail",
+          "reason": "猴场会议E5的政治局报告决定被归入遵义会议。"
+        },
+        "source_constraint": {
+          "status": "not_applicable",
+          "reason": "该题无独立来源限制。"
+        },
+        "time_constraint": {
+          "status": "unknown",
+          "reason": "三人团中旬/下旬存在真实来源冲突，暂不能将题集单一日期作为定论，需人工裁决。"
+        },
+        "routing": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "safe_refusal": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "scope_explanation": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        }
+      }
+    },
+    {
+      "case_id": "pilot_negative_cppcc_1949",
+      "case_definition_sha256": "3ff9d249470458f12008bc464bf74a5d706232a60e449beb6101aa31e0acb5eb",
+      "answer_sha256": "e03c1438beac71d80967766d2fc8ef1c3b6cbeb4a814602784c3e8f981eb0127",
+      "basis": "agent_review",
+      "reviewer": "agent:root_answer_rubric_migration",
+      "reviewed_at": "2026-09-23T06:49:35.365065+00:00",
+      "facts": [
+        {
+          "fact_id": "mao_chair",
+          "status": "covered",
+          "reason": "实际E6毛泽东年谱4卷12页有10月9日、会议名称及当选主席，主语由年谱语境确定。E2另独立明确主席毛泽东。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [
+            "E6"
+          ],
+          "support_status": "supported"
+        },
+        {
+          "fact_id": "zhou_vice_chair",
+          "status": "covered",
+          "reason": "E2周恩来年谱437完整区分第一届政协全国委员会主席毛泽东、副主席周恩来等人；E6给出10月9日第一届全国委员会第一次会议并列该名单开头。联合支持同一次选举的职务区分；E2自己截断在“会议选举产生”，不含10月9日，不能说它独立提供日期。E6没有副主席谓语，不能说它独立支持周恩来职务。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [
+            "E2",
+            "E6"
+          ],
+          "support_status": "supported"
+        }
+      ],
+      "dimensions": {
+        "citation_support": {
+          "status": "pass",
+          "reason": "E2与E6共同支持毛主席、周副主席及选举日期；后来的代理主席明确区分。"
+        },
+        "source_constraint": {
+          "status": "not_applicable",
+          "reason": "该题无独立来源限制。"
+        },
+        "time_constraint": {
+          "status": "pass",
+          "reason": "10月9日选举与11月代理安排明确区分。"
+        },
+        "routing": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "safe_refusal": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "scope_explanation": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        }
+      }
+    },
+    {
+      "case_id": "pilot_constraint_deng_1973_march",
+      "case_definition_sha256": "2f81245c9f3f0d6a0f58c450bf5bfb4813a7facb153eb7de6788fd1973d24c82",
+      "answer_sha256": "84a26ff90a600799e3dd1846e93a121942a40bbecb6efbc79b66316832d9cb97",
+      "basis": "agent_review",
+      "reviewer": "agent:root_answer_rubric_migration",
+      "reviewed_at": "2026-09-23T06:49:35.365065+00:00",
+      "facts": [
+        {
+          "fact_id": "restore_status",
+          "status": "partial",
+          "reason": "提到恢复党组织生活和副总理的决定稿及同意，但未陈述国务院分配适当工作的完整决定内容；虽然E1实际引用含全句，也不能替最终答案补足。",
+          "answer_excerpt": "3月9日毛泽东审阅周恩来本日报送的中共中央《关于恢复邓小平同志的党的组织生活和国务院副总理的职务的决定》稿，批示：“同意。",
+          "cited_evidence_ids": [
+            "E1"
+          ],
+          "support_status": "partial"
+        },
+        {
+          "fact_id": "state_council_work",
+          "status": "missing",
+          "reason": "最终回答没有国务院业务组或以副总理身份参加外事活动。实际E3引文有完整句，但正文只摘取无关的附件送阅开头。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable"
+        },
+        {
+          "fact_id": "attend_policy_discussion",
+          "status": "missing",
+          "reason": "最终回答未表达有关重要政策问题列席政治局会议讨论；E3引文拥有该句不等于正文覆盖。",
+          "answer_excerpt": null,
+          "cited_evidence_ids": [],
+          "support_status": "not_applicable"
+        }
+      ],
+      "dimensions": {
+        "citation_support": {
+          "status": "pass",
+          "reason": "各摘录能追溯实际引文；大多不切题的问题单列在事实、时间及来源维度。"
+        },
+        "source_constraint": {
+          "status": "fail",
+          "reason": "E4来自上卷，违反只依据下卷。"
+        },
+        "time_constraint": {
+          "status": "fail",
+          "reason": "答案混入1927、1968、1972年内容，没有分清1973年3月决定。"
+        },
+        "routing": {
+          "status": "fail",
+          "reason": "实际交付query_plan以书名1904—1974代替问题1973年，影响后续过滤。"
+        },
+        "safe_refusal": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "scope_explanation": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        }
+      }
+    },
+    {
+      "case_id": "pilot_refusal_out_of_scope_2024",
+      "case_definition_sha256": "1765ab8de6b56a03324cfec02fa4c731fe50d6b75f7d5c26c357b6ba002acc6d",
+      "answer_sha256": "8438ca41d89f78a82f1f79f72c38ec5428977231a86d66114d8f151a16cfe86e",
+      "basis": "agent_review",
+      "reviewer": "agent:root_answer_rubric_migration",
+      "reviewed_at": "2026-09-23T06:49:35.365065+00:00",
+      "facts": [],
+      "dimensions": {
+        "citation_support": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "source_constraint": {
+          "status": "not_applicable",
+          "reason": "该题无独立来源限制。"
+        },
+        "time_constraint": {
+          "status": "not_applicable",
+          "reason": "本题未定义该维度的独立判定标准，或该维度不适用。"
+        },
+        "routing": {
+          "status": "fail",
+          "reason": "明确超出项目研究范围却执行查询规划和两轮检索后才拒答。"
+        },
+        "safe_refusal": {
+          "status": "pass",
+          "reason": "未编造2024年行程且没有历史引文冒充当年事实。"
+        },
+        "scope_explanation": {
+          "status": "fail",
+          "reason": "仅说本地证据不足，未说明1921—1978研究范围。"
+        }
+      }
+    }
+  ]
+}
