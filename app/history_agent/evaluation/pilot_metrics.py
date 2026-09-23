@@ -9,8 +9,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from typing import Any
+
+from pydantic import ValidationError
+
+from history_agent.evaluation.pilot_models import RankingPool
 
 
 def _normalized_text(text: str) -> str:
@@ -55,8 +60,8 @@ def evidence_unit(hit: dict[str, Any], file_hashes: dict[str, str]) -> dict[str,
 def _metric(
     value: float | None,
     reason: str | None,
-    numerator: int | None = None,
-    denominator: int | None = None,
+    numerator: int | float | None = None,
+    denominator: int | float | None = None,
 ) -> dict[str, Any]:
     return {
         "value": value,
@@ -166,6 +171,141 @@ def _matched_groups(
     return matched
 
 
+_POOL_NDCG_CONVENTION = {
+    "gain": "2**relevance-1",
+    "discount": "log2(rank+1)",
+    "ideal_order": "all_unique_pool_units_by_descending_relevance",
+    "duplicates": "first_occurrence_only_later_positions_have_zero_gain",
+    "empty_slots": "zero_gain_without_reducing_ideal_denominator",
+    "relevance_grades": [0, 1, 2],
+    "scope": "fixed_judged_pool_not_exhaustive_corpus_relevance",
+}
+
+
+def _prepare_ranking_pool(
+    case: dict[str, Any],
+    payload: dict[str, Any] | None,
+    file_hashes: dict[str, str],
+    judgments: dict[str, dict[str, Any]],
+    label_mode: str,
+) -> tuple[dict[str, Any], set[str], list[int]]:
+    details: dict[str, Any] = {
+        "pool_id": None,
+        "pool_sha256": None,
+        "pool_fingerprint": None,
+        "pool_unit_count": None,
+        "selection_policy": None,
+        "convention": _POOL_NDCG_CONVENTION,
+        "reason": None,
+    }
+    if payload is None:
+        details["reason"] = "fixed_fully_judged_candidate_pool_required"
+        return details, set(), []
+    try:
+        pool = RankingPool.model_validate(payload)
+    except ValidationError as exc:
+        details["reason"] = "invalid_candidate_pool"
+        details["validation_errors"] = [
+            {"location": list(error["loc"]), "type": error["type"]} for error in exc.errors()
+        ]
+        return details, set(), []
+    details.update(
+        pool_id=pool.pool_id,
+        pool_sha256=pool.sha256,
+        pool_unit_count=len(pool.unit_ids),
+        selection_policy=pool.selection_policy,
+        basis=pool.basis,
+    )
+    members = set(pool.unit_ids)
+    if pool.case_id != case.get("id", case.get("case_id")):
+        details["reason"] = "pool_case_mismatch"
+    elif pool.sha256 != pool.content_sha256():
+        details["reason"] = "pool_sha256_mismatch"
+    elif label_mode == "approved" and pool.basis != "human_review":
+        details["reason"] = "pool_human_review_required"
+    else:
+        invalid: dict[str, str] = {}
+        for record in pool.unit_identity_records:
+            try:
+                current = evidence_unit(record.model_dump(), file_hashes)
+            except ValueError:
+                invalid[record.unit_id] = "missing_or_stale_pool_pdf_hash"
+                continue
+            if (
+                current["unit_id"] != record.unit_id
+                or current["identity"] != record.identity.model_dump()
+                or current["normalized_text_sha256"] != record.normalized_text_sha256
+            ):
+                invalid[record.unit_id] = "pool_unit_identity_mismatch"
+        if invalid:
+            details["reason"] = "invalid_pool_unit_identities"
+            details["invalid_units"] = invalid
+        else:
+            unjudged = sorted(members - judgments.keys())
+            if unjudged:
+                details["reason"] = "pool_contains_unjudged_units"
+                details["unjudged_unit_ids"] = unjudged
+    if details["reason"]:
+        return details, members, []
+    grades = {unit_id: judgments[unit_id]["relevance"] for unit_id in sorted(members)}
+    fingerprint = json.dumps(
+        {"pool_sha256": pool.sha256, "grades": grades, "convention": _POOL_NDCG_CONVENTION},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    details["pool_fingerprint"] = hashlib.sha256(
+        ("pool-ndcg-v1\0" + fingerprint).encode("utf-8")
+    ).hexdigest()
+    return details, members, sorted(grades.values(), reverse=True)
+
+
+def _pool_ndcg(
+    top: list[dict[str, Any]],
+    k: int,
+    details: dict[str, Any],
+    members: set[str],
+    ideal_grades: list[int],
+    *,
+    gate: bool,
+    answerable: bool,
+) -> dict[str, Any]:
+    outside = sorted({unit["unit_id"] for unit in top} - members)
+    reason = (
+        "case_human_review_not_approved"
+        if gate
+        else "no_relevance_target"
+        if not answerable
+        else details["reason"] or ("returned_units_outside_candidate_pool" if outside else None)
+    )
+    dcg = idcg = None
+    value = None
+    if not reason:
+        idcg = sum(
+            (2**grade - 1) / math.log2(rank + 1) for rank, grade in enumerate(ideal_grades[:k], 1)
+        )
+        dcg = sum(
+            (2 ** unit["relevance"] - 1) / math.log2(unit["rank"] + 1)
+            for unit in top
+            if not unit["duplicate"]
+        )
+        if not idcg:
+            reason = "pool_has_no_positive_relevance"
+        else:
+            value = dcg / idcg
+    return {
+        **_metric(value, reason, dcg, idcg),
+        "dcg": dcg,
+        "idcg": idcg,
+        "pool_id": details["pool_id"],
+        "pool_sha256": details["pool_sha256"],
+        "pool_fingerprint": details["pool_fingerprint"],
+        "pool_unit_count": details["pool_unit_count"],
+        "outside_pool_unit_ids": outside if members else [],
+        "convention": _POOL_NDCG_CONVENTION,
+    }
+
+
 def evaluate_stage(
     case: dict[str, Any],
     hits: list[dict[str, Any]],
@@ -173,6 +313,7 @@ def evaluate_stage(
     k_values: tuple[int, ...] = (1, 3, 5, 10, 20),
     *,
     label_mode: str = "provisional",
+    ranking_pool: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Evaluate a returned ordered list with explicit missing-label denominators.
 
@@ -180,6 +321,8 @@ def evaluate_stage(
     relevant positions. Duplicate rates are separate diagnostics. Missing slots
     after retrieval exhaustion count as zero; unknown returned units never do.
     MRR is exact only when no earlier unknown unit can change the first positive.
+    Pool nDCG uses a separately sealed, completely graded candidate universe;
+    candidates outside that universe make its applicable K values unevaluable.
     """
     if label_mode not in {"provisional", "approved"}:
         raise ValueError("label_mode must be provisional or approved")
@@ -187,6 +330,9 @@ def evaluate_stage(
         raise ValueError("k_values must contain positive integers")
     groups = case.get("evidence_groups", [])
     valid, invalid_labels = _judgments(case, label_mode)
+    pool_details, pool_members, ideal_grades = _prepare_ranking_pool(
+        case, ranking_pool, file_hashes, valid, label_mode
+    )
     invalid_groups = _invalid_groups(groups, file_hashes)
     gate = label_mode == "approved" and case.get("human_review", {}).get("status") != "approved"
     basis = "provisional_agent_review" if label_mode == "provisional" else "human_review"
@@ -227,13 +373,21 @@ def evaluate_stage(
             "evidence_group_count": len(groups),
             "evaluable_group_count": len(groups) - len(invalid_groups),
         }
+        metrics[f"pool_ndcg@{k}"] = _pool_ndcg(
+            top,
+            k,
+            pool_details,
+            pool_members,
+            ideal_grades,
+            gate=gate,
+            answerable=case.get("answerability") == "answerable",
+        )
         if gate:
             for name in (
                 "required_group_recall",
                 "precision",
                 "mrr",
                 "annotated_mrr_lower_bound",
-                "pool_ndcg",
             ):
                 metrics[f"{name}@{k}"] = _metric(None, "case_human_review_not_approved")
             continue
@@ -275,7 +429,6 @@ def evaluate_stage(
                 mrr = _metric(None, "unknown_units_can_change_first_positive_rank")
         metrics[f"mrr@{k}"] = mrr
         metrics[f"annotated_mrr_lower_bound@{k}"] = lower_bound
-        metrics[f"pool_ndcg@{k}"] = _metric(None, "fixed_fully_judged_candidate_pool_required")
     duplicate_count = sum(unit["duplicate"] for unit in units)
     return {
         "case_id": case.get("id", case.get("case_id")),
@@ -294,6 +447,7 @@ def evaluate_stage(
             "evidence_group_count": len(groups),
             "invalid_groups": invalid_groups,
             "invalid_judgments": invalid_labels,
+            "ranking_pool": pool_details,
             "at_k": at_k,
         },
         "units": units,

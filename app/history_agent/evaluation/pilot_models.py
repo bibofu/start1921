@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -65,6 +67,64 @@ class PilotJudgment(StrictModel):
 class PilotForbiddenClaim(StrictModel):
     claim: str
     reason: str
+
+
+class RankingPoolIdentity(StrictModel):
+    document_id: str = Field(min_length=1)
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    pdf_page_start: int = Field(ge=1, strict=True)
+    pdf_page_end: int = Field(ge=1, strict=True)
+    normalized_text_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class RankingPoolUnit(RankingPoolIdentity):
+    unit_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    identity: RankingPoolIdentity
+    text: str = Field(min_length=1)
+
+
+class RankingPool(StrictModel):
+    """A sealed, case-specific universe for pool-relative ranking evaluation.
+
+    Relevance labels stay in PilotCase.judgments. Keeping this model separate
+    preserves historical case-definition hashes when ranking pools are added.
+    """
+
+    schema_version: Literal[1] = 1
+    pool_id: str = Field(min_length=1)
+    case_id: str = Field(min_length=1)
+    selection_policy: str = Field(min_length=1)
+    unit_ids: list[str] = Field(min_length=1)
+    unit_identity_records: list[RankingPoolUnit] = Field(min_length=1)
+    basis: Literal["agent_review", "human_review"]
+    reviewer: str = Field(min_length=1)
+    reviewed_at: str = Field(min_length=1)
+    sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def require_complete_membership(self) -> RankingPool:
+        record_ids = [record.unit_id for record in self.unit_identity_records]
+        if len(set(self.unit_ids)) != len(self.unit_ids):
+            raise ValueError("ranking pool must contain unique unit IDs")
+        if len(set(record_ids)) != len(record_ids) or set(self.unit_ids) != set(record_ids):
+            raise ValueError("ranking pool membership must match its identity records exactly")
+        return self
+
+    def content_sha256(self) -> str:
+        content = self.model_dump(exclude={"sha256"})
+        content["unit_ids"] = sorted(content["unit_ids"])
+        content["unit_identity_records"] = sorted(
+            content["unit_identity_records"], key=lambda record: record["unit_id"]
+        )
+        serialized = json.dumps(content, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(("ranking-pool-v1\0" + serialized).encode("utf-8")).hexdigest()
+
+
+def seal_ranking_pool(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate pool membership and seal its fixed selection and identity records."""
+    pool = RankingPool.model_validate({**payload, "sha256": None})
+    pool.sha256 = pool.content_sha256()
+    return pool.model_dump()
 
 
 class PilotCase(StrictModel):

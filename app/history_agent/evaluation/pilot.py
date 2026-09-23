@@ -1,4 +1,4 @@
-"""Collect and score reviewable six-case trials without changing Golden v1."""
+"""Collect and score reviewable development trials without changing Golden v1."""
 
 from __future__ import annotations
 
@@ -22,14 +22,20 @@ from history_agent.evaluation.golden import (
     _index_attribution,
     _load_index_metadata,
 )
+from history_agent.evaluation.pilot_answers import (
+    AnswerReviews,
+    aggregate_answers,
+    evaluate_answer,
+    validate_reviews,
+)
 from history_agent.evaluation.pilot_metrics import evaluate_stage, evidence_unit
-from history_agent.evaluation.pilot_models import PilotDataset, case_definition
+from history_agent.evaluation.pilot_models import PilotDataset, RankingPool, case_definition
 from history_agent.evaluation.pilot_runtime import RecordedLLMRuntime
 from history_agent.extraction.report import load_page_records
 from history_agent.processing.chunks import effective_pages
 from history_agent.retrieval.hybrid import search_hybrid_index
 
-VERSION = "reviewable-pilot-v1"
+VERSION = "reviewable-pilot-v2"
 DEFAULT_DATASET = "evals/golden/pilot_annotations.json"
 DEFAULT_K = (1, 3, 5, 10, 20)
 
@@ -333,8 +339,11 @@ def stage_metrics(
     file_hashes: dict[str, str],
     k_values: tuple[int, ...],
     mode: str,
+    ranking_pool: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    result = evaluate_stage(case, hits, file_hashes, k_values, label_mode=mode)
+    result = evaluate_stage(
+        case, hits, file_hashes, k_values, label_mode=mode, ranking_pool=ranking_pool
+    )
     full_k = max(1, len(hits))
     full = evaluate_stage(case, hits, file_hashes, (full_k,), label_mode=mode)
     result["metrics"]["required_group_recall_at_returned"] = full["metrics"][
@@ -361,15 +370,46 @@ def _aggregate(results: list[dict[str, Any]], mode: str) -> dict[str, Any]:
             "total_cases": len(items),
             "evaluable_case_ids": [case_id for case_id, _ in valid],
             "unevaluable_case_ids": [case_id for case_id, item in items if not item["evaluable"]],
+            "pool_fingerprints": {
+                case_id: metric.get("pool_fingerprint") for case_id, metric in valid
+            }
+            if ".pool_ndcg@" in key
+            else None,
         }
     return result
 
 
 def score(
-    dataset_path: Path, capture_path: Path, output: Path, k_values: tuple[int, ...] = DEFAULT_K
+    dataset_path: Path,
+    capture_path: Path,
+    output: Path,
+    k_values: tuple[int, ...] = DEFAULT_K,
+    *,
+    ranking_pools_path: Path | None = None,
+    assessments_path: Path | None = None,
 ) -> dict[str, Any]:
     dataset = PilotDataset.model_validate(read_json(dataset_path))
     capture = read_json(capture_path)
+    pools = {}
+    if ranking_pools_path is not None:
+        pool_payload = read_json(ranking_pools_path)
+        if set(pool_payload) != {"schema_version", "pools"} or pool_payload["schema_version"] != 1:
+            raise ValueError("invalid ranking pool collection")
+        for payload in pool_payload["pools"]:
+            pool = RankingPool.model_validate(payload)
+            if pool.case_id in pools:
+                raise ValueError("duplicate ranking pool for case")
+            if pool.sha256 != pool.content_sha256():
+                raise ValueError("ranking pool seal mismatch")
+            pools[pool.case_id] = pool.model_dump(mode="json")
+    assessment = (
+        AnswerReviews.model_validate(read_json(assessments_path)) if assessments_path else None
+    )
+    reviews = (
+        validate_reviews(assessment, capture, [c.model_dump(mode="json") for c in dataset.cases])
+        if assessment
+        else {}
+    )
     captured = {item["case_id"]: item for item in capture["cases"]}
     if {case.id for case in dataset.cases} != set(captured):
         raise ValueError("capture and dataset case IDs differ")
@@ -393,7 +433,9 @@ def score(
                 "elapsed_ms": source["elapsed_ms"],
             }
             for mode in ("provisional", "approved"):
-                item[mode] = stage_metrics(case, source["hits"], file_hashes, k_values, mode)
+                item[mode] = stage_metrics(
+                    case, source["hits"], file_hashes, k_values, mode, pools.get(model.id)
+                )
             stages.append(item)
         for source in raw["generation_contexts"]:
             if not source["mapping_complete"] or source.get("http_status") != 200:
@@ -405,7 +447,9 @@ def score(
                 "elapsed_ms": None,
             }
             for mode in ("provisional", "approved"):
-                item[mode] = stage_metrics(case, source["hits"], file_hashes, k_values, mode)
+                item[mode] = stage_metrics(
+                    case, source["hits"], file_hashes, k_values, mode, pools.get(model.id)
+                )
             stages.append(item)
         results.append(
             {
@@ -417,9 +461,8 @@ def score(
                 "retrieval_ms": raw["retrieval_ms"],
                 "answer_ms": raw["answer_ms"],
                 "generation_assessment": {
-                    "value": None,
-                    "evaluable": False,
-                    "reason": "requires fact-by-fact human review; not auto string scoring",
+                    mode: evaluate_answer(case, reviews.get(model.id), mode=mode)
+                    for mode in ("provisional", "approved")
                 },
             }
         )
@@ -438,10 +481,14 @@ def score(
         "index_attribution": capture["index_attribution"],
         "component_candidate_fingerprints": capture.get("component_candidate_fingerprints"),
         "labels": "Provisional agent labels are diagnostic only, not approved Golden results.",
+        "answer_rubric_version": assessment.rubric_version if assessment else None,
+        "answer_reviews_sha256": digest(assessment.model_dump(mode="json")) if assessment else None,
         "k_values": list(k_values),
         "cases": results,
         "provisional_aggregate": _aggregate(results, "provisional"),
         "approved_aggregate": _aggregate(results, "approved"),
+        "provisional_answer_aggregate": aggregate_answers(results, "provisional"),
+        "approved_answer_aggregate": aggregate_answers(results, "approved"),
     }
     write_json(output, result)
     output.with_suffix(".md").write_text(markdown_report(result), encoding="utf8")
@@ -450,7 +497,7 @@ def score(
 
 def markdown_report(report: dict[str, Any]) -> str:
     lines = [
-        "# 六题评测试点报告",
+        "# 开发集评测报告",
         "",
         f"运行：`{report['run_name']}`",
         "",
@@ -460,8 +507,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         "同次运行的多 K 值是排序前缀诊断，不等于重新执行不同 Top-K 的生产实验。",
         "生成上下文来自实际 HTTP 请求中的证据区；它与最终答案引用列表分别记录。",
         "",
-        "| 题目 | 阶段 | 关键证据组 Recall@5 | Precision@5 | MRR@5 | 未判断候选 |",
-        "| --- | --- | ---: | ---: | ---: | ---: |",
+        "| 题目 | 阶段 | 关键证据组 Recall@5 | Precision@5 | MRR@5 | 固定池 nDCG@5 | 未判断候选 |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
     for case in report["cases"]:
         for stage in case["stages"]:
@@ -476,7 +523,7 @@ def markdown_report(report: dict[str, Any]) -> str:
                 continue
             metrics = stage["provisional"]["metrics"]
             values = []
-            for key in ("required_group_recall@5", "precision@5", "mrr@5"):
+            for key in ("required_group_recall@5", "precision@5", "mrr@5", "pool_ndcg@5"):
                 metric = metrics.get(key, {})
                 value = metric.get("value")
                 values.append(f"{value:.3f}" if value is not None else "不可评")
@@ -492,6 +539,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         "正式分数仅纳入人工已批准标签；nDCG 等未满足标注条件的指标不填零。",
         "",
     ]
+    lines += ["| 答案维度 | Agent 暂定分数 | 有效分母 |", "| --- | ---: | ---: |"]
+    for name, metric in report["provisional_answer_aggregate"].items():
+        value = metric["value"]
+        rendered = f"{value:.3f}" if value is not None else "不可评"
+        lines.append(f"| {name} | {rendered} | {metric['denominator']} |")
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -505,6 +558,14 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         a, b = left["provisional_aggregate"][name], right["provisional_aggregate"][name]
         valid = not reasons and a["evaluable_case_ids"] == b["evaluable_case_ids"]
         valid = valid and a["value"] is not None and b["value"] is not None
+        if ".pool_ndcg@" in name:
+            fingerprints = a.get("pool_fingerprints") or {}
+            valid = (
+                valid
+                and bool(fingerprints)
+                and all(fingerprints.get(case_id) for case_id in a["evaluable_case_ids"])
+                and fingerprints == b.get("pool_fingerprints")
+            )
         metrics[name] = {
             "comparable": valid,
             "delta": b["value"] - a["value"] if valid else None,
@@ -516,6 +577,35 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         for key in set(left["config"]) | set(right["config"])
         if left["config"].get(key) != right["config"].get(key)
     }
+    answer_metrics = {}
+    for name in sorted(
+        set(left.get("provisional_answer_aggregate", {}))
+        & set(right.get("provisional_answer_aggregate", {}))
+    ):
+        a = left["provisional_answer_aggregate"][name]
+        b = right["provisional_answer_aggregate"][name]
+        bases = a.get("review_bases") or {}
+        case_ids = a.get("evaluable_case_ids") or []
+        units = a.get("evaluable_unit_ids") or []
+        valid = (
+            not reasons
+            and bool(left.get("answer_rubric_version"))
+            and left.get("answer_rubric_version") == right.get("answer_rubric_version")
+            and bool(units)
+            and bool(case_ids)
+            and units == b.get("evaluable_unit_ids")
+            and case_ids == b.get("evaluable_case_ids")
+            and bases == b.get("review_bases")
+            and all(bases.get(case_id) in {"agent_review", "human_review"} for case_id in case_ids)
+            and a["value"] is not None
+            and b["value"] is not None
+        )
+        answer_metrics[name] = {
+            "comparable": valid,
+            "delta": b["value"] - a["value"] if valid else None,
+            "left_units": a.get("evaluable_unit_ids", []),
+            "right_units": b.get("evaluable_unit_ids", []),
+        }
     pools_known = all(report.get("component_candidate_fingerprints") for report in (left, right))
     pools_equal = (
         left.get("component_candidate_fingerprints")
@@ -530,9 +620,7 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         )
     if pools_equal is not True:
         attribution_reasons.append("Isolation requires identical ordered branch candidates")
-    if (
-        not left.get("source_sha256") or left.get("source_sha256") != right.get("source_sha256")
-    ):
+    if not left.get("source_sha256") or left.get("source_sha256") != right.get("source_sha256"):
         attribution_reasons.append("Isolation requires identical captured source code")
     return {
         "compatible": not reasons,
@@ -540,6 +628,7 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         "config_changes": changes,
         "basis": "provisional_agent_review",
         "metrics": metrics,
+        "answer_metrics": answer_metrics,
         "ordered_branch_candidates_equal": pools_equal,
         "attribution_unsafe_reasons": attribution_reasons,
         "attribution_safe": not reasons
@@ -565,6 +654,8 @@ def main() -> None:
     score_parser.add_argument("--dataset", type=Path, default=Path(DEFAULT_DATASET))
     score_parser.add_argument("--capture", type=Path, required=True)
     score_parser.add_argument("--output", type=Path, required=True)
+    score_parser.add_argument("--ranking-pools", type=Path)
+    score_parser.add_argument("--assessments", type=Path)
     compare_parser = sub.add_parser("compare")
     compare_parser.add_argument("left", type=Path)
     compare_parser.add_argument("right", type=Path)
@@ -581,7 +672,13 @@ def main() -> None:
             run_name=args.run_name,
         )
     elif args.command == "score":
-        score(args.dataset, args.capture, args.output)
+        score(
+            args.dataset,
+            args.capture,
+            args.output,
+            ranking_pools_path=args.ranking_pools,
+            assessments_path=args.assessments,
+        )
     else:
         write_json(args.output, compare(read_json(args.left), read_json(args.right)))
     print(args.output)

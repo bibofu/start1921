@@ -1,8 +1,10 @@
 from copy import deepcopy
+from math import log2
 from typing import Any
 
 import pytest
 from history_agent.evaluation.pilot_metrics import evaluate_stage, evidence_unit
+from history_agent.evaluation.pilot_models import seal_ranking_pool
 
 HASHES = {"doc": "a" * 64, "other": "b" * 64}
 
@@ -239,3 +241,174 @@ def test_conflicting_or_incomplete_judgments_are_unknown() -> None:
     result = evaluate_stage(case, [hit], HASHES, (1,))
     assert result["metrics"]["precision@1"]["value"] is None
     assert result["diagnostics"]["evaluable_unit_count"] == 0
+
+
+def _pool(hits: list[dict[str, Any]], *, basis: str = "agent_review") -> dict[str, Any]:
+    records = [evidence_unit(hit, HASHES) for hit in hits]
+    return seal_ranking_pool(
+        {
+            "pool_id": "pilot-fixed-pool-v1",
+            "case_id": "pilot",
+            "selection_policy": "Frozen union of keyword and vector top 5 before tuning.",
+            "unit_ids": [record["unit_id"] for record in records],
+            "unit_identity_records": records,
+            "basis": basis,
+            "reviewer": "test-reviewer",
+            "reviewed_at": "2026-09-23T12:00:00+00:00",
+        }
+    )
+
+
+def test_pool_ndcg_uses_fixed_graded_universe_including_unreturned_relevant_units() -> None:
+    case = _case()
+    hits = [_hit("直接证据。"), _hit("相关背景。", 11), _hit("无关资料。", 12)]
+    case["judgments"] = [_label(hit, grade) for hit, grade in zip(hits, [2, 1, 0], strict=True)]
+    result = evaluate_stage(
+        case, [hits[1], hits[2], hits[0]], HASHES, (1, 3, 5), ranking_pool=_pool(hits)
+    )
+    metric = result["metrics"]["pool_ndcg@3"]
+    assert metric["dcg"] == pytest.approx(1 + 3 / log2(4))
+    assert metric["idcg"] == pytest.approx(3 + 1 / log2(3))
+    assert metric["value"] == pytest.approx(metric["dcg"] / metric["idcg"])
+    assert metric["numerator"] == metric["dcg"]
+    assert metric["denominator"] == metric["idcg"]
+    assert result["metrics"]["pool_ndcg@1"]["value"] == pytest.approx(1 / 3)
+    assert result["metrics"]["pool_ndcg@5"]["value"] == metric["value"]
+    assert metric["pool_unit_count"] == 3
+    assert metric["pool_fingerprint"]
+
+
+def test_pool_ndcg_does_not_count_duplicate_gain_or_shrink_short_list_denominator() -> None:
+    case = _case()
+    hits = [_hit("直接证据。"), _hit("另一份直接证据。", 11)]
+    case["judgments"] = [_label(hit, 2) for hit in hits]
+    pool = _pool(hits)
+    duplicate = evaluate_stage(case, [hits[0], hits[0]], HASHES, (2,), ranking_pool=pool)
+    short = evaluate_stage(case, [hits[0]], HASHES, (2,), ranking_pool=pool)
+    empty = evaluate_stage(case, [], HASHES, (2,), ranking_pool=pool)
+    assert duplicate["metrics"]["pool_ndcg@2"]["dcg"] == 3
+    assert duplicate["metrics"]["pool_ndcg@2"]["value"] == pytest.approx(3 / (3 + 3 / log2(3)))
+    assert short["metrics"]["pool_ndcg@2"]["value"] == duplicate["metrics"]["pool_ndcg@2"]["value"]
+    assert empty["metrics"]["pool_ndcg@2"]["value"] == 0
+
+
+def test_pool_ndcg_requires_labels_for_entire_pool_not_only_returned_hits() -> None:
+    case = _case()
+    hits = [_hit("直接证据。"), _hit("未判断的候选。", 11)]
+    case["judgments"] = [_label(hits[0], 2)]
+    result = evaluate_stage(case, hits[:1], HASHES, (1,), ranking_pool=_pool(hits))
+    metric = result["metrics"]["pool_ndcg@1"]
+    assert metric["value"] is None and metric["reason"] == "pool_contains_unjudged_units"
+    assert result["diagnostics"]["ranking_pool"]["unjudged_unit_ids"] == [
+        evidence_unit(hits[1], HASHES)["unit_id"]
+    ]
+    assert result["metrics"]["precision@1"]["value"] == 1
+
+
+def test_pool_ndcg_only_rejects_k_values_that_include_outside_candidates() -> None:
+    case = _case()
+    inside, outside = _hit("池内证据。"), _hit("池外证据。", 11)
+    case["judgments"] = [_label(inside, 2), _label(outside, 2)]
+    result = evaluate_stage(case, [inside, outside], HASHES, (1, 2), ranking_pool=_pool([inside]))
+    assert result["metrics"]["pool_ndcg@1"]["value"] == 1
+    assert result["metrics"]["pool_ndcg@2"]["value"] is None
+    assert result["metrics"]["pool_ndcg@2"]["reason"] == "returned_units_outside_candidate_pool"
+    assert result["metrics"]["pool_ndcg@2"]["outside_pool_unit_ids"] == [
+        evidence_unit(outside, HASHES)["unit_id"]
+    ]
+
+
+@pytest.mark.parametrize("change", ["pdf", "text", "nested_identity", "seal", "case"])
+def test_pool_ndcg_rejects_stale_or_inconsistent_pool_identity(change: str) -> None:
+    case = _case()
+    hit = _hit("池内证据。")
+    case["judgments"] = [_label(hit, 2)]
+    pool = _pool([hit])
+    hashes = dict(HASHES)
+    if change == "pdf":
+        hashes["doc"] = "c" * 64
+    elif change == "text":
+        pool["unit_identity_records"][0]["text"] = "已改变的候选文本。"
+        pool = seal_ranking_pool(pool)
+    elif change == "nested_identity":
+        pool["unit_identity_records"][0]["identity"]["pdf_page_end"] = 99
+        pool = seal_ranking_pool(pool)
+    elif change == "seal":
+        pool["selection_policy"] = "Altered selection after sealing."
+    else:
+        pool["case_id"] = "some-other-question"
+        pool = seal_ranking_pool(pool)
+    result = evaluate_stage(case, [hit], hashes, (1,), ranking_pool=pool)
+    expected = {"seal": "pool_sha256_mismatch", "case": "pool_case_mismatch"}.get(
+        change, "invalid_pool_unit_identities"
+    )
+    assert result["metrics"]["pool_ndcg@1"]["reason"] == expected
+    assert result["metrics"]["pool_ndcg@1"]["value"] is None
+
+
+def test_pool_ndcg_zero_ideal_gain_is_not_a_zero_score_and_refusal_is_not_applicable() -> None:
+    case = _case()
+    hit = _hit("无关材料。")
+    case["judgments"] = [_label(hit, 0)]
+    result = evaluate_stage(case, [hit], HASHES, (1,), ranking_pool=_pool([hit]))
+    metric = result["metrics"]["pool_ndcg@1"]
+    assert metric["value"] is None and metric["reason"] == "pool_has_no_positive_relevance"
+    assert metric["dcg"] == metric["idcg"] == 0
+    case["answerability"] = "unanswerable"
+    refused = evaluate_stage(case, [hit], HASHES, (1,), ranking_pool=_pool([hit]))
+    assert refused["metrics"]["pool_ndcg@1"]["reason"] == "no_relevance_target"
+
+
+def test_pool_ndcg_approved_mode_requires_case_pool_and_every_label_human_review() -> None:
+    case = _case()
+    hit = _hit("直接证据。")
+    case["judgments"] = [_label(hit, 2)]
+    pool = _pool([hit])
+
+    def metric() -> dict[str, Any]:
+        return evaluate_stage(case, [hit], HASHES, (1,), label_mode="approved", ranking_pool=pool)[
+            "metrics"
+        ]["pool_ndcg@1"]
+
+    assert metric()["reason"] == "case_human_review_not_approved"
+    case["human_review"]["status"] = "approved"
+    assert metric()["reason"] == "pool_human_review_required"
+    pool = _pool([hit], basis="human_review")
+    assert metric()["reason"] == "pool_contains_unjudged_units"
+    case["judgments"][0]["basis"] = "human_review"
+    assert metric()["value"] == 1
+
+
+def test_pool_fingerprint_binds_membership_and_grades_but_not_member_order() -> None:
+    case = _case()
+    hits = [_hit("直接证据。"), _hit("背景材料。", 11)]
+    case["judgments"] = [_label(hits[0], 2), _label(hits[1], 1)]
+    pool = _pool(hits)
+
+    def fingerprint(selected_pool: dict[str, Any]) -> str:
+        return str(
+            evaluate_stage(case, hits[:1], HASHES, (1,), ranking_pool=selected_pool)["metrics"][
+                "pool_ndcg@1"
+            ]["pool_fingerprint"]
+        )
+
+    original = fingerprint(pool)
+    assert original == fingerprint(_pool(list(reversed(hits))))
+    assert original != fingerprint(_pool(hits[:1]))
+    case["judgments"][1]["relevance"] = 0
+    assert original != fingerprint(pool)
+
+
+def test_pool_ndcg_rejects_unsealed_or_malformed_pool_without_crashing_other_metrics() -> None:
+    case = _case()
+    hit = _hit("直接证据。")
+    case["judgments"] = [_label(hit, 2)]
+    pool = _pool([hit])
+    pool["unit_ids"].append("invented-unit")
+    result = evaluate_stage(case, [hit], HASHES, (1,), ranking_pool=pool)
+    assert result["metrics"]["pool_ndcg@1"]["reason"] == "invalid_candidate_pool"
+    assert result["metrics"]["precision@1"]["value"] == 1
+    pool = _pool([hit])
+    del pool["sha256"]
+    result = evaluate_stage(case, [hit], HASHES, (1,), ranking_pool=pool)
+    assert result["metrics"]["pool_ndcg@1"]["reason"] == "pool_sha256_mismatch"

@@ -58,6 +58,57 @@ class RecordedLLMRuntime(LLMRuntime):
             self.calls.append(entry)
         return entry
 
+    @staticmethod
+    def _record_response(entry: dict[str, Any], response: httpx.Response) -> None:
+        entry.update(status="response", http_status=response.status_code)
+        if response.status_code != 200:
+            return  # Error bodies can echo request headers or endpoint details.
+        try:
+            payload = response.json()
+        except ValueError:
+            entry["response_capture_status"] = "invalid_json"
+            return
+        if not isinstance(payload, dict):
+            entry["response_capture_status"] = "unexpected_shape"
+            return
+        choices = []
+        raw_choices = payload.get("choices")
+        for choice in raw_choices if isinstance(raw_choices, list) else []:
+            if not isinstance(choice, dict) or not isinstance(choice.get("message"), dict):
+                continue
+            content = choice["message"].get("content")
+            if not isinstance(content, str):
+                continue
+            choices.append(
+                {
+                    "index": choice.get("index"),
+                    "finish_reason": choice.get("finish_reason"),
+                    "message": {"role": "assistant", "content": content},
+                }
+            )
+        usage = payload.get("usage", {})
+        entry["response_summary"] = {
+            "model": payload.get("model") if isinstance(payload.get("model"), str) else None,
+            "choices": choices,
+            "usage": {
+                key: value
+                for key, value in usage.items()
+                if key
+                in {
+                    "prompt_tokens",
+                    "completion_tokens",
+                    "total_tokens",
+                    "prompt_cache_hit_tokens",
+                    "prompt_cache_miss_tokens",
+                }
+                and type(value) is int
+                and value >= 0
+            }
+            if isinstance(usage, dict)
+            else {},
+        }
+        entry["response_capture_status"] = "recorded"
+
     def post(
         self, url: str, *, timeout: float, headers: dict[str, str], json: dict[str, object]
     ) -> httpx.Response:
@@ -65,7 +116,7 @@ class RecordedLLMRuntime(LLMRuntime):
         started = perf_counter()
         try:
             response = super().post(url, timeout=timeout, headers=headers, json=json)
-            entry.update(status="response", http_status=response.status_code)
+            self._record_response(entry, response)
             return response
         except httpx.HTTPError as exc:
             entry.update(status="failed", error_type=type(exc).__name__)
@@ -80,7 +131,7 @@ class RecordedLLMRuntime(LLMRuntime):
         started = perf_counter()
         try:
             response = await super().apost(url, timeout=timeout, headers=headers, json=json)
-            entry.update(status="response", http_status=response.status_code)
+            self._record_response(entry, response)
             return response
         except httpx.HTTPError as exc:
             entry.update(status="failed", error_type=type(exc).__name__)
