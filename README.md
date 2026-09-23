@@ -229,6 +229,8 @@ v13 的真实 LLM 评测方法、指标口径和首轮基线见
 [`evals/V13_LLM_EVALUATION.md`](evals/V13_LLM_EVALUATION.md)。
 Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法见
 [`evals/golden/README.md`](evals/golden/README.md)。
+当前v2开发集进展（13题预标注、固定池排序指标及六题真实答案重算）见
+[`evals/golden/DEVELOPMENT_BASELINE.md`](evals/golden/DEVELOPMENT_BASELINE.md)；人工Golden仍待复核。
 
 如果扫描发现某份已登记 PDF 的 SHA-256 发生变化，程序会保留旧版本，不会直接接受新内容。确认差异后运行：
 

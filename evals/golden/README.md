@@ -2,11 +2,11 @@
 
 六题真实模型结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
-## v2设计与六题试点入口
+## v2设计与当前开发集
 
-当前v2处于草案和工具验证阶段：`design_v2.json`有30个具体候选问题（20开发、10保留），`pilot_annotations.json`有6个开发试点（5可答、1拒答）及48条Agent暂定候选判断，全部人工复核仍为pending。**这不是已完成的30题正式Golden。** 保留题不进入当前调参和试点运行。
+当前v2设计清单有30题（20开发、10保留）；`development_v2.json` 已完成13题Agent原文核验和候选标注（12可答、1拒答），人工批准仍为0。**尚未完成30题正式Golden。** 保留题禁止进入当前调参和运行。最新执行结果与复现命令见 [DEVELOPMENT_BASELINE.md](DEVELOPMENT_BASELINE.md)。
 
-设计、实际指标口径和 `pilot collect/score/compare`、`pilot_review build/import` 流程见 [DESIGN_V2.md](DESIGN_V2.md)。v2试点已支持证据组Recall、以K为分母的Precision和处理未知候选的MRR；nDCG尚未实现评分，正式人工指标待复核。默认运行无LLM；本次六题已在用户明确授权后完成真实LLM实验。
+设计及分母见 [DESIGN_V2.md](DESIGN_V2.md)。当前支持分阶段证据组Recall、Precision、MRR与固定候选池nDCG，以及绑定具体答案的显式逐事实/维度评审汇总。未知项不按0处理，跨配置比较核对标注、有效分母和池指纹。默认采集无LLM；有真实模型调用的仍为此前获授权的六题，新七题先完成本地检索评测。
 
 **以下各节描述旧v1的12题数据集、`evaluation.golden`与 `eval golden` 命令；v1和v2试点的数据、指标及报告不能混用。**
 
