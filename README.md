@@ -19,11 +19,15 @@
 - Python 3.11 或更高版本；
 - [uv](https://docs.astral.sh/uv/)；
 - DeepSeek API Key（可选；不配置时使用本地证据摘录模式）；
-- 本项目登记的 PDF 史料。PDF 和生成索引不随 Git 仓库分发。
+- Git LFS：`docs/` 中登记的 PDF 史料通过 Git LFS 随仓库分发；生成索引仍在本地构建。
 
 ```powershell
 git clone git@github.com:bibofu/history-agent.git
 cd history-agent
+
+# 为当前仓库启用 Git LFS，并下载 docs/ 中的原始 PDF
+git lfs install --local
+git lfs pull
 
 # 创建虚拟环境并安装 OCR、向量检索、Web 和开发依赖
 uv sync --extra ocr --extra vector --extra app --group dev
@@ -58,7 +62,7 @@ uv run history-agent llm check
 
 ### 3. 放入史料并首次建库
 
-将 PDF 放入 `docs/`。文件名应与 `config/corpus_catalog.json` 中登记的名称一致，然后执行：
+完成 `git lfs pull` 后，`docs/` 中应为完整 PDF 文件。新增史料也放入 `docs/`，文件名应与 `config/corpus_catalog.json` 中登记的名称一致，然后执行：
 
 ```powershell
 # 登记文献并提取全部页面
@@ -300,7 +304,7 @@ DEEPSEEK_API_KEY=你的密钥
 | 《西行漫记（红星照耀中国）》 | 早期人物经历和同时代外部观察 | 扫描版，需要完整 OCR |
 | 《毛泽东年谱》九卷（1893—1976） | 毛泽东经历、会议和历史事件检索 | 按卷登记、保留年份书签，对疑似坏文字层及章节起始页重新 OCR；1921 年以前的章节默认不参与检索 |
 
-原始 PDF 保存在 `docs/` 中。原始文件只读使用，不在预处理过程中覆盖或改写。
+原始 PDF 保存在 `docs/` 中，通过 Git LFS 管理。Git 提交保存文件指针，原始文件由 LFS 下载；普通源码压缩包不能保证包含 PDF 实体，应使用安装了 Git LFS 的仓库克隆并执行 `git lfs pull`。原始文件只读使用，不在预处理过程中覆盖或改写。
 
 停用或缺失文献的分片应移出活跃 `data/processed/chunks/` 目录后再重建双索引。结构化时间线、交集和组织关系查询也会排除停用或缺失的来源；涉及撤下来源的规范事件回退到仍有可用证据的源事件，历史数据与复核状态保持可追溯。
 
