@@ -235,7 +235,7 @@ Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法
 [`evals/golden/README.md`](evals/golden/README.md)。
 当前v2开发集已完成20题原文/事实/边界预标注，人工复核分批入口见
 [`evals/golden/DEVELOPMENT_ANNOTATION_PROGRESS.md`](evals/golden/DEVELOPMENT_ANNOTATION_PROGRESS.md)。
-已有运行仍是[13题检索基线及六题真实答案](evals/golden/DEVELOPMENT_BASELINE.md)；新标注包尚未接入多轮协议，人工Golden仍待复核。
+最新已完成[13题真实模型评测与逐事实评审](evals/golden/observations/20261005/README.md)；[历史检索基线](evals/golden/DEVELOPMENT_BASELINE.md)保留。新20题标注包尚未接入多轮协议，新增7题未运行，人工Golden仍待复核。
 
 如果扫描发现某份已登记 PDF 的 SHA-256 发生变化，程序会保留旧版本，不会直接接受新内容。确认差异后运行：
 

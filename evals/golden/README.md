@@ -1,14 +1,14 @@
 # Unified RAG Golden Benchmark
 
-六题真实模型结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
+最新13题真实模型观察见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
 ## v2设计与当前开发集
 
 截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，人工批准仍为0。新标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
 
-新 `development_annotations_v3.json` 是待人工审核和协议接入的标注包，旧采集器会明确拒绝，不能忽略多轮条件后直接运行。`development_v2.json` 的13题历史执行入口及其标签完整保留；现有实际采集仍为13题本地检索和6题真实模型答案，最新执行结果与复现命令见 [DEVELOPMENT_BASELINE.md](DEVELOPMENT_BASELINE.md)。
+新 `development_annotations_v3.json` 是待人工审核和协议接入的标注包，旧采集器会明确拒绝，不能忽略多轮条件后直接运行。`development_v2.json` 的13题历史执行入口及其标签完整保留；2026-10-05从该13题应用已记录的旬别局部裁定后冻结本轮快照，完成13题真实模型流程及新的逐事实评审，见 [本轮报告与复现命令](observations/20261005/README.md)。新增7道标注题仍未运行，不能将本轮称作20题评测。
 
-设计及分母见 [DESIGN_V2.md](DESIGN_V2.md)。当前支持分阶段证据组Recall、Precision、MRR与固定候选池nDCG，以及绑定具体答案的显式逐事实/维度评审汇总。未知项不按0处理，跨配置比较核对标注、有效分母和池指纹。默认采集无LLM；有真实模型调用的仍为此前获授权的六题，新七题先完成本地检索评测。
+设计及分母见 [DESIGN_V2.md](DESIGN_V2.md)。当前支持分阶段证据组Recall、Precision、MRR与固定候选池nDCG，以及绑定具体答案的显式逐事实/维度评审汇总。未知项不按0处理，跨配置比较核对标注、有效分母和池指纹。默认采集无LLM；本轮用户已明确授权现有13题真实模型调用，仍没有批准整题Golden标注。
 
 **以下各节描述旧v1的12题数据集、`evaluation.golden`与 `eval golden` 命令；v1和v2试点的数据、指标及报告不能混用。**
 
