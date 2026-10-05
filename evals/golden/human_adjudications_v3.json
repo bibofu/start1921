@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "version": "scoped-human-adjudications-20261005",
+  "whole_case_approvals": 0,
+  "decisions": [
+    {
+      "id": "zunyi_march_period_20261005",
+      "case_id": "pilot_multievidence_zunyi_leadership",
+      "scope": "partial_annotation_ruling",
+      "case_approved": false,
+      "reviewer": "user_in_current_chat",
+      "identity_note": "本会话用户明确文字回复；未额外采集姓名，不冒充外部历史专家审核。",
+      "recorded_at": "2026-10-05T06:42:23.123317+00:00",
+      "user_response": "采纳，旬别不作硬性评分",
+      "proposal": "只把3月、毛周王组成、周恩来任团长及职责作为必要事实，中旬/下旬作为来源差异说明。",
+      "source_conflict": [
+        {
+          "document_id": "cpc_history_volume_1",
+          "pdf_page": 483,
+          "wording": "3月中旬"
+        },
+        {
+          "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+          "pdf_page": 124,
+          "printed_page": 117,
+          "wording": "三月下旬"
+        }
+      ],
+      "historical_case_sha256": "a7fbdf125f1cde25ff074656f470f5ce1e7f2ad7016b075031ddcfd1968e3a94",
+      "changes": [
+        {
+          "path": [
+            "facts",
+            2,
+            "claim"
+          ],
+          "before": "3月中旬新三人团由毛泽东、周恩来、王稼祥组成，以周恩来为团长，负责指挥全军军事行动。",
+          "after": "3月新三人团由毛泽东、周恩来、王稼祥组成，以周恩来为团长，负责指挥全军军事行动。"
+        },
+        {
+          "path": [
+            "evidence_groups",
+            2,
+            "description"
+          ],
+          "before": "3月中旬新三人团的成员；句子在下一页续完",
+          "after": "3月新三人团的成员；旬别不作硬性评分，句子在下一页续完"
+        },
+        {
+          "path": [
+            "reference_answer"
+          ],
+          "before": "遵义会议选举毛泽东为政治局常委，取消原“三人团”，由朱德、周恩来指挥军事，周恩来负党内最后决心责任；2月5日分工决定毛泽东为周恩来在军事指挥上的帮助者；3月中旬成立毛泽东、周恩来、王稼祥组成的新“三人团”，以周恩来为团长，指挥全军军事行动。依据党史第一卷 PDF 第483—484页。",
+          "after": "遵义会议选举毛泽东为政治局常委，取消原“三人团”，由朱德、周恩来指挥军事，周恩来负党内最后决心责任；2月5日分工决定毛泽东为周恩来在军事指挥上的帮助者；3月成立毛泽东、周恩来、王稼祥组成的新“三人团”，以周恩来为团长，指挥全军军事行动。依据党史第一卷 PDF 第483—484页。党史记中旬、邓年谱上卷PDF124记下旬；本题只要求3月，旬别作为来源差异说明，不作硬性评分。"
+        },
+        {
+          "path": [
+            "review_notes",
+            1
+          ],
+          "before": "金标按本地来源叙述评估，不用模型记忆补日期或改写该书的叙述。",
+          "after": "2026-10-05用户采纳：只将3月、毛周王组成、周恩来任团长及职责作为必要事实；中旬/下旬作为来源差异说明，不作硬性评分。原文quote保留源书写法，此裁定不代表整题批准。"
+        }
+      ],
+      "effect": "仅修订新标注包的评分口径；历史数据和分数不重写，不自动批准整题。"
+    }
+  ]
+}

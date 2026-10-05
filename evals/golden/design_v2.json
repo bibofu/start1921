@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "version": "golden-v2-design-draft-20260922",
-  "status": "13_agent_verified_development_cases_pending_human_review",
-  "description": "30个具体候选问题：20个开发候选和10个禁止调参/运行、待原文核验的保留候选。不是30个人工Golden。",
+  "version": "golden-v2-design-20261005",
+  "status": "20_agent_verified_development_cases_pending_human_review",
+  "description": "30个具体问题：20开发题原文/事实/边界预标注完成，10保留题待独立核验；人工批准0。13题保留旧执行入口，新7题尚未采集。",
   "target_counts": {
     "exact_fact": 6,
     "semantic_retrieval": 6,
@@ -340,14 +340,16 @@
         "judgment_coverage",
         "rerank_gain"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": true,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "derived_from_existing_zunyi_development_case",
-      "run_allowed": true,
-      "tuning_allowed": true,
-      "holdout_admission_status": "not_applicable"
+      "run_allowed": false,
+      "tuning_allowed": false,
+      "holdout_admission_status": "not_applicable",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "dev_semantic_investigation",
@@ -477,14 +479,16 @@
         "judgment_coverage",
         "rerank_gain"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": true,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "golden_multihop_compare_meetings_001",
-      "run_allowed": true,
-      "tuning_allowed": true,
-      "holdout_admission_status": "not_applicable"
+      "run_allowed": false,
+      "tuning_allowed": false,
+      "holdout_admission_status": "not_applicable",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "dev_multi_zhou_periods",
@@ -546,14 +550,16 @@
         "judgment_coverage",
         "rerank_gain"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": true,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "BC-003/BC-006/BC-011",
-      "run_allowed": true,
-      "tuning_allowed": true,
-      "holdout_admission_status": "not_applicable"
+      "run_allowed": false,
+      "tuning_allowed": false,
+      "holdout_admission_status": "not_applicable",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "dev_intersection_mao_zhou_1949",
@@ -582,14 +588,16 @@
         "judgment_coverage",
         "rerank_gain"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": true,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "BC-019",
-      "run_allowed": true,
-      "tuning_allowed": true,
-      "holdout_admission_status": "not_applicable"
+      "run_allowed": false,
+      "tuning_allowed": false,
+      "holdout_admission_status": "not_applicable",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "dev_constraint_month_place",
@@ -653,13 +661,13 @@
         "route_accuracy",
         "context_evidence_coverage"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": false,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "BC-017",
-      "run_allowed": true,
-      "tuning_allowed": true,
+      "run_allowed": false,
+      "tuning_allowed": false,
       "holdout_admission_status": "not_applicable",
       "conversation_history": [
         {
@@ -668,7 +676,9 @@
         }
       ],
       "paired_control": "same_question_without_history",
-      "history_note": "历史只提供用户问题，不制造未经核验的历史助手答案。"
+      "history_note": "历史只提供用户问题，不制造未经核验的历史助手答案。",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "dev_refusal_einstein",
@@ -686,14 +696,16 @@
         "latency",
         "tokens"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": false,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "golden_refusal_einstein_001",
-      "run_allowed": true,
-      "tuning_allowed": true,
-      "holdout_admission_status": "not_applicable"
+      "run_allowed": false,
+      "tuning_allowed": false,
+      "holdout_admission_status": "not_applicable",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "dev_refusal_source_year",
@@ -715,14 +727,16 @@
         "latency",
         "tokens"
       ],
-      "metric_status": "planned_pending_labels_and_human_review",
+      "metric_status": "source_fact_protocol_labels_available_candidates_and_execution_pending",
       "candidate_pool_review_required": false,
       "pilot": false,
-      "review_status": "pending",
+      "review_status": "agent_verified_human_pending",
       "origin": "new_proposal",
-      "run_allowed": true,
-      "tuning_allowed": true,
-      "holdout_admission_status": "not_applicable"
+      "run_allowed": false,
+      "tuning_allowed": false,
+      "holdout_admission_status": "not_applicable",
+      "annotation_package": "evals/golden/development_annotations_v3.json",
+      "execution_status": "annotation_only_pending_protocol_integration"
     },
     {
       "id": "holdout_exact_date",
