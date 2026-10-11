@@ -1,6 +1,8 @@
 # Unified RAG Golden Benchmark
 
-2026-10-11人工复核更新：第一批4题的题干、原文、必要事实与回答边界已获用户明确批准，当前为 **4/20开发题批准、16题待审**。当前标注使用 [development_annotations_v4.json](development_annotations_v4.json) 及配套 [development_protocols_v4.json](development_protocols_v4.json)，逐字段裁定及用户原话见 [human_adjudications_v4.json](human_adjudications_v4.json)，下一批见 [review_queue_v4.json](review_queue_v4.json)。周恩来1954题的首项事实收窄为年初政务院总理，9月国务院总理由独立事实评分；总理到月、政协主席到日的精度不变。85项事实、90个题级证据组、20题/21输入保持不变。候选等级、排序池及真实答案不在本批批准范围，不能据此把旧成绩升级为正式Golden成绩；v3及以下历史观察保持原样。
+2026-10-11人工复核更新：前两批的题干、原文、必要事实与回答边界已获用户明确批准，当前为 **8/20开发题批准、12题待审**。当前标注使用 [development_annotations_v5.json](development_annotations_v5.json) 及配套 [development_protocols_v5.json](development_protocols_v5.json)，本批逐字段裁定及用户原话见 [human_adjudications_v5.json](human_adjudications_v5.json)，下一批见 [review_queue_v5.json](review_queue_v5.json)。第二批将周恩来知识分子报告事实限定为“知识分子中的绝大部分”，允许《矛盾论》其他准确篇内例证替代侵略战争例。第一批4题及其裁定原样继承，85项事实、90个题级证据组、20题/21输入不变。候选等级、排序池及真实答案不在本批批准范围，不能把旧成绩升级为正式Golden成绩；v3/v4和历史观察保持原样。
+
+《矛盾论》的篇目限制不等于独占本地合订版本。替代例证的答案及实际引用须逐项核验；固定锚点Recall只反映已标注证据，不穷尽全部合格例证，也不能用来否定另有本文证据支持的正确答案。新增候选和锚点仍需单独标注。
 
 最新13题真实回答的新口径复核见 [2026-10-11复核对照](observations/20261011_calibrated/README.md)：仍为3/13通过、20/43事实完整覆盖，引用、来源与范围说明的部分判断已更新。这是同一答案重审，没有新增模型运行或修改Agent。原始运行见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
@@ -10,7 +12,7 @@
 
 答案复核已提供离线工作台：`pilot prepare-reviews` 同时生成 `index.html`、版本化校准说明与复核导出包；填写后用 `pilot import-reviews` 校验导入新目录。开放题最低覆盖、正文与引用分离、额外断言及边界示例见 [答案复核口径](ANSWER_REVIEW_CALIBRATION.md)。旧答案不会自动沿用判断或提分，必要事实分母和人工批准状态不变。
 
-截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，当时人工批准为0；当前人工进展见上述v4记录。标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
+截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，当时人工批准为0；当前人工进展见上述v5记录。标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
 
 2026-10-11执行更新：`development_annotations_v3.json` 可通过 `pilot collect --protocols evals/golden/development_protocols_v3.json` 显式接入新评测入口。协议保留20个独立题、21个执行输入：淮海题按带历史和无历史两臂运行，湖南活动题保留六年覆盖与14事实的独立分母。原文件的 `annotation_only` 和协议制作期状态不回写，原定义、哈希、标签及人工pending保持冻结；不能降schema或丢弃历史绕过检查。新接入默认仅做本地检索，未新增真实模型答案，新增7题的候选相关性及排名池仍待标注。
 

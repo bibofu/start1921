@@ -1,0 +1,2789 @@
+{
+  "schema_version": 1,
+  "version": "development-protocols-r5-20261011",
+  "dataset_file": "evals/golden/development_annotations_v5.json",
+  "annotation_sha256": "1536dd41aa65bc90dbc5d6e88130a6bbc5d914f8eed9c9c874acd48c30aff876",
+  "status": "partially_human_reviewed_annotation_contracts_no_new_scores",
+  "k_values": [
+    1,
+    3,
+    5,
+    10,
+    20
+  ],
+  "unknown_policy": "未标注/未观测/不可评保留N/A，不补0；任何聚合或前后对比须列出相同有效题和事实单位。",
+  "approval_policy": "所有自动计算或Agent预标只作provisional；human_review需明确的人类复核者、时间和裁定。",
+  "open_question_policy": "必要事实是可审核最低覆盖，不是全量活动/观点全集；额外有据正确内容可接受。",
+  "cases": [
+    {
+      "case_id": "pilot_exact_deng_1952_appointment",
+      "case_definition_sha256": "3973e913609efba37ad561d4a753be36976ac467ba4598e33aa1f8af64fd4610",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "deng_xiaoping_chronology_1904_1974_middle"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "1952年8月7日，邓小平被任命为什么职务？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "appointed_vice_premier"
+      ],
+      "required_evidence_group_ids": [
+        "appointment"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别邓小平、1952-08-07、任命职务，保留日级日期。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 1,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 1,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 1,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "核对8月7日条目；机构为政务院，不能用国务院替换；条目月份优先于页眉。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "pilot_semantic_deng_1962_agriculture",
+      "case_definition_sha256": "14ee4ceb3fe07da3c2c73acfc8b6f233a1e9b2c3370fa80900ca1141fa36ac60",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "deng_xiaoping_chronology_1904_1974_lower"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "1962年7月，邓小平怎样判断哪种农业生产组织形式更合适？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "practical_standard",
+        "respect_preference",
+        "allow_diversity"
+      ],
+      "required_evidence_group_ids": [
+        "practical_recovery",
+        "mass_preference",
+        "diversity"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别1962年7月、农业生产组织形式与选择标准，不只检索农业或猫的比喻。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 3,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 3,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "确认实效、群众意愿和形式多样三项最低覆盖；7月的题目不能用3月材料冒充当月直接证据。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "pilot_multievidence_zunyi_leadership",
+      "case_definition_sha256": "a02140445fc026f1873bb2c11c87bdcd9b148520bebf3b148751cb82a6f3b6f4",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "cpc_history_volume_1"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "遵义会议、会后2月5日的常委分工和3月成立新“三人团”，分别怎样调整了中央军事领导？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "meeting_membership",
+        "february_mao_role",
+        "march_group"
+      ],
+      "required_evidence_group_ids": [
+        "meeting_adjustment",
+        "february_division",
+        "march_members",
+        "march_authority"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "拆出遵义会议、1935-02-05、3月新三人团三阶段及军事领导安排。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 4,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 4,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "分别核对遵义会议、2月5日常委分工、3月新三人团，避免阶段合并。",
+        "用户已采纳只把3月、毛周王组成、周恩来任团长及职责作为必要事实；中旬/下旬不作硬性评分，原文差异仍保留说明。此项裁定不代表整题获批。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "pilot_negative_cppcc_1949",
+      "case_definition_sha256": "3ff9d249470458f12008bc464bf74a5d706232a60e449beb6101aa31e0acb5eb",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "mao_zedong_chronology_volume_4"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？请区分二人的职务。",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "mao_chair",
+        "zhou_vice_chair"
+      ],
+      "required_evidence_group_ids": [
+        "chair_and_list_start",
+        "list_continuation"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别共同当选主席这一待检验前提，绑定1949-10-09两人各自职务。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 2,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 2,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 2,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 2,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "周恩来副主席名单跨PDF12—13页；必须合读续句，不能把同页人物都绑定为主席。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "pilot_constraint_deng_1973_march",
+      "case_definition_sha256": "2f81245c9f3f0d6a0f58c450bf5bfb4813a7facb153eb7de6788fd1973d24c82",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "deng_xiaoping_chronology_1904_1974_lower"
+      ],
+      "source_scope_kind": "hard_user_constraint",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "restore_status",
+        "state_council_work",
+        "attend_policy_discussion"
+      ],
+      "required_evidence_group_ids": [
+        "restoration_decision",
+        "work_assignment"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "事件时间1973年3月；1904—1974为书名年代；来源硬限下卷。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 2,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 2,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "只依据下卷；1904—1974是书名版本范围，事件时间应保留1973年3月。",
+        "区分恢复组织生活/副总理职务、参加国务院业务组和以副总理身份参加外事、列席重要政策讨论三个必要事实。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "pilot_refusal_out_of_scope_2024",
+      "case_definition_sha256": "1765ab8de6b56a03324cfec02fa4c731fe50d6b75f7d5c26c357b6ba002acc6d",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "习近平在2024年考察了哪些地方？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [],
+      "required_evidence_group_ids": [],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别请求2024年行程超出项目1921—1978资料范围。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "拒答题没有正向历史证据目标，检索质量不适用。",
+          "denominator": null,
+          "status": "not_applicable"
+        },
+        "ranking": {
+          "criterion": "无相关性目标，不计算排序分数。",
+          "denominator": null,
+          "status": "not_applicable"
+        },
+        "context": {
+          "criterion": "核对是否把无关材料放入生成并诱发编造；无生成请求不是失败。",
+          "denominator": "1个可观察拒答过程；无请求单独记not_applicable。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "不能给出无依据的具体活动或职务；需说明证据/来源限制，并保留有依据的澄清。",
+          "denominator": "无正向事实分母；按拒答边界整题评分。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "不得用无关史料支持编造结论；可引用出版说明等说明限制，不把恰当元证据引用判错。",
+          "denominator": "1题是否滥用引用；无引用的合理拒答可通过。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "满足refusal_basis边界，解释限制，不把资料不足断言为历史事件不存在。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "确认项目1921—1978研究范围；应解释资料范围不足而非声称2024年没有活动。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_exact_zhou_1954",
+      "case_definition_sha256": "613480f6e4ed082aba2915574df7a5c5adcec88429f44545fb2d22e19281ec6a",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "zhou_enlai_chronology_1949_1976"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "周恩来在1954年担任哪些主要职务？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "zhou_premier_before_september",
+        "zhou_party_secretariat",
+        "zhou_cppcc_before_december",
+        "zhou_premier",
+        "zhou_foreign_minister",
+        "zhou_cppcc"
+      ],
+      "required_evidence_group_ids": [
+        "zhou_roles_before_1954_changes",
+        "zhou_government_work_jan1954",
+        "zhou_government_transition_sep1954",
+        "zhou_premier_1954",
+        "zhou_foreign_minister_1954",
+        "zhou_cppcc_1954"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "按1954全年任职变化理解问题，不以年末单点快照代替全年。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 6,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 6,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 6,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 6,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "用户已认可全年范围：年初政务院总理、9月国务院总理以及政协副主席到12月主席的变化，不能仅列年末头衔。",
+        "用户认可履历脚注结合当年条目的证据。3A仅考1954年初仍任政务院总理，由履历身份和1月活动两组共同支持；3D独立评9月国务院总理。",
+        "六项事实和六个题级证据组分母不变。政务院9月改为国务院的沿革组继续用于题级时间边界，不再作为3A的AND证据要求；全部原文锚点及候选标签保留。",
+        "用户确认日期精度保持：国务院总理要求1954年9月，政协主席要求1954年12月25日；其他有据职务可补充。",
+        "1956年中央副主席仅为防错边界；正确答书记处书记无需额外主动说明1956年任职。正文完整覆盖与实际引文支持分开复核。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_exact_deng_1954",
+      "case_definition_sha256": "a6ff956c61d2430bb935c2dd60e3827bb7cf148ec6de824bf09a0bc95491d7d1",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "deng_xiaoping_chronology_1904_1974_middle"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "deng_vice_premier",
+        "deng_defense_vice_chair"
+      ],
+      "required_evidence_group_ids": [
+        "deng_vice_premier_1954",
+        "deng_defense_vice_chair_1954"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "保留1954年9月、邓小平、国务院与国防委员会两个机构。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 2,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 2,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 2,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 2,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "确认国务院副总理与国防委员会副主席的机构—职务绑定；不扩大为国防部长或委员会主席。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_constraint_month_place",
+      "case_definition_sha256": "cd2b3782d6c6927e611e84dc9b249f3df3c0bf755589853214e8b0900c9430ec",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "mao_zedong_chronology_volume_3",
+        "cpc_history_volume_1"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "1949年3月毛泽东在北平有哪些活动？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "mao_arrival",
+        "mao_xiyuan",
+        "mao_command",
+        "mao_cadres"
+      ],
+      "required_evidence_group_ids": [
+        "mao_arrive_beiping_march25",
+        "mao_xiyuan_march25",
+        "mao_yangtze_command_late_march",
+        "mao_xiangshan_march31"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "同时保留毛泽东、1949年3月、北平三项条件；不得只筛1949全年。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 4,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 4,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 4,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。 军委复电的北平地点需迁驻与后续复电组合证据；27日和29日为已认可OR替代。",
+          "denominator": 4,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "用户认可四项最低覆盖及3月/北平硬约束；允许有据补充，不要求逐日穷尽。",
+        "3月27/29日复电所在地由25日迁驻+后续条目共同支持，不把收电人地点当发电地点；准确列出27日或29日任一次即可覆盖相应事实。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_multi_zhou_periods",
+      "case_definition_sha256": "1f725759f7d11fea57bc16b155156f340eb2732ebc32a73ca2c7b9f9e56d5198",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "zhou_enlai_chronology_1949_1976"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "按时间和主题梳理周恩来从1954年至1956年的主要经历，并说明这三年工作重点的变化。",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "zhou_1954_geneva",
+        "zhou_1954_government",
+        "zhou_1955_bandung",
+        "zhou_1955_plan",
+        "zhou_1956_intellectuals",
+        "zhou_1956_balance",
+        "zhou_synthesis"
+      ],
+      "required_evidence_group_ids": [
+        "zhou_1954_geneva",
+        "zhou_1954_government",
+        "zhou_1954_cppcc",
+        "zhou_1955_bandung",
+        "zhou_1955_first_plan",
+        "zhou_1956_intellectuals",
+        "zhou_1956_balance"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别周恩来1954、1955、1956三年及工作重点比较，时间与主题并列覆盖。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 7,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 7,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。 本题六项活动+一项综合；知识分子事实保留绝大部分限定，各事件按本题年月精度，跨年主题不排他。",
+          "denominator": 7,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 7,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "用户认可六项代表活动加一项跨年综合为最低覆盖，不穷尽全部经历，有据补充可接受。",
+        "知识分子中的“绝大部分”是必要限定，不可表述为全体无例外；本题按年月精度，不套用第一批任职题的日级要求。",
+        "综合主题不代表各年排他的唯一工作重点；允许准确同义归纳，无须逐字复述反面提醒，但不得声称停止其他工作。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_semantic_investigation",
+      "case_definition_sha256": "5c0df2a96edfd0957b8771f2d666d15a3e9d8ab092d76119293994a4d5387403",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "mao_selected_works_combined"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "毛泽东关于调查研究有哪些观点？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "evidence_before_conclusion",
+        "oppose_book_worship",
+        "leaders_investigate",
+        "learn_by_discussion"
+      ],
+      "required_evidence_group_ids": [
+        "investigate_before_concluding",
+        "theory_with_actual_conditions",
+        "personal_in_depth_investigation",
+        "learn_from_people_through_discussion"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别调查研究观点问题，需要可证实的命题而非仅事件列表。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 4,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 4,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 4,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 4,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "用户认可四项最低观点、允许其他有据观点及可靠启用来源，不要求穷尽。",
+        "用户认可本地民间合订文件作为本轮证据基准，引用必须用实际PDF物理页；亲身调查不等于每个调查点必须本人包办，反对本本主义不等于反对学习理论。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_semantic_contradiction",
+      "case_definition_sha256": "8a15f2616f6c2b847066da66ba2be19cd13e05b694e90117ae7f0db3d94860c9",
+      "annotation_status": "human_approved_source_fact_boundary",
+      "source_scope": [
+        "mao_selected_works_combined"
+      ],
+      "source_scope_kind": "hard_user_constraint",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "毛泽东在《矛盾论》中怎样分析主要矛盾？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "definition",
+        "method",
+        "conditional_priority"
+      ],
+      "required_evidence_group_ids": [
+        "principal_role",
+        "find_and_prioritize_principal",
+        "changing_conditions_change_priority"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "限定《矛盾论》篇目、主要矛盾概念及方法，不混淆矛盾主要方面。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。 当前数值仅针对三组已标注锚点；其他可接受篇内例证未补锚点前，不据该数值断言答案缺乏合格证据。",
+          "denominator": 3,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。 当前数值仅针对三组已标注锚点；其他可接受篇内例证未补锚点前，不据该数值断言答案缺乏合格证据。",
+          "denominator": 3,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。 条件变化的说明可用《矛盾论》其他准确例证替代侵略战争例；正文命题及篇内例证须完整准确，不能机械匹配参考例证。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。 替代例证须核验《矛盾论》篇目身份和实际交付引文支持，不能只因未采用现有战争段落而判无据。",
+          "denominator": 3,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "用户认可三个必要命题，条件变化导致主次地位变化必须解释，并允许《矛盾论》中其他准确例证替代侵略战争例。",
+        "硬约束是《矛盾论》篇目，不是独占本地合订版本；当前source_scope列出已标注文件，不能据此排除可靠其他版本的同文证据。其他文章、后来讲话不能替代本文。",
+        "用户认可本地版本适用性及主要矛盾与主要方面的防错区分；不要求额外完整展开主要方面学说。",
+        "冻结三组锚点的召回/上下文数值只反映已标注证据覆盖，不代表所有可接受例证；不能据固定锚点未命中否定经本文原文支持的答案。替代例证与实际引用须逐项核验，新增候选/锚点另审，不自动赋级或当不相关。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_semantic_first_congress",
+      "case_definition_sha256": "f4401b3b06666ed4f049e9b5afbeff42587be747262f2fa264b8a4c06d29d53e",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "cpc_history_volume_1"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "党的头一次全国大会讲了些什么、形成了哪些决定？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "programme",
+        "discipline",
+        "workers",
+        "independence",
+        "leadership"
+      ],
+      "required_evidence_group_ids": [
+        "programme_and_name",
+        "organization_discipline",
+        "worker_movement_priority",
+        "independent_policy",
+        "central_bureau_election"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "将党的头一次全国大会解析为中共一大，关注讨论内容与形成的决定。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 5,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "existing_small_pool_agent_labels_only"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 5,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 5,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 5,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "确认党纲、组织纪律、工人运动、独立政策、中央局五项最低覆盖。",
+        "PDF121有OCR异常，锚点避开损坏文字；应读原图确认，不能把自动OCR修正当原文。"
+      ],
+      "specialist_protocol": null,
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_exact_zunyi_election",
+      "case_definition_sha256": "f7dbb53f85b52050e453551baed45c8cabc04e76658f69c8f71f7c3e03ac8176",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "cpc_history_volume_1"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "遵义会议选举毛泽东担任什么党内职务？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "elected_standing_member"
+      ],
+      "required_evidence_group_ids": [
+        "zunyi_election"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别遵义会议、毛泽东及当场选举的党内职务，区分后续调整。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 1,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "pending_candidate_labels"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 1,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 1,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "窄事实只问遵义会议选举职务；不要把2月分工或3月三人团安排提前到会议当场。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_exact_zunyi_election",
+        "annotation_basis": "agent_review_human_pending",
+        "execution_status": "not_run",
+        "coverage_scope": "必要事实是最低覆盖；不声称所有可相关文献或开放题全部事实已被标注。",
+        "dimensions": {
+          "query_understanding": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "识别1935年遵义会议为目标事件。",
+              "识别所问为会议直接选举毛泽东的党内职务，不能扩成会后领导调整。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "routing": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "使用历史语料检索证据（允许hybrid_retrieval或可审计的等价证据检索路线）。",
+              "已启用资料能够回答，不能错误拒答或凭空直接回答。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "recall": {
+            "applicable": true,
+            "status": "labels_ready_not_run",
+            "metric": "required_group_recall@K",
+            "k_values": [
+              1,
+              3,
+              5,
+              10,
+              20
+            ],
+            "denominator": 1,
+            "basis": "必要组为AND；组内替代锚点为OR；匹配SHA、物理页和去空白原文。按实际采集的各召回/融合阶段独立算，不以同页命中代替完整锚点。",
+            "group_ids": [
+              "zunyi_election"
+            ],
+            "unknown_policy": "没有阶段结果为N/A。正式Golden指标须先获人工批准。"
+          },
+          "ranking": {
+            "applicable": true,
+            "status": "pending_candidate_annotation_step_2",
+            "metrics": {
+              "precision@K": "充分判定前K后，以相关候选位置数/K；现阶段未标候选为unknown。",
+              "mrr@K": "第一个相关候选位置倒数；该项及之前全部需有标签，或前K全判无相关才可为0。",
+              "pool_ndcg@K": "完全分级固定候选池IDCG；本题未建池所以分母未定、N/A。"
+            },
+            "candidate_judgment_count": 0,
+            "pool_id": null,
+            "warning": "不新增或伪造相关性标签；本步没有声称Precision、MRR、nDCG可计算。"
+          },
+          "context_selection": {
+            "applicable": true,
+            "status": "labels_ready_no_generation_trace",
+            "metric": "generation_context_required_group_recall",
+            "denominator": 1,
+            "basis": "只核对实际送入生成模型的证据区；候选列表或最终引用不替代实际上下文。摘要不能可靠映射完整锚点时N/A。"
+          },
+          "answer": {
+            "applicable": true,
+            "status": "labels_ready_no_answer",
+            "metric": "required_fact_recall",
+            "denominator": 1,
+            "fact_ids": [
+              "elected_standing_member"
+            ],
+            "basis": "covered=1；partial/missing/contradicted=0；unknown使对应汇总N/A。复合事实需所有子主张覆盖并有AND证据，不要求逐字复述。必要事实外的新事实逐项核查，未知不视为错。",
+            "additional_checks": "检查forbidden_claims；比较题按对象挂靠事实与引用；淮海题另执行配对隔离判据。"
+          },
+          "citation": {
+            "applicable": true,
+            "status": "manual_review_planned_no_answer",
+            "metric": "citation_support",
+            "denominator": "实际答案中已逐项评审的引用-主张绑定数；未绑定或未评审项另报，存在unknown不报告全答案精确率。",
+            "basis": "核对启用来源、实际PDF SHA、物理页和具体原文是否支持所引主张；分母为0时N/A；另核查必要事实是否有可追溯引用。"
+          },
+          "refusal": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "已核验资料可回答当前问题；不得整题无依据拒答。",
+              "允许对最低覆盖之外缺乏证据的细节说明不确定性，不编造事实或引用。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "cost": {
+            "applicable": true,
+            "status": "not_run",
+            "latency": "每个真实运行及已记录阶段的毫秒值；未执行不记0。",
+            "tokens": "每次实际模型调用返回的输入/输出用量，缺失为unknown，不估造。"
+          }
+        }
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_multi_meetings",
+      "case_definition_sha256": "0f761e38390e116229fcc0ebbbb22b4dfd34daa3b2022302b04a9635b800eeb3",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "cpc_history_volume_1",
+        "cpc_history_volume_2"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "比较遵义会议和1959年庐山会议各自讨论的核心问题、会议进程和后续影响。",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "zunyi_date",
+        "zunyi_core",
+        "zunyi_process",
+        "zunyi_organization",
+        "zunyi_influence",
+        "lushan_initial",
+        "lushan_letter",
+        "lushan_turn",
+        "lushan_plenum",
+        "lushan_party_campaign",
+        "lushan_economic_effect",
+        "lushan_democratic_effect"
+      ],
+      "required_evidence_group_ids": [
+        "zunyi_date",
+        "zunyi_core",
+        "zunyi_process",
+        "zunyi_organization",
+        "zunyi_influence",
+        "lushan_initial",
+        "lushan_letter_content",
+        "lushan_letter_discussion",
+        "lushan_turn_date",
+        "lushan_turn",
+        "lushan_plenum_date",
+        "lushan_plenum_decisions",
+        "lushan_party_campaign",
+        "lushan_economic_effect",
+        "lushan_democratic_effect"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "拆解遵义与1959庐山两对象，各自的核心问题、会议进程和后续影响。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 15,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "pending_candidate_labels"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 15,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 12,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 12,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "按两会议分别确认核心问题、进程与后续影响的最低覆盖；不得把两次会议的组织调整或结论互换。",
+        "开放比较允许其他有据角度；原文的历史判断须作出处归属，不能把时间先后自动升级为因果。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_multi_meetings",
+        "annotation_basis": "agent_review_human_pending",
+        "execution_status": "not_run",
+        "coverage_scope": "必要事实是最低覆盖；不声称所有可相关文献或开放题全部事实已被标注。",
+        "dimensions": {
+          "query_understanding": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "同时保留遵义会议和1959年庐山会议两个对象。",
+              "分别覆盖核心问题、会议进程、后续影响三个比较维度。",
+              "识别1959年庐山会议的特定时间，不能替换为1970年庐山会议。"
+            ],
+            "denominator": 3,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "routing": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "使用历史语料检索证据（允许hybrid_retrieval或可审计的等价证据检索路线）。",
+              "已启用资料能够回答，不能错误拒答或凭空直接回答。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "recall": {
+            "applicable": true,
+            "status": "labels_ready_not_run",
+            "metric": "required_group_recall@K",
+            "k_values": [
+              1,
+              3,
+              5,
+              10,
+              20
+            ],
+            "denominator": 15,
+            "basis": "必要组为AND；组内替代锚点为OR；匹配SHA、物理页和去空白原文。按实际采集的各召回/融合阶段独立算，不以同页命中代替完整锚点。",
+            "group_ids": [
+              "zunyi_date",
+              "zunyi_core",
+              "zunyi_process",
+              "zunyi_organization",
+              "zunyi_influence",
+              "lushan_initial",
+              "lushan_letter_content",
+              "lushan_letter_discussion",
+              "lushan_turn_date",
+              "lushan_turn",
+              "lushan_plenum_date",
+              "lushan_plenum_decisions",
+              "lushan_party_campaign",
+              "lushan_economic_effect",
+              "lushan_democratic_effect"
+            ],
+            "unknown_policy": "没有阶段结果为N/A。正式Golden指标须先获人工批准。"
+          },
+          "ranking": {
+            "applicable": true,
+            "status": "pending_candidate_annotation_step_2",
+            "metrics": {
+              "precision@K": "充分判定前K后，以相关候选位置数/K；现阶段未标候选为unknown。",
+              "mrr@K": "第一个相关候选位置倒数；该项及之前全部需有标签，或前K全判无相关才可为0。",
+              "pool_ndcg@K": "完全分级固定候选池IDCG；本题未建池所以分母未定、N/A。"
+            },
+            "candidate_judgment_count": 0,
+            "pool_id": null,
+            "warning": "不新增或伪造相关性标签；本步没有声称Precision、MRR、nDCG可计算。"
+          },
+          "context_selection": {
+            "applicable": true,
+            "status": "labels_ready_no_generation_trace",
+            "metric": "generation_context_required_group_recall",
+            "denominator": 15,
+            "basis": "只核对实际送入生成模型的证据区；候选列表或最终引用不替代实际上下文。摘要不能可靠映射完整锚点时N/A。"
+          },
+          "answer": {
+            "applicable": true,
+            "status": "labels_ready_no_answer",
+            "metric": "required_fact_recall",
+            "denominator": 12,
+            "fact_ids": [
+              "zunyi_date",
+              "zunyi_core",
+              "zunyi_process",
+              "zunyi_organization",
+              "zunyi_influence",
+              "lushan_initial",
+              "lushan_letter",
+              "lushan_turn",
+              "lushan_plenum",
+              "lushan_party_campaign",
+              "lushan_economic_effect",
+              "lushan_democratic_effect"
+            ],
+            "basis": "covered=1；partial/missing/contradicted=0；unknown使对应汇总N/A。复合事实需所有子主张覆盖并有AND证据，不要求逐字复述。必要事实外的新事实逐项核查，未知不视为错。",
+            "additional_checks": "检查forbidden_claims；比较题按对象挂靠事实与引用；淮海题另执行配对隔离判据。"
+          },
+          "citation": {
+            "applicable": true,
+            "status": "manual_review_planned_no_answer",
+            "metric": "citation_support",
+            "denominator": "实际答案中已逐项评审的引用-主张绑定数；未绑定或未评审项另报，存在unknown不报告全答案精确率。",
+            "basis": "核对启用来源、实际PDF SHA、物理页和具体原文是否支持所引主张；分母为0时N/A；另核查必要事实是否有可追溯引用。"
+          },
+          "refusal": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "已核验资料可回答当前问题；不得整题无依据拒答。",
+              "允许对最低覆盖之外缺乏证据的细节说明不确定性，不编造事实或引用。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "cost": {
+            "applicable": true,
+            "status": "not_run",
+            "latency": "每个真实运行及已记录阶段的毫秒值；未执行不记0。",
+            "tokens": "每次实际模型调用返回的输入/输出用量，缺失为unknown，不估造。"
+          }
+        }
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_constraint_history_isolation",
+      "case_definition_sha256": "6de4e1f9d0fba0fffe596805ef8e4d39ccc5a9f5472b538d7dbde67db3f6650e",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "cpc_history_volume_1"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "with_history",
+          "question": "详细介绍淮海战役。",
+          "history": [
+            {
+              "role": "user",
+              "content": "林彪在1930—1949年相继担任哪些职务？"
+            }
+          ]
+        },
+        {
+          "id": "without_history_control",
+          "question": "详细介绍淮海战役。",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "battle_geography",
+        "battle_forces",
+        "battle_planning",
+        "battle_command",
+        "battle_stage_one",
+        "battle_stage_two",
+        "battle_stage_three",
+        "battle_result",
+        "battle_impact",
+        "battle_civilian_support"
+      ],
+      "required_evidence_group_ids": [
+        "battle_geography",
+        "battle_forces_start",
+        "battle_forces_end",
+        "battle_planning",
+        "battle_command",
+        "battle_stage_one",
+        "battle_stage_two",
+        "battle_stage_three_time",
+        "battle_stage_three_result",
+        "battle_result",
+        "battle_impact",
+        "battle_civilian_support"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "当前目标淮海战役；前轮林彪及1930—1949任职条件不得变为当前实体或硬过滤。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 12,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "pending_candidate_labels"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 12,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 10,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 10,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "必须同时复核带“林彪1930—1949职务”前轮与无历史控制两个输入；同一题号，不增加独立样本数。",
+        "新问题自包含，林彪实体和旧年份硬过滤不得污染淮海战役；目前未运行配对测试，不得预填通过。",
+        "确认战役概述必要事实的覆盖范围，避免把无历史控制答案当多轮成功证据。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_constraint_history_isolation",
+        "annotation_basis": "agent_review_human_pending",
+        "execution_status": "not_run",
+        "coverage_scope": "必要事实是最低覆盖；不声称所有可相关文献或开放题全部事实已被标注。",
+        "dimensions": {
+          "query_understanding": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "当前自包含问题以淮海战役为对象。",
+              "不得继承林彪作为目标人物硬约束。",
+              "不得继承1930—1949为当前显式时间过滤；可根据战役本身独立识别1948—1949。",
+              "不得继承相继担任哪些职务为当前任务类型。"
+            ],
+            "denominator": 4,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "routing": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "使用历史语料检索证据（允许hybrid_retrieval或可审计的等价证据检索路线）。",
+              "不因错误的人物/时间继承转为无关人物查询或拒答。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "recall": {
+            "applicable": true,
+            "status": "labels_ready_not_run",
+            "metric": "required_group_recall@K",
+            "k_values": [
+              1,
+              3,
+              5,
+              10,
+              20
+            ],
+            "denominator": 12,
+            "basis": "必要组为AND；组内替代锚点为OR；匹配SHA、物理页和去空白原文。按实际采集的各召回/融合阶段独立算，不以同页命中代替完整锚点。",
+            "group_ids": [
+              "battle_geography",
+              "battle_forces_start",
+              "battle_forces_end",
+              "battle_planning",
+              "battle_command",
+              "battle_stage_one",
+              "battle_stage_two",
+              "battle_stage_three_time",
+              "battle_stage_three_result",
+              "battle_result",
+              "battle_impact",
+              "battle_civilian_support"
+            ],
+            "unknown_policy": "没有阶段结果为N/A。正式Golden指标须先获人工批准。"
+          },
+          "ranking": {
+            "applicable": true,
+            "status": "pending_candidate_annotation_step_2",
+            "metrics": {
+              "precision@K": "充分判定前K后，以相关候选位置数/K；现阶段未标候选为unknown。",
+              "mrr@K": "第一个相关候选位置倒数；该项及之前全部需有标签，或前K全判无相关才可为0。",
+              "pool_ndcg@K": "完全分级固定候选池IDCG；本题未建池所以分母未定、N/A。"
+            },
+            "candidate_judgment_count": 0,
+            "pool_id": null,
+            "warning": "不新增或伪造相关性标签；本步没有声称Precision、MRR、nDCG可计算。"
+          },
+          "context_selection": {
+            "applicable": true,
+            "status": "labels_ready_no_generation_trace",
+            "metric": "generation_context_required_group_recall",
+            "denominator": 12,
+            "basis": "只核对实际送入生成模型的证据区；候选列表或最终引用不替代实际上下文。摘要不能可靠映射完整锚点时N/A。"
+          },
+          "answer": {
+            "applicable": true,
+            "status": "labels_ready_no_answer",
+            "metric": "required_fact_recall",
+            "denominator": 10,
+            "fact_ids": [
+              "battle_geography",
+              "battle_forces",
+              "battle_planning",
+              "battle_command",
+              "battle_stage_one",
+              "battle_stage_two",
+              "battle_stage_three",
+              "battle_result",
+              "battle_impact",
+              "battle_civilian_support"
+            ],
+            "basis": "covered=1；partial/missing/contradicted=0；unknown使对应汇总N/A。复合事实需所有子主张覆盖并有AND证据，不要求逐字复述。必要事实外的新事实逐项核查，未知不视为错。",
+            "additional_checks": "检查forbidden_claims；比较题按对象挂靠事实与引用；淮海题另执行配对隔离判据。"
+          },
+          "citation": {
+            "applicable": true,
+            "status": "manual_review_planned_no_answer",
+            "metric": "citation_support",
+            "denominator": "实际答案中已逐项评审的引用-主张绑定数；未绑定或未评审项另报，存在unknown不报告全答案精确率。",
+            "basis": "核对启用来源、实际PDF SHA、物理页和具体原文是否支持所引主张；分母为0时N/A；另核查必要事实是否有可追溯引用。"
+          },
+          "refusal": {
+            "applicable": true,
+            "status": "manual_review_planned_not_executed",
+            "criteria": [
+              "已核验资料可回答当前问题；不得整题无依据拒答。",
+              "允许对最低覆盖之外缺乏证据的细节说明不确定性，不编造事实或引用。"
+            ],
+            "denominator": 2,
+            "scoring": "每项由显式评审标为pass/fail/unknown；全部已判才可计算通过数/项数，unknown为N/A而非0。"
+          },
+          "cost": {
+            "applicable": true,
+            "status": "not_run",
+            "latency": "每个真实运行及已记录阶段的毫秒值；未执行不记0。",
+            "tokens": "每次实际模型调用返回的输入/输出用量，缺失为unknown，不估造。"
+          }
+        },
+        "conversation_protocol": {
+          "status": "not_supported_by_current_runner",
+          "required": true,
+          "treatment": {
+            "conversation_history": [
+              {
+                "role": "user",
+                "content": "林彪在1930—1949年相继担任哪些职务？"
+              }
+            ],
+            "question": "详细介绍淮海战役。"
+          },
+          "control": {
+            "conversation_history": [],
+            "question": "详细介绍淮海战役。"
+          },
+          "matching": "固定代码、索引、模型、随机设置、K、上下文预算与同版标注；只改变conversation_history。先记录原始输入/计划/过滤条件/各阶段候选/实际上下文/答案，再同口径配对。",
+          "primary_isolation_checks": [
+            "两臂均以淮海战役为当前对象。",
+            "treatment的plan或retrieval constraints不含继承的林彪目标过滤。",
+            "treatment的plan或retrieval constraints不含继承的1930—1949显式硬过滤。",
+            "treatment不继续回答职务历程。"
+          ],
+          "isolation_denominator": 4,
+          "unknown_policy": "必须两臂真实运行且有足够trace；单轮控制只能检验基础问答，历史隔离总分N/A。因战役本来在1930—1949内，不能用答案年代猜测时间隔离。",
+          "paired_quality_reporting": "分别报告两臂事实Recall、必要证据Recall和引用；质量差值是诊断，单次差异不直接证明历史泄漏。",
+          "no_assistant_history_fabrication": true
+        }
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_multi_mao_hunan",
+      "case_definition_sha256": "628ab73f3dd7553525c345a1a87a4d50bfd08b319bd84494dc509e7d7db0c70c",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "mao_zedong_chronology_volume_1",
+        "cpc_history_volume_1"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "逐年梳理毛泽东1921—1926年在湖南的活动。",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "y1921_self_study_university",
+        "y1921_hunan_branch",
+        "y1922_xiang_committee",
+        "y1922_changsha_carpenters_strike",
+        "y1923_handover_in_changsha",
+        "y1923_return_build_kmt",
+        "y1924_return_for_convalescence",
+        "y1925_shaoshan_inquiry",
+        "y1925_secret_peasant_associations",
+        "y1925_peasant_night_schools",
+        "y1925_shaoshan_party_branch",
+        "y1925_fair_price_grain_campaign",
+        "y1926_hunan_peasant_congress",
+        "y1926_workers_peasants_welcome_speech"
+      ],
+      "required_evidence_group_ids": [
+        "y1921_self_study_university",
+        "y1921_hunan_branch",
+        "y1922_xiang_committee",
+        "y1922_changsha_carpenters_strike",
+        "y1923_handover_in_changsha",
+        "y1923_return_build_kmt",
+        "y1924_return_for_convalescence",
+        "y1925_shaoshan_inquiry",
+        "y1925_secret_peasant_associations",
+        "y1925_peasant_night_schools",
+        "y1925_shaoshan_party_branch",
+        "y1925_fair_price_grain_campaign",
+        "y1926_hunan_peasant_congress",
+        "y1926_workers_peasants_welcome_speech"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "保留毛泽东、1921—1926逐年、湖南活动；地点是活动发生地。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 14,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "pending_candidate_labels"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 14,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 14,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 14,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "确认六年逐年最低覆盖，尤其1924年底回湘、1926年12月长沙活动。",
+        "1925五类活动较多，请裁定是否足够代表且非重复；同时看固定六年的覆盖率，避免多条1925事实掩盖漏年。",
+        "安源属江西；上海、广州活动不算在湖南，1927年考察不能前移；PDF143平粜OCR异文需原图核对。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_multi_mao_hunan",
+        "protocol_version": "agent-proposal-20261005",
+        "annotation_basis": "agent_source_and_image_review",
+        "human_review_status": "pending",
+        "run_status": "not_run",
+        "input": {
+          "mode": "single_turn",
+          "question": "逐年梳理毛泽东1921—1926年在湖南的活动。"
+        },
+        "answer_boundary": {
+          "mode": "minimum_verified_coverage_not_exhaustive",
+          "years": [
+            {
+              "year": 1921,
+              "required_fact_ids": [
+                "y1921_self_study_university",
+                "y1921_hunan_branch"
+              ],
+              "required_evidence_group_ids": [
+                "y1921_self_study_university",
+                "y1921_hunan_branch"
+              ],
+              "source_status": "positive_evidence_verified",
+              "absence_claim_allowed": false
+            },
+            {
+              "year": 1922,
+              "required_fact_ids": [
+                "y1922_xiang_committee",
+                "y1922_changsha_carpenters_strike"
+              ],
+              "required_evidence_group_ids": [
+                "y1922_xiang_committee",
+                "y1922_changsha_carpenters_strike"
+              ],
+              "source_status": "positive_evidence_verified",
+              "absence_claim_allowed": false
+            },
+            {
+              "year": 1923,
+              "required_fact_ids": [
+                "y1923_handover_in_changsha",
+                "y1923_return_build_kmt"
+              ],
+              "required_evidence_group_ids": [
+                "y1923_handover_in_changsha",
+                "y1923_return_build_kmt"
+              ],
+              "source_status": "positive_evidence_verified",
+              "absence_claim_allowed": false
+            },
+            {
+              "year": 1924,
+              "required_fact_ids": [
+                "y1924_return_for_convalescence"
+              ],
+              "required_evidence_group_ids": [
+                "y1924_return_for_convalescence"
+              ],
+              "source_status": "positive_evidence_verified",
+              "absence_claim_allowed": false
+            },
+            {
+              "year": 1925,
+              "required_fact_ids": [
+                "y1925_shaoshan_inquiry",
+                "y1925_secret_peasant_associations",
+                "y1925_peasant_night_schools",
+                "y1925_shaoshan_party_branch",
+                "y1925_fair_price_grain_campaign"
+              ],
+              "required_evidence_group_ids": [
+                "y1925_shaoshan_inquiry",
+                "y1925_secret_peasant_associations",
+                "y1925_peasant_night_schools",
+                "y1925_shaoshan_party_branch",
+                "y1925_fair_price_grain_campaign"
+              ],
+              "source_status": "positive_evidence_verified",
+              "absence_claim_allowed": false
+            },
+            {
+              "year": 1926,
+              "required_fact_ids": [
+                "y1926_hunan_peasant_congress",
+                "y1926_workers_peasants_welcome_speech"
+              ],
+              "required_evidence_group_ids": [
+                "y1926_hunan_peasant_congress",
+                "y1926_workers_peasants_welcome_speech"
+              ],
+              "source_status": "positive_evidence_verified",
+              "absence_claim_allowed": false
+            }
+          ],
+          "year_coverage_denominator": 6,
+          "year_coverage_is_distinct_from_fact_recall": "年份覆盖固定1921—1926六年；另报每年必要事实完整性及六年宏平均。1925年五条不能抵消漏掉1924或1926整年。",
+          "selection_rationale_1925": "五条分别覆盖社会调查、秘密农协这一群众组织、农民夜校教育、中共韶山支部建设和维护农民经济利益的平粜阻禁斗争；不是将同一活动拆成五个碎片。具体参会次数、雪耻会、安化访问和长沙汇报为允许有据补充的非必选活动。",
+          "region": "湖南境内实际发生的活动；赴外地的起止和背景可标明，但不能算作湖南事件。",
+          "sources_used": [
+            "mao_zedong_chronology_volume_1"
+          ],
+          "additional_valid_evidence_policy": "新增有据活动可补充答案，不自动扩大本版分母；修改必要事实/证据须升版并统一重算比较双方。"
+        },
+        "stage_criteria": {
+          "query_understanding": {
+            "status": "manual_protocol_pending_runner_support",
+            "denominator": 4,
+            "checks": [
+              "主体为毛泽东",
+              "时间为1921—1926含首尾六年",
+              "地点为湖南实际活动",
+              "按年组织且不能以该年检索未命中推断没有活动"
+            ]
+          },
+          "routing": {
+            "status": "manual_protocol_pending_runner_support",
+            "expected": "historical_multi_year_timeline_with_geographic_constraint",
+            "denominator": 1,
+            "pass_rule": "历史资料检索路径处理逐年综合题；不误入纯单点日期问答或整题拒答。标签名可映射，不要求某个未经实现的内部枚举。"
+          },
+          "recall": {
+            "status": "annotations_ready_capture_pending",
+            "ks": [
+              1,
+              3,
+              5,
+              10,
+              20
+            ],
+            "required_group_recall": {
+              "denominator": 14,
+              "positive_threshold": "命中完整组原文锚点或有效支持组标注",
+              "across_groups": "AND",
+              "within_alternatives": "OR"
+            },
+            "per_year_recall_denominators": {
+              "1921": 2,
+              "1922": 2,
+              "1923": 2,
+              "1924": 1,
+              "1925": 5,
+              "1926": 2
+            },
+            "year_hit_rate": {
+              "status": "manual_protocol_pending_runner_support",
+              "denominator": 6,
+              "rule": "至少命中一个该年必要证据组的年份数/6；不等同该年事实齐全。"
+            }
+          },
+          "candidate_precision_and_ranking": {
+            "status": "pending_step2_candidate_annotation",
+            "relevance_scale": {
+              "0": "不相关或不符合人物/年份/湖南约束",
+              "1": "有关背景或部分支持",
+              "2": "直接支持至少一个必要事实"
+            },
+            "precision_denominator": "K；只在前K所有实际候选有判定时可算，unknown不能判0。",
+            "mrr": "首相关rank倒数；首相关前任何unknown导致精确MRR N/A；本题尚无候选标签。",
+            "ndcg": "未建立全分级固定池，IDCG未定义，本轮N/A。",
+            "rerank": "真实重排输入/输出及统一充分标签存在后，再按各年组覆盖和排序指标比较；未执行不伪造。"
+          },
+          "context_selection": {
+            "status": "capture_pending",
+            "denominator": 14,
+            "rule": "只按实际生成请求证据区计算14组覆盖；同时逐年报告；候选列表或最终引用不充当真实上下文。"
+          },
+          "final_answer": {
+            "status": "answer_capture_and_review_pending",
+            "fact_coverage_denominator": 14,
+            "fact_rule": "covered=1，partial/missing/contradicted=0；unknown使对应分数N/A。按year_rows分别算六个年份分数，再以6为宏平均分母；不得与14事实微平均混报。",
+            "year_completeness_denominator": 6,
+            "year_completeness_rule": "每年全部必要事实covered才算该年完整；只写年标题或只说资料不足不能覆盖本版已有肯定证据。此为人工判据，自动汇总待实现。",
+            "citation_support": "每个具体活动的引用须支持主体、动作及年份地点；分母为实际需核对的全部活动级引用关系数，不预设为14；unknown使整体引用支持率N/A，不能从分母删去未知关系后称整体通过；无引用的事实另记引用缺失。",
+            "geographic_temporal_constraints": "将上海/广州/嘉兴/安源活动计入湖南或把1927实地考察提前到1926是明确失败；可提作标明地点的背景。",
+            "scope_and_refusal": "可答题，不应整题拒答。对没有查到的非必要活动应如实披露资料范围；不能编造，也不能宣告无活动。"
+          },
+          "cost": {
+            "status": "not_run",
+            "latency": "按实际各阶段和全程记录毫秒；缺失N/A。",
+            "tokens": "仅记录实际模型usage；未调用不是已测零成本模型答案，缺失N/A。"
+          }
+        },
+        "insufficient_year_evidence_policy": {
+          "current_annotation_state": "六年均有已核正例，不存在完全未标注年份。1924最低覆盖只为年底回湘，不能外推全年活动。",
+          "agent_failed_to_retrieve_known_year": "已标事实仍为固定分母；回答如实说明未找到材料可通过不编造维度，但不能拿该年的事实覆盖分；按检索/上下文/回答阶段分别定位。",
+          "future_source_uncertainty": "如人工否定某年度当前证据，应暂停该事实/年度对应评分并升版裁定，不把未标或无法判的真实历史活动算0。"
+        },
+        "independent_acceptance": "development only; not holdout; no human approval and no acceptance score"
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2",
+      "year_coverage": {
+        "years": [
+          1921,
+          1922,
+          1923,
+          1924,
+          1925,
+          1926
+        ],
+        "denominator": 6,
+        "rule": "某年命中至少一个本年必要事实组才计年份覆盖；另报每年组Recall并按六年宏平均，不能替代14事实微平均。"
+      }
+    },
+    {
+      "case_id": "dev_intersection_mao_zhou_1949",
+      "case_definition_sha256": "247693113e2170985c2f8dcb7e63807f33a39c99e6e20a70c013ad0cc0399aac",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "mao_zedong_chronology_volume_3",
+        "mao_zedong_chronology_volume_4",
+        "zhou_enlai_chronology_1949_1976"
+      ],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "毛泽东与周恩来在1949年有哪些有直接原文支持的交集？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [
+        "joint_telegram_0119",
+        "joint_departure_0323",
+        "joint_meeting_0607",
+        "joint_consultation_0925",
+        "joint_meeting_1024"
+      ],
+      "required_evidence_group_ids": [
+        "joint_telegram_0119",
+        "joint_departure_0323",
+        "joint_meeting_0607",
+        "joint_consultation_0925",
+        "joint_meeting_1024"
+      ],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别1949年毛泽东/周恩来共同动作，要求直接原文，不以姓名共现代替。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "分别评价关键词、向量、融合和最终候选中的必要证据组；组内OR、事实跨组AND，命中同页无关文字不得得分。",
+          "denominator": 5,
+          "status": "component_metric_available_no_new_run"
+        },
+        "ranking": {
+          "criterion": "Precision为前K相关位置/K；首正例之前有unknown时MRR不可评；nDCG只在完整分级固定池内计算。新候选不自动判0。",
+          "denominator": "K∈{1,3,5,10,20}；nDCG分母为已封印全池IDCG；MRR聚合分母为同口径有效题。",
+          "status": "pending_candidate_labels"
+        },
+        "context": {
+          "criterion": "仅评价实际生成请求收到的原文证据组；记录召回→上下文流失。摘要不能映射原页时记unknown，不以最终引用列表代替输入。",
+          "denominator": 5,
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "每项必要事实covered=1，partial/missing/contradicted=0，unknown使完整事实Recall不可评；有据的清单外补充不自动判错。",
+          "denominator": 5,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "检查原页/引文真实性与主张蕴含分别成立；必需事实引用覆盖以固定必要事实为分母，引用支持率须所有被评价的主张—引用对逐项标注，未知不可当不支持。",
+          "denominator": 5,
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "有足够证据时不能无理由整体拒答；允许明确披露尚无证据的子项。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "只接受两人参与同一明确动作的直接原文，不把同页出现、人名名单或单方活动当交集。",
+        "选定事件只是代表性最低覆盖，不声称穷尽1949年全部交集；跨页主语和日期须一起复核。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_intersection_mao_zhou_1949",
+        "split": "development",
+        "input": {
+          "question": "毛泽东与周恩来在1949年有哪些有直接原文支持的交集？",
+          "history": []
+        },
+        "expected_query_understanding": {
+          "entities": [
+            "毛泽东",
+            "周恩来"
+          ],
+          "start_year": 1949,
+          "end_year": 1949,
+          "intent": "intersection",
+          "evidence_standard": "same dated event explicitly relates both people through an action/participation/communication",
+          "scope": "representative non-exhaustive intersections",
+          "clarification": "do not claim the given people or year are missing",
+          "route_policy": "structured intersection route is acceptable; hybrid fallback is also acceptable when both entities/year/direct-support constraints are retained"
+        },
+        "assessment_status": "annotation_only_no_new_agent_run",
+        "human_review_status": "pending",
+        "execution_contract_status": "pending_evaluator_side_protocol_support",
+        "execution_contract_notes": "Current legacy pilot collector has no protocol-aware structured query-understanding scoring. Do not treat this sidecar as an implemented metric or silently run it without protocol support.",
+        "k_values": [
+          1,
+          3,
+          5,
+          10,
+          20
+        ],
+        "process_evidence_required": [
+          "actual query plan and route/fallback",
+          "ordered recall/fusion/ranking lists with source identity",
+          "actual generation context and truncation/compression status",
+          "delivered answer and citations",
+          "stage latency and actual token usage; missing is unknown"
+        ],
+        "cost_metrics": [
+          {
+            "name": "latency",
+            "denominator": "each executed stage/case",
+            "status": "pending_execution",
+            "rule": "Record actual elapsed_ms and repetitions; no synthetic latency and no inference of latency distribution from a single run."
+          },
+          {
+            "name": "tokens",
+            "denominator": "each actual model call and summed case total",
+            "status": "pending_execution",
+            "rule": "Sum recorded prompt/completion tokens across planner/reflection/generation/repair; missing usage remains unknown, local no-LLM run is not a real-model cost estimate."
+          }
+        ],
+        "not_run": [
+          "new candidate collection",
+          "ranking pool expansion",
+          "remote LLM answering",
+          "final answer assessment",
+          "production harness modification"
+        ],
+        "stages": {
+          "understanding_and_routing": {
+            "checks": [
+              "resolve 毛泽东",
+              "resolve 周恩来",
+              "preserve 1949",
+              "recognize intersection intent",
+              "preserve direct textual support",
+              "avoid missing-people/year clarification"
+            ],
+            "metrics": [
+              {
+                "name": "query_understanding_checks",
+                "denominator": 6,
+                "status": "pending_protocol_aware_evaluator_and_run",
+                "rule": "Each check is explicit pass/fail/unknown; unknown excluded with coverage and case identity reported, never silently zero."
+              },
+              {
+                "name": "routing_validity",
+                "denominator": 1,
+                "status": "pending_explicit_trace_review",
+                "rule": "Pass semantic route validity only if usable direct evidence can reach answer; hybrid fallback is not automatically wrong."
+              }
+            ]
+          },
+          "retrieval": {
+            "positive_target": "five explicitly named representative event groups, not all historical intersections",
+            "metrics": [
+              {
+                "name": "required_group_recall@K",
+                "denominator": 5,
+                "status": "anchors_ready_human_pending_capture_pending",
+                "rule": "Count distinct required event groups matched by exact source quote/page or explicit reviewed supporting span; alternatives within group OR. Missing or stale anchors invalidate rather than shrink denominator."
+              },
+              {
+                "name": "precision@K",
+                "denominator": "K returned positions; exhausted empty slots count 0",
+                "status": "pending_step2_capture_and_candidate_labels",
+                "rule": "Every returned candidate within K must be judged for exact Precision; an unjudged candidate is unknown, not irrelevant. Extra true intersections can be relevant even outside the five target facts."
+              },
+              {
+                "name": "mrr@K",
+                "denominator": "rank of first relevant returned candidate",
+                "status": "pending_step2_capture_and_candidate_labels",
+                "rule": "Exact only with no unknown preceding first positive. First direct intersection may belong to or extend beyond the required five groups."
+              },
+              {
+                "name": "hit_rate@K",
+                "denominator": 1,
+                "status": "planned_not_implemented",
+                "rule": "At least one directly supported relevant event in top K; do not report until candidate labels and scoring support exist."
+              }
+            ]
+          },
+          "ranking": {
+            "relevance_rubric": {
+              "2": "Source span explicitly connects both people to the same dated 1949 event and supports the proposed action; an additional valid intersection can receive 2.",
+              "1": "Material genuinely helps interpret or locate a 1949 intersection but is incomplete on participants/action/date; cannot alone satisfy a required direct-support group.",
+              "0": "Reviewed span cannot support this relation: wrong year/person, separate dates, background name/quoted statement or participation invented across entries.",
+              "unknown": "Not reviewed or disputed; never map to 0."
+            },
+            "metrics": [
+              {
+                "name": "pool_ndcg@K",
+                "denominator": "IDCG from all unique fully graded members of the same frozen pool",
+                "status": "pending_step2_pool_and_labels",
+                "rule": "gain=2**grade-1 and log2(rank+1); pool outside/unknown/zero-IDCG => N/A; duplicate gain only at first occurrence."
+              },
+              {
+                "name": "rerank_gain",
+                "denominator": "same per-case fixed candidate pool, same labels and K",
+                "status": "pending_actual_ranking_stage_and_labels",
+                "rule": "Only compare an actually executed before/after ranker; absence of reranking stays not_executed. Track evidence-group loss as well as P/MRR/nDCG."
+              },
+              {
+                "name": "judgment_coverage@K",
+                "denominator": "actual unique candidate units in evaluated top K",
+                "status": "pending_capture",
+                "rule": "Report judged/returned alongside relevance metrics; no manufactured candidate pool from reference anchors."
+              }
+            ],
+            "hard_negative_review_examples": [
+              {
+                "document_id": "mao_zedong_chronology_volume_3",
+                "pdf_page": 476,
+                "span_scope": "3月26日通知南京政府的代表名单和谈判基础",
+                "rule": "Mao's cited January statement does not establish Mao's personal presence as April 1 negotiator. This is a failure of support from this concrete span, not a historical claim of absence. New direct evidence must be reviewed rather than automatically labeled negative. Full page also contains other potentially true communications, so never blanket-label the page."
+              },
+              {
+                "document_id": "mao_zedong_chronology_volume_3",
+                "pdf_page": 521,
+                "span_scope": "6月8日会见傅作义",
+                "rule": "Do not infer Zhou's June 8 participation solely from PDF521 or inherit it from the adjacent June 7 Chen Jiageng meeting. The June 8 sentence lacks that direct support, but its silence does not prove Zhou was absent. Any new direct evidence for June 8 joint participation remains pending review and must not be automatically labeled negative."
+              }
+            ]
+          },
+          "context_selection": {
+            "metrics": [
+              {
+                "name": "required_group_recall_at_prompt",
+                "denominator": 5,
+                "status": "pending_real_prompt_capture",
+                "rule": "Score actual source spans sent to generation; distinguish retrieved hits, selected prompt evidence, final citations. Summaries/unmapped contexts need explicit unknown status, not invented page hits."
+              }
+            ],
+            "checks": [
+              "preserve event date and participants together",
+              "preserve 同日 antecedent for September 25",
+              "do not merge June 7 and June 8",
+              "retain enough text to distinguish action from name-only mention"
+            ]
+          },
+          "final_answer": {
+            "metrics": [
+              {
+                "name": "required_fact_recall",
+                "denominator": 5,
+                "status": "facts_ready_human_pending_answer_review_pending",
+                "rule": "covered=1; partial/missing/contradicted=0; unknown makes per-case recall unknown under explicit-answer-review-v1."
+              },
+              {
+                "name": "citation_support",
+                "denominator": "five required event claims plus any additional delivered historical claims",
+                "status": "pending_explicit_answer_review",
+                "rule": "Every delivered event must be supported for date, both participants and action. Additional correct events are allowed; additional unsupported events fail citation_support."
+              },
+              {
+                "name": "scope_explanation",
+                "denominator": 1,
+                "status": "pending_explicit_answer_review",
+                "rule": "State representative/non-exhaustive scope and do not call the five events a complete yearly list."
+              },
+              {
+                "name": "false_refusal",
+                "denominator": 1,
+                "status": "pending_explicit_answer_review",
+                "rule": "Unsupported generic request for people/year or blanket no-evidence answer is wrong given these sources; no answer yet means N/A."
+              }
+            ],
+            "overall_pass": "All five required groups covered, accurate dates/actions and citations, no forbidden claim, explicit non-exhaustive scope; provisional criterion pending human calibration."
+          }
+        }
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_refusal_einstein",
+      "case_definition_sha256": "6ed2001f207c3f0ad8e3c39ee84c49e0b97f6e6a7661ce3630ac09c7aba5d552",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [],
+      "source_scope_kind": "annotation_sources_not_exclusive",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "爱因斯坦在1925年担任了什么党内职务？",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [],
+      "required_evidence_group_ids": [],
+      "stages": {
+        "query_understanding": {
+          "criterion": "识别爱因斯坦、1925年、党内职务这一未经证据支持的前提。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "拒答题没有正向历史证据目标，检索质量不适用。",
+          "denominator": null,
+          "status": "not_applicable"
+        },
+        "ranking": {
+          "criterion": "无相关性目标，不计算排序分数。",
+          "denominator": null,
+          "status": "not_applicable"
+        },
+        "context": {
+          "criterion": "核对是否把无关材料放入生成并诱发编造；无生成请求不是失败。",
+          "denominator": "1个可观察拒答过程；无请求单独记not_applicable。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "不能给出无依据的具体活动或职务；需说明证据/来源限制，并保留有依据的澄清。",
+          "denominator": "无正向事实分母；按拒答边界整题评分。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "不得用无关史料支持编造结论；可引用出版说明等说明限制，不把恰当元证据引用判错。",
+          "denominator": "1题是否滥用引用；无引用的合理拒答可通过。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "满足refusal_basis边界，解释限制，不把资料不足断言为历史事件不存在。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "检索未发现证据不是历史上绝无此事的证明；允许说明当前库无法支持1925年党内职务，不编造职务。",
+        "核对搜到的科学家提及确实无关，不把1955/1963材料移到1925。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_refusal_einstein",
+        "split": "development",
+        "input": {
+          "question": "爱因斯坦在1925年担任了什么党内职务？",
+          "history": []
+        },
+        "expected_query_understanding": {
+          "entity": "爱因斯坦",
+          "requested_year": 1925,
+          "requested_information": "party-internal position",
+          "unspecified_party": true,
+          "expected_disposition": "insufficient local evidence; may ask which party without inventing office",
+          "global_time_boundary": "1925 is within 1921-1978, not a time-out-of-scope refusal"
+        },
+        "assessment_status": "annotation_only_no_new_agent_run",
+        "human_review_status": "pending",
+        "execution_contract_status": "pending_evaluator_side_protocol_support",
+        "execution_contract_notes": "Current legacy pilot collector has no protocol-aware structured query-understanding scoring. Do not treat this sidecar as an implemented metric or silently run it without protocol support.",
+        "k_values": [
+          1,
+          3,
+          5,
+          10,
+          20
+        ],
+        "process_evidence_required": [
+          "actual query plan and route/fallback",
+          "ordered recall/fusion/ranking lists with source identity",
+          "actual generation context and truncation/compression status",
+          "delivered answer and citations",
+          "stage latency and actual token usage; missing is unknown"
+        ],
+        "cost_metrics": [
+          {
+            "name": "latency",
+            "denominator": "each executed stage/case",
+            "status": "pending_execution",
+            "rule": "Record actual elapsed_ms and repetitions; no synthetic latency and no inference of latency distribution from a single run."
+          },
+          {
+            "name": "tokens",
+            "denominator": "each actual model call and summed case total",
+            "status": "pending_execution",
+            "rule": "Sum recorded prompt/completion tokens across planner/reflection/generation/repair; missing usage remains unknown, local no-LLM run is not a real-model cost estimate."
+          }
+        ],
+        "not_run": [
+          "new candidate collection",
+          "ranking pool expansion",
+          "remote LLM answering",
+          "final answer assessment",
+          "production harness modification"
+        ],
+        "stages": {
+          "understanding_and_routing": {
+            "checks": [
+              "retain Einstein",
+              "retain 1925",
+              "identify party office request",
+              "do not invent unspecified party",
+              "recognize insufficient local supporting evidence",
+              "do not label 1925 outside project period"
+            ],
+            "metrics": [
+              {
+                "name": "query_understanding_checks",
+                "denominator": 6,
+                "status": "pending_protocol_aware_evaluator_and_run",
+                "rule": "Explicit pass/fail/unknown per check; preserve unknown and denominator identity."
+              },
+              {
+                "name": "routing_validity",
+                "denominator": 1,
+                "status": "pending_explicit_trace_review",
+                "rule": "Refuse the unsupported local-evidence premise, explain insufficiency and optionally ask party; do not claim all historical affiliations are disproven."
+              }
+            ]
+          },
+          "retrieval": {
+            "quality_metrics": {
+              "recall": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "Refusal has no positive historical evidence target; denominator absent, not zero score."
+              },
+              "precision": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "No labeled relevance universe for answering the unsupported requested facts; retrieval N/A."
+              },
+              "mrr": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "No relevant first result is prescribed for this refusal case."
+              },
+              "ndcg": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "No positive ranking pool or ideal gain denominator for this refusal case."
+              }
+            },
+            "required_trace_review": "If retrieval is executed, inspect any concrete evidence used to assert the requested historical answer; metadata/source-scope evidence may support a refusal explanation. No prescribed relevant ranking universe."
+          },
+          "ranking": {
+            "status": "not_applicable_no_positive_ranking_target",
+            "metrics": [
+              {
+                "name": "rerank_gain",
+                "denominator": null,
+                "status": "not_applicable",
+                "rule": "No positive answer ranking denominator; keep execution status/cost without a fabricated quality score."
+              }
+            ]
+          },
+          "context_selection": {
+            "status": "pending_trace_review_if_executed",
+            "checks": [
+              "do not transform unrelated name/year matches into requested factual support",
+              "preserve provenance and relevant source restriction",
+              "do not treat refusal metadata as positive answer fact targets"
+            ],
+            "denominator": "explicit trace checks when actual contexts exist; no context => not executed, not zero"
+          },
+          "final_answer": {
+            "metrics": [
+              {
+                "name": "safe_refusal",
+                "denominator": 1,
+                "status": "boundary_ready_human_pending_answer_review_pending",
+                "rule": "Pass only if refusal/insufficient-evidence explanation responds to this case-specific boundary and avoids invented requested facts."
+              },
+              {
+                "name": "false_answer_rate",
+                "denominator": 1,
+                "status": "planned_protocol_metric_pending_implementation_and_run",
+                "rule": "1 if a definite unsupported answer to the requested premise/completeness is delivered; 0 if no such claim, but unknown/unrun remains N/A. Harmless quoted premise is not an asserted answer."
+              },
+              {
+                "name": "scope_explanation",
+                "denominator": 1,
+                "status": "boundary_ready_human_pending_answer_review_pending",
+                "rule": "Refuse the unsupported local-evidence premise, explain insufficiency and optionally ask party; do not claim all historical affiliations are disproven."
+              },
+              {
+                "name": "source_constraint",
+                "denominator": 1,
+                "status": "pending_explicit_answer_review",
+                "rule": "Fail if the answer silently uses unallowed material to satisfy the request. For Einstein apply local-evidence-only; for source-year apply specified three-volume chronology."
+              },
+              {
+                "name": "citation_support",
+                "denominator": "each historical assertion/citation actually delivered",
+                "status": "pending_answer_review_or_not_applicable_if_no_historical_claims",
+                "rule": "Citations, if present, must support the limited claim actually made. A refusal without a historical claim need not invent a positive citation."
+              }
+            ],
+            "required_fact_recall": {
+              "status": "not_applicable",
+              "denominator": null,
+              "reason": "No required positive historical facts."
+            }
+          }
+        }
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    },
+    {
+      "case_id": "dev_refusal_source_year",
+      "case_definition_sha256": "bb82e0909bd1471b9a13a608712b2391cbbc634a2e86b2c275152a720becf400",
+      "annotation_status": "agent_prepared_human_pending",
+      "source_scope": [
+        "deng_xiaoping_chronology_1904_1974_middle",
+        "deng_xiaoping_chronology_1904_1974_lower",
+        "deng_xiaoping_chronology_1904_1974_upper"
+      ],
+      "source_scope_kind": "hard_user_constraint",
+      "input_variants": [
+        {
+          "id": "single_turn",
+          "question": "只依据《邓小平年谱（1904—1974）》，列出邓小平1975年的全部活动。",
+          "history": []
+        }
+      ],
+      "independent_case_count": 1,
+      "required_fact_ids": [],
+      "required_evidence_group_ids": [],
+      "stages": {
+        "query_understanding": {
+          "criterion": "区分指定年谱1904—1974版本范围与请求1975全年全部活动，保留来源硬限制。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "denominator": 1,
+          "status": "manual_rubric_no_new_run"
+        },
+        "routing": {
+          "criterion": "所选路由必须保留本题条件并能返回原文证据；允许等效路线，不以路由名称单独判断正确。拒答允许先澄清或检索确认。",
+          "denominator": "1个完整可观察的本题路由决策；缺轨迹为N/A。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "retrieval": {
+          "criterion": "拒答题没有正向历史证据目标，检索质量不适用。",
+          "denominator": null,
+          "status": "not_applicable"
+        },
+        "ranking": {
+          "criterion": "无相关性目标，不计算排序分数。",
+          "denominator": null,
+          "status": "not_applicable"
+        },
+        "context": {
+          "criterion": "核对是否把无关材料放入生成并诱发编造；无生成请求不是失败。",
+          "denominator": "1个可观察拒答过程；无请求单独记not_applicable。",
+          "status": "manual_rubric_no_new_run"
+        },
+        "answer": {
+          "criterion": "不能给出无依据的具体活动或职务；需说明证据/来源限制，并保留有依据的澄清。",
+          "denominator": "无正向事实分母；按拒答边界整题评分。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "citation": {
+          "criterion": "不得用无关史料支持编造结论；可引用出版说明等说明限制，不把恰当元证据引用判错。",
+          "denominator": "1题是否滥用引用；无引用的合理拒答可通过。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "refusal": {
+          "criterion": "满足refusal_basis边界，解释限制，不把资料不足断言为历史事件不存在。",
+          "denominator": "1题；未观测真实答案为N/A。",
+          "status": "explicit_review_required_no_new_answer"
+        },
+        "cost": {
+          "criterion": "记录各阶段实际耗时、调用次数与Token；缺失不补0。单次样本不推p95或账单总额。",
+          "denominator": "每次真实运行及每个实际模型调用；配对题两臂分列。",
+          "status": "no_new_run"
+        }
+      },
+      "human_review_focus": [
+        "核对出版说明与最后正文，1904—1974年谱不能支持“1975全年全部活动”的穷尽要求。",
+        "书中可能提及1975或次年安排；不得误标“完全没有1975文字”，也不能改用其他来源或声称本人1975年无活动。"
+      ],
+      "specialist_protocol": {
+        "case_id": "dev_refusal_source_year",
+        "split": "development",
+        "input": {
+          "question": "只依据《邓小平年谱（1904—1974）》，列出邓小平1975年的全部活动。",
+          "history": []
+        },
+        "expected_query_understanding": {
+          "entity": "邓小平",
+          "requested_year": 1975,
+          "allowed_document_ids": [
+            "deng_xiaoping_chronology_1904_1974_middle",
+            "deng_xiaoping_chronology_1904_1974_lower",
+            "deng_xiaoping_chronology_1904_1974_upper"
+          ],
+          "exclusive_source_constraint": true,
+          "requested_completeness": "all activities",
+          "expected_disposition": "specified source coverage is insufficient for complete year",
+          "global_time_boundary": "1975 is within 1921-1978"
+        },
+        "assessment_status": "annotation_only_no_new_agent_run",
+        "human_review_status": "pending",
+        "execution_contract_status": "pending_evaluator_side_protocol_support",
+        "execution_contract_notes": "Current legacy pilot collector has no protocol-aware structured query-understanding scoring. Do not treat this sidecar as an implemented metric or silently run it without protocol support.",
+        "k_values": [
+          1,
+          3,
+          5,
+          10,
+          20
+        ],
+        "process_evidence_required": [
+          "actual query plan and route/fallback",
+          "ordered recall/fusion/ranking lists with source identity",
+          "actual generation context and truncation/compression status",
+          "delivered answer and citations",
+          "stage latency and actual token usage; missing is unknown"
+        ],
+        "cost_metrics": [
+          {
+            "name": "latency",
+            "denominator": "each executed stage/case",
+            "status": "pending_execution",
+            "rule": "Record actual elapsed_ms and repetitions; no synthetic latency and no inference of latency distribution from a single run."
+          },
+          {
+            "name": "tokens",
+            "denominator": "each actual model call and summed case total",
+            "status": "pending_execution",
+            "rule": "Sum recorded prompt/completion tokens across planner/reflection/generation/repair; missing usage remains unknown, local no-LLM run is not a real-model cost estimate."
+          }
+        ],
+        "not_run": [
+          "new candidate collection",
+          "ranking pool expansion",
+          "remote LLM answering",
+          "final answer assessment",
+          "production harness modification"
+        ],
+        "stages": {
+          "understanding_and_routing": {
+            "checks": [
+              "retain Deng Xiaoping",
+              "retain 1975",
+              "retain only specified chronology",
+              "retain all-activities completeness",
+              "distinguish source coverage from project scope",
+              "distinguish mentions/plans from complete yearly record"
+            ],
+            "metrics": [
+              {
+                "name": "query_understanding_checks",
+                "denominator": 6,
+                "status": "pending_protocol_aware_evaluator_and_run",
+                "rule": "Explicit pass/fail/unknown per check; preserve unknown and denominator identity."
+              },
+              {
+                "name": "routing_validity",
+                "denominator": 1,
+                "status": "pending_explicit_trace_review",
+                "rule": "Explain 1904-1974 source scope cannot establish all 1975 activities, while incidental 1975 mentions exist; do not silently supplement other sources or infer no historical activity."
+              }
+            ]
+          },
+          "retrieval": {
+            "quality_metrics": {
+              "recall": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "Refusal has no positive historical evidence target; denominator absent, not zero score."
+              },
+              "precision": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "No labeled relevance universe for answering the unsupported requested facts; retrieval N/A."
+              },
+              "mrr": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "No relevant first result is prescribed for this refusal case."
+              },
+              "ndcg": {
+                "status": "not_applicable",
+                "denominator": null,
+                "reason": "No positive ranking pool or ideal gain denominator for this refusal case."
+              }
+            },
+            "required_trace_review": "If retrieval is executed, inspect any concrete evidence used to assert the requested historical answer; metadata/source-scope evidence may support a refusal explanation. No prescribed relevant ranking universe."
+          },
+          "ranking": {
+            "status": "not_applicable_no_positive_ranking_target",
+            "metrics": [
+              {
+                "name": "rerank_gain",
+                "denominator": null,
+                "status": "not_applicable",
+                "rule": "No positive answer ranking denominator; keep execution status/cost without a fabricated quality score."
+              }
+            ]
+          },
+          "context_selection": {
+            "status": "pending_trace_review_if_executed",
+            "checks": [
+              "do not transform unrelated name/year matches into requested factual support",
+              "preserve provenance and relevant source restriction",
+              "do not treat refusal metadata as positive answer fact targets"
+            ],
+            "denominator": "explicit trace checks when actual contexts exist; no context => not executed, not zero"
+          },
+          "final_answer": {
+            "metrics": [
+              {
+                "name": "safe_refusal",
+                "denominator": 1,
+                "status": "boundary_ready_human_pending_answer_review_pending",
+                "rule": "Pass only if refusal/insufficient-evidence explanation responds to this case-specific boundary and avoids invented requested facts."
+              },
+              {
+                "name": "false_answer_rate",
+                "denominator": 1,
+                "status": "planned_protocol_metric_pending_implementation_and_run",
+                "rule": "1 if a definite unsupported answer to the requested premise/completeness is delivered; 0 if no such claim, but unknown/unrun remains N/A. Harmless quoted premise is not an asserted answer."
+              },
+              {
+                "name": "scope_explanation",
+                "denominator": 1,
+                "status": "boundary_ready_human_pending_answer_review_pending",
+                "rule": "Explain 1904-1974 source scope cannot establish all 1975 activities, while incidental 1975 mentions exist; do not silently supplement other sources or infer no historical activity."
+              },
+              {
+                "name": "source_constraint",
+                "denominator": 1,
+                "status": "pending_explicit_answer_review",
+                "rule": "Fail if the answer silently uses unallowed material to satisfy the request. For Einstein apply local-evidence-only; for source-year apply specified three-volume chronology."
+              },
+              {
+                "name": "citation_support",
+                "denominator": "each historical assertion/citation actually delivered",
+                "status": "pending_answer_review_or_not_applicable_if_no_historical_claims",
+                "rule": "Citations, if present, must support the limited claim actually made. A refusal without a historical claim need not invent a positive citation."
+              }
+            ],
+            "required_fact_recall": {
+              "status": "not_applicable",
+              "denominator": null,
+              "reason": "No required positive historical facts."
+            }
+          }
+        }
+      },
+      "execution_gate": "annotation_package_not_accepted_by_legacy_collector; protocol-aware integration is step 2"
+    }
+  ]
+}
