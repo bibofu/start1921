@@ -156,10 +156,37 @@ def _report() -> dict[str, Any]:
         "corpus_sha256": "corpus",
         "source_sha256": "source",
         "k_values": [1, 5],
-        "cases": [{"case_id": "p1"}, {"case_id": "p2"}],
+        "cases": [
+            {"case_id": case_id, "stages": [{"stage": "keyword_candidates", "scope": "component"}]}
+            for case_id in ("p1", "p2")
+        ],
         "config": {"candidate_k": 30, "top_k": 10},
         "index_attribution": {"attribution_safe": True},
-        "component_candidate_fingerprints": {"case1": {"keyword_candidates": "same"}},
+        "index_metadata": {
+            "reports": {
+                "keyword_index": {
+                    "manifest": {
+                        "chunk_artifact_sha256": "chunks",
+                        "index_artifact_sha256": "keyword-artifact",
+                        "build_run_id": "keyword-build",
+                        "chunk_build_run_id": "chunks-build",
+                        "git_commit": "builder-commit",
+                        "chunking": {
+                            "version": "v1",
+                            "target_chars": 650,
+                            "max_chars": 900,
+                            "overlap": 0,
+                        },
+                        "keyword_index_version": "keyword-v1",
+                    },
+                    "artifact_verified": True,
+                    "actual_index_artifact_sha256": "keyword-artifact",
+                }
+            }
+        },
+        "component_candidate_fingerprints": {
+            case_id: {"keyword_candidates": "same"} for case_id in ("p1", "p2")
+        },
         "provisional_aggregate": {
             "final.precision@5": {
                 "value": 0.5,

@@ -56,15 +56,17 @@ class AnswerReview(ReviewModel):
     case_id: str = Field(min_length=1)
     case_definition_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     answer_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    basis: Literal["agent_review", "human_review"]
-    reviewer: str = Field(min_length=1)
-    reviewed_at: str
+    basis: Literal["agent_review", "human_review"] | None = None
+    reviewer: str | None = Field(default=None, min_length=1)
+    reviewed_at: str | None = None
     facts: list[FactReview]
     dimensions: dict[str, DimensionReview]
 
     @field_validator("reviewed_at")
     @classmethod
-    def require_timezone(cls, value: str) -> str:
+    def require_timezone(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         if parsed.tzinfo is None:
             raise ValueError("review timestamp must include timezone")
@@ -76,6 +78,11 @@ class AnswerReview(ReviewModel):
             raise ValueError("every answer dimension needs an explicit judgment or N/A reason")
         if len({item.fact_id for item in self.facts}) != len(self.facts):
             raise ValueError("duplicate fact reviews")
+        identity = (self.basis, self.reviewer, self.reviewed_at)
+        judged = any(f.status != "unknown" or f.support_status != "unknown" for f in self.facts)
+        judged = judged or any(d.status != "unknown" for d in self.dimensions.values())
+        if (judged or any(v is not None for v in identity)) and not all(identity):
+            raise ValueError("explicit judgments require basis, reviewer and reviewed_at")
         return self
 
 

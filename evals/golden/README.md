@@ -2,6 +2,8 @@
 
 最新13题真实模型观察见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
+当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：为每次采集生成独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
+
 ## v2设计与当前开发集
 
 截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，人工批准仍为0。新标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。

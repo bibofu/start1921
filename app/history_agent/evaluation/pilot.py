@@ -28,14 +28,23 @@ from history_agent.evaluation.pilot_answers import (
     evaluate_answer,
     validate_reviews,
 )
+from history_agent.evaluation.pilot_comparison import compare
 from history_agent.evaluation.pilot_metrics import evaluate_stage, evidence_unit
 from history_agent.evaluation.pilot_models import PilotDataset, RankingPool, case_definition
+from history_agent.evaluation.pilot_process import summarize_process
+from history_agent.evaluation.pilot_process_reviews import evaluate_process_reviews
+from history_agent.evaluation.pilot_reporting import markdown_report
 from history_agent.evaluation.pilot_runtime import RecordedLLMRuntime
+from history_agent.evaluation.pilot_workflow import (
+    prepare_reviews,
+    protect_inputs,
+    validate_capture_binding,
+)
 from history_agent.extraction.report import load_page_records
 from history_agent.processing.chunks import effective_pages
 from history_agent.retrieval.hybrid import search_hybrid_index
 
-VERSION = "reviewable-pilot-v2"
+VERSION = "reviewable-pilot-v3"
 DEFAULT_DATASET = "evals/golden/pilot_annotations.json"
 DEFAULT_K = (1, 3, 5, 10, 20)
 
@@ -213,6 +222,9 @@ def collect(
     run_name: str = "pilot_baseline",
     settings: Settings | None = None,
 ) -> dict[str, Any]:
+    protect_inputs([output, output.with_suffix(".partial.json")], [dataset_path])
+    if output.exists() or output.with_suffix(".partial.json").exists():
+        raise FileExistsError("capture output already exists; choose a new run directory")
     settings = settings or get_settings()
     dataset = PilotDataset.model_validate(read_json(dataset_path))
     if not 1 <= top_k <= candidate_k <= 100 or not 1 <= answer_top_k <= 12:
@@ -387,9 +399,35 @@ def score(
     *,
     ranking_pools_path: Path | None = None,
     assessments_path: Path | None = None,
+    process_reviews_path: Path | None = None,
+    protocols_path: Path | None = None,
 ) -> dict[str, Any]:
+    if not k_values or any(type(k) is not int or k < 1 for k in k_values):
+        raise ValueError("K values must be positive integers")
+    k_values = tuple(sorted(set(k_values)))
+    protect_inputs(
+        [output, output.with_suffix(".md"), output.with_suffix(".summary.json")],
+        [
+            dataset_path,
+            capture_path,
+            ranking_pools_path,
+            assessments_path,
+            process_reviews_path,
+            protocols_path,
+        ],
+    )
     dataset = PilotDataset.model_validate(read_json(dataset_path))
     capture = read_json(capture_path)
+    case_definitions = [case.model_dump(mode="json") for case in dataset.cases]
+    captured = validate_capture_binding(case_definitions, capture)
+    process_review_payload = read_json(process_reviews_path) if process_reviews_path else None
+    understanding = evaluate_process_reviews(
+        process_review_payload,
+        case_definitions,
+        capture,
+        digest(dataset.model_dump(mode="json")),
+        protocol_path=protocols_path,
+    )
     pools = {}
     if ranking_pools_path is not None:
         pool_payload = read_json(ranking_pools_path)
@@ -410,9 +448,6 @@ def score(
         if assessment
         else {}
     )
-    captured = {item["case_id"]: item for item in capture["cases"]}
-    if {case.id for case in dataset.cases} != set(captured):
-        raise ValueError("capture and dataset case IDs differ")
     file_hashes = {item["document_id"]: item["sha256"] for item in capture["corpus"]["documents"]}
     results = []
     for model in dataset.cases:
@@ -483,6 +518,14 @@ def score(
         "labels": "Provisional agent labels are diagnostic only, not approved Golden results.",
         "answer_rubric_version": assessment.rubric_version if assessment else None,
         "answer_reviews_sha256": digest(assessment.model_dump(mode="json")) if assessment else None,
+        "process_reviews_sha256": digest(process_review_payload)
+        if process_review_payload
+        else None,
+        "protocol_file_sha256": hashlib.sha256(protocols_path.read_bytes()).hexdigest()
+        if protocols_path
+        else None,
+        "query_understanding": understanding,
+        "process_summary": summarize_process(case_definitions, capture),
         "k_values": list(k_values),
         "cases": results,
         "provisional_aggregate": _aggregate(results, "provisional"),
@@ -491,152 +534,29 @@ def score(
         "approved_answer_aggregate": aggregate_answers(results, "approved"),
     }
     write_json(output, result)
+    write_json(output.with_suffix(".summary.json"), compact_report(result))
     output.with_suffix(".md").write_text(markdown_report(result), encoding="utf8")
     return result
 
 
-def markdown_report(report: dict[str, Any]) -> str:
-    lines = [
-        "# 开发集评测报告",
-        "",
-        f"运行：`{report['run_name']}`",
-        "",
-        "以下数值来自 Agent 核对的暂定标签，不是人工确认的 Golden 分数。",
-        "未知候选不按不相关处理，未审题目的正式指标保持不可评。",
-        "",
-        "同次运行的多 K 值是排序前缀诊断，不等于重新执行不同 Top-K 的生产实验。",
-        "生成上下文来自实际 HTTP 请求中的证据区；它与最终答案引用列表分别记录。",
-        "",
-        "| 题目 | 阶段 | 关键证据组 Recall@5 | Precision@5 | MRR@5 | 固定池 nDCG@5 | 未判断候选 |",
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
-    ]
-    for case in report["cases"]:
-        for stage in case["stages"]:
-            if stage["stage"] not in {
-                "keyword_candidates",
-                "vector_candidates",
-                "rrf_fusion",
-                "rule_ranking",
-                "page_deduplication",
-                "final",
-            }:
-                continue
-            metrics = stage["provisional"]["metrics"]
-            values = []
-            for key in ("required_group_recall@5", "precision@5", "mrr@5", "pool_ndcg@5"):
-                metric = metrics.get(key, {})
-                value = metric.get("value")
-                values.append(f"{value:.3f}" if value is not None else "不可评")
-            unknown = stage["provisional"]["diagnostics"].get("unknown_judgment_count", "—")
-            lines.append(
-                f"| {case['case_id']} | {stage['stage']} | "
-                + " | ".join(values)
-                + f" | {unknown} |"
+def compact_report(report: dict[str, Any]) -> dict[str, Any]:
+    """Keep versions, denominators and per-case outcomes without repeated hit diagnostics."""
+    result = {key: value for key, value in report.items() if key != "cases"}
+    result["cases"] = [
+        {
+            key: case[key]
+            for key in (
+                "case_id",
+                "question",
+                "human_review",
+                "retrieval_ms",
+                "answer_ms",
+                "generation_assessment",
             )
-    lines += [
-        "",
-        "逐题答案、引用、模型状态、Token 用量、各指标不可评原因与分母见同名 JSON。",
-        "正式分数仅纳入人工已批准标签；nDCG 等未满足标注条件的指标不填零。",
-        "",
+        }
+        for case in report["cases"]
     ]
-    lines += ["| 答案维度 | Agent 暂定分数 | 有效分母 |", "| --- | ---: | ---: |"]
-    for name, metric in report["provisional_answer_aggregate"].items():
-        value = metric["value"]
-        rendered = f"{value:.3f}" if value is not None else "不可评"
-        lines.append(f"| {name} | {rendered} | {metric['denominator']} |")
-    lines.append("")
-    return "\n".join(lines)
-
-
-def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
-    keys = ("evaluator_version", "dataset_sha256", "corpus_sha256", "k_values")
-    reasons = [f"{key} differs" for key in keys if left[key] != right[key]]
-    if [item["case_id"] for item in left["cases"]] != [item["case_id"] for item in right["cases"]]:
-        reasons.append("case IDs differ")
-    metrics = {}
-    for name in sorted(set(left["provisional_aggregate"]) & set(right["provisional_aggregate"])):
-        a, b = left["provisional_aggregate"][name], right["provisional_aggregate"][name]
-        valid = not reasons and a["evaluable_case_ids"] == b["evaluable_case_ids"]
-        valid = valid and a["value"] is not None and b["value"] is not None
-        if ".pool_ndcg@" in name:
-            fingerprints = a.get("pool_fingerprints") or {}
-            valid = (
-                valid
-                and bool(fingerprints)
-                and all(fingerprints.get(case_id) for case_id in a["evaluable_case_ids"])
-                and fingerprints == b.get("pool_fingerprints")
-            )
-        metrics[name] = {
-            "comparable": valid,
-            "delta": b["value"] - a["value"] if valid else None,
-            "left_cases": a["evaluable_case_ids"],
-            "right_cases": b["evaluable_case_ids"],
-        }
-    changes = {
-        key: [left["config"].get(key), right["config"].get(key)]
-        for key in set(left["config"]) | set(right["config"])
-        if left["config"].get(key) != right["config"].get(key)
-    }
-    answer_metrics = {}
-    for name in sorted(
-        set(left.get("provisional_answer_aggregate", {}))
-        & set(right.get("provisional_answer_aggregate", {}))
-    ):
-        a = left["provisional_answer_aggregate"][name]
-        b = right["provisional_answer_aggregate"][name]
-        bases = a.get("review_bases") or {}
-        case_ids = a.get("evaluable_case_ids") or []
-        units = a.get("evaluable_unit_ids") or []
-        valid = (
-            not reasons
-            and bool(left.get("answer_rubric_version"))
-            and left.get("answer_rubric_version") == right.get("answer_rubric_version")
-            and bool(units)
-            and bool(case_ids)
-            and units == b.get("evaluable_unit_ids")
-            and case_ids == b.get("evaluable_case_ids")
-            and bases == b.get("review_bases")
-            and all(bases.get(case_id) in {"agent_review", "human_review"} for case_id in case_ids)
-            and a["value"] is not None
-            and b["value"] is not None
-        )
-        answer_metrics[name] = {
-            "comparable": valid,
-            "delta": b["value"] - a["value"] if valid else None,
-            "left_units": a.get("evaluable_unit_ids", []),
-            "right_units": b.get("evaluable_unit_ids", []),
-        }
-    pools_known = all(report.get("component_candidate_fingerprints") for report in (left, right))
-    pools_equal = (
-        left.get("component_candidate_fingerprints")
-        == right.get("component_candidate_fingerprints")
-        if pools_known
-        else None
-    )
-    attribution_reasons = []
-    if set(changes) - {"top_k"}:
-        attribution_reasons.append(
-            "Pilot isolation currently verifies only Top-K or repeated-control experiments"
-        )
-    if pools_equal is not True:
-        attribution_reasons.append("Isolation requires identical ordered branch candidates")
-    if not left.get("source_sha256") or left.get("source_sha256") != right.get("source_sha256"):
-        attribution_reasons.append("Isolation requires identical captured source code")
-    return {
-        "compatible": not reasons,
-        "reasons": reasons,
-        "config_changes": changes,
-        "basis": "provisional_agent_review",
-        "metrics": metrics,
-        "answer_metrics": answer_metrics,
-        "ordered_branch_candidates_equal": pools_equal,
-        "attribution_unsafe_reasons": attribution_reasons,
-        "attribution_safe": not reasons
-        and not attribution_reasons
-        and all(
-            report["index_attribution"].get("attribution_safe", False) for report in (left, right)
-        ),
-    }
+    return result
 
 
 def main() -> None:
@@ -656,6 +576,14 @@ def main() -> None:
     score_parser.add_argument("--output", type=Path, required=True)
     score_parser.add_argument("--ranking-pools", type=Path)
     score_parser.add_argument("--assessments", type=Path)
+    score_parser.add_argument("--process-reviews", type=Path)
+    score_parser.add_argument("--protocols", type=Path)
+    score_parser.add_argument("--k-values", type=int, nargs="+", default=DEFAULT_K)
+    review_parser = sub.add_parser("prepare-reviews")
+    review_parser.add_argument("--dataset", type=Path, default=Path(DEFAULT_DATASET))
+    review_parser.add_argument("--capture", type=Path, required=True)
+    review_parser.add_argument("--protocols", type=Path)
+    review_parser.add_argument("--output-dir", type=Path, required=True)
     compare_parser = sub.add_parser("compare")
     compare_parser.add_argument("left", type=Path)
     compare_parser.add_argument("right", type=Path)
@@ -676,10 +604,18 @@ def main() -> None:
             args.dataset,
             args.capture,
             args.output,
+            tuple(args.k_values),
             ranking_pools_path=args.ranking_pools,
             assessments_path=args.assessments,
+            process_reviews_path=args.process_reviews,
+            protocols_path=args.protocols,
         )
+    elif args.command == "prepare-reviews":
+        prepare_reviews(args.dataset, args.capture, args.output_dir, protocol_path=args.protocols)
+        print(args.output_dir)
+        return
     else:
+        protect_inputs([args.output], [args.left, args.right])
         write_json(args.output, compare(read_json(args.left), read_json(args.right)))
     print(args.output)
 
