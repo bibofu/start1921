@@ -1,6 +1,6 @@
 # Unified RAG Golden Benchmark
 
-最新13题真实模型观察见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
+最新13题真实回答的新口径复核见 [2026-10-11复核对照](observations/20261011_calibrated/README.md)：仍为3/13通过、20/43事实完整覆盖，引用、来源与范围说明的部分判断已更新。这是同一答案重审，没有新增模型运行或修改Agent。原始运行见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
 当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 已接入20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
 

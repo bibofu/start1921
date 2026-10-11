@@ -1,0 +1,2011 @@
+{
+  "schema_version": 1,
+  "kind": "pilot-review-bundle",
+  "capture_sha256": "b84e8dcf48e149e043dba4e3abd195c342176967d567f7f6601d423810cab3f5",
+  "dataset_sha256": "1fbaeedc71e3f39b4d310f60dfccc3743a891d955d0ce5cfd984cbb3f5487729",
+  "protocol_sha256": "13f51b46ca1404b502f33ea99dd14e20c3e7e0869997dee1c74303b222e27498",
+  "calibration_sha256": "1582f3b5b5f46d1f65db5d55da3a332c40dd6937ea72cfe7baa1d522fdf76cd7",
+  "template_sha256": "aa3675048cd206d8cefa5438d2f8f56d9fbf5cba9a3e0faba5dea7af8be0a898",
+  "exported_at": "2026-10-11T06:21:45.737873+00:00",
+  "files": {
+    "answer_reviews.json": {
+      "schema_version": 1,
+      "rubric_version": "explicit-answer-review-v1",
+      "capture_sha256": "b84e8dcf48e149e043dba4e3abd195c342176967d567f7f6601d423810cab3f5",
+      "calibration_sha256": "1582f3b5b5f46d1f65db5d55da3a332c40dd6937ea72cfe7baa1d522fdf76cd7",
+      "cases": [
+        {
+          "case_id": "pilot_exact_deng_1952_appointment",
+          "case_definition_sha256": "3973e913609efba37ad561d4a753be36976ac467ba4598e33aa1f8af64fd4610",
+          "answer_sha256": "c6d799fc2e38596b1b705032d13b89d3c243fb085bd03245ab48182b3c8d7615",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview A",
+          "reviewed_at": "2026-10-11T06:16:51.400795+00:00",
+          "facts": [
+            {
+              "fact_id": "appointed_vice_premier",
+              "status": "covered",
+              "reason": "正文明确给出1952年8月7日、中央人民政府及政务院副总理任命；E1脚注和E2当日条目均直接支持，不把政务院替成国务院。",
+              "answer_excerpt": "1952年8月7日，中央人民政府第十七次会议任命邓小平为政务院副总理",
+              "cited_evidence_ids": [
+                "E1",
+                "E2"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "逐项核对全部正文：任命日期、机构、职务与E1/E2一致；扩展的第十七次会议信息由E1脚注直接支持。引文在周年谱PDF550、邓年谱中卷PDF420本地页文本中核实。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；协议 source_scope_kind 为 annotation_sources_not_exclusive，金标取材书目不构成排他约束。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "正文保留1952年8月7日日级日期；没有用引文的7月页眉或次日8月8日活动替换任命日期。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan保留邓小平、1952年、8月7日与任命职务，走hybrid；production_1_final及后续阶段均ok，最终证据包含目标任命原文，允许event_overview等效路由名称。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题为有据可答的事实/观点问题，实际交付了正向回答，没有拒答行为或待检验的拒答边界。"
+            },
+            "scope_explanation": {
+              "status": "not_applicable",
+              "reason": "精确任命题已完整回答，无开放全集或已承诺而缺失的子项；通用limitations不计为具体范围说明，也不额外要求范围段。"
+            }
+          }
+        },
+        {
+          "case_id": "pilot_semantic_deng_1962_agriculture",
+          "case_definition_sha256": "14ee4ceb3fe07da3c2c73acfc8b6f233a1e9b2c3370fa80900ca1141fa36ac60",
+          "answer_sha256": "306a424a2743ced7f537aafe6ac48ae69db552efe4952395a696a807fdb3b17e",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview A",
+          "reviewed_at": "2026-10-11T06:16:51.400795+00:00",
+          "facts": [
+            {
+              "fact_id": "practical_standard",
+              "status": "covered",
+              "reason": "正文以哪一种方法有利于恢复就用哪一种，完整表达农业恢复的实效选择标准；E6直接支持。",
+              "answer_excerpt": "不管是黄猫、黑猫，在过渡时期，哪一种方法有利于恢复，就用哪一种方法。",
+              "cited_evidence_ids": [
+                "E6"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "respect_preference",
+              "status": "partial",
+              "reason": "正文表达群众要求有道理、应研究且不应预先否定，仍未表达尊重群众愿意采取哪种形式就采取哪种的选择关系。已表达的这一部分由E6充分支持；不以金标PDF386或引用替正文补足。",
+              "answer_excerpt": "你说不好，总要有答复。群众要求，总有道理。不要一口否定，不要在否定的前提下去搞。",
+              "cited_evidence_ids": [
+                "E6"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "allow_diversity",
+              "status": "covered",
+              "reason": "正文明确形式多样、不轻易否定、实事求是和不千篇一律；E6完整支持这一已表达命题。",
+              "answer_excerpt": "过渡时期，要多种多样。退的时期，退够才能进。总之，要实事求是，不要千篇一律，这几年就是千篇一律。",
+              "cited_evidence_ids": [
+                "E6"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "fail",
+              "reason": "E1/E2/E5/E6均支持对应实效、形式多样及会议扩展；但末句把E8的8月26日—9月23日八届十中全会预备会议写成“中央工作会议预备会议”。E8同段明确中央工作会议8月24日结束，不能支持该会议名绑定；这是必要清单以外的具体断言错误。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；协议 source_scope_kind 为 annotation_sources_not_exclusive，金标取材书目不构成排他约束。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "7月判断用E6的1962年7月记录；3月29日类似原则明确标为3月，8月以后材料也明确分开，没有将其冒充7月表态。会议名称误绑单列引用失败。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan为viewpoint/hybrid，保留1962年7月、邓小平和农业组织形式选择标准，检索扩展到包产到户/生产关系且实际production阶段均ok；没有将任务退化为只找猫的比喻。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题为有据可答的事实/观点问题，实际交付了正向回答，没有拒答行为或待检验的拒答边界。"
+            },
+            "scope_explanation": {
+              "status": "pass",
+              "reason": "正文明确现有片段不直接记载7月8日以后当月新的个人判断，并区分3月类似表述和8月后无个人表态；属具体材料边界，不把局部史料说成全年穷尽。此说明不能抵消群众选择关系缺失。"
+            }
+          }
+        },
+        {
+          "case_id": "pilot_multievidence_zunyi_leadership",
+          "case_definition_sha256": "a02140445fc026f1873bb2c11c87bdcd9b148520bebf3b148751cb82a6f3b6f4",
+          "answer_sha256": "40be067be0aa3a0aea3180e5344ffe3ee5092d9cd9ae8f85fc0a0958cb494bb5",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview A",
+          "reviewed_at": "2026-10-11T06:16:51.400795+00:00",
+          "facts": [
+            {
+              "fact_id": "meeting_membership",
+              "status": "covered",
+              "reason": "正文完整写出增选毛为常委、取消旧三人团、朱周指挥以及周恩来最后决心责任；E5与E2直接支持，额外E19的会议错绑另列全答失败。",
+              "answer_excerpt": "遵义会议改组中央领导机构，**增选毛泽东为中央政治局常委**；**取消长征前成立的“三人团”**；**取消博古、李德的最高军事指挥权**；决定由中革军委主要负责人**朱德、周恩来指挥军事**，**周恩来为党内委托的对于指挥军事下最后决心的负责者**",
+              "cited_evidence_ids": [
+                "E5",
+                "E2"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "february_mao_role",
+              "status": "covered",
+              "reason": "正文单独说明鸡鸣三省常委分工及毛为周的军事帮助者；虽然2月5日小标题被删，题干与正文资料限制明确命名“2月5日常委分工会议”，共同提供唯一事件绑定。按上下文明示指代接受，不要求重复日期；E2并同E3/E5支持。",
+              "answer_excerpt": "中央政治局常委在川滇黔边界的**鸡鸣三省村**分工，决定由**张闻天代替博古负中央总的责任**；决定以**毛泽东为周恩来在军事指挥上的帮助者**，**博古任总政治部代理主任**",
+              "cited_evidence_ids": [
+                "E2",
+                "E3",
+                "E5"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "march_group",
+              "status": "covered",
+              "reason": "正文明确3月新三人团的毛周王三人成员、周恩来团长及全军指挥职责；E3给成员和指挥权，E4给团长及全军职责。旬别按已采纳裁定不作硬评分。",
+              "answer_excerpt": "- 3月10日中央负责人在**狗坝**开会讨论进攻打鼓新场计划，经毛泽东说服决定放弃；随后毛泽东鉴于作战情况瞬息万变、指挥需要集中，提议成立新“三人团”全权指挥军事；到**三月下旬（渡乌江之前）**，中央决定由**周恩来、毛泽东、王稼祥**组成“三人团”（也称三人军事指挥小组），**全权指挥军事**[E3]。\n- 党史记载，新的“三人团”**以周恩来为团长**，负责指挥全军的军事行动，并称在战争环境中这是中央最重要的领导机构[E4]。",
+              "cited_evidence_ids": [
+                "E3",
+                "E4"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "fail",
+              "reason": "核查全部断言：E2/E3/E4/E5支持必要事实、张闻天和博古分工以及3月10日提议背景，E7支持排除长征到陕北后的变化。但E19被放在遵义会议段并称“会议还决定”，原党史PDF480完整上文明确为1934年12月31日晚至次日凌晨猴场政治局会议，不能支持遵义会议的事件归属。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；协议 source_scope_kind 为 annotation_sources_not_exclusive，金标取材书目不构成排他约束。"
+            },
+            "time_constraint": {
+              "status": "fail",
+              "reason": "三项必要阶段可由题干、正文和明确指代分辨，3月旬别不扣分；但扩展E19把1934年12月底—1935年1月初猴场会议的决定移入遵义会议阶段，违反事件阶段约束。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan拆分遵义会议、1935年2月5日常委分工及1935年3月新三人团，coverage=per_item；hybrid实际执行按阶段变体检索并以24条最终证据作分组综合。无year数值过滤不单独判路由失败，实体及query保留1935阶段。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题为有据可答的事实/观点问题，实际交付了正向回答，没有拒答行为或待检验的拒答边界。"
+            },
+            "scope_explanation": {
+              "status": "pass",
+              "reason": "资料限制明确缺少三次会议完整记录，且把E7的1935年10月底/11月初材料排除于目标阶段；这是具体史料限制。它不能抵消E19已经写出的会议错绑。"
+            }
+          }
+        },
+        {
+          "case_id": "pilot_negative_cppcc_1949",
+          "case_definition_sha256": "3ff9d249470458f12008bc464bf74a5d706232a60e449beb6101aa31e0acb5eb",
+          "answer_sha256": "bafe554003836d7dc83986d3a8e6e3ffd92e98f636dfac126688b3bffe8bcbeb",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview A",
+          "reviewed_at": "2026-10-11T06:16:51.400795+00:00",
+          "facts": [
+            {
+              "fact_id": "mao_chair",
+              "status": "covered",
+              "reason": "正文明确毛为主席；E6有10月9日毛出席并当选主席的直接条目，E2亦列完整主席名。",
+              "answer_excerpt": "毛泽东当选为全国政协主席，周恩来当选为全国政协副主席，二人职务不同",
+              "cited_evidence_ids": [
+                "E6",
+                "E2"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "zhou_vice_chair",
+              "status": "covered",
+              "reason": "正文明确否定共同当选主席并给周副主席；虽然E6副主席名单跨页截断，实际交付E2已独立明确副主席周恩来，允许金标之外的有效替代证据。",
+              "answer_excerpt": "**结论：不是。** 毛泽东当选为全国政协主席，周恩来当选为全国政协副主席，二人职务不同",
+              "cited_evidence_ids": [
+                "E2"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "核查全部正文：毛主席及会议由E6/E2支持；周副主席及其余四位副主席由E2完整名单支持；毛赴苏期间周代理的扩展由E4/E5的11月25日政治局决定支持，正文也区分代理决定与10月9日选举，没有跨页同名误绑。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；协议 source_scope_kind 为 annotation_sources_not_exclusive，金标取材书目不构成排他约束。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "题干与正文共同绑定10月9日选举；正文把后来12月访问苏联期间的代理安排单独说明，明确不是初次全国委员会会议的选举结果，没有提前或混淆。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan保留1949年10月9日、毛周两人、政协主席与副主席职务区分，并以hybrid检索选举/职务变体；实际production阶段均ok，未把错误的共同任主席前提当成已知事实。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题为有据可答的事实/观点问题，实际交付了正向回答，没有拒答行为或待检验的拒答边界。"
+            },
+            "scope_explanation": {
+              "status": "not_applicable",
+              "reason": "此题核验一个具体错误前提并已完整区分职务，无需覆盖全年全部岗位；末尾空“资料限制”标题和通用limitations不据此计范围说明通过，也不额外强求会议全文。"
+            }
+          }
+        },
+        {
+          "case_id": "pilot_constraint_deng_1973_march",
+          "case_definition_sha256": "2f81245c9f3f0d6a0f58c450bf5bfb4813a7facb153eb7de6788fd1973d24c82",
+          "answer_sha256": "84a26ff90a600799e3dd1846e93a121942a40bbecb6efbc79b66316832d9cb97",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview B",
+          "reviewed_at": "2026-10-11T14:17:39.234041+08:00",
+          "facts": [
+            {
+              "fact_id": "restore_status",
+              "status": "partial",
+              "reason": "正文以决定标题和毛泽东同意表达恢复组织生活及国务院副总理职务，但没有写由国务院分配适当工作；E1支持已表达部分，不能以E1后句补正文。",
+              "answer_excerpt": "3月9日毛泽东审阅周恩来本日报送的中共中央《关于恢复邓小平同志的党的组织生活和国务院副总理的职务的决定》稿，批示：“同意。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "state_council_work",
+              "status": "missing",
+              "reason": "完整正文只摘录附件送阅，没有表达3月29日晚参加国务院业务组及以副总理身份参加外事活动；虽E3有全句，未交付为正文，因此无本条正文支持对象。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "attend_policy_discussion",
+              "status": "missing",
+              "reason": "完整正文没有重要政策问题列席政治局参加讨论；该句只出现在E3引用卡片，不能补正文，本条支持不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "逐一核对5条正文摘录：E1恢复决定审阅、E2周恩来1972年信、E3附件送阅、E4留苏人员名单、E5专案报告均有同文交付引文并可定位对应页。它们不满足题目来源/时间范围，分别在约束维判失败；未将真实但无关的摘录误判为引文伪造。"
+            },
+            "source_constraint": {
+              "status": "fail",
+              "reason": "硬限制为只依据下卷，正文E4来自上卷PDF44；限制已明确违反。"
+            },
+            "time_constraint": {
+              "status": "fail",
+              "reason": "题目1973年3月，正文混入明确1972年12月、实际1927年和1968年摘录，且未作为排除项说明；limitations把书名1904—1974误作召回时间范围。"
+            },
+            "routing": {
+              "status": "fail",
+              "reason": "实际query_plan.start_year=1904/end_year=1974且constraints丢失1973年3月；生产混合检索最终含上卷1927及下卷1968片段，未保留事件月份与硬来源限制。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可回答且交付正文进行了正向回答，未作拒答或声称相关历史事实不存在；没有本次拒答行为需要评分，覆盖不足及范围问题分别检查。"
+            },
+            "scope_explanation": {
+              "status": "fail",
+              "reason": "交付limitations虽说明生成失败、摘录及非完整历史结论，却错误说明按1904—1974召回，没有解释缺3月29日安排或标明上卷/其他年份摘录不属本题。"
+            }
+          }
+        },
+        {
+          "case_id": "pilot_refusal_out_of_scope_2024",
+          "case_definition_sha256": "1765ab8de6b56a03324cfec02fa4c731fe50d6b75f7d5c26c357b6ba002acc6d",
+          "answer_sha256": "8438ca41d89f78a82f1f79f72c38ec5428977231a86d66114d8f151a16cfe86e",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview B",
+          "reviewed_at": "2026-10-11T14:17:39.234041+08:00",
+          "facts": [],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "正文仅说明本地证据不足，未给具体2024年行程，也无正向历史引用；按拒答协议可通过，无需虚构引文。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干未限定书目，协议source_scope_kind为annotation_sources_not_exclusive，且没有引入外部来源。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "保持问题2024年的指向，未用其他年代活动替代，也未声称2024年没有活动。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "可观察query_plan明确习近平及2024，实际生产检索后因人物证据缺失拒答；协议明确允许拒答先检索确认，不以hybrid名称单独判失败。未识别项目范围的问题在范围解释维体现。"
+            },
+            "safe_refusal": {
+              "status": "pass",
+              "reason": "拒答限定为现有本地资料没有足够证据，没有编造考察地点或将证据不足断言为活动不存在。"
+            },
+            "scope_explanation": {
+              "status": "fail",
+              "reason": "正文及limitations只说未找到人物/地点并执行补充检索，没有说明2024超出项目1921—1978研究范围；未正确传达本题out_of_scope边界。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_exact_zhou_1954",
+          "case_definition_sha256": "daf9f746054edc200ae299fb373120101f51f1ad9bc9a8f2cd49282a99b03bf7",
+          "answer_sha256": "80c3c0cb8371753948e411e57db4703bad9e62ec4665daad1ffcb39aaa36c268",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview B; Codex primary cross-check",
+          "reviewed_at": "2026-10-11T06:21:45.737873+00:00",
+          "facts": [
+            {
+              "fact_id": "zhou_premier_before_september",
+              "status": "partial",
+              "reason": "正文完整表达9月决定国务院总理，但没有年初仍任政务院总理及机构转换；不能把8月“总理兼外长”的简称补成政务院职衔。E1支持已表达的9月部分。",
+              "answer_excerpt": "1954年9月，第一届全国人民代表大会第一次会议根据毛泽东主席的提名，决定以周恩来为国务院总理[E1]。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "zhou_party_secretariat",
+              "status": "missing",
+              "reason": "正文未出现中共中央书记处书记；因此没有本条正文支持对象，也不因未额外写1956年副主席而扣另一项分。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "zhou_cppcc_before_december",
+              "status": "missing",
+              "reason": "本条目标是12月当选主席以前所任全国政协副主席；当选主席只是时间参照。正文没有表达此前副主席任职或转任关系，不能将另一条主席任职重复算成本条部分覆盖，因此没有本条正文主张可评引用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "zhou_premier",
+              "status": "covered",
+              "reason": "正文明确1954年9月由会议决定周恩来为国务院总理；E1明写提名和决定，已核对周年谱PDF629及相接条目，不要求额外复述未列入本事实的职位沿革。",
+              "answer_excerpt": "1954年9月，第一届全国人民代表大会第一次会议根据毛泽东主席的提名，决定以周恩来为国务院总理[E1]。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "zhou_foreign_minister",
+              "status": "covered",
+              "reason": "正文直接写周恩来兼任外交部部长，E1完整列明该职务；正文另一处报纸日期扩展错误在整答引用维另判。",
+              "answer_excerpt": "同一会议根据周恩来的提名通过国务院组成人员人选，周恩来兼任外交部部长[E1]。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "zhou_cppcc",
+              "status": "partial",
+              "reason": "正文给12月21—25日会议期间当选，未明确必要命题的12月25日；E8交付文本止于“周恩来为为秘书长”，支持会议及选举背景却缺主张所需的主席任职句，不能借完整金标页补齐。",
+              "answer_excerpt": "1954年12月21日至25日召开的全国政协二届一次会议选举周恩来为政协第二届全国委员会主席[E8]。",
+              "cited_evidence_ids": [
+                "E8"
+              ],
+              "support_status": "partial"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "fail",
+              "reason": "检查全部扩展后发现E5是8月11日报告、8月14日《人民日报》刊载，正文却称8月11日《人民日报》所载；E8主席任职句OCR缺损，不能完整支持周恩来当选政协主席。E1及E10支持总理/外长和日内瓦代表团首席代表。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干未限定书目；协议列出的金标来源不排除其他有据文献，混用周/邓年谱及党史本身不构成来源违反。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "所述任职均绑定1954年，国务院总理明确限定9月，并未前移到全年；政协给12月会议区间而未给25日，在该必要事实记partial。8月报告/刊报日混淆在全答引用核验中判错。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan保留周恩来与1954，structured路由返回当年职务证据；允许等效路线，未因路由名称或覆盖遗漏单独判路由失败。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可回答且交付正文进行了正向回答，未作拒答或声称相关历史事实不存在；没有本次拒答行为需要评分，覆盖不足及范围问题分别检查。"
+            },
+            "scope_explanation": {
+              "status": "fail",
+              "reason": "正文“资料限制说明”仅标题无说明；交付limitations仅移除未引用草稿及通用非完整历史提示，未披露遗漏年初政务院/政协副主席和党内职务，不能满足本开放题代表性覆盖缺口说明。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_exact_deng_1954",
+          "case_definition_sha256": "a6ff956c61d2430bb935c2dd60e3827bb7cf148ec6de824bf09a0bc95491d7d1",
+          "answer_sha256": "0914e42cc628e1553f3a1f1db57c48d22b2e310901d46802c7c59963085e8c05",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview B",
+          "reviewed_at": "2026-10-11T14:17:39.234041+08:00",
+          "facts": [
+            {
+              "fact_id": "deng_vice_premier",
+              "status": "covered",
+              "reason": "正文明确国务院副总理，E1包含周恩来提名、名单中的邓小平及副总理职务；题干和同次会议绑定1954年9月，不强求每句重写年月。",
+              "answer_excerpt": "第一届全国人大一次会议根据周恩来总理的提名，通过国务院组成人员人选，邓小平为**国务院副总理**[E1]。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "deng_defense_vice_chair",
+              "status": "covered",
+              "reason": "正文明确国防委员会副主席，与同次会议及机构绑定正确；E1支持毛主席、提名与邓小平副主席，未误写国防部长。",
+              "answer_excerpt": "同次会议通过毛泽东为国防委员会主席，根据毛泽东提名，通过国防委员会副主席和委员人选，邓小平任**国防委员会副主席**[E1]。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "全答两个任职及扩展的提名人、毛泽东任国防委员会主席、同次会议均与E1相符；中卷PDF552及相接551的9月15—28日会议条目可复核。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干未限定书目，协议金标来源不是硬限制；唯一交付引文也来自所列邓年谱中卷。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "题目1954年9月，正文以第一届全国人大一次会议及同次会议承接；E1原页为当月条目，未混入其他时期职务。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan保留1954年9月、邓小平、国务院及国防委员会，hybrid检索返回PDF552同时覆盖两职务，路由保留必要条件。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可回答且交付正文进行了正向回答，未作拒答或声称相关历史事实不存在；没有本次拒答行为需要评分，覆盖不足及范围问题分别检查。"
+            },
+            "scope_explanation": {
+              "status": "not_applicable",
+              "reason": "题干为两个机构职务的封闭问题，已逐项回答，没有缺证子项或声称穷尽全年经历；本题没有须额外解释的范围限制，不以通用免责声明给分。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_constraint_month_place",
+          "case_definition_sha256": "9402c8628342eb6fcf83862534f6dca894389ada01bdf967f4a38926cef68e59",
+          "answer_sha256": "d27f43b539f484a14945779af906f4729ecee167283682c9718ab9b814919430",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview B; Codex primary cross-check",
+          "reviewed_at": "2026-10-11T06:19:59.236925+00:00",
+          "facts": [
+            {
+              "fact_id": "mao_arrival",
+              "status": "covered",
+              "reason": "正文3月25日条完整包含清华园、颐和园及进驻香山双清别墅；E6逐项支持。结尾对E14日期的错误说明不明确否定本条已给日期，单独计入整答引用及范围问题。",
+              "answer_excerpt": "- **3月25日**：凌晨到达北平清华园车站，改乘汽车至颐和园；下午五时，与刘少奇、朱德、周恩来、任弼时、林伯渠等在北平西苑机场同各界代表及民主人士一千多人见面，并乘车检阅部队，随后进驻香山双清别墅[E6]。",
+              "cited_evidence_ids": [
+                "E6"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "mao_xiyuan",
+              "status": "covered",
+              "reason": "同一3月25日段明确下午五时西苑机场会见各界及民主人士、乘车检阅部队，E6完整支持。",
+              "answer_excerpt": "- **3月25日**：凌晨到达北平清华园车站，改乘汽车至颐和园；下午五时，与刘少奇、朱德、周恩来、任弼时、林伯渠等在北平西苑机场同各界代表及民主人士一千多人见面，并乘车检阅部队，随后进驻香山双清别墅[E6]。",
+              "cited_evidence_ids": [
+                "E6"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "mao_command",
+              "status": "partial",
+              "reason": "正文明确3月27日起草复电及同意“十五日”渡江，但没有说明是4月15日及推迟安排；当前上下文3月不能自动补出4月。E1支持所表达命题且注释有完整关系，E6支持此前迁驻，引用不能补正文。",
+              "answer_excerpt": "- **3月27日**：为中共中央军委起草复刘伯承、陈毅、邓小平、粟裕、谭震林电，同意其十五日发起渡江战斗及对北岸敌人的处置[E1]。",
+              "cited_evidence_ids": [
+                "E1",
+                "E6"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "mao_cadres",
+              "status": "missing",
+              "reason": "全文未表达3月31日香山接见并宴请四野师以上干部；不因所检索材料范围有限而把该事实记unknown，本条无正文支持对象。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "fail",
+              "reason": "正文3月24—25日行程、题词/停止庆祝、3月27日电报均可在E6/E1核对；但结尾断言E14未标具体月日并无法确认3月25日活动，与交付E14“二十五日晨二时”及相邻1949年3月条目冲突，完整原页亦明确属于3月23日条内后续。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干未限定书目，协议金标来源非硬约束；引用周年谱E14本身可以接受，问题在对日期的解释。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "明确列出的活动均在1949年3月。3月24日入平前活动的地域边界、对E14日期的错误解释保留在范围及引用失败；不将同月内地域错误再次当成月份越界。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan和生产补检索查询保留毛泽东、1949年3月、北平三条件，hybrid路线取回抵平与军事电报证据；后续综合日期解释及遗漏不回推成路由名称错误。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可回答且交付正文进行了正向回答，未作拒答或声称相关历史事实不存在；没有本次拒答行为需要评分，覆盖不足及范围问题分别检查。"
+            },
+            "scope_explanation": {
+              "status": "fail",
+              "reason": "虽明确给资料限制，却把3月上中旬毛在北平活动当待补材料，未指出25日前尚未入平；又称E14无具体月日，与所交付证据不符。通用limitations不能修复具体范围错误。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_multi_zhou_periods",
+          "case_definition_sha256": "e6d0fd1201a92535ce0a531a13dea1acd0299cbe7bf5ba05f30a5552bf85de7c",
+          "answer_sha256": "221b0419775b5ce9db1df1989e08eb2fbc89b9cd23694cb93d2b6080939a0312",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview C",
+          "reviewed_at": "2026-10-11T14:17:08+08:00",
+          "facts": [
+            {
+              "fact_id": "zhou_1954_geneva",
+              "status": "partial",
+              "reason": "正文仅摘录1954年4月19日被任命为首席代表，未表达4月率团实际赴会；任命不能代替赴会行动。E2完整支持已表达的任命部分。",
+              "answer_excerpt": "中央人民政府主席毛泽东任命周恩来为出席日内瓦会议的中华人民共和国代表团首席代表。",
+              "cited_evidence_ids": [
+                "E2"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "zhou_1954_government",
+              "status": "missing",
+              "reason": "完整正文未写1954年9月任国务院总理兼外交部长及12月全国政协主席；主持12月国务院会议不能补出任职月份和三项职务，因此没有本条正文主张可核验引用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "zhou_1955_bandung",
+              "status": "partial",
+              "reason": "正文交代1955年4月19日参加亚非会议并引友好合作愿望，但截断在书面发言，缺求同存异原则；E5支持已交付的参与及合作部分，不能拿原页后半段补正文。",
+              "answer_excerpt": "出席亚非会议全体会议。针对会议出现的新情况，在上午会议上临时决定将原来的发言稿改\n作书面发言散发，而在下午会议上作补充发言。",
+              "cited_evidence_ids": [
+                "E5"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "zhou_1955_plan",
+              "status": "missing",
+              "reason": "正文没有1955年6月向全国人大常委会说明一五计划草案；8月工资制报告不是该事件。 本条无正文主张，支持维不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "zhou_1956_intellectuals",
+              "status": "missing",
+              "reason": "正文没有1956年1月知识分子问题报告及工人阶级一部分/建设作用的命题。 本条无正文主张，支持维不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "zhou_1956_balance",
+              "status": "missing",
+              "reason": "正文没有1956年6月反急躁冒进、压缩支出与基建以及综合平衡；4月体制发言不能替代这项活动。 本条无正文主张，支持维不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "zhou_synthesis",
+              "status": "missing",
+              "reason": "最终正文是十条记录摘录，未按主题归纳三年工作重点变化；未交付草稿不属于正文，也不拿其排他性归纳算本次正文错误。 本条无正文主张，支持维不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "逐条核对E1—E10与交付的十条摘录及记录日期，摘录均能在对应源页复核，正文未增造综合结论；928条为检索规模说明而非历史事实，十条交付数相符。已移除草稿不并入本维。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；绑定协议的 annotation_sources_not_exclusive 是标注取材范围，不是用户硬来源限制。"
+            },
+            "time_constraint": {
+              "status": "pass",
+              "reason": "十条记录的索引日期及源页事件均处1954—1956；多日会议摘录清楚保留25/27/28日，后续或回顾年份是引文内容，没有冒充区间外发生的新活动。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan保留周恩来、1954—1956、per_year及按时间主题/重点变化两项约束；retrieval_mode为structured_timeline，两次generation_contexts确实是本人物本时段记录。关键活动漏召回及缺综合另计，不以答案残缺倒推查询理解错误。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可答，实际交付回答已作答且没有整体拒答；局部缺口与摘录降级分别在事实覆盖和范围说明维核验。"
+            },
+            "scope_explanation": {
+              "status": "pass",
+              "reason": "正文开头明确从928条抽10条且不是完整经历结论；交付limitations具体说明时间线仅主体记录、按月份/时段抽样不代表重要性、日期需核对及生成降级，针对实际抽样局限。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_semantic_investigation",
+          "case_definition_sha256": "7cff605430f492ad1adbdcb5ce9469c3dda43bf390eb4654fa3c59126210b3c1",
+          "answer_sha256": "4ee57a8d2f6914493f120574c7657bfd3dd1050ce63e4445024a4e6fd7da3015",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview C",
+          "reviewed_at": "2026-10-11T14:17:08+08:00",
+          "facts": [
+            {
+              "fact_id": "evidence_before_conclusion",
+              "status": "covered",
+              "reason": "正文明确调查是正确政策前提，列情况不明导致错误、策略来源调查及没有调查无发言权，完整表达先了解实际再决策；E3/E5/E10支持。",
+              "answer_excerpt": "毛泽东反复强调，调查研究是形成正确政策、解决实际问题的前提。他明确指出：“没有调查研究，是不能产生正确的具体政策的”[E3]；“我总是不相信没有调查会有发言权的”[E4]；“没有调查研究就没有发言权”[E10]。",
+              "cited_evidence_ids": [
+                "E3",
+                "E5",
+                "E10"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "oppose_book_worship",
+              "status": "partial",
+              "reason": "已写克服脱离具体政策的教条主义，但没有肯定马克思主义理论仍须学习并同中国实际相结合；这不是反对理论的错误，只是复合必要事实不完整。E3支持已表达部分。",
+              "answer_excerpt": "调查研究是克服教条主义的途径。教条主义“只有原理原则，没有具体政策，是不能解决问题的，而没有调查研究，是不能产生正确的具体政策的”[E3]。",
+              "cited_evidence_ids": [
+                "E3"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "leaders_investigate",
+              "status": "covered",
+              "reason": "亲自出马、深入解剖个别问题与正文后部批评只浮在上面看报告合读，完整表达领导者亲身调查且书面报告不能替代；不额外要求每个点均由本人完成。E4支持亲调，E5支持报告替代之不足。",
+              "answer_excerpt": "**要亲自出马**：“从乡政府主席到中央政府主席，从大队长到总司令，从支部书记到总书记，都要亲自出马”[E4]。",
+              "cited_evidence_ids": [
+                "E4",
+                "E5"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "learn_by_discussion",
+              "status": "partial",
+              "reason": "正文完整表达调查会、讨论方案和各类人参加，但没有表达向有经验的群众/干部学习这一对象与学习关系；E2引用卡中老农干部的内容不能替正文补答。E9/E4支持已说的方法。",
+              "answer_excerpt": "**开调查会，做讨论式调查**：“要开调查会，做讨论式的调查。你可提出几个方案，跟他们讨论，跟他们研究……要做讨论式的调查，才能得出近乎正确的结论”[E9]。",
+              "cited_evidence_ids": [
+                "E9",
+                "E4"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "检查全部断言：政策与阶级策略E3/E5，眼耳口手与规模E2/E7，调查会/亲自出马/纲目/典型/自记E4/E9，第二次反围剿与彭德怀察地E8，拿刀比喻E10，以及解放后削弱与自我批评E1/E4/E5/E8均由交付引用支持，九条引用均匹配源页；不因两项事实partial而误判引文无据。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；绑定协议的 annotation_sources_not_exclusive 是标注取材范围，不是用户硬来源限制。"
+            },
+            "time_constraint": {
+              "status": "not_applicable",
+              "reason": "题干询问观点而未限定年份、月份或活动阶段；各时期讲话作为有出处例证，年代与引用真实性在引用维核验。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "query_plan识别毛泽东调查研究为viewpoint/hybrid，检索变体含反对本本主义、农村调查、实事求是，实际生产链完成关键词/向量融合和最终10条选取，没有丢失主体或主题。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可答，实际交付回答已作答且没有整体拒答；局部缺口与摘录降级分别在事实覆盖和范围说明维核验。"
+            },
+            "scope_explanation": {
+              "status": "fail",
+              "reason": "正文只有“根据现有证据”起句，交付limitations只有草稿移除说明和通用“不等同完整历史结论”；未说明所引观点以1961年前后材料为主、理论学习结合实际等未覆盖边界。被移除草稿中的具体范围说明不能当已交付说明。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_semantic_contradiction",
+          "case_definition_sha256": "fa123047d99f5ddab5d157136989ef66a7a61613e3050c987440a5bfc942ae64",
+          "answer_sha256": "46507617afcada62e9bba814bbc326f31a966a20308c426cae853ec8ee330491",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview C",
+          "reviewed_at": "2026-10-11T14:17:08+08:00",
+          "facts": [
+            {
+              "fact_id": "definition",
+              "status": "covered",
+              "reason": "开篇及定义节完整说明多种矛盾、主要矛盾的领导决定作用与对其他矛盾的影响；E1/E3支持。",
+              "answer_excerpt": "毛泽东在《矛盾论》中分析主要矛盾的核心观点是：在复杂事物的发展过程中，存在多种矛盾，其中必有一种是主要矛盾，它起着领导的、决定的作用，规定或影响着其他矛盾的存在和发展；因此研究问题必须全力找出主要矛盾，捉住了主要矛盾，一切问题就迎刃而解[E1][E3]。",
+              "cited_evidence_ids": [
+                "E1",
+                "E3"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "method",
+              "status": "covered",
+              "reason": "明确不能一律看待各种矛盾并全力找出、捉住主要矛盾；表达与冻结命题等效，E1/E6支持。",
+              "answer_excerpt": "研究任何过程，如果存在两个以上矛盾的复杂过程，**就要用全力找出它的主要矛盾**。捉住了这个主要矛盾，**一切问题就迎刃而解了**[E1]。",
+              "cited_evidence_ids": [
+                "E1",
+                "E6"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "conditional_priority",
+              "status": "partial",
+              "reason": "正文说特定对立条件下这一矛盾成为主要矛盾，也提各阶段，但未表达条件变化导致主次转换及内部阶级矛盾暂居次要的关系；末段承认机制不足不是完成解释。E1支持已说条件例子的部分。",
+              "answer_excerpt": "当外国帝国主义和国内反动派完全公开地站在一个极端、人民大众站在另一极端时，这一矛盾便成为主要矛盾，而规定或影响其他矛盾的发展状态[E1]。",
+              "cited_evidence_ids": [
+                "E1"
+              ],
+              "support_status": "supported"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "fail",
+              "reason": "核心定义方法及各矛盾例子有E1/E3/E6支持，但扩展背景“是毛泽东在抗日军政大学的讲演稿的一部分”不在实际交付E10或E2 quote中；E1对列宁/斯大林方法句也在末尾截断。完整源页/检索trace可核验背景真实性，不能补已交付引文；此为引用不充分，不声称校名历史事实错误。"
+            },
+            "source_constraint": {
+              "status": "fail",
+              "reason": "绑定协议将《矛盾论》设为hard_user_constraint；正文写作目的、结构与背景以年谱E2和党史E5补答，超出限定原文来源。核心E1/E3/E6/E10在选集原篇不抵消该混入。"
+            },
+            "time_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有独立年份/月日要求；《矛盾论》的篇目来源是硬约束，1937年背景和他期材料在来源/引用维核验。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "实际query_plan为viewpoint/hybrid，明确识别《矛盾论》document实体并保留篇目constraint；实际检索三条变体均含矛盾论/主要矛盾，最终上下文含原篇。其他来源混入在来源维判失败，不重复视为问题理解丢失。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可答，实际交付回答已作答且没有整体拒答；局部缺口与摘录降级分别在事实覆盖和范围说明维核验。"
+            },
+            "scope_explanation": {
+              "status": "pass",
+              "reason": "正文资料限制具体指出缺主要矛盾方面完整片段与半殖民地条件下主次转化详细分析，承认转化机制说明不足；这说明实际缺口，但不使缺失事实通过。"
+            }
+          }
+        },
+        {
+          "case_id": "dev_semantic_first_congress",
+          "case_definition_sha256": "f4401b3b06666ed4f049e9b5afbeff42587be747262f2fa264b8a4c06d29d53e",
+          "answer_sha256": "d96455f5a47d68f8647f75b4c8883b5bd28b86a23a529b25cebe0a3a0f20e2fe",
+          "basis": "agent_review",
+          "reviewer": "Codex calibrated rereview C; Codex primary cross-check",
+          "reviewed_at": "2026-10-11T06:19:59.236925+00:00",
+          "facts": [
+            {
+              "fact_id": "programme",
+              "status": "missing",
+              "reason": "正文只有正式成立中国共产党及泛谈奋斗目标，没有大会通过党纲、党名决定、推翻资产阶级政权/专政/私有制/联合共产国际的纲领命题；背景认同社会主义不能替代这些决议内容。本条无正文命题可判引用支持。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "discipline",
+              "status": "missing",
+              "reason": "全文未表达全党统一组织及严格纪律；引文卡片或未交付原页不能补答，本条支持维不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            },
+            {
+              "fact_id": "workers",
+              "status": "covered",
+              "reason": "正文明确集中力量领导工人运动、先组织工会教育工人，与必要命题完整同义；E13直接支持。",
+              "answer_excerpt": "大会要求党集中力量领导工人运动，首先是组织工会和教育工人[E13]。",
+              "cited_evidence_ids": [
+                "E13"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "independence",
+              "status": "covered",
+              "reason": "正文把独立政策放在大会决定语境，明确维护无产阶级利益、不与其他党派建立联系；无需重复决议文件全名。E11直接支持。",
+              "answer_excerpt": "大会决定，在反对军阀官僚的斗争中、在争取言论出版集会自由的斗争中，党应采取独立的政策以维护无产阶级的利益，不同其他党派建立任何联系[E11]。",
+              "cited_evidence_ids": [
+                "E11"
+              ],
+              "support_status": "supported"
+            },
+            {
+              "fact_id": "leadership",
+              "status": "missing",
+              "reason": "只保留“暂不成立中央……”并明确原文截断，没有说明暂设中央局、三位成员及分工；不构成必要命题的任何组织任职内容。该截断自述不等于断言未设任何中央领导机构，因此不判contradicted；本条支持维不适用。",
+              "answer_excerpt": null,
+              "cited_evidence_ids": [],
+              "support_status": "not_applicable"
+            }
+          ],
+          "dimensions": {
+            "citation_support": {
+              "status": "pass",
+              "reason": "全部交付历史断言逐项核对：筹备者/函商/上海/各派两名/13代表与50多党员E1，工运组织宣传与独立政策E11/E13，马克思主义及社会主义认识E13，中央机构句照录E11且明确截断，没有把省略号补成无中央领导机构；三条引文均能定位原页。最低清单未完成另计。"
+            },
+            "source_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有限定唯一来源；绑定协议的 annotation_sources_not_exclusive 是标注取材范围，不是用户硬来源限制。"
+            },
+            "time_constraint": {
+              "status": "not_applicable",
+              "reason": "题干没有独立日期或时段要求；将口语理解为中共一大在路由维检查，正文年份真实性在引用维检查，不新增时间维分母。"
+            },
+            "routing": {
+              "status": "pass",
+              "reason": "query_plan把口语表述规范为中共一大event_overview/hybrid；实际两轮检索和reflection识别议程/决议/机构缺口并补检，generation_contexts两组再综合，路由与用户事件一致。"
+            },
+            "safe_refusal": {
+              "status": "not_applicable",
+              "reason": "本题可答，实际交付回答已作答且没有整体拒答；局部缺口与摘录降级分别在事实覆盖和范围说明维核验。"
+            },
+            "scope_explanation": {
+              "status": "pass",
+              "reason": "正文逐一指出E11在中央机构处截断、E13文件标题截断，具体说明党纲/其他决议/组织安排不完整；limitations还说明17候选分组综合和一次补充检索，未声称穷尽。"
+            }
+          }
+        }
+      ]
+    },
+    "process_reviews.json": {
+      "schema_version": 2,
+      "rubric_version": "explicit-process-review-v1",
+      "dimension": "query_understanding",
+      "capture_sha256": "b84e8dcf48e149e043dba4e3abd195c342176967d567f7f6601d423810cab3f5",
+      "dataset_sha256": "1fbaeedc71e3f39b4d310f60dfccc3743a891d955d0ce5cfd984cbb3f5487729",
+      "protocol_file": "evals\\golden\\development_protocols_v3.json",
+      "protocol_file_sha256": "b162c29e679c5606004081214e47b3813764e882eacb6f1c33a777a9df1a73b8",
+      "scope": "Effective plan and observable production queries; separate from routing.",
+      "cases": [
+        {
+          "case_id": "pilot_exact_deng_1952_appointment",
+          "case_definition_sha256": "3973e913609efba37ad561d4a753be36976ac467ba4598e33aa1f8af64fd4610",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "识别邓小平、1952-08-07、任命职务，保留日级日期。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "实际query_plan保留邓小平、1952-08-07与任命问题，constraints保留日级日期；实际检索变体仍附加1952年8月7日，没有将月级近似替代原约束。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1952年8月7日，邓小平被任命为什么职务？",
+            "search_queries": [
+              "1952年8月7日 邓小平 任命",
+              "邓小平 1952年8月 职务任命",
+              "1952年8月7日 政务院 任命 邓小平"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              }
+            ],
+            "start_year": 1952,
+            "end_year": 1952,
+            "coverage": "relevance",
+            "constraints": [
+              "1952年8月7日"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "1952年8月7日，邓小平被任命为什么职务？",
+            "1952年8月7日 邓小平 任命 1952年8月7日",
+            "邓小平 1952年8月 职务任命 1952年8月7日"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "39dc04e64f061b042dbd28f380660dd563694f130a9024e77a7fbf2fcde08707",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1952年8月7日，邓小平被任命为什么职务？",
+            "search_queries": [
+              "1952年8月7日 邓小平 任命",
+              "邓小平 1952年8月 职务任命",
+              "1952年8月7日 政务院 任命 邓小平"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              }
+            ],
+            "start_year": 1952,
+            "end_year": 1952,
+            "coverage": "relevance",
+            "constraints": [
+              "1952年8月7日"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "pilot_semantic_deng_1962_agriculture",
+          "case_definition_sha256": "14ee4ceb3fe07da3c2c73acfc8b6f233a1e9b2c3370fa80900ca1141fa36ac60",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "识别1962年7月、农业生产组织形式与选择标准，不只检索农业或猫的比喻。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "识别viewpoint，保留1962年7月、农业生产组织形式与“判断哪种更合适”；实际查询含这些条件及观点/论述/主张，不仅搜索农业或猫的比喻。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "viewpoint",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1962年7月，邓小平怎样判断哪种农业生产组织形式更合适？",
+            "search_queries": [
+              "邓小平 1962年7月 农业生产组织形式 判断",
+              "邓小平 1962年7月 包产到户 农业生产",
+              "邓小平 1962年7月 农村生产关系 形式",
+              "1962年7月 邓小平 农业 生产组织"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "event",
+                "text": "农业生产组织形式",
+                "canonical": "农业生产组织形式"
+              }
+            ],
+            "start_year": 1962,
+            "end_year": 1962,
+            "coverage": "relevance",
+            "constraints": [
+              "1962年7月",
+              "农业生产组织形式",
+              "判断哪种更合适"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "1962年7月，邓小平怎样判断哪种农业生产组织形式更合适？",
+            "邓小平 1962年7月 农业生产组织形式 判断 1962年7月 农业生产组织形式 判断哪种更合适 观点 论述 主张 策略",
+            "邓小平 1962年7月 包产到户 农业生产 1962年7月 农业生产组织形式 判断哪种更合适 观点 论述 主张 策略"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "ad5a4f257b8cc03716618d13b9bd27ab93959ca24f99c7be5f06f25213923e31",
+          "raw_planner_plan": {
+            "intent": "viewpoint",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1962年7月，邓小平怎样判断哪种农业生产组织形式更合适？",
+            "search_queries": [
+              "邓小平 1962年7月 农业生产组织形式 判断",
+              "邓小平 1962年7月 包产到户 农业生产",
+              "邓小平 1962年7月 农村生产关系 形式",
+              "1962年7月 邓小平 农业 生产组织"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "event",
+                "text": "农业生产组织形式",
+                "canonical": "农业生产组织形式"
+              }
+            ],
+            "start_year": 1962,
+            "end_year": 1962,
+            "coverage": "relevance",
+            "constraints": [
+              "1962年7月",
+              "农业生产组织形式",
+              "判断哪种更合适"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "pilot_multievidence_zunyi_leadership",
+          "case_definition_sha256": "a02140445fc026f1873bb2c11c87bdcd9b148520bebf3b148751cb82a6f3b6f4",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "拆出遵义会议、1935-02-05、3月新三人团三阶段及军事领导安排。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "实体明确拆为遵义会议、1935年2月5日常委分工、1935年3月新三人团；coverage=per_item，保留分别说明中央军事领导调整，执行轨迹含各阶段查询。start/end_year为null不影响实体与实际查询内已保留的1935日期；未强制中旬/下旬。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "遵义会议、会后2月5日的常委分工和3月成立新“三人团”，分别怎样调整了中央军事领导？",
+            "search_queries": [
+              "遵义会议 中央军事领导 调整",
+              "遵义会议 军事领导 变动",
+              "2月5日 常委分工 中央军事领导",
+              "新三人团 中央军事领导 调整",
+              "遵义会议 会后 军事指挥 变化"
+            ],
+            "entities": [
+              {
+                "type": "event",
+                "text": "遵义会议",
+                "canonical": "遵义会议"
+              },
+              {
+                "type": "event",
+                "text": "会后2月5日的常委分工",
+                "canonical": "1935年2月5日常委分工"
+              },
+              {
+                "type": "event",
+                "text": "3月成立新“三人团”",
+                "canonical": "1935年3月新三人团成立"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "per_item",
+            "constraints": [
+              "遵义会议",
+              "会后2月5日的常委分工",
+              "3月成立新“三人团”",
+              "分别说明",
+              "中央军事领导调整"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "遵义会议、会后2月5日的常委分工和3月成立新“三人团”，分别怎样调整了中央军事领导？",
+            "遵义会议 中央军事领导 调整 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "遵义会议 军事领导 变动 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "2月5日 常委分工 中央军事领导 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "新三人团 中央军事领导 调整 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "遵义会议 会后 军事指挥 变化 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "遵义会议、会后2月5日的常委分工和3月成立新“三人团”，分别怎样调整了中央军事领导？ 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "1935年2月5日常委分工 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整",
+            "1935年3月新三人团成立 遵义会议 会后2月5日的常委分工 3月成立新“三人团” 分别说明 中央军事领导调整"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "b4e15447ab3a876337a2a6ba203271ca949438e4e55df6ba568ec6f35c840a24",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "遵义会议、遵义会议后1935年2月5日的常委分工和1935年3月成立新“三人团”，分别怎样调整了中央军事领导？",
+            "search_queries": [
+              "遵义会议 中央军事领导 调整",
+              "遵义会议 军事领导 变动",
+              "1935年2月5日 常委分工 军事领导",
+              "2月5日 常委分工 中央军事领导",
+              "1935年3月 新三人团 成立 军事领导",
+              "新三人团 中央军事领导 调整",
+              "遵义会议 会后 军事指挥 变化"
+            ],
+            "entities": [
+              {
+                "type": "event",
+                "text": "遵义会议",
+                "canonical": "遵义会议"
+              },
+              {
+                "type": "event",
+                "text": "会后2月5日的常委分工",
+                "canonical": "1935年2月5日常委分工"
+              },
+              {
+                "type": "event",
+                "text": "3月成立新“三人团”",
+                "canonical": "1935年3月新三人团成立"
+              }
+            ],
+            "start_year": 1935,
+            "end_year": 1935,
+            "coverage": "per_item",
+            "constraints": [
+              "遵义会议",
+              "会后2月5日的常委分工",
+              "3月成立新“三人团”",
+              "分别说明",
+              "中央军事领导调整"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": true,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "pilot_negative_cppcc_1949",
+          "case_definition_sha256": "3ff9d249470458f12008bc464bf74a5d706232a60e449beb6101aa31e0acb5eb",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "识别共同当选主席这一待检验前提，绑定1949-10-09两人各自职务。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "原问题保留“是否共同当选”和区分两人职务，实体同时包含毛泽东/周恩来，constraints保留1949-10-09及职务区分，检索变体主动包括主席/副主席选举，没有把共同当选当作既成事实。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？请区分二人的职务。",
+            "search_queries": [
+              "1949年10月9日 全国政协 主席 毛泽东 周恩来 职务",
+              "1949年10月9日 中国人民政治协商会议 主席 副主席 选举",
+              "毛泽东 全国政协主席 1949年10月9日",
+              "周恩来 全国政协 职务 1949年10月9日",
+              "1949年10月9日 政协 毛泽东 周恩来 当选"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              },
+              {
+                "type": "person",
+                "text": "周恩来",
+                "canonical": "周恩来"
+              },
+              {
+                "type": "organization",
+                "text": "全国政协",
+                "canonical": "中国人民政治协商会议"
+              }
+            ],
+            "start_year": 1949,
+            "end_year": 1949,
+            "coverage": "relevance",
+            "constraints": [
+              "1949年10月9日",
+              "区分毛泽东和周恩来的职务",
+              "全国政协主席"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？请区分二人的职务。",
+            "1949年10月9日 全国政协 主席 毛泽东 周恩来 职务 1949年10月9日 区分毛泽东和周恩来的职务 全国政协主席",
+            "1949年10月9日 中国人民政治协商会议 主席 副主席 选举 1949年10月9日 区分毛泽东和周恩来的职务 全国政协主席"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "b69c9ff19bf794ba86a177d8076910219686b095c5f0aaf1180fad5087ffb544",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？请区分二人的职务。",
+            "search_queries": [
+              "1949年10月9日 全国政协 主席 毛泽东 周恩来 职务",
+              "1949年10月9日 中国人民政治协商会议 主席 副主席 选举",
+              "毛泽东 全国政协主席 1949年10月9日",
+              "周恩来 全国政协 职务 1949年10月9日",
+              "1949年10月9日 政协 毛泽东 周恩来 当选"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              },
+              {
+                "type": "person",
+                "text": "周恩来",
+                "canonical": "周恩来"
+              },
+              {
+                "type": "organization",
+                "text": "全国政协",
+                "canonical": "中国人民政治协商会议"
+              },
+              {
+                "type": "event",
+                "text": "1949年10月9日当选",
+                "canonical": "1949年10月9日全国政协选举"
+              }
+            ],
+            "start_year": 1949,
+            "end_year": 1949,
+            "coverage": "relevance",
+            "constraints": [
+              "1949年10月9日",
+              "区分毛泽东和周恩来的职务",
+              "全国政协主席"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": true,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "pilot_constraint_deng_1973_march",
+          "case_definition_sha256": "2f81245c9f3f0d6a0f58c450bf5bfb4813a7facb153eb7de6788fd1973d24c82",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "事件时间1973年3月；1904—1974为书名年代；来源硬限下卷。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "fail",
+          "reason": "原始Planner响应正确给出1973—1973、1973年3月约束和5个查询；但实际answer.query_plan变为1904—1974，search_queries清空，constraints丢掉1973年3月。执行limitations明确按1904—1974召回，说明书名年代污染发生在原始模型输出之后、实际计划生效之前。来源下卷文字虽保留，事件时间判据明确违反。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？",
+            "search_queries": [],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "document",
+                "text": "《邓小平年谱（1904—1974）》下卷",
+                "canonical": "《邓小平年谱（1904—1974）》下卷"
+              }
+            ],
+            "start_year": 1904,
+            "end_year": 1974,
+            "coverage": "relevance",
+            "constraints": [
+              "只依据《邓小平年谱（1904—1974）》下卷",
+              "恢复邓小平职务和安排工作的决定分别是什么"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？",
+            "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？ 只依据《邓小平年谱（1904—1974）》下卷 恢复邓小平职务和安排工作的决定分别是什么"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "74c1f64a046902b7889291c1eb0ac47fc3f1886b6bc5ece2ecf6e7c44b67e81e",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月关于恢复邓小平职务和安排工作的决定分别是什么？",
+            "search_queries": [
+              "《邓小平年谱（1904—1974）》下卷 1973年3月 恢复邓小平职务 决定",
+              "《邓小平年谱（1904—1974）》下卷 1973年3月 安排邓小平工作 决定",
+              "邓小平年谱 1904-1974 下卷 1973年3月 邓小平 职务 工作安排",
+              "1973年3月 恢复邓小平 副总理 决定",
+              "1973年3月 邓小平 工作安排 决定"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "document",
+                "text": "《邓小平年谱（1904—1974）》下卷",
+                "canonical": "《邓小平年谱（1904—1974）》下卷"
+              }
+            ],
+            "start_year": 1973,
+            "end_year": 1973,
+            "coverage": "relevance",
+            "constraints": [
+              "只依据《邓小平年谱（1904—1974）》下卷",
+              "1973年3月",
+              "恢复邓小平职务和安排工作的决定分别是什么"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": true,
+          "raw_planner_semantic_note": "The raw model got the event year and month right; failure is in the effective plan, not an attribution to the model."
+        },
+        {
+          "case_id": "pilot_refusal_out_of_scope_2024",
+          "case_definition_sha256": "1765ab8de6b56a03324cfec02fa4c731fe50d6b75f7d5c26c357b6ba002acc6d",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "识别请求2024年行程超出项目1921—1978资料范围。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "fail",
+          "reason": "实际计划识别2024，但未识别它超出项目1921—1978范围；计划与反思继续将“2024年考察地点/活动记录”当作缺失可补检索方面，答复及可见limitations仅说明没有人物/证据而未说明范围。按本题查询理解判据不通过；先检索本身不等于路由失败。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "习近平在2024年考察了哪些地方？",
+            "search_queries": [
+              "习近平 2024年 考察 地方",
+              "习近平 2024年 考察 地点",
+              "习近平 2024年 调研 考察"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "习近平",
+                "canonical": "习近平"
+              }
+            ],
+            "start_year": 2024,
+            "end_year": 2024,
+            "coverage": "per_item",
+            "constraints": [
+              "2024年"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "习近平在2024年考察了哪些地方？",
+            "习近平 2024年 考察 地方 2024年",
+            "习近平 2024年 考察 地点 2024年",
+            "习近平 2024年 调研 考察 2024年",
+            "习近平在2024年考察了哪些地方？ 2024年",
+            "习近平 2024年考察地点 2024年",
+            "习近平 考察活动记录 2024年"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "ba45df93bf7b3b07fb5908d2ee029f124455fbe09ad0fe618230a4c05e6befec",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "习近平在2024年考察了哪些地方？",
+            "search_queries": [
+              "习近平 2024年 考察 地方",
+              "习近平 2024年 考察 地点",
+              "习近平 2024年 调研 考察"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "习近平",
+                "canonical": "习近平"
+              }
+            ],
+            "start_year": 2024,
+            "end_year": 2024,
+            "coverage": "per_item",
+            "constraints": [
+              "2024年"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_exact_zhou_1954",
+          "case_definition_sha256": "daf9f746054edc200ae299fb373120101f51f1ad9bc9a8f2cd49282a99b03bf7",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "按1954全年任职变化理解问题，不以年末单点快照代替全年。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "normalized_question保留1954全年“哪些主要职务”，start/end均为1954，所有执行查询检索1954任职而未改为年末或9月/12月单点快照；查询范围没有舍弃年内变化。最终任职覆盖是否完整另按事实Recall评审，不以缺事实倒推查询理解失败。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "general",
+            "retrieval_route": "structured",
+            "normalized_question": "周恩来在1954年担任哪些主要职务？",
+            "search_queries": [
+              "周恩来 1954年 职务",
+              "周恩来 1954年 任职",
+              "周恩来 1954年 主要职务",
+              "周恩来 1954年 担任"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "周恩来",
+                "canonical": "周恩来"
+              }
+            ],
+            "start_year": 1954,
+            "end_year": 1954,
+            "coverage": "relevance",
+            "constraints": [
+              "1954年"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "周恩来在1954年担任哪些主要职务？",
+            "周恩来 1954年 职务 1954年",
+            "周恩来 1954年 任职 1954年"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "86545e7c675ea5e6f9f619b4a61e25e8f00e951c985e2b86cadf8f71cb19340e",
+          "raw_planner_plan": {
+            "intent": "general",
+            "retrieval_route": "structured",
+            "normalized_question": "周恩来在1954年担任哪些主要职务？",
+            "search_queries": [
+              "周恩来 1954年 职务",
+              "周恩来 1954年 任职",
+              "周恩来 1954年 主要职务",
+              "周恩来 1954年 担任"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "周恩来",
+                "canonical": "周恩来"
+              }
+            ],
+            "start_year": 1954,
+            "end_year": 1954,
+            "coverage": "relevance",
+            "constraints": [
+              "1954年"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_exact_deng_1954",
+          "case_definition_sha256": "a6ff956c61d2430bb935c2dd60e3827bb7cf148ec6de824bf09a0bc95491d7d1",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "保留1954年9月、邓小平、国务院与国防委员会两个机构。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "实体/constraints明确保留邓小平、1954年9月、国务院和国防委员会；实际检索分别查询两个机构且附加原有月级条件。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "general",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+            "search_queries": [
+              "1954年9月 邓小平 国务院 职务",
+              "1954年9月 邓小平 国防委员会 职务",
+              "1954年 邓小平 国务院副总理",
+              "1954年 邓小平 国防委员会副主席",
+              "1954年9月 国务院 组成人员 邓小平",
+              "1954年9月 国防委员会 组成人员 邓小平"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "organization",
+                "text": "国务院",
+                "canonical": "中华人民共和国国务院"
+              },
+              {
+                "type": "organization",
+                "text": "国防委员会",
+                "canonical": "中华人民共和国国防委员会"
+              }
+            ],
+            "start_year": 1954,
+            "end_year": 1954,
+            "coverage": "relevance",
+            "constraints": [
+              "1954年9月",
+              "国务院",
+              "国防委员会"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+            "1954年9月 邓小平 国务院 职务 1954年9月 国务院 国防委员会",
+            "1954年9月 邓小平 国防委员会 职务 1954年9月 国务院 国防委员会"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "06a1de69cf0b8ca2f540232dba0a045befaf45d6218c8feaa6908f270761311b",
+          "raw_planner_plan": {
+            "intent": "general",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+            "search_queries": [
+              "1954年9月 邓小平 国务院 职务",
+              "1954年9月 邓小平 国防委员会 职务",
+              "1954年 邓小平 国务院副总理",
+              "1954年 邓小平 国防委员会副主席",
+              "1954年9月 国务院 组成人员 邓小平",
+              "1954年9月 国防委员会 组成人员 邓小平"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "邓小平",
+                "canonical": "邓小平"
+              },
+              {
+                "type": "organization",
+                "text": "国务院",
+                "canonical": "中华人民共和国国务院"
+              },
+              {
+                "type": "organization",
+                "text": "国防委员会",
+                "canonical": "中华人民共和国国防委员会"
+              }
+            ],
+            "start_year": 1954,
+            "end_year": 1954,
+            "coverage": "relevance",
+            "constraints": [
+              "1954年9月",
+              "国务院",
+              "国防委员会"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_constraint_month_place",
+          "case_definition_sha256": "9402c8628342eb6fcf83862534f6dca894389ada01bdf967f4a38926cef68e59",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "同时保留毛泽东、1949年3月、北平三项条件；不得只筛1949全年。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "实体含毛泽东和北平，constraints明确1949年3月及北平；实际首轮与反思补检索均携带这两个条件，没有仅检索1949全年。检索结果中混入其他月份是后续证据选择问题，单独分析。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1949年3月毛泽东在北平有哪些活动？",
+            "search_queries": [
+              "毛泽东 1949年3月 北平 活动",
+              "1949年3月 毛泽东 北平 行程",
+              "毛泽东 1949年3月 北平 会议",
+              "毛泽东 1949年3月 北平 会见",
+              "1949年3月 中共中央 北平 毛泽东"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              },
+              {
+                "type": "place",
+                "text": "北平",
+                "canonical": "北平"
+              }
+            ],
+            "start_year": 1949,
+            "end_year": 1949,
+            "coverage": "relevance",
+            "constraints": [
+              "1949年3月",
+              "北平"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "1949年3月毛泽东在北平有哪些活动？",
+            "毛泽东 1949年3月 北平 活动 1949年3月 北平",
+            "1949年3月 毛泽东 北平 行程 1949年3月 北平",
+            "毛泽东 北平 毛泽东3月25日抵达北平及阅兵 1949年3月 北平",
+            "毛泽东 北平 毛泽东在北平香山双清别墅的居住与办公 1949年3月 北平",
+            "毛泽东 北平 毛泽东在北平会见民主人士与各界代表 1949年3月 北平"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "a42e0bd7ab9d0c62d1d9d1faca3d4b524dd433ee0d1dc241ee4576de93d152f8",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "1949年3月毛泽东在北平有哪些活动？",
+            "search_queries": [
+              "毛泽东 1949年3月 北平 活动",
+              "1949年3月 毛泽东 北平 行程",
+              "毛泽东 1949年3月 北平 会议",
+              "毛泽东 1949年3月 北平 会见",
+              "1949年3月 中共中央 北平 毛泽东"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              },
+              {
+                "type": "place",
+                "text": "北平",
+                "canonical": "北平"
+              }
+            ],
+            "start_year": 1949,
+            "end_year": 1949,
+            "coverage": "relevance",
+            "constraints": [
+              "1949年3月",
+              "北平"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_multi_zhou_periods",
+          "case_definition_sha256": "e6d0fd1201a92535ce0a531a13dea1acd0299cbe7bf5ba05f30a5552bf85de7c",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "识别周恩来1954、1955、1956三年及工作重点比较，时间与主题并列覆盖。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "识别timeline、1954—1956、coverage=per_year，查询计划分别列三年并检索工作重点变化；constraints保留按时间和主题梳理及三年变化。实际走结构化时间线，生成请求仍保留完整问题；此处不评路线优劣。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "timeline",
+            "retrieval_route": "structured",
+            "normalized_question": "按时间和主题梳理周恩来从1954年至1956年的主要经历，并说明这三年工作重点的变化。",
+            "search_queries": [
+              "周恩来 1954年 主要经历",
+              "周恩来 1955年 主要经历",
+              "周恩来 1956年 主要经历",
+              "周恩来 1954 1955 1956 工作重点 变化",
+              "周恩来 1954年至1956年 年谱",
+              "周恩来 1954 1955 1956 外交 内政 工作重点"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "周恩来",
+                "canonical": "周恩来"
+              }
+            ],
+            "start_year": 1954,
+            "end_year": 1956,
+            "coverage": "per_year",
+            "constraints": [
+              "按时间和主题梳理",
+              "说明这三年工作重点的变化"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "f4795bd9422976e4cef09a29c4b0c01061991dead7efb9f846f381d2e64fdb58",
+          "raw_planner_plan": {
+            "intent": "timeline",
+            "retrieval_route": "structured",
+            "normalized_question": "按时间和主题梳理周恩来从1954年至1956年的主要经历，并说明这三年工作重点的变化。",
+            "search_queries": [
+              "周恩来 1954年 主要经历",
+              "周恩来 1955年 主要经历",
+              "周恩来 1956年 主要经历",
+              "周恩来 1954 1955 1956 工作重点 变化",
+              "周恩来 1954年至1956年 年谱",
+              "周恩来 1954 1955 1956 外交 内政 工作重点"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "周恩来",
+                "canonical": "周恩来"
+              }
+            ],
+            "start_year": 1954,
+            "end_year": 1956,
+            "coverage": "per_year",
+            "constraints": [
+              "按时间和主题梳理",
+              "说明这三年工作重点的变化"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_semantic_investigation",
+          "case_definition_sha256": "7cff605430f492ad1adbdcb5ce9469c3dda43bf390eb4654fa3c59126210b3c1",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "识别调查研究观点问题，需要可证实的命题而非仅事件列表。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "intent=viewpoint，检索问题保持毛泽东关于调查研究的观点，变体含观点/论述/思想及反对本本主义/农村调查；实际执行附加观点、论述、主张，而非改为单纯事件清单。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "viewpoint",
+            "retrieval_route": "hybrid",
+            "normalized_question": "毛泽东关于调查研究有哪些观点？",
+            "search_queries": [
+              "毛泽东 调查研究 观点",
+              "毛泽东 调查研究 论述",
+              "毛泽东 调查研究 思想",
+              "毛泽东 反对本本主义 调查研究",
+              "毛泽东 农村调查 调查研究",
+              "毛泽东 实事求是 调查研究"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "relevance",
+            "constraints": [],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "毛泽东关于调查研究有哪些观点？",
+            "毛泽东 调查研究 观点 观点 论述 主张 策略",
+            "毛泽东 调查研究 论述 观点 论述 主张 策略"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "b87bcc77027d8d981a91dd61b45a0e854e331df7a5768fdbc90f10b008223460",
+          "raw_planner_plan": {
+            "intent": "viewpoint",
+            "retrieval_route": "hybrid",
+            "normalized_question": "毛泽东关于调查研究有哪些观点？",
+            "search_queries": [
+              "毛泽东 调查研究 观点",
+              "毛泽东 调查研究 论述",
+              "毛泽东 调查研究 思想",
+              "毛泽东 反对本本主义 调查研究",
+              "毛泽东 农村调查 调查研究",
+              "毛泽东 实事求是 调查研究"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "relevance",
+            "constraints": [],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_semantic_contradiction",
+          "case_definition_sha256": "fa123047d99f5ddab5d157136989ef66a7a61613e3050c987440a5bfc942ae64",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "限定《矛盾论》篇目、主要矛盾概念及方法，不混淆矛盾主要方面。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "document实体与constraints限定《矛盾论》，查询围绕主要矛盾分析和论述，没有替换成矛盾的主要方面。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "viewpoint",
+            "retrieval_route": "hybrid",
+            "normalized_question": "毛泽东在《矛盾论》中怎样分析主要矛盾？",
+            "search_queries": [
+              "毛泽东 矛盾论 主要矛盾 分析",
+              "矛盾论 主要矛盾 论述",
+              "毛泽东 主要矛盾 矛盾论 文本"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              },
+              {
+                "type": "document",
+                "text": "《矛盾论》",
+                "canonical": "矛盾论"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "relevance",
+            "constraints": [
+              "《矛盾论》"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "毛泽东在《矛盾论》中怎样分析主要矛盾？",
+            "毛泽东 矛盾论 主要矛盾 分析 《矛盾论》 观点 论述 主张 策略",
+            "矛盾论 主要矛盾 论述 《矛盾论》 观点 论述 主张 策略"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "f4099ce06cab6784f5df449ea54bd20ee381746893c99763422352311adb059b",
+          "raw_planner_plan": {
+            "intent": "viewpoint",
+            "retrieval_route": "hybrid",
+            "normalized_question": "毛泽东在《矛盾论》中怎样分析主要矛盾？",
+            "search_queries": [
+              "毛泽东 矛盾论 主要矛盾 分析",
+              "矛盾论 主要矛盾 论述",
+              "毛泽东 主要矛盾 矛盾论 文本"
+            ],
+            "entities": [
+              {
+                "type": "person",
+                "text": "毛泽东",
+                "canonical": "毛泽东"
+              },
+              {
+                "type": "document",
+                "text": "《矛盾论》",
+                "canonical": "矛盾论"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "relevance",
+            "constraints": [
+              "《矛盾论》"
+            ],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        },
+        {
+          "case_id": "dev_semantic_first_congress",
+          "case_definition_sha256": "f4401b3b06666ed4f049e9b5afbeff42587be747262f2fa264b8a4c06d29d53e",
+          "basis": "agent_review",
+          "reviewer": "Codex execution-process review",
+          "reviewed_at": "2026-10-05T15:11:15.902443+08:00",
+          "criterion": "将党的头一次全国大会解析为中共一大，关注讨论内容与形成的决定。 本题完整理解判1，任一明确违反判0；缺少可观察轨迹时N/A，不因未观测而给0。",
+          "status": "pass",
+          "reason": "normalized_question和实体canonical明确把“党的头一次全国大会”映射为中国共产党第一次全国代表大会，查询涵盖讨论议题、决议/纲领和决定，反思补检索包括中央机构；查询理解成功与原始组件召回失败需区分。",
+          "denominator": 1,
+          "executed_query_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "中国共产党第一次全国代表大会讲了些什么、形成了哪些决定？",
+            "search_queries": [
+              "中国共产党第一次全国代表大会 内容",
+              "中共一大 讨论 议题",
+              "中共一大 决议",
+              "中国共产党第一个纲领",
+              "中国共产党第一个决议",
+              "中共一大 会议内容 决定"
+            ],
+            "entities": [
+              {
+                "type": "event",
+                "text": "党的头一次全国大会",
+                "canonical": "中国共产党第一次全国代表大会"
+              },
+              {
+                "type": "organization",
+                "text": "党",
+                "canonical": "中国共产党"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "relevance",
+            "constraints": [],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "observed_query_variants": [
+            "党的头一次全国大会讲了些什么、形成了哪些决定？",
+            "中国共产党第一次全国代表大会 内容",
+            "中共一大 讨论 议题 中国共产党第一次全国代表大会",
+            "中国共产党第一次全国代表大会 中国共产党 一大会议议程与讨论内容",
+            "中国共产党第一次全国代表大会 中国共产党 一大形成的决议和决定",
+            "中国共产党第一次全国代表大会 中国共产党 一大选举产生的中央机构"
+          ],
+          "raw_planner_call_index": 1,
+          "raw_planner_response_sha256": "c1d325f7027c7213d7412ca5296a36dde81358543cd8a6a2c408452d4555a479",
+          "raw_planner_plan": {
+            "intent": "event_overview",
+            "retrieval_route": "hybrid",
+            "normalized_question": "中国共产党第一次全国代表大会讲了些什么、形成了哪些决定？",
+            "search_queries": [
+              "中国共产党第一次全国代表大会 内容",
+              "中共一大 讨论 议题",
+              "中共一大 决议",
+              "中国共产党第一个纲领",
+              "中国共产党第一个决议",
+              "中共一大 会议内容 决定"
+            ],
+            "entities": [
+              {
+                "type": "event",
+                "text": "党的头一次全国大会",
+                "canonical": "中国共产党第一次全国代表大会"
+              },
+              {
+                "type": "organization",
+                "text": "党",
+                "canonical": "中国共产党"
+              }
+            ],
+            "start_year": null,
+            "end_year": null,
+            "coverage": "relevance",
+            "constraints": [],
+            "needs_clarification": false,
+            "clarification_question": null
+          },
+          "raw_to_executed_plan_changed": false,
+          "raw_planner_semantic_note": null
+        }
+      ]
+    }
+  }
+}
