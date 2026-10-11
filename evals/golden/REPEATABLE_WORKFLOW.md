@@ -1,6 +1,8 @@
 # 开发集可重复评测流程
 
-本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v3`），仅涉及评测工具。当前可执行入口仍为 13 题 schema v1；20 题 `development_annotations_v3.json` 的多轮协议接入属于后续工作，不得改低 schema 后直接运行。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
+本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v4`），仅涉及评测工具。2026-10-11起，20题 `development_annotations_v3.json` 可与显式指定的 `development_protocols_v3.json` 一起运行；旧13题 schema v1 入口继续兼容。20题按21个输入采集：淮海题的带历史主臂和无历史控制臂分开执行，仍只占1个独立题。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
+
+原 schema v2 标注包及其 `execution_status=annotation_only`、协议中的制作期状态保持原样，作为2026-10-05冻结资产。新评测入口校验整包、协议、逐题定义和输入绑定后执行；不会改低 schema、忽略历史或回写人工批准。当前新增接入不包含20题真实模型回答或新增7题的候选相关性标注。
 
 ## 1. 冻结输入并采集
 
@@ -9,29 +11,45 @@
 ```powershell
 # 示例：新的本地检索采集，不调用模型。已有输出或 partial 输出会拒绝覆盖。
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
-  --dataset evals/golden/observations/20261005/dataset.json `
+  --dataset evals/golden/development_annotations_v3.json `
+  --protocols evals/golden/development_protocols_v3.json `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
-  --run-name control_a --output data/reports/control_a/capture.json
+  --run-name development20_local_stable_20261011 `
+  --output data/reports/eval_development20_20261011/stable/capture.json
 ```
 
-需要真实问答时显式加 `--with-llm`，会发送问题、史料与中间答案并产生服务用量。上述命令不带该参数，答案及生成过程可能 N/A。不要把本地检索结果当成真实问答结果。
+需要真实问答时显式加 `--with-llm`，会发送问题、史料与中间答案并产生服务用量。上述命令不带该参数，执行本地组件检索及无模型的摘录回答路径；已记录的检索阶段可以评分，但模型 Planner、生成上下文和真实模型成本保持 N/A，摘录答案仍须独立复核。不会为了补全报告自动调用模型。此前13题的外发范围不代表新增7题已经做过真实模型评测。
 
-`capture.json` 记录应用源码指纹、Git 状态、PDF 文件身份、索引 manifest 与实际 artifact 校验、模型/提示词/参数、各层候选、实际 HTTP 请求及用量。保留 capture 原件；评分不重新读取当前索引，不会重新调用 Agent。采集失败时 `.partial.json` 保留已完成题目，但不是完整集报告，须使用新目录重新采集。
+`capture.json` 记录应用源码指纹、Git 状态、PDF 文件身份、索引 manifest 与实际 artifact 校验、模型/提示词/参数和已执行阶段的轨迹。schema v2 另绑定原标注包、协议文件字节和规范化内容、每臂的原始 `question + history` 及其指纹。`cases` 保存20个主输入，`control_cases` 保存淮海无历史控制输入；输入缺失、重复、被替换或历史被删除均不能通过完整采集校验。
+
+淮海主臂只传协议中已有的一条用户历史，不补造上一轮 Assistant 回答。两臂使用同一配置，组件检索仍以当前原问题为输入，不读取历史；因此相同组件结果不能证明历史隔离通过。隔离检查需要真实两臂的执行计划、约束、检索轨迹和回答。`source_scope` 标注也不会被评测器注入为 Agent 的额外检索过滤条件。
+
+保留 capture 原件；评分不重新读取当前索引，不会重新调用 Agent。采集失败时 `.partial.json` 保留已完成的主输入及控制输入，但不是完整集报告，须使用新目录重新采集。
+
+采集前后分别核对源码指纹；运行期间源码变化会令归因检查失败，应在代码固定后重新采集。修改评测工具期间产生的试跑与稳定版本的正式对照应使用不同目录。
 
 ## 2. 为本次 capture 生成复核包
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot prepare-reviews `
-  --dataset evals/golden/observations/20261005/dataset.json `
-  --capture data/reports/control_a/capture.json `
+  --dataset evals/golden/development_annotations_v3.json `
+  --capture data/reports/eval_development20_20261011/stable/capture.json `
   --protocols evals/golden/development_protocols_v3.json `
-  --output-dir data/reports/control_a/reviews
+  --output-dir data/reports/eval_development20_20261011/stable/reviews
 ```
 
-生成 `review_packet.json`（题目、证据、必要事实、本次答案及轨迹入口）、`answer_reviews.json`、`process_reviews.json` 和操作说明。复核目录必须不存在，以免覆盖正在进行的审查。
+生成以下文件。复核目录必须不存在，以免覆盖正在进行的审查。
+
+| 位置 | 内容 |
+| --- | --- |
+| `reviews/review_packet.json` | 20题的题目、证据、必要事实、本次答案及轨迹入口 |
+| `reviews/answer_reviews.json`、`process_reviews.json` | 主输入的答案与过程复核；未生成答案时不虚构答案记录 |
+| `reviews/controls/without_history_control/` | 淮海控制臂的独立答案、过程复核包 |
+| `reviews/specialist_reviews.json` | 专门协议的逐项检查及淮海双臂隔离检查 |
 
 - 答案复核：逐事实覆盖和引用支持、来源/时间约束、路由、拒答、范围说明。引用中有事实而正文未回答，不能算正文完整覆盖。
-- 过程复核：依协议检查实际执行计划与查询变体是否保留实体、意图和约束；原始 Planner 输出和实际执行计划分别留证。`--protocols` 可省略，使用明确的通用判据；若指定，协议字节哈希和逐题定义必须匹配。
+- 过程复核：依协议检查实际执行计划与查询变体是否保留实体、意图和约束；原始 Planner 输出和实际执行计划分别留证。20题 schema v2 必须显式提供同一 `--protocols`；旧 schema v1 可省略并使用通用判据。
+- 专门复核：淮海隔离有4项明确检查，不能仅从战役年份落在1930—1949期间推断没有旧时间过滤。湖南题按1921—1926六年分别报告，逐年事实/证据分母为2、2、2、1、5、2，同时保留14项事实微平均与6年宏平均，不能用1925年多项命中掩盖漏年。
 - 所有模板初始 `unknown`，不自动打分或批准。明确判断须填写依据、复核人、带时区时间和理由。可先评分未审模板，结果按实际缺口显示 N/A。
 - 复核绑定整份 capture、题目定义，以及答案/引用或执行计划快照。换一次 capture 就必须生成并审阅新包，不能修改哈希来复用旧判断。
 
@@ -39,14 +57,13 @@
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot score `
-  --dataset evals/golden/observations/20261005/dataset.json `
-  --capture data/reports/control_a/capture.json `
+  --dataset evals/golden/development_annotations_v3.json `
+  --capture data/reports/eval_development20_20261011/stable/capture.json `
   --ranking-pools evals/golden/ranking_pools_v2.json `
-  --assessments data/reports/control_a/reviews/answer_reviews.json `
-  --process-reviews data/reports/control_a/reviews/process_reviews.json `
+  --reviews-dir data/reports/eval_development20_20261011/stable/reviews `
   --protocols evals/golden/development_protocols_v3.json `
   --k-values 1 3 5 10 20 `
-  --output data/reports/control_a/report.json
+  --output data/reports/eval_development20_20261011/stable/report.json
 ```
 
 每次自动输出三份文件：
@@ -58,6 +75,12 @@
 | `report.md` | 便于查看的多 K 检索、答案、过程、成本与缺失原因摘要 |
 
 暂定与人工批准结果分别保存。未提供答案/过程复核时，相应维度为 N/A。未映射的摘要上下文、缺失生产检索轨迹、缺失 usage 均不计零；成本同时报告完整总量和已知子集。HTTP 统计包含重试和失败；请求耗时之和可能有并发，不能冒充逐题 wall-clock 延时。
+
+`--reviews-dir` 一次装入主输入、控制臂和专门复核文件，不能与 `--assessments`、`--process-reviews` 等单独复核路径同时使用。原有单独路径参数继续供旧13题回放使用。
+
+20题报告的主 `cases` 和常规质量聚合只计20个独立题；`control_reports.without_history_control` 单列控制臂，`execution_accounting` 统计全部21次执行的耗时、调用与成本，避免漏记控制臂或把它作为第21题抬高质量分母。`specialist_assessment` 保存淮海配对诊断和湖南逐年结果。湖南年份证据命中、年份事实完整、每年事实Recall是不同指标；没有真实答案或明确复核时不会产生答案完整率。拒答元证据仅支持资料边界说明，不进入正向事实、Recall或排名分母。
+
+新增7题尚无候选相关性分级及固定池；其必要证据Recall可算，Precision/MRR/nDCG按实际标签与池状态保留 N/A。其余题的新候选若超出现有标注，也遵守同一未知规则。
 
 生产路径的多变体、多轮候选并集只计算关键证据覆盖，不能拼成 Precision/MRR/nDCG 排名。严格锚点和 span 身份会受到裁剪影响，因此阶段 Recall 下降不一定全部是语义丢失。最后一次摘要综合若不能还原原页，保持 N/A，同时报告可评子集及分母。
 
@@ -73,13 +96,19 @@
 
 比较器区分三件事：
 
-1. `compatible`：评分器版本、数据集、语料、K 集合和题目集合是否一致。
+1. `compatible`：评分器版本、数据集、语料、K 集合和题目集合是否一致；协议采集还要求输入协议及主/控制臂身份一致，不能把不同历史条件当同一次实验。
 2. `metrics` / `answer_metrics`：组件检索和答案指标的有效题目、事实分母、复核依据、nDCG 固定池是否一致，可比时才给 delta。查询理解、生产并集和成本在统一报告中按各自分母查看，当前比较器没有自动生成这些维度的 delta。
 3. `attribution_safe`：除了配置只改变组件 `top_k`（或重复对照），还要求源码相同、逐题活跃分支相同、有序候选相同、实际使用的索引身份完整且跨运行一致。逐项核对 embedding、切分参数及版本、chunk/index artifact、build ID 和构建 commit。双方都说“校验成功”并不能证明双方使用同一份索引。
 
 索引身份缺失或变化时，仍可展示同口径指标差值，但归因为不安全；原因和差异见 `index_identity_comparison`。未参与的降级分支不冒充本次配置。当前支持的归因范围为 **component_retrieval**：组件 `top_k` 不控制实际生产问答的候选预算，不能据此解释答案波动。现有 `source_sha256` 也包含评测代码，评测代码变化会保守地阻止源码一致性归因。
 
-## 已有 13 题的离线复现
+## 2026-10-11 接入验证
+
+上述 `stable/` 目录已实际完成本地采集、复核包生成、评分和同报告比较。20个主输入、1个控制输入均完成，采集前后及评分时源码指纹一致，索引身份校验通过，无检索降级。组件最终阶段关键证据 Recall@20 为60.88%（17道可答题宏平均），Precision@5 为70.00%（12道已有候选标注题）；未标候选不计作不相关。没有外部模型请求，答案及专项检查仍待复核，不能据此报告20题真实问答通过率。
+
+评测相关测试共407项通过；最终控制臂复核包定位和源码变化检查另经14项定向回归通过，Ruff与8个相关源码文件的mypy检查通过。旧13题离线重算的检索与答案四组聚合结果与原报告完全一致。此轮只接入评测流程，未改Agent、冻结标注或人工批准状态。
+
+## 已有 13 题的离线复现（兼容入口）
 
 本地大 capture 位于 ignored `data/reports/eval_observation_20261005/live_capture.json`；远程仓库只保存紧凑观察记录。缺少该文件时不能靠紧凑答案记录重建全部调用和上下文，不得伪造 capture。
 

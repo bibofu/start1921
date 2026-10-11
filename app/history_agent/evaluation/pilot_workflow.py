@@ -13,8 +13,15 @@ from history_agent.evaluation.pilot_answers import (
     fingerprint,
     validate_reviews,
 )
-from history_agent.evaluation.pilot_models import PilotDataset, case_definition
+from history_agent.evaluation.pilot_models import case_definition
 from history_agent.evaluation.pilot_process_reviews import prepare_process_reviews
+from history_agent.evaluation.pilot_protocols import load_inputs
+from history_agent.evaluation.pilot_specialist import prepare_specialist_reviews
+from history_agent.evaluation.pilot_variants import (
+    list_control_variants,
+    project_control_capture,
+    validate_protocol_capture,
+)
 
 
 def validate_capture_binding(
@@ -40,20 +47,16 @@ def protect_inputs(outputs: list[Path], inputs: list[Path | None]) -> None:
         raise ValueError("output must not overwrite an input artifact")
 
 
-def prepare_reviews(
+def _review_files(
+    cases: list[dict[str, Any]],
+    capture: dict[str, Any],
+    dataset_sha256: str,
     dataset_path: Path,
     capture_path: Path,
-    output_dir: Path,
-    *,
-    protocol_path: Path | None = None,
+    protocol_path: Path | None,
 ) -> dict[str, Any]:
-    dataset = PilotDataset.model_validate(json.loads(dataset_path.read_text(encoding="utf8")))
-    cases = [case.model_dump(mode="json") for case in dataset.cases]
-    capture = json.loads(capture_path.read_text(encoding="utf8"))
     captured = validate_capture_binding(cases, capture)
-    process = prepare_process_reviews(
-        cases, capture, fingerprint(dataset.model_dump(mode="json")), protocol_path=protocol_path
-    )
+    process = prepare_process_reviews(cases, capture, dataset_sha256, protocol_path=protocol_path)
     answer_cases = []
     packet_cases = []
     for case in cases:
@@ -88,7 +91,15 @@ def prepare_reviews(
                 "case_id": case["id"],
                 "definition": case,
                 "answer": answer,
-                "capture_case_path": f"cases[case_id={case['id']}]",
+                "input_variant_id": raw.get("input_variant_id", "single_turn"),
+                "input_sha256": raw.get("input_sha256"),
+                "request": raw.get("request"),
+                "capture_case_path": (
+                    f"control_cases[case_id={case['id']},"
+                    f"input_variant_id={capture['control_variant_id']}]"
+                    if capture.get("control_variant_id")
+                    else f"cases[case_id={case['id']}]"
+                ),
                 "trace_fields": ["production_stages", "generation_contexts", "llm_calls"],
             }
         )
@@ -100,21 +111,62 @@ def prepare_reviews(
         "schema_version": 1,
         "dataset_path": str(dataset_path.resolve()),
         "capture_path": str(capture_path.resolve()),
-        "dataset_sha256": fingerprint(dataset.model_dump(mode="json")),
+        "dataset_sha256": dataset_sha256,
         "capture_sha256": fingerprint(capture),
+        "capture_view": "control_projection" if capture.get("control_variant_id") else "full",
+        "control_variant_id": capture.get("control_variant_id"),
+        "parent_capture_sha256": capture.get("parent_capture_sha256"),
         "cases": packet_cases,
     }
-    # All validation happens before creating the directory. Never replace a review in progress.
-    output_dir.mkdir(parents=True, exist_ok=False)
     files = {
         "answer_reviews.json": answers.model_dump(mode="json"),
         "process_reviews.json": process,
         "review_packet.json": packet,
     }
-    for name, payload in files.items():
-        (output_dir / name).write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf8"
+    return files
+
+
+def prepare_reviews(
+    dataset_path: Path,
+    capture_path: Path,
+    output_dir: Path,
+    *,
+    protocol_path: Path | None = None,
+) -> dict[str, Any]:
+    inputs = load_inputs(dataset_path, protocol_path)
+    cases = [case.model_dump(mode="json") for case in inputs.dataset.cases]
+    capture = json.loads(capture_path.read_text(encoding="utf8"))
+    validate_protocol_capture(inputs, capture)
+    files = _review_files(
+        cases, capture, inputs.dataset_sha256, dataset_path, capture_path, protocol_path
+    )
+    for name in list_control_variants(capture):
+        control = project_control_capture(capture, name)
+        ids = {case["case_id"] for case in control["cases"]}
+        control_files = _review_files(
+            [case for case in cases if case["id"] in ids],
+            control,
+            inputs.dataset_sha256,
+            dataset_path,
+            capture_path,
+            protocol_path,
         )
+        files.update(
+            {f"controls/{name}/{filename}": data for filename, data in control_files.items()}
+        )
+    if inputs.is_protocol_release:
+        assert inputs.protocols is not None
+        files["specialist_reviews.json"] = prepare_specialist_reviews(
+            cases, inputs.protocols, capture
+        )
+        files["review_packet.json"]["execution_protocols"] = inputs.protocols
+        files["review_packet.json"]["execution_contract"] = capture["execution_contract"]
+    # Validate every arm before creating the output; never overwrite work in progress.
+    output_dir.mkdir(parents=True, exist_ok=False)
+    for name, payload in files.items():
+        path = output_dir / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
     (output_dir / "README.md").write_text(
         "# 本次运行复核包\n\n"
         "先读 review_packet.json 的题目、必要事实、证据与本次回答，再核对 capture 中的轨迹。\n"
@@ -129,4 +181,18 @@ def prepare_reviews(
         "评分时还需传入同一 --protocols。\n",
         encoding="utf8",
     )
-    return {"output_dir": str(output_dir), "answer_cases": len(answer_cases), "cases": len(cases)}
+    if inputs.is_protocol_release:
+        with (output_dir / "README.md").open("a", encoding="utf8") as stream:
+            stream.write(
+                "\n20题使用 pilot score --reviews-dir 此目录 --protocols 同一协议。"
+                "controls/without_history_control 保存淮海控制臂的独立复核；"
+                "specialist_reviews.json 保存逐项专项及四项历史隔离审查。"
+                "主臂与控制臂不可互换，控制臂不增加独立题数。"
+                "湖南逐年分数从绑定的事实与证据判断计算，不能仅靠年份标题计分。\n"
+            )
+    return {
+        "output_dir": str(output_dir),
+        "answer_cases": len(files["answer_reviews.json"]["cases"]),
+        "cases": len(cases),
+        "control_variants": list_control_variants(capture),
+    }

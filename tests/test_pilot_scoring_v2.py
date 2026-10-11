@@ -82,6 +82,7 @@ def _scoring_inputs(root: Path) -> dict[str, Path]:
     case_hash = digest(case_definition(dataset["cases"][0]))
     answer = {"answer": "他出任总理。[E1]", "citations": [{"evidence_id": "E1"}]}
     capture = {
+        "schema_version": 1,
         "run_name": "synthetic-v2",
         "corpus": {"sha256": "corpus", "documents": [{"document_id": "doc", "sha256": PDF_HASH}]},
         "git": {"commit": "fixture", "dirty": False},

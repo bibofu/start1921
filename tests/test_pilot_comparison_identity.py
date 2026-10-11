@@ -312,3 +312,64 @@ def test_missing_or_malformed_cases_reject_comparison(cases: Any) -> None:
     result = compare(left, right)
     assert not result["compatible"]
     assert not result["attribution_safe"]
+
+
+def test_equal_execution_contracts_allow_comparison_regardless_of_key_order() -> None:
+    left, right = _report(), _report()
+    left["execution_contract"] = {"protocol_sha256": "protocol", "input_variants": {"p1": []}}
+    right["execution_contract"] = {"input_variants": {"p1": []}, "protocol_sha256": "protocol"}
+    assert compare(left, right)["attribution_safe"]
+
+
+@pytest.mark.parametrize("field", ["protocol_sha256", "protocol_file_sha256", "input_variants"])
+def test_changed_execution_contract_rejects_metric_comparison(field: str) -> None:
+    left, right = _report(), _report()
+    for report in (left, right):
+        report["execution_contract"] = {
+            "protocol_sha256": "protocol",
+            "protocol_file_sha256": "protocol-file",
+            "input_variants": {"p1": [{"id": "with_history", "history": []}]},
+        }
+    right["execution_contract"][field] = "different"
+    result = compare(left, right)
+    assert not result["compatible"]
+    assert not result["attribution_safe"]
+    assert not result["metrics"]["final.precision@5"]["comparable"]
+    assert result["metrics"]["final.precision@5"]["delta"] is None
+    assert "execution_contract differs" in result["reasons"]
+
+
+@pytest.mark.parametrize("invalid", [None, {}, [], True, "protocol"])
+def test_missing_or_invalid_execution_contract_cannot_equal_valid_contract(invalid: Any) -> None:
+    left, right = _report(), _report()
+    left["execution_contract"] = {"protocol_sha256": "protocol"}
+    right["execution_contract"] = invalid
+    assert not compare(left, right)["compatible"]
+    right.pop("execution_contract")
+    assert not compare(left, right)["compatible"]
+
+
+def test_matching_invalid_execution_contracts_are_not_compatible() -> None:
+    left, right = _report(), _report()
+    left["execution_contract"] = right["execution_contract"] = None
+    assert not compare(left, right)["compatible"]
+
+
+def test_execution_contract_does_not_equate_boolean_and_integer() -> None:
+    left, right = _report(), _report()
+    left["execution_contract"] = {"schema_version": 1}
+    right["execution_contract"] = {"schema_version": True}
+    assert not compare(left, right)["compatible"]
+
+
+def test_control_variant_must_match_but_parent_capture_may_change_between_runs() -> None:
+    left, right = _report(), _report()
+    for report in (left, right):
+        report["control_variant_id"] = "without_history_control"
+    left["parent_capture_sha256"] = "first-run"
+    right["parent_capture_sha256"] = "second-run"
+    assert compare(left, right)["compatible"]
+    right["control_variant_id"] = "different_control"
+    assert not compare(left, right)["compatible"]
+    right.pop("control_variant_id")
+    assert not compare(left, right)["compatible"]

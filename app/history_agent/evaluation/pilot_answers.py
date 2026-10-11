@@ -209,6 +209,7 @@ def evaluate_answer(
         "basis": review.basis if review else None,
         "mode": mode,
         "metrics": metrics,
+        "fact_statuses": {f.fact_id: f.status for f in facts} if not gate else {},
         "fact_status_counts": {
             status: sum(f.status == status for f in facts)
             for status in ("covered", "partial", "missing", "contradicted", "unknown")

@@ -363,14 +363,97 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"协议文件指纹：`{_text(report.get('protocol_file_sha256') or 'N/A')}`",
         "",
     ]
+    accounting = report.get("execution_accounting")
+    if accounting:
+        lines += [
+            f"独立题数：{accounting['independent_case_count']}；"
+            f"实际执行：{accounting['execution_count']}（含配对控制臂）。",
+            "主质量聚合每题只纳入协议首个输入，淮海无历史控制臂单列；下面主路径成本表不含控制臂。",
+            f"所有执行的 HTTP 调用数：{_value(accounting.get('http_calls'))}；"
+            f"总 Token：{_value(accounting['tokens']['total_tokens']['value'])}。",
+            "本次未启用真实模型；答案/过程仍须复核，不能据此评估真实模型质量。"
+            if not report.get("config", {}).get("with_llm")
+            else "本次启用真实模型，按绑定本次采集的复核记录评分。",
+            "组件探针使用原问题，不接收对话历史；历史隔离需看两臂实际生产计划和轨迹。",
+            "",
+        ]
     _component_tables(report, lines)
     _answer_tables(report, lines)
     _process_tables(process, lines)
     _cost_tables(process, lines)
     _per_case_table(report, process, lines)
+    _specialist_tables(report.get("specialist_assessment", {}), lines)
     lines += [
         "完整逐题分母、有效/不可评题 ID、逐调用 usage、候选身份、N/A 原因及"
         "索引/模型/参数版本见同名 JSON；紧凑 JSON 保留汇总与逐题结果。",
         "",
     ]
     return "\n".join(lines)
+
+
+def _specialist_tables(specialist: dict[str, Any], lines: list[str]) -> None:
+    if not specialist:
+        return
+    lines += [
+        "## 专项协议复核",
+        "",
+        "以下为协议声明的检查项分母，与主报告按题打分分别展示，不增加独立题数。",
+        "",
+        "| 题目 / 输入 | 检查维度 | 暂定 | 分母 | 正式 |",
+        "| --- | --- | --- | ---: | --- |",
+    ]
+    for row in specialist.get("cases", []):
+        for name, dimension in row["dimensions"].items():
+            provisional = dimension["provisional"]
+            lines.append(
+                f"| {_text(row['case_id'])} / {_text(row['input_variant_id'])} | "
+                f"{_text(name)} | {_metric(provisional)} | "
+                f"{_value(provisional.get('denominator'))} | {_metric(dimension['approved'])} |"
+            )
+    for pair in specialist.get("paired_cases", []):
+        lines += [
+            "",
+            "### 淮海历史隔离配对",
+            "",
+            f"四项隔离检查：{_metric(pair['isolation']['provisional'])}；"
+            "必须同时复核两臂计划与过滤条件，质量差值本身不能证明历史泄漏。",
+            "",
+            "| 维度 | 带历史 | 无历史控制 | 差值（带历史−控制） |",
+            "| --- | --- | --- | --- |",
+        ]
+        for name, metric in pair["quality"]["provisional"].items():
+            lines.append(
+                f"| {_text(DIMENSIONS.get(name, PHASE_NAMES.get(name, name)))} | "
+                f"{_metric(metric['with_history'])} | {_metric(metric['without_history_control'])}"
+                f" | {_value(metric['difference_with_minus_without'])} |"
+            )
+    for row in specialist.get("yearly_cases", []):
+        answer = row["answer_metrics"]["provisional"]
+        lines += [
+            "",
+            "### 湖南活动：固定六年分层",
+            "",
+            f"完整年份：{_metric(answer['complete_years'])}；"
+            f"六年事实 Recall 宏平均：{_metric(answer['year_macro_fact_recall'])}。"
+            "年份分母为6，必要事实分母为14，两者独立。",
+            "",
+            "| 年份 | 必要事实数 | 该年事实 Recall |",
+            "| --- | ---: | --- |",
+        ]
+        for year in answer["years"]:
+            lines.append(
+                f"| {year['year']} | {len(year['required_fact_ids'])} | "
+                f"{_metric(year['required_fact_recall'])} |"
+            )
+        lines += [
+            "",
+            "| 组件最终候选 K | 命中年份/6 | 六年证据 Recall 宏平均 |",
+            "| ---: | --- | --- |",
+        ]
+        for stage in row["stage_metrics"]:
+            if stage["stage"] == "final" and stage["mode"] == "provisional":
+                lines.append(
+                    f"| {stage['k']} | {_ratio(stage['year_hit_rate'])} | "
+                    f"{_metric(stage['year_macro_recall'])} |"
+                )
+        lines += ["", "逐年各阶段/生成上下文覆盖及正式门槛结果见 JSON。", ""]

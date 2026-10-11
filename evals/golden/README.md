@@ -2,15 +2,17 @@
 
 最新13题真实模型观察见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
-当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：为每次采集生成独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
+当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v4` 已接入20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
 
 ## v2设计与当前开发集
 
 截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，人工批准仍为0。新标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
 
-新 `development_annotations_v3.json` 是待人工审核和协议接入的标注包，旧采集器会明确拒绝，不能忽略多轮条件后直接运行。`development_v2.json` 的13题历史执行入口及其标签完整保留；2026-10-05从该13题应用已记录的旬别局部裁定后冻结本轮快照，完成13题真实模型流程及新的逐事实评审，见 [本轮报告与复现命令](observations/20261005/README.md)。新增7道标注题仍未运行，不能将本轮称作20题评测。
+2026-10-11执行更新：`development_annotations_v3.json` 可通过 `pilot collect --protocols evals/golden/development_protocols_v3.json` 显式接入新评测入口。协议保留20个独立题、21个执行输入：淮海题按带历史和无历史两臂运行，湖南活动题保留六年覆盖与14事实的独立分母。原文件的 `annotation_only` 和协议制作期状态不回写，原定义、哈希、标签及人工pending保持冻结；不能降schema或丢弃历史绕过检查。新接入默认仅做本地检索，未新增真实模型答案，新增7题的候选相关性及排名池仍待标注。
 
-设计及分母见 [DESIGN_V2.md](DESIGN_V2.md)。当前支持分阶段证据组Recall、Precision、MRR与固定候选池nDCG，以及绑定具体答案的显式逐事实/维度评审汇总。未知项不按0处理，跨配置比较核对标注、有效分母和池指纹。默认采集无LLM；本轮用户已明确授权现有13题真实模型调用，仍没有批准整题Golden标注。
+`development_v2.json` 的13题历史执行入口及其标签完整保留；2026-10-05从该13题应用已记录的旬别局部裁定后冻结本轮快照，完成13题真实模型流程及新的逐事实评审，见 [历史运行报告与复现命令](observations/20261005/README.md)。该报告仍是13题观察，不能重命名为20题成绩。
+
+设计及分母见 [DESIGN_V2.md](DESIGN_V2.md)。当前支持分阶段证据组Recall、Precision、MRR与固定候选池nDCG，以及绑定具体答案的显式逐事实/维度评审汇总。未知项不按0处理，跨配置比较核对标注、有效分母和池指纹；控制臂计入执行成本，不扩充独立题分母。默认采集无LLM；此前用户授权的13题真实模型观察不代表20题均已运行真实问答，也不代表整题Golden标注获批。
 
 **以下各节描述旧v1的12题数据集、`evaluation.golden`与 `eval golden` 命令；v1和v2试点的数据、指标及报告不能混用。**
 

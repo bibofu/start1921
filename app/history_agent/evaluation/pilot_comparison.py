@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any, TypeGuard
 
+from history_agent.evaluation.pilot_answers import fingerprint
+
 BRANCH_STAGE = re.compile(r"(?:production_\d+_)?(keyword|vector)_candidates\Z")
 CHUNKING_FIELDS = ("version", "target_chars", "max_chars", "overlap")
 COMMON_IDENTITY_FIELDS = (
@@ -248,6 +250,18 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
             reasons.append(f"{key} is missing")
         elif left[key] != right[key]:
             reasons.append(f"{key} differs")
+    if "execution_contract" in left or "execution_contract" in right:
+        contracts = [report.get("execution_contract") for report in (left, right)]
+        if any(not isinstance(contract, dict) or not contract for contract in contracts):
+            reasons.append("execution_contract is missing or invalid")
+        elif fingerprint(contracts[0]) != fingerprint(contracts[1]):
+            reasons.append("execution_contract differs")
+    if "control_variant_id" in left or "control_variant_id" in right:
+        variants = [report.get("control_variant_id") for report in (left, right)]
+        if not all(_known_text(variant) for variant in variants):
+            reasons.append("control_variant_id is missing or invalid")
+        elif variants[0] != variants[1]:
+            reasons.append("control_variant_id differs")
     left_ids, left_case_reasons = _case_ids(left, "left")
     right_ids, right_case_reasons = _case_ids(right, "right")
     reasons.extend([*left_case_reasons, *right_case_reasons])
