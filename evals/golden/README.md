@@ -1,5 +1,7 @@
 # Unified RAG Golden Benchmark
 
+2026-10-11人工复核更新：第一批4题的题干、原文、必要事实与回答边界已获用户明确批准，当前为 **4/20开发题批准、16题待审**。当前标注使用 [development_annotations_v4.json](development_annotations_v4.json) 及配套 [development_protocols_v4.json](development_protocols_v4.json)，逐字段裁定及用户原话见 [human_adjudications_v4.json](human_adjudications_v4.json)，下一批见 [review_queue_v4.json](review_queue_v4.json)。周恩来1954题的首项事实收窄为年初政务院总理，9月国务院总理由独立事实评分；总理到月、政协主席到日的精度不变。85项事实、90个题级证据组、20题/21输入保持不变。候选等级、排序池及真实答案不在本批批准范围，不能据此把旧成绩升级为正式Golden成绩；v3及以下历史观察保持原样。
+
 最新13题真实回答的新口径复核见 [2026-10-11复核对照](observations/20261011_calibrated/README.md)：仍为3/13通过、20/43事实完整覆盖，引用、来源与范围说明的部分判断已更新。这是同一答案重审，没有新增模型运行或修改Agent。原始运行见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
 当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 已接入20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
@@ -8,7 +10,7 @@
 
 答案复核已提供离线工作台：`pilot prepare-reviews` 同时生成 `index.html`、版本化校准说明与复核导出包；填写后用 `pilot import-reviews` 校验导入新目录。开放题最低覆盖、正文与引用分离、额外断言及边界示例见 [答案复核口径](ANSWER_REVIEW_CALIBRATION.md)。旧答案不会自动沿用判断或提分，必要事实分母和人工批准状态不变。
 
-截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，人工批准仍为0。新标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
+截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，当时人工批准为0；当前人工进展见上述v4记录。标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
 
 2026-10-11执行更新：`development_annotations_v3.json` 可通过 `pilot collect --protocols evals/golden/development_protocols_v3.json` 显式接入新评测入口。协议保留20个独立题、21个执行输入：淮海题按带历史和无历史两臂运行，湖南活动题保留六年覆盖与14事实的独立分母。原文件的 `annotation_only` 和协议制作期状态不回写，原定义、哈希、标签及人工pending保持冻结；不能降schema或丢弃历史绕过检查。新接入默认仅做本地检索，未新增真实模型答案，新增7题的候选相关性及排名池仍待标注。
 

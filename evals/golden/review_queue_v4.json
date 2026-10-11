@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "version": "development-review-r4-20261011",
+  "status": "batch_1_human_approved_batch_2_pending",
+  "scope": "仅题干、原文、必要事实与回答/拒答边界；候选分级及真实答案评价另行进行。",
+  "no_automatic_approval": true,
+  "human_approved": 4,
+  "batches": [
+    {
+      "id": "batch_1",
+      "title": "第1批 · 原有4题：约束与争议",
+      "purpose": "优先裁定时间、来源、职务沿革和三人团旬别，防止有争议内容成为硬性金标。",
+      "case_ids": [
+        "pilot_multievidence_zunyi_leadership",
+        "pilot_constraint_deng_1973_march",
+        "dev_exact_zhou_1954",
+        "pilot_semantic_deng_1962_agriculture"
+      ],
+      "status": "approved",
+      "reviewed_by": "user_in_current_chat",
+      "reviewed_at": "2026-10-11T16:57:42+08:00",
+      "case_review_statuses": {
+        "pilot_multievidence_zunyi_leadership": "approved",
+        "pilot_constraint_deng_1973_march": "approved",
+        "dev_exact_zhou_1954": "approved",
+        "pilot_semantic_deng_1962_agriculture": "approved"
+      }
+    },
+    {
+      "id": "batch_2",
+      "title": "第2批 · 原有4题：开放范围",
+      "purpose": "确认跨年经历、观点和月份地点题的最低覆盖范围及证据组合。",
+      "case_ids": [
+        "dev_multi_zhou_periods",
+        "dev_constraint_month_place",
+        "dev_semantic_investigation",
+        "dev_semantic_contradiction"
+      ],
+      "status": "pending",
+      "case_review_statuses": {
+        "dev_multi_zhou_periods": "pending",
+        "dev_constraint_month_place": "pending",
+        "dev_semantic_investigation": "pending",
+        "dev_semantic_contradiction": "pending"
+      }
+    },
+    {
+      "id": "batch_3",
+      "title": "第3批 · 原有5题：事实与边界",
+      "purpose": "核对窄事实、跨页名单、一大改写和项目范围拒答。",
+      "case_ids": [
+        "pilot_exact_deng_1952_appointment",
+        "pilot_negative_cppcc_1949",
+        "dev_exact_deng_1954",
+        "dev_semantic_first_congress",
+        "pilot_refusal_out_of_scope_2024"
+      ],
+      "status": "pending",
+      "case_review_statuses": {
+        "pilot_exact_deng_1952_appointment": "pending",
+        "pilot_negative_cppcc_1949": "pending",
+        "dev_exact_deng_1954": "pending",
+        "dev_semantic_first_congress": "pending",
+        "pilot_refusal_out_of_scope_2024": "pending"
+      }
+    },
+    {
+      "id": "batch_4",
+      "title": "第4批 · 新增3题：会议与多轮",
+      "purpose": "复核会议选举、两会议比较和淮海战役概述；确认多轮配对输入。",
+      "case_ids": [
+        "dev_exact_zunyi_election",
+        "dev_multi_meetings",
+        "dev_constraint_history_isolation"
+      ],
+      "status": "pending",
+      "case_review_statuses": {
+        "dev_exact_zunyi_election": "pending",
+        "dev_multi_meetings": "pending",
+        "dev_constraint_history_isolation": "pending"
+      }
+    },
+    {
+      "id": "batch_5",
+      "title": "第5批 · 新增4题：逐年、交集、拒答",
+      "purpose": "复核湖南逐年活动、共同动作直接证据及两类拒答边界。",
+      "case_ids": [
+        "dev_multi_mao_hunan",
+        "dev_intersection_mao_zhou_1949",
+        "dev_refusal_einstein",
+        "dev_refusal_source_year"
+      ],
+      "status": "pending",
+      "case_review_statuses": {
+        "dev_multi_mao_hunan": "pending",
+        "dev_intersection_mao_zhou_1949": "pending",
+        "dev_refusal_einstein": "pending",
+        "dev_refusal_source_year": "pending"
+      }
+    }
+  ],
+  "annotation_file": "evals/golden/development_annotations_v4.json",
+  "protocols_file": "evals/golden/development_protocols_v4.json",
+  "adjudications_file": "evals/golden/human_adjudications_v4.json",
+  "next_batch_id": "batch_2"
+}
