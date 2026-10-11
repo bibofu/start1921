@@ -256,6 +256,16 @@ def _validate_packet(payload: dict[str, Any], expected: dict[str, Any]) -> None:
                     raise ValueError("specialist review timestamp must include timezone")
 
 
+def validate_specialist_reviews(
+    payload: dict[str, Any],
+    cases: list[dict[str, Any]],
+    protocols: dict[str, Any],
+    capture: dict[str, Any],
+) -> None:
+    """Validate edited checks without requiring score reports or judging their semantics."""
+    _validate_packet(payload, prepare_specialist_reviews(cases, protocols, capture))
+
+
 def _metric(numerator: float | None, denominator: int, reason: str | None = None) -> dict[str, Any]:
     available = numerator is not None and reason is None and denominator > 0
     return {

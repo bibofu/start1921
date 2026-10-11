@@ -373,3 +373,77 @@ def test_control_variant_must_match_but_parent_capture_may_change_between_runs()
     assert not compare(left, right)["compatible"]
     right.pop("control_variant_id")
     assert not compare(left, right)["compatible"]
+
+
+def _answer_report(value: float) -> dict[str, Any]:
+    report = _report()
+    report["answer_rubric_version"] = "explicit-answer-review-v1"
+    report["provisional_answer_aggregate"] = {
+        "required_fact_recall": {
+            "value": value,
+            "evaluable_case_ids": ["p1"],
+            "evaluable_unit_ids": ["p1:f1", "p1:f2"],
+            "review_bases": {"p1": "agent_review"},
+        }
+    }
+    return report
+
+
+@pytest.mark.parametrize("binding", ["absent", "null", "same"])
+def test_matching_answer_calibration_or_legacy_absence_allows_answer_delta(binding: str) -> None:
+    left, right = _answer_report(0.5), _answer_report(1.0)
+    if binding != "absent":
+        for report in (left, right):
+            report["answer_calibration_sha256"] = "a" * 64 if binding == "same" else None
+    result = compare(left, right)
+    assert result["compatible"]
+    assert result["attribution_safe"]
+    assert result["answer_calibration_comparison"]["compatible"]
+    assert result["answer_metrics"]["required_fact_recall"]["comparable"]
+    assert result["answer_metrics"]["required_fact_recall"]["delta"] == pytest.approx(0.5)
+
+
+def test_missing_and_explicit_null_both_mean_legacy_answer_calibration() -> None:
+    left, right = _answer_report(0.5), _answer_report(1.0)
+    right["answer_calibration_sha256"] = None
+    result = compare(left, right)
+    assert result["answer_calibration_comparison"]["compatible"]
+    assert result["answer_metrics"]["required_fact_recall"]["comparable"]
+
+
+@pytest.mark.parametrize("changed", ["absent", "null", "different"])
+@pytest.mark.parametrize("swap_sides", [False, True])
+def test_answer_calibration_mismatch_blocks_only_answer_delta(
+    changed: str, swap_sides: bool
+) -> None:
+    left, right = _answer_report(0.5), _answer_report(1.0)
+    left["answer_calibration_sha256"] = "a" * 64
+    if changed != "absent":
+        right["answer_calibration_sha256"] = "b" * 64 if changed == "different" else None
+    if swap_sides:
+        left, right = right, left
+    result = compare(left, right)
+    assert result["compatible"]
+    assert result["attribution_safe"]
+    assert result["metrics"]["final.precision@5"]["comparable"]
+    assert not result["answer_metrics"]["required_fact_recall"]["comparable"]
+    assert result["answer_metrics"]["required_fact_recall"]["delta"] is None
+    assert result["answer_calibration_comparison"]["reasons"] == [
+        "answer_calibration_sha256 differs"
+    ]
+
+
+@pytest.mark.parametrize("invalid", ["", " ", "a" * 63, "A" * 64, True, [], {}])
+def test_matching_invalid_calibration_hashes_cannot_allow_answer_comparison(invalid: Any) -> None:
+    left, right = _answer_report(0.5), _answer_report(1.0)
+    left["answer_calibration_sha256"] = right["answer_calibration_sha256"] = invalid
+    result = compare(left, right)
+    assert result["compatible"]
+    assert result["attribution_safe"]
+    assert result["metrics"]["final.precision@5"]["comparable"]
+    assert not result["answer_metrics"]["required_fact_recall"]["comparable"]
+    assert result["answer_metrics"]["required_fact_recall"]["delta"] is None
+    assert result["answer_calibration_comparison"]["reasons"] == [
+        "left: answer_calibration_sha256 is invalid",
+        "right: answer_calibration_sha256 is invalid",
+    ]

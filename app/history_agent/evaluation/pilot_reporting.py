@@ -359,6 +359,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"题集指纹：`{_text(report.get('dataset_sha256', 'N/A'))}`  ",
         f"代码指纹：`{_text(report.get('source_sha256') or 'N/A')}`  ",
         f"答案复核指纹：`{_text(report.get('answer_reviews_sha256') or 'N/A')}`  ",
+        f"答案校准口径：`{_text(report.get('answer_calibration_sha256') or '未绑定（旧入口）')}`  ",
         f"过程复核指纹：`{_text(report.get('process_reviews_sha256') or 'N/A')}`  ",
         f"协议文件指纹：`{_text(report.get('protocol_file_sha256') or 'N/A')}`",
         "",

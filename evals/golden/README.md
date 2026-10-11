@@ -2,9 +2,11 @@
 
 最新13题真实模型观察见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
-当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v4` 已接入20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
+当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 已接入20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
 
 ## v2设计与当前开发集
+
+答案复核已提供离线工作台：`pilot prepare-reviews` 同时生成 `index.html`、版本化校准说明与复核导出包；填写后用 `pilot import-reviews` 校验导入新目录。开放题最低覆盖、正文与引用分离、额外断言及边界示例见 [答案复核口径](ANSWER_REVIEW_CALIBRATION.md)。旧答案不会自动沿用判断或提分，必要事实分母和人工批准状态不变。
 
 截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，人工批准仍为0。新标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
 

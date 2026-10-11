@@ -90,6 +90,7 @@ class AnswerReviews(ReviewModel):
     schema_version: Literal[1] = 1
     rubric_version: Literal["explicit-answer-review-v1"] = "explicit-answer-review-v1"
     capture_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    calibration_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     cases: list[AnswerReview]
 
     @model_validator(mode="after")

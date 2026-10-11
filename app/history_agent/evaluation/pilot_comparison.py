@@ -242,6 +242,27 @@ def _candidate_pools_equal(
     return bool(pools[0] == pools[1])
 
 
+def _answer_calibration_comparison(
+    left: dict[str, Any], right: dict[str, Any]
+) -> dict[str, Any]:
+    """Keep answer review policy identity separate from retrieval comparability."""
+    values = [report.get("answer_calibration_sha256") for report in (left, right)]
+    reasons = []
+    for side, value in zip(("left", "right"), values, strict=True):
+        if value is not None and (
+            not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None
+        ):
+            reasons.append(f"{side}: answer_calibration_sha256 is invalid")
+    if values[0] != values[1]:
+        reasons.append("answer_calibration_sha256 differs")
+    return {
+        "compatible": not reasons,
+        "left": values[0],
+        "right": values[1],
+        "reasons": reasons,
+    }
+
+
 def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
     keys = ("evaluator_version", "dataset_sha256", "corpus_sha256", "k_values")
     reasons = []
@@ -292,6 +313,7 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         if left["config"].get(key) != right["config"].get(key)
     }
     answer_metrics = {}
+    answer_calibration = _answer_calibration_comparison(left, right)
     for name in sorted(
         set(left.get("provisional_answer_aggregate", {}))
         & set(right.get("provisional_answer_aggregate", {}))
@@ -303,6 +325,7 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         units = a.get("evaluable_unit_ids") or []
         valid = (
             not reasons
+            and answer_calibration["compatible"]
             and bool(left.get("answer_rubric_version"))
             and left.get("answer_rubric_version") == right.get("answer_rubric_version")
             and bool(units)
@@ -353,6 +376,7 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         "basis": "provisional_agent_review",
         "metrics": metrics,
         "answer_metrics": answer_metrics,
+        "answer_calibration_comparison": answer_calibration,
         "ordered_branch_candidates_equal": pools_equal,
         "index_identity_comparison": index_comparison,
         "attribution_scope": "component_retrieval",

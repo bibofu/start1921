@@ -28,6 +28,10 @@ from history_agent.evaluation.pilot_answers import (
     evaluate_answer,
     validate_reviews,
 )
+from history_agent.evaluation.pilot_calibration import (
+    build_calibration_packet,
+    validate_review_decisions,
+)
 from history_agent.evaluation.pilot_comparison import compare
 from history_agent.evaluation.pilot_metrics import evaluate_stage, evidence_unit
 from history_agent.evaluation.pilot_models import (
@@ -56,7 +60,7 @@ from history_agent.extraction.report import load_page_records
 from history_agent.processing.chunks import effective_pages
 from history_agent.retrieval.hybrid import search_hybrid_index
 
-VERSION = "reviewable-pilot-v4"
+VERSION = "reviewable-pilot-v5"
 DEFAULT_DATASET = "evals/golden/pilot_annotations.json"
 DEFAULT_K = (1, 3, 5, 10, 20)
 
@@ -497,6 +501,20 @@ def score(
     inputs = load_inputs(dataset_path, protocols_path)
     capture = read_json(capture_path)
     validate_protocol_capture(inputs, capture)
+    calibration = build_calibration_packet(
+        [case.model_dump(mode="json") for case in inputs.dataset.cases],
+        inputs.protocols,
+        dataset_sha256=inputs.dataset_sha256,
+    )
+    calibration_sha256 = digest(calibration)
+    calibration_path = reviews_dir / "calibration.json" if reviews_dir else None
+    calibrated_directory = bool(calibration_path and calibration_path.exists())
+    if (
+        calibration_path is not None
+        and calibrated_directory
+        and read_json(calibration_path) != calibration
+    ):
+        raise ValueError("review calibration changed; prepare a new review workspace")
     controls = {
         name: project_control_capture(capture, name) for name in list_control_variants(capture)
     }
@@ -520,6 +538,7 @@ def score(
             ranking_pools_path,
             protocols_path,
             specialist_path,
+            calibration_path,
             *review_paths,
         ],
     )
@@ -532,6 +551,9 @@ def score(
         assessments_path=assessments_path,
         process_reviews_path=process_reviews_path,
         protocols_path=protocols_path,
+        expected_calibration_sha256=calibration_sha256,
+        calibration_protocols=inputs.protocols,
+        require_calibration=calibrated_directory,
     )
     control_reports = {}
     for name, control in controls.items():
@@ -549,6 +571,9 @@ def score(
             assessments_path=directory / "answer_reviews.json" if directory else None,
             process_reviews_path=directory / "process_reviews.json" if directory else None,
             protocols_path=protocols_path,
+            expected_calibration_sha256=calibration_sha256,
+            calibration_protocols=inputs.protocols,
+            require_calibration=calibrated_directory,
         )
     if inputs.is_protocol_release:
         assert inputs.protocols is not None
@@ -615,6 +640,9 @@ def _score_capture(
     assessments_path: Path | None = None,
     process_reviews_path: Path | None = None,
     protocols_path: Path | None = None,
+    expected_calibration_sha256: str | None = None,
+    calibration_protocols: dict[str, Any] | None = None,
+    require_calibration: bool = False,
 ) -> dict[str, Any]:
     case_definitions = [case.model_dump(mode="json") for case in dataset.cases]
     captured = validate_capture_binding(case_definitions, capture)
@@ -646,6 +674,14 @@ def _score_capture(
         if assessment
         else {}
     )
+    if require_calibration and (assessment is None or assessment.calibration_sha256 is None):
+        raise ValueError("calibrated review directory requires bound answer reviews on every arm")
+    if assessment and assessment.calibration_sha256 is not None:
+        if assessment.calibration_sha256 != expected_calibration_sha256:
+            raise ValueError(
+                "answer review calibration differs from the bound dataset and protocol"
+            )
+        validate_review_decisions(assessment, capture, case_definitions, calibration_protocols)
     file_hashes = {item["document_id"]: item["sha256"] for item in capture["corpus"]["documents"]}
     results = []
     for model in dataset.cases:
@@ -729,6 +765,7 @@ def _score_capture(
         "component_candidate_fingerprints": capture.get("component_candidate_fingerprints"),
         "labels": "Provisional agent labels are diagnostic only, not approved Golden results.",
         "answer_rubric_version": assessment.rubric_version if assessment else None,
+        "answer_calibration_sha256": assessment.calibration_sha256 if assessment else None,
         "answer_reviews_sha256": digest(assessment.model_dump(mode="json")) if assessment else None,
         "process_reviews_sha256": digest(process_review_payload)
         if process_review_payload
@@ -788,6 +825,12 @@ def main() -> None:
     review_parser.add_argument("--capture", type=Path, required=True)
     review_parser.add_argument("--protocols", type=Path)
     review_parser.add_argument("--output-dir", type=Path, required=True)
+    import_parser = sub.add_parser("import-reviews")
+    import_parser.add_argument("--dataset", type=Path, default=Path(DEFAULT_DATASET))
+    import_parser.add_argument("--capture", type=Path, required=True)
+    import_parser.add_argument("--protocols", type=Path)
+    import_parser.add_argument("--bundle", type=Path, required=True)
+    import_parser.add_argument("--output-dir", type=Path, required=True)
     compare_parser = sub.add_parser("compare")
     compare_parser.add_argument("left", type=Path)
     compare_parser.add_argument("right", type=Path)
@@ -818,6 +861,14 @@ def main() -> None:
         )
     elif args.command == "prepare-reviews":
         prepare_reviews(args.dataset, args.capture, args.output_dir, protocol_path=args.protocols)
+        print(args.output_dir)
+        return
+    elif args.command == "import-reviews":
+        from history_agent.evaluation.pilot_review_bundle import import_reviews
+
+        import_reviews(
+            args.dataset, args.capture, args.bundle, args.output_dir, protocol_path=args.protocols
+        )
         print(args.output_dir)
         return
     else:

@@ -1,6 +1,6 @@
 # 开发集可重复评测流程
 
-本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v4`），仅涉及评测工具。2026-10-11起，20题 `development_annotations_v3.json` 可与显式指定的 `development_protocols_v3.json` 一起运行；旧13题 schema v1 入口继续兼容。20题按21个输入采集：淮海题的带历史主臂和无历史控制臂分开执行，仍只占1个独立题。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
+本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v5`），仅涉及评测工具。2026-10-11起，20题 `development_annotations_v3.json` 可与显式指定的 `development_protocols_v3.json` 一起运行；旧13题 schema v1 入口继续兼容。20题按21个输入采集：淮海题的带历史主臂和无历史控制臂分开执行，仍只占1个独立题。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
 
 原 schema v2 标注包及其 `execution_status=annotation_only`、协议中的制作期状态保持原样，作为2026-10-05冻结资产。新评测入口校验整包、协议、逐题定义和输入绑定后执行；不会改低 schema、忽略历史或回写人工批准。当前新增接入不包含20题真实模型回答或新增7题的候选相关性标注。
 
@@ -46,12 +46,34 @@
 | `reviews/answer_reviews.json`、`process_reviews.json` | 主输入的答案与过程复核；未生成答案时不虚构答案记录 |
 | `reviews/controls/without_history_control/` | 淮海控制臂的独立答案、过程复核包 |
 | `reviews/specialist_reviews.json` | 专门协议的逐项检查及淮海双臂隔离检查 |
+| `reviews/index.html` | 离线答案复核工作台，逐题对照正文、交付引用、必要事实及过程 |
+| `reviews/calibration.json` | 版本化开放题口径、原事实与证据追溯、边界示例 |
+| `reviews/review_bundle.json` | 初始全量待审包；工作台导出的判断保留同一绑定 |
 
 - 答案复核：逐事实覆盖和引用支持、来源/时间约束、路由、拒答、范围说明。引用中有事实而正文未回答，不能算正文完整覆盖。
 - 过程复核：依协议检查实际执行计划与查询变体是否保留实体、意图和约束；原始 Planner 输出和实际执行计划分别留证。20题 schema v2 必须显式提供同一 `--protocols`；旧 schema v1 可省略并使用通用判据。
 - 专门复核：淮海隔离有4项明确检查，不能仅从战役年份落在1930—1949期间推断没有旧时间过滤。湖南题按1921—1926六年分别报告，逐年事实/证据分母为2、2、2、1、5、2，同时保留14项事实微平均与6年宏平均，不能用1925年多项命中掩盖漏年。
 - 所有模板初始 `unknown`，不自动打分或批准。明确判断须填写依据、复核人、带时区时间和理由。可先评分未审模板，结果按实际缺口显示 N/A。
 - 复核绑定整份 capture、题目定义，以及答案/引用或执行计划快照。换一次 capture 就必须生成并审阅新包，不能修改哈希来复用旧判断。
+
+### 在工作台填写与导入
+
+打开 `index.html`，用题目搜索和“只看仍有待审项”定位。答案、交付引文与必要事实对照展示，允许选取回答原文后填入事实摘录。主输入与控制臂分开保存；过程、原始计划、生产证据和专项检查可按需展开。页面无外部依赖、不发送数据，不会调用模型。
+
+可随时保存或导出草稿，继续时只接受同一 capture、校准版本和模板的草稿。复核依据默认未选择，不把填写姓名自动当成人工批准。完整覆盖、部分覆盖或存在矛盾须填写正文摘录；引用支持须选实际交付的引用编号。未审保持 `unknown`，不适用要解释，题目明确要求的维度不能用 N/A 跳过。开放题的具体口径见 [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md)。
+
+点击“导出复核包”后，把导出的 JSON 路径传给导入命令；输出目录必须是新目录。例如将下载文件放到本次运行目录并命名为 `review-bundle.json` 后：
+
+```powershell
+.\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot import-reviews `
+  --dataset evals/golden/development_annotations_v3.json `
+  --capture data/reports/eval_development20_20261011/stable/capture.json `
+  --protocols evals/golden/development_protocols_v3.json `
+  --bundle data/reports/eval_development20_20261011/stable/review-bundle.json `
+  --output-dir data/reports/eval_development20_20261011/stable/reviewed
+```
+
+导入端从命令行指定的原件重建模板，不读取导出包自带的路径。主输入、控制臂、事实、观察快照、分母和全部版本绑定通过检查后，才写入新目录并保存导入凭据；允许只完成部分判断，其余待审项仍须保留。不会覆盖原复核包或修改整题人工批准。之后评分将 `--reviews-dir` 指向新 `reviewed` 目录；未开始复核时可直接使用下面的初始 `reviews` 示例。
 
 ## 3. 离线生成统一报告
 
@@ -100,6 +122,8 @@
 2. `metrics` / `answer_metrics`：组件检索和答案指标的有效题目、事实分母、复核依据、nDCG 固定池是否一致，可比时才给 delta。查询理解、生产并集和成本在统一报告中按各自分母查看，当前比较器没有自动生成这些维度的 delta。
 3. `attribution_safe`：除了配置只改变组件 `top_k`（或重复对照），还要求源码相同、逐题活跃分支相同、有序候选相同、实际使用的索引身份完整且跨运行一致。逐项核对 embedding、切分参数及版本、chunk/index artifact、build ID 和构建 commit。双方都说“校验成功”并不能证明双方使用同一份索引。
 
+答案报告另记录 `answer_calibration_sha256`。两边校准包不同或只有一边使用新口径时，只禁止答案指标差值，不影响原本可比的检索指标；原因在 `answer_calibration_comparison` 中。旧13题未绑定新口径的直接评分入口继续保留，不批量改旧判断或分数。把旧答案放入新工作台时会生成空白复核，须按新口径重新判断。
+
 索引身份缺失或变化时，仍可展示同口径指标差值，但归因为不安全；原因和差异见 `index_identity_comparison`。未参与的降级分支不冒充本次配置。当前支持的归因范围为 **component_retrieval**：组件 `top_k` 不控制实际生产问答的候选预算，不能据此解释答案波动。现有 `source_sha256` 也包含评测代码，评测代码变化会保守地阻止源码一致性归因。
 
 ## 2026-10-11 接入验证
@@ -109,6 +133,10 @@
 评测相关测试共407项通过；最终控制臂复核包定位和源码变化检查另经14项定向回归通过，Ruff与8个相关源码文件的mypy检查通过。旧13题离线重算的检索与答案四组聚合结果与原报告完全一致。此轮只接入评测流程，未改Agent、冻结标注或人工批准状态。
 
 ## 已有 13 题的离线复现（兼容入口）
+
+2026-10-11答案工作台补充验证：501项评测相关测试通过；浏览器验收后的最终54项工作台、导入和报告定向回归通过，Ruff与9个相关源码文件的mypy通过。浏览器实际导出的20+1待审包已经过 `import-reviews` 和 `score --reviews-dir`，仍保持20题质量分母、21次执行与待审N/A；旧13题四组检索/答案聚合值完全不变。本轮没有新增模型调用，也没有自动填写新答案判断。
+
+可直接打开本地 `data/reports/eval_answer_review_20261011/observed13_ready/index.html` 复核旧13题真实回答，或 `development20_ready/index.html` 查看20题本地摘录采集。两页都是新生成的空白复核，不会复制历史结论。页面内保存、导出后按上节导入；这些本地报告资产不提交到Git。
 
 本地大 capture 位于 ignored `data/reports/eval_observation_20261005/live_capture.json`；远程仓库只保存紧凑观察记录。缺少该文件时不能靠紧凑答案记录重建全部调用和上下文，不得伪造 capture。
 
