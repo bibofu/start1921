@@ -1248,68 +1248,6 @@ wheels = [
 ]
 
 [[package]]
-name = "history-agent"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "llama-index-core" },
-    { name = "markdown-it-py" },
-    { name = "pdfplumber" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "pymupdf" },
-    { name = "pypdf" },
-    { name = "typer" },
-]
-
-[package.optional-dependencies]
-app = [
-    { name = "fastapi" },
-    { name = "httpx" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-ocr = [
-    { name = "paddleocr" },
-    { name = "paddlepaddle" },
-]
-vector = [
-    { name = "qdrant-client", extra = ["fastembed"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", marker = "extra == 'app'", specifier = ">=0.115,<1" },
-    { name = "httpx", marker = "extra == 'app'", specifier = ">=0.28,<1" },
-    { name = "llama-index-core", specifier = ">=0.14.24,<0.15" },
-    { name = "markdown-it-py", specifier = ">=4,<5" },
-    { name = "paddleocr", marker = "extra == 'ocr'", specifier = ">=3.3,<4" },
-    { name = "paddlepaddle", marker = "extra == 'ocr'", specifier = "==3.2.0" },
-    { name = "pdfplumber", specifier = ">=0.11" },
-    { name = "pydantic", specifier = ">=2.10" },
-    { name = "pydantic-settings", specifier = ">=2.7" },
-    { name = "pymupdf", specifier = ">=1.25" },
-    { name = "pypdf", specifier = ">=5.1" },
-    { name = "qdrant-client", extras = ["fastembed"], marker = "extra == 'vector'", specifier = ">=1.14.2,<2" },
-    { name = "typer", specifier = ">=0.15" },
-    { name = "uvicorn", extras = ["standard"], marker = "extra == 'app'", specifier = ">=0.34,<1" },
-]
-provides-extras = ["ocr", "vector", "app"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = ">=1.14" },
-    { name = "pytest", specifier = ">=8.3" },
-    { name = "ruff", specifier = ">=0.9" },
-]
-
-[[package]]
 name = "hpack"
 version = "4.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3665,6 +3603,68 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b5/b4/205b0d5241d934e8add0c38aa924c4f9fb7330834ff11e5444db964ec3f9/starlette-1.6.0.tar.gz", hash = "sha256:d4e3ac5e546444960c710297a3c9fc3f7ebae1b7e963f3d36173b49da535be9b", size = 2716969, upload-time = "2026-08-08T18:27:57.512Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/cb/6a6a47d5b464bd08695d254f3da6e7986cc70c9fa5d778eda57538edfe56/starlette-1.6.0-py3-none-any.whl", hash = "sha256:a86dd39d14bb45f85a3d18525215a9ef0cfd1f192ac793220e72598c90335f0c", size = 75969, upload-time = "2026-08-08T18:27:56.196Z" },
+]
+
+[[package]]
+name = "start1921"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "llama-index-core" },
+    { name = "markdown-it-py" },
+    { name = "pdfplumber" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "pymupdf" },
+    { name = "pypdf" },
+    { name = "typer" },
+]
+
+[package.optional-dependencies]
+app = [
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+ocr = [
+    { name = "paddleocr" },
+    { name = "paddlepaddle" },
+]
+vector = [
+    { name = "qdrant-client", extra = ["fastembed"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", marker = "extra == 'app'", specifier = ">=0.115,<1" },
+    { name = "httpx", marker = "extra == 'app'", specifier = ">=0.28,<1" },
+    { name = "llama-index-core", specifier = ">=0.14.24,<0.15" },
+    { name = "markdown-it-py", specifier = ">=4,<5" },
+    { name = "paddleocr", marker = "extra == 'ocr'", specifier = ">=3.3,<4" },
+    { name = "paddlepaddle", marker = "extra == 'ocr'", specifier = "==3.2.0" },
+    { name = "pdfplumber", specifier = ">=0.11" },
+    { name = "pydantic", specifier = ">=2.10" },
+    { name = "pydantic-settings", specifier = ">=2.7" },
+    { name = "pymupdf", specifier = ">=1.25" },
+    { name = "pypdf", specifier = ">=5.1" },
+    { name = "qdrant-client", extras = ["fastembed"], marker = "extra == 'vector'", specifier = ">=1.14.2,<2" },
+    { name = "typer", specifier = ">=0.15" },
+    { name = "uvicorn", extras = ["standard"], marker = "extra == 'app'", specifier = ">=0.34,<1" },
+]
+provides-extras = ["ocr", "vector", "app"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = ">=1.14" },
+    { name = "pytest", specifier = ">=8.3" },
+    { name = "ruff", specifier = ">=0.9" },
 ]
 
 [[package]]

@@ -135,10 +135,10 @@ Fact Recall 的 aggregate 使用 fact-level micro denominator，不再平均各 
 通过现有 CLI：
 
 ```powershell
-.\.venv\Scripts\history-agent.exe eval golden --dimension retrieval
-.\.venv\Scripts\history-agent.exe eval golden --dimension all --limit 3 --run-name baseline
-.\.venv\Scripts\history-agent.exe eval golden --dimension generation --case-id golden_event_zunyi_001
-.\.venv\Scripts\history-agent.exe eval golden --dimension retrieval --category event --json
+.\.venv\Scripts\start1921.exe eval golden --dimension retrieval
+.\.venv\Scripts\start1921.exe eval golden --dimension all --limit 3 --run-name baseline
+.\.venv\Scripts\start1921.exe eval golden --dimension generation --case-id golden_event_zunyi_001
+.\.venv\Scripts\start1921.exe eval golden --dimension retrieval --category event --json
 ```
 
 也可按模块运行：
@@ -152,7 +152,7 @@ Fact Recall 的 aggregate 使用 fact-level micro denominator，不再平均各 
 默认 generation 使用无外部调用的 extractive fallback。需要真实生成与语义判定时显式使用：
 
 ```powershell
-.\.venv\Scripts\history-agent.exe eval golden --dimension all `
+.\.venv\Scripts\start1921.exe eval golden --dimension all `
   --with-llm --semantic-judge --run-name production-v14
 ```
 
@@ -168,17 +168,17 @@ run metadata 记录 `actual_retrieval_branches`、`degraded_retrieval_branches`�
 
 ```powershell
 # baseline 索引
-.\.venv\Scripts\history-agent.exe eval golden --dimension all --run-name chunk650_bge
+.\.venv\Scripts\start1921.exe eval golden --dimension all --run-name chunk650_bge
 
 # 修改 chunking 并重建索引后
-.\.venv\Scripts\history-agent.exe eval golden --dimension all --run-name chunk800_bge
+.\.venv\Scripts\start1921.exe eval golden --dimension all --run-name chunk800_bge
 
 # 只有 dataset SHA、case IDs 和 requested dimension 一致才计算 delta
-.\.venv\Scripts\history-agent.exe eval golden-compare `
+.\.venv\Scripts\start1921.exe eval golden-compare `
   data/reports/baseline.json data/reports/chunk800.json
 
 # 机器可读输出；每项同时展示两边 denominator 和 evaluable case IDs
-.\.venv\Scripts\history-agent.exe eval golden-compare `
+.\.venv\Scripts\start1921.exe eval golden-compare `
   data/reports/baseline.json data/reports/chunk800.json --json
 ```
 

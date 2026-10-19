@@ -649,21 +649,21 @@ RRF 后再按查询意图增加 0.004：
 完整重建顺序：
 
 ```powershell
-uv run history-agent corpus scan
-uv run history-agent extract text
-uv run history-agent extract ocr
-uv run history-agent extract report
-uv run history-agent process chunks
-uv run history-agent index build-keyword
-uv run history-agent index build-vector
+uv run start1921 corpus scan
+uv run start1921 extract text
+uv run start1921 extract ocr
+uv run start1921 extract report
+uv run start1921 process chunks
+uv run start1921 index build-keyword
+uv run start1921 index build-vector
 ```
 
 只重做指定文献的抽取或分片：
 
 ```powershell
-uv run history-agent extract text --document-id mao_zedong_chronology_volume_2 --rebuild
-uv run history-agent extract ocr --document-id mao_zedong_chronology_volume_2 --rebuild
-uv run history-agent process chunks --document-id mao_zedong_chronology_volume_2
+uv run start1921 extract text --document-id mao_zedong_chronology_volume_2 --rebuild
+uv run start1921 extract ocr --document-id mao_zedong_chronology_volume_2 --rebuild
+uv run start1921 process chunks --document-id mao_zedong_chronology_volume_2
 ```
 
 关键词和向量索引构建命令总是读取 `data/processed/chunks/` 下的全部 JSONL。局部分片更新后，需要重新构建两个索引，线上查询才会同时看到一致的数据。
@@ -671,17 +671,17 @@ uv run history-agent process chunks --document-id mao_zedong_chronology_volume_2
 分别调试三种检索：
 
 ```powershell
-uv run history-agent search "毛泽东对抗日战争的谋划" --top-k 12
-uv run history-agent search-vector "毛泽东对抗日战争的谋划" --top-k 12
-uv run history-agent search-hybrid "毛泽东对抗日战争的谋划" --top-k 12
+uv run start1921 search "毛泽东对抗日战争的谋划" --top-k 12
+uv run start1921 search-vector "毛泽东对抗日战争的谋划" --top-k 12
+uv run start1921 search-hybrid "毛泽东对抗日战争的谋划" --top-k 12
 ```
 
 运行回归检查：
 
 ```powershell
 & .\scripts\check.ps1
-uv run history-agent eval retrieval --top-k 10
-uv run history-agent eval answers --top-k 10
+uv run start1921 eval retrieval --top-k 10
+uv run start1921 eval answers --top-k 10
 ```
 
 ## 15. 主要边界和改进方向

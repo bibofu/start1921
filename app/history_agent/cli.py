@@ -65,7 +65,7 @@ from history_agent.retrieval.vector import build_vector_index, search_vector_ind
 from history_agent.run_tracker import RunTracker
 
 app = typer.Typer(
-    name="history-agent",
+    name="start1921",
     help="Evidence-grounded local research tools for the 1921-1978 corpus.",
     no_args_is_help=True,
 )
@@ -1428,9 +1428,9 @@ def eval_golden(
             "error": type(exc).__name__,
             "message": str(exc),
             "hint": (
-                "Build current chunks and indexes with `history-agent process chunks`, "
-                "`history-agent index build-keyword`, and "
-                "`history-agent index build-vector`, then retry."
+                "Build current chunks and indexes with `start1921 process chunks`, "
+                "`start1921 index build-keyword`, and "
+                "`start1921 index build-vector`, then retry."
             ),
         }
         if json_output:

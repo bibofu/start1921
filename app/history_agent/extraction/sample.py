@@ -51,7 +51,7 @@ def extract_sample_pages(
         if file_record is None:
             raise ExtractionError(
                 f"No current registered PDF for sample document: {document_id}. "
-                "Run `history-agent corpus scan` first."
+                "Run `start1921 corpus scan` first."
             )
         path = project_root / str(file_record["relative_path"])
         reader = PdfReader(str(path), strict=False)

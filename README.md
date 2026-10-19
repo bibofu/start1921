@@ -1,4 +1,4 @@
-# 近现代史研究 Agent（1921—1978）
+# start1921 · 近现代史研究 Agent（1921—1978）
 
 一个面向中国近现代史学习与研究的本地知识库 Agent。项目以 1921—1978 年为时间边界，以中国共产党历史为主线，围绕毛泽东、周恩来、邓小平、林彪等关键人物组织史料，提供带原文出处的问答、时间线梳理、人物交集分析和观点检索。
 
@@ -14,6 +14,8 @@
 
 ## 快速启动
 
+项目命令统一使用 `start1921`，原 `history-agent` 命令保留为兼容入口。内部 Python 包 `history_agent`、`HISTORY_AGENT_` 环境变量前缀及既有数据库 `data/history_agent.db` 保持兼容，可继续复用现有配置和数据。
+
 ### 1. 准备环境
 
 - Python 3.11 或更高版本；
@@ -22,8 +24,8 @@
 - Git LFS：`docs/` 中登记的 PDF 史料通过 Git LFS 随仓库分发；生成索引仍在本地构建。
 
 ```powershell
-git clone git@github.com:bibofu/history-agent.git
-cd history-agent
+git clone git@github.com:bibofu/start1921.git
+cd start1921
 
 # 为当前仓库启用 Git LFS，并下载 docs/ 中的原始 PDF
 git lfs install --local
@@ -56,8 +58,8 @@ DEEPSEEK_API_KEY=你的密钥
 默认使用 `deepseek-v4-pro` 非思考模式。确认配置且不显示密钥：
 
 ```powershell
-uv run history-agent llm status
-uv run history-agent llm check
+uv run start1921 llm status
+uv run start1921 llm check
 ```
 
 ### 3. 放入史料并首次建库
@@ -66,28 +68,28 @@ uv run history-agent llm check
 
 ```powershell
 # 登记文献并提取全部页面
-uv run history-agent corpus scan
-uv run history-agent extract text
+uv run start1921 corpus scan
+uv run start1921 extract text
 
 # OCR 扫描页并生成质量报告
-uv run history-agent extract ocr
-uv run history-agent extract report
+uv run start1921 extract ocr
+uv run start1921 extract report
 
 # 清洗、切分并建立双索引
-uv run history-agent process chunks
-uv run history-agent index build-keyword
-uv run history-agent index build-vector
+uv run start1921 process chunks
+uv run start1921 index build-keyword
+uv run start1921 index build-vector
 
 # 初始化研究表，从周、林年谱及毛泽东年谱九卷生成带页码证据的事件候选
-uv run history-agent research init
-uv run history-agent research extract-chronologies
+uv run start1921 research init
+uv run start1921 research extract-chronologies
 
 # 只预览待模型处理的复杂/低置信度事件，不调用 DeepSeek
-uv run history-agent research enrich-events --dry-run --limit 5
+uv run start1921 research enrich-events --dry-run --limit 5
 
 # 预览跨来源重复事件；确认规则输出后去重并保留全部来源证据
-uv run history-agent research merge-events --dry-run --json
-uv run history-agent research merge-events
+uv run start1921 research merge-events --dry-run --json
+uv run start1921 research merge-events
 ```
 
 首次 OCR 和向量索引构建耗时较长，并会下载 PaddleOCR 与中文嵌入模型；任务支持复用已完成的页面结果。生成内容位于 `data/`，不会提交到 Git。
@@ -97,7 +99,7 @@ uv run history-agent research merge-events
 完成首次建库后，日常启动只需要：
 
 ```powershell
-uv run history-agent serve
+uv run start1921 serve
 ```
 
 浏览器打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)。停止服务按 `Ctrl+C`。如果修改了 `.env`，需要重启服务才能读取新配置。
@@ -114,11 +116,11 @@ uv run history-agent serve
 
 ```powershell
 # 检查文献目录、数据库和研究时间边界
-uv run history-agent health --json
+uv run start1921 health --json
 
 # 检查 DeepSeek 配置与真实连通性
-uv run history-agent llm status
-uv run history-agent llm check
+uv run start1921 llm status
+uv run start1921 llm check
 
 # 执行代码质量检查和测试
 & .\scripts\check.ps1
@@ -137,93 +139,93 @@ uv run history-agent llm check
 uv sync --extra ocr --extra vector --extra app --group dev
 
 # 检查环境和研究时间边界
-.\.venv\Scripts\history-agent.exe health --json
+.\.venv\Scripts\start1921.exe health --json
 
 # 扫描 docs/，更新文献数据库并导出清单和差异报告
-.\.venv\Scripts\history-agent.exe corpus scan
+.\.venv\Scripts\start1921.exe corpus scan
 
 # 初始化人物主数据、别名和关系词表（幂等，可重复执行）
-.\.venv\Scripts\history-agent.exe research init
+.\.venv\Scripts\start1921.exe research init
 
 # 将历史别名解析为稳定 person_id；歧义名称不会被强制合并
-.\.venv\Scripts\history-agent.exe research people resolve "伍豪" --json
+.\.venv\Scripts\start1921.exe research people resolve "伍豪" --json
 
 # 从已支持的十一份年谱 PDF 抽取事件；可加 --dry-run 预览，重复运行跳过相同记录
-.\.venv\Scripts\history-agent.exe research extract-chronologies
+.\.venv\Scripts\start1921.exe research extract-chronologies
 
 # 先预览候选；下一条命令会把所选事件的短证据发送给 DeepSeek
-.\.venv\Scripts\history-agent.exe research enrich-events --dry-run --limit 5
-.\.venv\Scripts\history-agent.exe research enrich-events --limit 5
+.\.venv\Scripts\start1921.exe research enrich-events --dry-run --limit 5
+.\.venv\Scripts\start1921.exe research enrich-events --limit 5
 
 # 查看所有模型成功、无效或失败后生成的待复核项
-.\.venv\Scripts\history-agent.exe research review-queue --limit 20 --json
+.\.venv\Scripts\start1921.exe research review-queue --limit 20 --json
 
 # 预览并生成跨来源规范事件；源事件和源证据不会被覆盖或删除
-.\.venv\Scripts\history-agent.exe research merge-events --dry-run --json
-.\.venv\Scripts\history-agent.exe research merge-events
+.\.venv\Scripts\start1921.exe research merge-events --dry-run --json
+.\.venv\Scripts\start1921.exe research merge-events
 
 # 查看不确定合并，并按稳定 canonical_event_id 确认、驳回或重新打开
-.\.venv\Scripts\history-agent.exe research merge-review-queue --limit 20 --json
-.\.venv\Scripts\history-agent.exe research review-event-merge CANONICAL_EVENT_ID `
+.\.venv\Scripts\start1921.exe research merge-review-queue --limit 20 --json
+.\.venv\Scripts\start1921.exe research review-event-merge CANONICAL_EVENT_ID `
   --decision confirmed --reviewed-by "研究者" --note "两份年谱记载同一事件"
 
 # 查询人物年度时间线；支持姓名、稳定 ID、年份区间、类型和复核状态
-.\.venv\Scripts\history-agent.exe research timeline 周恩来 --year 1956 --limit 50
-.\.venv\Scripts\history-agent.exe research timeline lin_biao `
+.\.venv\Scripts\start1921.exe research timeline 周恩来 --year 1956 --limit 50
+.\.venv\Scripts\start1921.exe research timeline lin_biao `
   --start-year 1942 --end-year 1943 --event-type correspondence --json
 
 # 查询两个人的共同动作候选；不是人名共现统计，全部仍需复核
-.\.venv\Scripts\history-agent.exe research intersections 毛泽东 周恩来 --year 1949 --json
+.\.venv\Scripts\start1921.exe research intersections 毛泽东 周恩来 --year 1949 --json
 
 # 复算经原页视觉核对的 26 条定向交集样本（JSON，不调用模型）
-.\.venv\Scripts\history-agent.exe eval intersections
+.\.venv\Scripts\start1921.exe eval intersections
 
 # 生成不含预测和答案的 40 条独立复核包；复核流程见 evals/INTERSECTION_INDEPENDENT_REVIEW.md
-.\.venv\Scripts\history-agent.exe eval prepare-intersection-review
+.\.venv\Scripts\start1921.exe eval prepare-intersection-review
 
 # 查看最近一次扫描结果
-.\.venv\Scripts\history-agent.exe corpus diff
+.\.venv\Scripts\start1921.exe corpus diff
 
 # 导出当前文献清单 JSON/CSV
-.\.venv\Scripts\history-agent.exe corpus export
+.\.venv\Scripts\start1921.exe corpus export
 
 # 全量提取、OCR、清洗切分
-.\.venv\Scripts\history-agent.exe extract text
-.\.venv\Scripts\history-agent.exe extract ocr
-.\.venv\Scripts\history-agent.exe extract report
-.\.venv\Scripts\history-agent.exe process chunks
+.\.venv\Scripts\start1921.exe extract text
+.\.venv\Scripts\start1921.exe extract ocr
+.\.venv\Scripts\start1921.exe extract report
+.\.venv\Scripts\start1921.exe process chunks
 
 # 构建 BM25 与 Qdrant 中文向量索引
-.\.venv\Scripts\history-agent.exe index build-keyword
-.\.venv\Scripts\history-agent.exe index build-vector
+.\.venv\Scripts\start1921.exe index build-keyword
+.\.venv\Scripts\start1921.exe index build-vector
 
 # 调试三种检索方式；正式问答使用混合检索
-.\.venv\Scripts\history-agent.exe search "周恩来在1956年主要有哪些经历" --top-k 5
-.\.venv\Scripts\history-agent.exe search-vector "毛泽东关于调查研究的观点" --top-k 5
-.\.venv\Scripts\history-agent.exe search-hybrid "毛泽东和周恩来在长征期间的交集" --top-k 8
+.\.venv\Scripts\start1921.exe search "周恩来在1956年主要有哪些经历" --top-k 5
+.\.venv\Scripts\start1921.exe search-vector "毛泽东关于调查研究的观点" --top-k 5
+.\.venv\Scripts\start1921.exe search-hybrid "毛泽东和周恩来在长征期间的交集" --top-k 8
 
 # 运行 44 道可回答题的目标文献/年份检索基线（另含 3 道拒答题）
-.\.venv\Scripts\history-agent.exe eval retrieval --top-k 10
+.\.venv\Scripts\start1921.exe eval retrieval --top-k 10
 
 # 运行 47 题页码、引用、事实覆盖与拒答的回答验收
 # 默认使用确定性的证据摘录模式，不消耗 DeepSeek Token
-.\.venv\Scripts\history-agent.exe eval answers --top-k 10
+.\.venv\Scripts\start1921.exe eval answers --top-k 10
 
 # 审计 M8.1 的 105 题综合评估集，并回归 18 个结构化查询
-.\.venv\Scripts\history-agent.exe eval comprehensive --verify-structured
+.\.venv\Scripts\start1921.exe eval comprehensive --verify-structured
 
 # 用统一 Golden Dataset 分层评估 routing、retrieval、context、generation 与 citation
-.\.venv\Scripts\history-agent.exe eval golden --dimension all --run-name baseline
+.\.venv\Scripts\start1921.exe eval golden --dimension all --run-name baseline
 
 # 运行 v13 真实 DeepSeek 链路，并启用逐回答语义引文评判、错误校准集和延迟统计
-.\.venv\Scripts\history-agent.exe eval answers --top-k 10 --with-llm
+.\.venv\Scripts\start1921.exe eval answers --top-k 10 --with-llm
 
 # 检查 DeepSeek V4 配置与连通性
-.\.venv\Scripts\history-agent.exe llm status
-.\.venv\Scripts\history-agent.exe llm check
+.\.venv\Scripts\start1921.exe llm status
+.\.venv\Scripts\start1921.exe llm check
 
 # 启动本地问答页面：http://127.0.0.1:8000
-.\.venv\Scripts\history-agent.exe serve
+.\.venv\Scripts\start1921.exe serve
 
 # 执行静态检查、类型检查和测试
 & .\scripts\check.ps1
@@ -240,7 +242,7 @@ Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法
 如果扫描发现某份已登记 PDF 的 SHA-256 发生变化，程序会保留旧版本，不会直接接受新内容。确认差异后运行：
 
 ```powershell
-.\.venv\Scripts\history-agent.exe corpus scan --accept-changes
+.\.venv\Scripts\start1921.exe corpus scan --accept-changes
 ```
 
 首次构建向量索引会下载中文嵌入模型。运行数据保存在 `data/`：SQLite 数据库、逐页文本、OCR、chunks、年谱事件候选、检索索引、质量报告和任务运行记录都可以删除后重建，不提交 Git。
@@ -257,7 +259,7 @@ Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法
 DEEPSEEK_API_KEY=你的密钥
 ```
 
-保存后运行 `history-agent llm check` 验证连接，再重启 Web 服务。也可以在 `.env` 中将 `HISTORY_AGENT_LLM_MODEL` 改为 `deepseek-v4-flash`。没有配置密钥时，查询理解退回原问题，页面继续使用“证据摘录模式”；DeepSeek 超时、余额不足、认证失败、查询计划非法或返回虚构证据编号时，也会自动安全降级，不影响本地检索和引用展示。Web 会话通过浏览器保存的 `session_id` 与服务端 `data/conversations.db` 关联，刷新页面后可以恢复；送入查询理解和最终生成的历史由服务端统一按消息数、字符预算裁剪，旧回答中的证据编号会先失效化。历史对话仅用于解析指代和承接，不作为本轮史实证据；本轮生成仍只允许使用当前检索得到的证据包。
+保存后运行 `start1921 llm check` 验证连接，再重启 Web 服务。也可以在 `.env` 中将 `HISTORY_AGENT_LLM_MODEL` 改为 `deepseek-v4-flash`。没有配置密钥时，查询理解退回原问题，页面继续使用“证据摘录模式”；DeepSeek 超时、余额不足、认证失败、查询计划非法或返回虚构证据编号时，也会自动安全降级，不影响本地检索和引用展示。Web 会话通过浏览器保存的 `session_id` 与服务端 `data/conversations.db` 关联，刷新页面后可以恢复；送入查询理解和最终生成的历史由服务端统一按消息数、字符预算裁剪，旧回答中的证据编号会先失效化。历史对话仅用于解析指代和承接，不作为本轮史实证据；本轮生成仍只允许使用当前检索得到的证据包。
 
 `research enrich-events` 是独立的批处理入口，默认一次最多处理 5 条，每个事件发送的全部证据正文合计硬限制为 1200 字符。它使用 DeepSeek JSON Output，但仍在本地执行严格 schema 与原文子串校验；模型不能修改日期、事件原文或证据页码，也不能直接把记录标为“已确认”。每次原始响应、模型与提示词版本、调用前后快照和 Token 用量都会写入 SQLite，结果统一进入复核队列。该命令会把选中事件的短证据发送到 DeepSeek；对资料出境有要求时，应只运行 `--dry-run`，或先完成相应授权与脱敏。JSON Output 参数以 [DeepSeek 官方说明](https://api-docs.deepseek.com/guides/json_mode/) 为准。
 

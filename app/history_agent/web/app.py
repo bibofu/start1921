@@ -76,7 +76,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await runtime.aclose()
 
     api = FastAPI(
-        title="近现代史研究 Agent",
+        title="start1921 · 近现代史研究 Agent",
         version=__version__,
         description="Local evidence-grounded RAG for the 1921-1978 corpus.",
         lifespan=lifespan,

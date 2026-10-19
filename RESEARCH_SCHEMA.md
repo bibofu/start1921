@@ -90,20 +90,20 @@ extraction_methods
 
 ```powershell
 # 创建或迁移表，并同步人物与关系词表；命令幂等
-.\.venv\Scripts\history-agent.exe research init
+.\.venv\Scripts\start1921.exe research init
 
 # 解析标准姓名或历史别名
-.\.venv\Scripts\history-agent.exe research people resolve "伍豪" --json
+.\.venv\Scripts\start1921.exe research people resolve "伍豪" --json
 
 # 生成周、林年谱及毛泽东年谱九卷的事件候选、SQLite 记录和质量报告；命令幂等
-.\.venv\Scripts\history-agent.exe research extract-chronologies
+.\.venv\Scripts\start1921.exe research extract-chronologies
 
 # 提议合并，不立即修改数据
-.\.venv\Scripts\history-agent.exe research people propose-merge SOURCE_ID TARGET_ID `
+.\.venv\Scripts\start1921.exe research people propose-merge SOURCE_ID TARGET_ID `
   --reason "人工核对理由" --proposed-by "研究者"
 
 # 人工接受或拒绝合并
-.\.venv\Scripts\history-agent.exe research people review-merge PROPOSAL_ID `
+.\.venv\Scripts\start1921.exe research people review-merge PROPOSAL_ID `
   --decision accepted --reviewed-by "复核者" --note "复核说明"
 ```
 
@@ -127,17 +127,17 @@ M6.4 不让模型从整份文献自由生成事件，而是从已有规则事件
 
 ```powershell
 # 只看候选，不调用外部 API
-.\.venv\Scripts\history-agent.exe research enrich-events --dry-run --limit 5 --json
+.\.venv\Scripts\start1921.exe research enrich-events --dry-run --limit 5 --json
 
 # 会将所选事件的短证据发送到 DeepSeek；默认最多 5 条
-.\.venv\Scripts\history-agent.exe research enrich-events --limit 5
+.\.venv\Scripts\start1921.exe research enrich-events --limit 5
 
 # 可按文献或稳定事件 ID 缩小范围
-.\.venv\Scripts\history-agent.exe research enrich-events `
+.\.venv\Scripts\start1921.exe research enrich-events `
   --document-id zhou_enlai_chronology_1949_1976 --limit 2
 
 # 查看待复核项
-.\.venv\Scripts\history-agent.exe research review-queue --limit 20 --json
+.\.venv\Scripts\start1921.exe research review-queue --limit 20 --json
 ```
 
 模型增强报告位于 `data/reports/model_event_extraction_latest.json`。本地契约测试与首批 2 条真实 API 冒烟结果见 `evals/MODEL_EVENT_EXTRACTION.md`。任何后续批次仍应先明确资料出境范围，再从小批量开始。
@@ -159,16 +159,16 @@ M6.4 不让模型从整份文献自由生成事件，而是从已有规则事件
 
 ```powershell
 # 只计算候选和报告，不写规范表
-.\.venv\Scripts\history-agent.exe research merge-events --dry-run --json
+.\.venv\Scripts\start1921.exe research merge-events --dry-run --json
 
 # 写入或幂等同步规范事件
-.\.venv\Scripts\history-agent.exe research merge-events
+.\.venv\Scripts\start1921.exe research merge-events
 
 # 查看人工待审队列
-.\.venv\Scripts\history-agent.exe research merge-review-queue --limit 20 --json
+.\.venv\Scripts\start1921.exe research merge-review-queue --limit 20 --json
 
 # 确认、驳回或重新打开，不改动源事件
-.\.venv\Scripts\history-agent.exe research review-event-merge CANONICAL_EVENT_ID `
+.\.venv\Scripts\start1921.exe research review-event-merge CANONICAL_EVENT_ID `
   --decision confirmed --reviewed-by "研究者" --note "复核依据"
 ```
 
@@ -194,10 +194,10 @@ M6.4 不让模型从整份文献自由生成事件，而是从已有规则事件
 
 ```powershell
 # 姓名、稳定 ID 和无歧义别名均可用于 CLI
-.\.venv\Scripts\history-agent.exe research timeline 周恩来 --year 1956
+.\.venv\Scripts\start1921.exe research timeline 周恩来 --year 1956
 
 # 可重复指定事件类型和复核状态
-.\.venv\Scripts\history-agent.exe research timeline lin_biao `
+.\.venv\Scripts\start1921.exe research timeline lin_biao `
   --start-year 1942 --end-year 1943 `
   --event-type correspondence --review-status confirmed --json
 ```
