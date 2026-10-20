@@ -39,6 +39,7 @@ from history_agent.evaluation.semantic import (
 )
 from history_agent.processing.chunks import index_artifact_sha256
 from history_agent.retrieval.hybrid import RRF_K, search_hybrid_index
+from history_agent.retrieval.keyword import load_keyword_index_metadata
 from history_agent.retrieval.models import SearchHit, SearchResponse
 
 GoldenCategory = Literal[
@@ -1213,6 +1214,27 @@ def _load_index_metadata(settings: Settings) -> dict[str, Any]:
     reports: dict[str, Any] = {}
     warnings: list[str] = []
     for name in ("keyword_index_latest.json", "vector_index_latest.json"):
+        if name == "keyword_index_latest.json" and settings.keyword_database_url:
+            try:
+                # The active PostgreSQL generation is authoritative. A local
+                # report or the old SQLite file cannot identify the queried index.
+                keyword_metadata = load_keyword_index_metadata(
+                    settings.keyword_database_url.get_secret_value()
+                )
+                reports["keyword_index"] = keyword_metadata
+                if not keyword_metadata.get("artifact_verified"):
+                    warnings.append(
+                        "keyword_index manifest does not match the queried index artifact"
+                    )
+            except Exception:
+                reports["keyword_index"] = {
+                    "summary": {"backend": "postgresql"},
+                    "manifest": None,
+                    "artifact_verified": False,
+                    "actual_index_artifact_sha256": None,
+                }
+                warnings.append("PostgreSQL keyword index metadata could not be verified")
+            continue
         path = settings.reports_dir / name
         if not path.is_file():
             warnings.append(f"missing index report: {name}")
@@ -1574,7 +1596,7 @@ def run_golden_benchmark(
         if selected.intersection({"retrieval", "ranking", "context"}):
             retrieval_started = perf_counter()
             retrieval_response = search_backend(
-                keyword_index_path=settings.keyword_index_path,
+                keyword_index_path=settings.keyword_index_target,
                 vector_index_path=settings.vector_index_path,
                 model_cache_dir=settings.model_cache_dir / "fastembed",
                 aliases_path=settings.person_aliases_path,

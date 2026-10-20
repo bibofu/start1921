@@ -27,7 +27,7 @@ flowchart LR
     E --> D
     D --> F[目录过滤、页眉页脚清理、结构恢复]
     F --> G[页内分片 JSONL]
-    G --> H[SQLite FTS5 / BM25]
+    G --> H[PostgreSQL 倒排索引 / BM25]
     G --> I[FastEmbed / Qdrant]
 
     Q[用户问题] --> P[DeepSeek JSON 查询理解]
@@ -65,7 +65,7 @@ flowchart LR
 - 查询规划、证据充分性判断、最终回答和流式回答统一通过自定义 `DeepSeekLlamaIndexLLM`；该适配器实现 LlamaIndex `LLM` 接口，接入共享 `CallbackManager`，同时保留连接池、并发准入、请求总预算、供应商 `thinking` 参数和 SSE 故障降级；
 - 最终证据回答提示词由 `ChatPromptTemplate` 构造。
 
-框架与领域层之间通过适配器隔离。SQLite FTS5、FastEmbed/Qdrant、RRF、年代覆盖、人物
+框架与领域层之间通过适配器隔离。关键词 BM25、FastEmbed/Qdrant、RRF、年代覆盖、人物
 硬过滤和引用校验没有替换成通用默认实现，因为这些规则是当前评测表现和史料可核验性的
 关键。普通混合检索响应公开 `rag_framework=llamaindex`；篇目全文、结构化数据库和直接检索
 等绕过 LlamaIndex 检索工作流的路径公开 `rag_framework=native`。健康检查同时列出两种执行路径
@@ -107,7 +107,7 @@ PDF 页码及实际拼接的 chunk 数，不调用查询规划、混合召回或
 | OCR | 需要 OCR 的页面记录 | `data/processed/ocr/*.jsonl` |
 | 结构恢复 | PDF 目录或年份章节 | `data/processed/structure/*.json` |
 | 分片 | 每个文档一份 chunk JSONL | `data/processed/chunks/*.jsonl` |
-| 关键词索引 | SQLite FTS5 数据库 | `data/indexes/keyword_fts.db` |
+| 关键词索引 | PostgreSQL 倒排词位与 BM25；保留 SQLite 对照后端 | `HISTORY_AGENT_KEYWORD_DATABASE_URL`；旧文件 `data/indexes/keyword_fts.db` |
 | 向量索引 | 本地 Qdrant collection | `data/indexes/qdrant/` |
 | 嵌入模型缓存 | FastEmbed 模型文件 | `data/models/fastembed/` |
 
@@ -275,18 +275,26 @@ chunk正文 + 文献标题 + section_path + 规范人物名 + “YYYY年”
 
 向量索引使用另一份输入，见第 6 节。
 
-## 5. 关键词索引：SQLite FTS5 + BM25
+## 5. 关键词索引：PostgreSQL + FTS5 兼容 BM25
 
 ### 5.1 索引结构
 
-关键词索引版本为 `sqlite-fts5-cjk-bigram-v1`。SQLite 中有两个主要结构：
+配置关键词 PostgreSQL URL 后，索引版本为 `postgresql-fts5-bm25-compatible-v1`。
+`keyword_chunks` 保存完整元数据、原预分词文本、长度和原始行号；
+`keyword_postings` 保存倒排词项及词位。`keyword_generations` 与 `keyword_active`
+管理索引版本，完整数据校验通过后在同一事务中切换活动版本。
+构建、搜索及评测通过统一入口选择目标，详见 [迁移与评测说明](KEYWORD_POSTGRESQL.md)。
+
+迁移对照后端保留原 `sqlite-fts5-cjk-bigram-v1`，包含：
 
 - `chunk_metadata` 普通表：保存文档、页码、章节、正文、年份、人物、范围状态等完整元数据；
 - `chunk_fts` FTS5 虚拟表：保存不参与搜索的 `chunk_id` 和预分词后的 `terms`。
 
-FTS5 的底层 tokenizer 是 `unicode61 remove_diacritics 2`。中文切词由应用层预先完成，不依赖 SQLite 的中文分词能力。
+原 FTS5 的底层 tokenizer 是 `unicode61 remove_diacritics 2`。中文切词由应用层预先完成。
+PostgreSQL 后端以纯 Python 保留预分词结果的词法及短语语义，不调用 SQLite 词法器。
 
-构建时先写临时数据库，关闭 journal 和同步写以提高批量导入速度，完成后运行 `PRAGMA integrity_check`。只有结果为 `ok` 才会原子替换正式索引。
+旧 SQLite 后端构建时先写临时数据库，运行 `PRAGMA integrity_check` 后原子替换。
+PostgreSQL 后端构建新版本并核对全部元数据和词位摘要，失败时保留原活动版本。
 
 ### 5.2 中文和非中文分词
 
@@ -305,7 +313,7 @@ FTS5 的底层 tokenizer 是 `unicode61 remove_diacritics 2`。中文切词由�
 - 去重；
 - 没有剩余可检索 token 时直接报检索错误。
 
-最终 FTS 表达式是所有 token 的精确短语 OR：
+查询语义保持所有 token 的精确短语 OR，原 FTS 表达式为：
 
 ```text
 "毛泽" OR "泽东" OR "抗日" OR "日战" OR "战争" ...
@@ -315,7 +323,9 @@ FTS5 的底层 tokenizer 是 `unicode61 remove_diacritics 2`。中文切词由�
 
 ### 5.3 BM25 排名和来源偏置
 
-SQLite `bm25(chunk_fts)` 的原始值越小越靠前。系统在排序表达式中减去以下奖励值：
+PostgreSQL 后端显式实现原 SQLite `bm25(chunk_fts)` 的计分规则：
+`k1=1.2`、`b=0.75`，使用全索引统计，非正 IDF 取 `1e-6`。
+原始值越小越靠前，同分保留原 FTS 行号顺序。系统减去以下奖励值：
 
 | 条件 | BM25 排序奖励 |
 | --- | ---: |

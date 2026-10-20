@@ -22,6 +22,7 @@ from history_agent.evaluation.semantic import (
 )
 from history_agent.extraction.report import load_page_records
 from history_agent.processing.chunks import effective_pages
+from history_agent.retrieval.keyword import load_keyword_index_metadata
 
 TEXT_TOKEN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fffA-Za-z0-9]")
 CATEGORY_MINIMUMS = {
@@ -135,6 +136,28 @@ def _citation_check(
 def _index_versions(settings: Settings) -> dict[str, object]:
     versions: dict[str, object] = {}
     for name in ("keyword_index_latest.json", "vector_index_latest.json"):
+        if name == "keyword_index_latest.json" and settings.keyword_database_url:
+            try:
+                metadata = load_keyword_index_metadata(
+                    settings.keyword_database_url.get_secret_value()
+                )
+                versions["keyword_index"] = {
+                    **{
+                        key: metadata["summary"][key]
+                        for key in ("run_id", "index_version", "chunks")
+                        if key in metadata["summary"]
+                    },
+                    "backend": "postgresql",
+                    "generation_id": metadata.get("generation_id"),
+                    "artifact_verified": metadata.get("artifact_verified") is True,
+                    "actual_index_artifact_sha256": metadata.get("actual_index_artifact_sha256"),
+                }
+            except Exception:
+                versions["keyword_index"] = {
+                    "backend": "postgresql",
+                    "artifact_verified": False,
+                }
+            continue
         path = settings.reports_dir / name
         if not path.is_file():
             continue

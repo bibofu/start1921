@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "status": "completed_with_user_requested_reduced_validation",
+  "created_at": "2026-10-20T06:46:47.397794+00:00",
+  "baseline_commit": "55c9e025c2d5ef14f83fd2541b9c2039aee26d39",
+  "protocol": "protocol_v1.json",
+  "oracle_hash_addendum": "oracle_identity_v1.json",
+  "annotation_scope": {
+    "development_cases": 20,
+    "executions": 21,
+    "human_approved_case_definitions": 8,
+    "human_candidate_judgments": 0,
+    "holdout_cases_not_executed": 10,
+    "complete_30_case_golden": false
+  },
+  "raw_compatibility": {
+    "schema_version": 1,
+    "status": "stopped_at_user_request",
+    "created_at": "2026-10-20T06:46:47.347878+00:00",
+    "scope": "completed_keyword_workloads_only_not_full_planned_acceptance",
+    "planned_workloads": 461,
+    "completed_candidate_workloads": 278,
+    "completed_baseline_workloads": 461,
+    "queries_per_workload": 8,
+    "completed_candidate_search_calls": 2224,
+    "incomplete_checkpoint_lines_excluded": 0,
+    "passed_completed_workloads": 278,
+    "all_completed_equal": true,
+    "full_planned_acceptance": null,
+    "reason": "User explicitly requested stopping further extensive validation. Remaining workloads were not executed or claimed to pass.",
+    "header_identities_equal": true,
+    "checkpoint_sha256": "1242ad673ecd8bdc99d8d987a17956e9413fda7b8d5f11c6f248d212ff11d59e"
+  },
+  "end_to_end": {
+    "executions": 21,
+    "independent_cases": 20,
+    "passed": true,
+    "external_model_calls": 0,
+    "actual_model_prompt_context": null,
+    "new_answer_semantic_quality": null,
+    "compared": [
+      "query interpretation and route",
+      "keyword/vector candidates",
+      "fusion and ranking",
+      "context candidates and production trace",
+      "final extractive answer",
+      "citations",
+      "refusal behavior"
+    ]
+  },
+  "strict_historical_metrics": {
+    "aggregation": "macro over eight approved case definitions; unchanged before/after where captured",
+    "evidence_group_denominators": [
+      3,
+      4,
+      2,
+      6,
+      4,
+      7,
+      4,
+      3
+    ],
+    "macro_denominator": 8,
+    "raw_baseline_recall": {
+      "1": 0.28125,
+      "3": 0.35416666666666663,
+      "5": 0.44791666666666663,
+      "10": 0.5699404761904762,
+      "20": 0.6116071428571428,
+      "30": 0.6532738095238095,
+      "100": 0.7127976190476191
+    },
+    "production_final_recall_at_10_before": 0.6086309523809523,
+    "production_final_recall_at_10_after": 0.6086309523809523,
+    "precision": null,
+    "mrr": null,
+    "ndcg": null,
+    "human_candidate_metric_evaluable_cases": 0,
+    "annotation_limit": "The 196 agent_review candidate grades are not human labels. Old refusal project-file hashes are stale for current documentation; no refusal correctness score or new answer quality score was inferred."
+  },
+  "synthetic": {
+    "records": 7,
+    "queries": 10,
+    "k_values": [
+      1,
+      2,
+      3,
+      5,
+      10
+    ],
+    "query_k_comparisons": 50,
+    "passed": true,
+    "scope": "Artificial complete relevance labels, separate from historical Golden",
+    "range_query_at_3": {
+      "recall": 1,
+      "recall_denominator": 1,
+      "precision": 0.3333333333333333,
+      "precision_denominator": 3,
+      "mrr": 0.5,
+      "first_relevant_rank": 2
+    },
+    "mrr_denominator_note": "The synthetic metric denominator=1 is the single-case aggregation count; reciprocal rank uses first_relevant_rank."
+  },
+  "performance": {
+    "claim": "Observed PostgreSQL keyword latency increased; no speedup claimed. Shared-load/cache observations are not a rigorous performance benchmark.",
+    "preparation": "ANALYZE completed during final collection; no algorithm/score change.",
+    "paired_median_ms": [
+      {
+        "sqlite": 88.749,
+        "postgres": 288.285
+      },
+      {
+        "sqlite": 104.425,
+        "postgres": 330.193
+      },
+      {
+        "sqlite": 49.97,
+        "postgres": 149.712
+      },
+      {
+        "sqlite": 128.007,
+        "postgres": 425.134
+      }
+    ]
+  },
+  "validation": {
+    "evaluation_tests": "7 passed, including actual PostgreSQL isolated-schema synthetic differential",
+    "score_e2e_outputs": "21 payloads equal, per-stage approved denominator<=8, unknowns remain null, zero model calls",
+    "project_checks_reported_by_parent": "975 Python tests + 3 frontend tests + Ruff + mypy passed before final evaluation-only postprocessor addition",
+    "independent_read_only_metric_audit": "No blocking issue or false scoring found",
+    "full_corpus_rebuild_fingerprint_equal": true,
+    "preserved_original_artifacts": 27
+  },
+  "artifacts": {
+    "baseline_raw": "data/reports/keyword-migration-v1/baseline-keyword.json",
+    "partial_candidate_checkpoint": "data/reports/keyword-migration-v1/final-candidate-keyword.checkpoint.jsonl",
+    "partial_comparison": "data/reports/keyword-migration-v1/partial-keyword-comparison.json",
+    "baseline_e2e": "data/reports/keyword-migration-v1/baseline-e2e.json",
+    "candidate_e2e": "data/reports/keyword-migration-v1/final-candidate-e2e.json",
+    "e2e_comparison": "data/reports/keyword-migration-v1/final-e2e-comparison.json",
+    "baseline_stage_metrics": "data/reports/keyword-migration-v1/baseline-stage-metrics.json",
+    "candidate_stage_metrics": "data/reports/keyword-migration-v1/final-candidate-stage-metrics.json",
+    "synthetic": "data/reports/keyword-migration-v1/final-synthetic/comparison.json",
+    "rebuild": "data/reports/postgres-keyword-rebuild-verification.json",
+    "preservation": "data/reports/postgres-keyword-preservation.json",
+    "performance": "data/reports/keyword-performance-paired-after-analyze.json"
+  }
+}

@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     database_path: Path = Path("data/history_agent.db")
     database_url: SecretStr | None = None
     conversation_database_url: SecretStr | None = None
+    keyword_database_url: SecretStr | None = None
     catalog_path: Path = Path("config/corpus_catalog.json")
     person_aliases_path: Path = Path("config/person_aliases.json")
     relation_types_path: Path = Path("config/relation_types.json")
@@ -83,7 +84,7 @@ class Settings(BaseSettings):
                 setattr(self, field_name, value.resolve())
         if self.research_start > self.research_end:
             raise ValueError("research_start must be on or before research_end")
-        for field_name in ("database_url", "conversation_database_url"):
+        for field_name in ("database_url", "conversation_database_url", "keyword_database_url"):
             secret = getattr(self, field_name)
             if secret is not None:
                 value = secret.get_secret_value().strip()
@@ -130,6 +131,15 @@ class Settings(BaseSettings):
     @property
     def keyword_index_path(self) -> Path:
         return self.data_dir / "indexes" / "keyword_fts.db"
+
+    @property
+    def keyword_index_target(self) -> Path | str:
+        secret = self.keyword_database_url
+        return secret.get_secret_value() if secret else self.keyword_index_path
+
+    @property
+    def keyword_database_backend(self) -> str:
+        return "postgresql" if self.keyword_database_url else "sqlite"
 
     @property
     def vector_index_path(self) -> Path:
@@ -189,6 +199,7 @@ class Settings(BaseSettings):
             "data_dir": str(self.data_dir),
             "database_backend": self.database_backend,
             "conversation_database_backend": self.conversation_database_backend,
+            "keyword_database_backend": self.keyword_database_backend,
             "database_path": None if self.database_url else str(self.database_path),
             "catalog_path": str(self.catalog_path),
             "person_aliases_path": str(self.person_aliases_path),

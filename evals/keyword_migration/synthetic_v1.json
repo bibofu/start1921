@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "scope": "Artificial complete relevance labels, not historical Golden or human annotations.",
+  "relevance_rule": "A unit is relevant iff its literal text describes a quartz station and it satisfies every explicitly requested scope/document/year/person/section constraint. Games and basalt stations are irrelevant even when they share query tokens. All seven units are graded before retrieval; relevant units have grade 2.",
+  "k_values": [1, 2, 3, 5, 10],
+  "records": [
+    {"id": "a", "document_id": "doc_a", "text": "quartz station quartz station", "years": [1935], "people": ["毛泽东"], "scope": "in_scope", "section": "normal"},
+    {"id": "b", "document_id": "doc_b", "text": "quartz station detailed description platform gate building road river tree street bridge", "years": [1936], "people": ["周恩来"], "scope": "in_scope", "section": "normal"},
+    {"id": "c", "document_id": "doc_a", "text": "quartz games quartz games quartz games quartz games quartz games quartz games", "years": [1935], "people": ["毛泽东"], "scope": "in_scope", "section": "normal"},
+    {"id": "d", "document_id": "doc_b", "text": "basalt station station station station station station station station", "years": [1937], "people": ["周恩来"], "scope": "in_scope", "section": "normal"},
+    {"id": "e", "document_id": "doc_c", "text": "quartz station modern quartz station", "years": [1980], "people": ["毛泽东"], "scope": "out_of_scope", "section": "normal"},
+    {"id": "f", "document_id": "doc_c", "text": "quartz station platform", "years": [1935], "people": ["毛泽东"], "scope": "in_scope", "section": "目标%_\\区"},
+    {"id": "g", "document_id": "doc_a", "text": "quartz station quartz station", "years": [1935], "people": ["毛泽东"], "scope": "in_scope", "section": "normal"}
+  ],
+  "queries": [
+    {"id": "default", "question": "quartz station", "options": {}, "grades": {"a": 2, "b": 2, "c": 0, "d": 0, "e": 0, "f": 2, "g": 2}},
+    {"id": "include_scope", "question": "quartz station", "options": {"include_out_of_scope": true}, "grades": {"a": 2, "b": 2, "c": 0, "d": 0, "e": 2, "f": 2, "g": 2}},
+    {"id": "document", "question": "quartz station", "options": {"document_ids": ["doc_a"]}, "grades": {"a": 2, "b": 0, "c": 0, "d": 0, "e": 0, "f": 0, "g": 2}},
+    {"id": "two_documents", "question": "quartz station", "options": {"document_ids": ["doc_a", "doc_c"]}, "grades": {"a": 2, "b": 0, "c": 0, "d": 0, "e": 0, "f": 2, "g": 2}},
+    {"id": "year", "question": "quartz station", "options": {"plan": {"query_intent": "general", "query_years": [1935]}}, "grades": {"a": 2, "b": 0, "c": 0, "d": 0, "e": 0, "f": 2, "g": 2}},
+    {"id": "range", "question": "quartz station", "options": {"plan": {"query_intent": "timeline", "query_year_range": [1936, 1937]}}, "grades": {"a": 0, "b": 2, "c": 0, "d": 0, "e": 0, "f": 0, "g": 0}},
+    {"id": "person", "question": "quartz station", "options": {"plan": {"query_intent": "general", "query_people": ["毛泽东"]}}, "grades": {"a": 2, "b": 0, "c": 0, "d": 0, "e": 0, "f": 2, "g": 2}},
+    {"id": "literal_section", "question": "quartz station", "options": {"section_path_contains": "%_\\"}, "grades": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0, "f": 2, "g": 0}},
+    {"id": "missing_document", "question": "quartz station", "options": {"document_ids": ["missing"]}, "grades": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0, "f": 0, "g": 0}},
+    {"id": "zero_hit", "question": "zzqvxm", "options": {}, "grades": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0, "f": 0, "g": 0}}
+  ]
+}

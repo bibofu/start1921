@@ -1,8 +1,9 @@
 # PostgreSQL 主库与会话库
 
 本项目支持将文献、人物、事件、证据、关系、复核记录和聊天记录放入
-PostgreSQL。关键词检索继续使用 `data/indexes/keyword_fts.db`，
-向量检索继续使用原有 Qdrant；迁移命令不重建或修改这两个索引。
+PostgreSQL。主库迁移命令不重建或修改关键词和向量索引。
+关键词索引另行通过 [关键词迁移流程](KEYWORD_POSTGRESQL.md) 使用 PostgreSQL；
+向量检索继续使用原有 Qdrant。
 
 ## 配置与启动
 

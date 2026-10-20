@@ -35,16 +35,7 @@ def readiness_snapshot(settings: Settings) -> dict[str, object]:
         components["database"] = _database_ready(settings.database_target)
     except (OSError, *DATABASE_ERRORS):
         components["database"] = False
-    try:
-        search_keyword_index(
-            index_path=settings.keyword_index_path,
-            query="中国共产党",
-            aliases_path=settings.person_aliases_path,
-            top_k=1,
-        )
-        components["keyword"] = True
-    except Exception:
-        components["keyword"] = False
+    components["keyword"] = keyword_index_ready(settings)
     try:
         search_vector_index(
             index_path=settings.vector_index_path,
@@ -61,3 +52,17 @@ def readiness_snapshot(settings: Settings) -> dict[str, object]:
         "status": "ready" if ready else "not_ready",
         "components": components,
     }
+
+
+def keyword_index_ready(settings: Settings) -> bool:
+    """Probe the configured index instead of a leftover SQLite backup."""
+    try:
+        search_keyword_index(
+            index_path=settings.keyword_index_target,
+            query="中国共产党",
+            aliases_path=settings.person_aliases_path,
+            top_k=1,
+        )
+        return True
+    except Exception:
+        return False

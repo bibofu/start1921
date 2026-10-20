@@ -304,7 +304,7 @@ def collect(
             print(f"collect {case.id}/{variant['id']}", flush=True)
             started = perf_counter()
             response = search_hybrid_index(
-                keyword_index_path=settings.keyword_index_path,
+                keyword_index_path=settings.keyword_index_target,
                 vector_index_path=settings.vector_index_path,
                 model_cache_dir=settings.model_cache_dir / "fastembed",
                 aliases_path=settings.person_aliases_path,

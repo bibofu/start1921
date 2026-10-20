@@ -1326,11 +1326,89 @@ def process_chunks(
             )
 
 
+def _keyword_postgres_target() -> str:
+    settings = get_settings()
+    if settings.keyword_database_url is None:
+        raise typer.BadParameter(
+            "Set HISTORY_AGENT_KEYWORD_DATABASE_URL to the PostgreSQL keyword target."
+        )
+    return settings.keyword_database_url.get_secret_value()
+
+
+@index_app.command("migrate-keyword-postgres")
+def index_migrate_keyword_postgres(
+    backup_dir: Annotated[
+        Path, typer.Option(help="Directory for a consistent SQLite index backup.")
+    ],
+    source_index: Annotated[Path | None, typer.Option()] = None,
+    source_report: Annotated[Path | None, typer.Option()] = None,
+    report: Annotated[
+        Path | None, typer.Option(help="Save the verification result as JSON.")
+    ] = None,
+) -> None:
+    """Copy the existing keyword index into PostgreSQL and verify its records."""
+    from history_agent.retrieval.keyword_migration import migrate_keyword_index
+
+    settings = get_settings()
+    target = _keyword_postgres_target()
+    settings.ensure_runtime_dirs()
+    tracker = RunTracker(
+        settings.runs_dir, "migrate_keyword_postgres", settings.public_snapshot()
+    )
+    existing_report = settings.reports_dir / "keyword_index_latest.json"
+    try:
+        result = migrate_keyword_index(
+            source_index=source_index or settings.keyword_index_path,
+            target_url=target,
+            backup_dir=backup_dir,
+            reports_dir=settings.reports_dir,
+            run_id=tracker.run_id,
+            source_report=source_report or (existing_report if existing_report.is_file() else None),
+        )
+        tracker.finish(result)
+    except HistoryAgentError as exc:
+        tracker.fail(exc)
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    if report is not None:
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+@index_app.command("verify-keyword-postgres")
+def index_verify_keyword_postgres(
+    source_index: Annotated[Path | None, typer.Option()] = None,
+    generation_id: Annotated[int | None, typer.Option(min=1)] = None,
+    report: Annotated[
+        Path | None, typer.Option(help="Save the verification result as JSON.")
+    ] = None,
+) -> None:
+    """Compare SQLite keyword records with the active or specified PostgreSQL generation."""
+    from history_agent.retrieval.keyword_migration import verify_keyword_index
+
+    settings = get_settings()
+    target = _keyword_postgres_target()
+    try:
+        result = verify_keyword_index(
+            source_index=source_index or settings.keyword_index_path,
+            target_url=target,
+            generation_id=generation_id,
+        )
+    except HistoryAgentError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    if report is not None:
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+
 @index_app.command("build-keyword")
 def index_build_keyword(
     json_output: bool = typer.Option(False, "--json", help="Emit JSON."),
 ) -> None:
-    """Build an atomic Chinese bigram FTS5/BM25 index from all chunks."""
+    """Build an atomic Chinese bigram BM25 index on the configured storage backend."""
 
     settings = get_settings()
     settings.ensure_runtime_dirs()
@@ -1339,7 +1417,7 @@ def index_build_keyword(
     try:
         summary = build_keyword_index(
             chunks_dir=settings.chunks_dir,
-            index_path=settings.keyword_index_path,
+            index_path=settings.keyword_index_target,
             reports_dir=settings.reports_dir,
             run_id=tracker.run_id,
             project_root=settings.project_root,
@@ -1717,7 +1795,7 @@ def search(
 
     settings = get_settings()
     response = search_keyword_index(
-        index_path=settings.keyword_index_path,
+        index_path=settings.keyword_index_target,
         query=query,
         aliases_path=settings.person_aliases_path,
         top_k=top_k,
@@ -1800,7 +1878,7 @@ def search_hybrid(
 
     settings = get_settings()
     response = search_hybrid_index(
-        keyword_index_path=settings.keyword_index_path,
+        keyword_index_path=settings.keyword_index_target,
         vector_index_path=settings.vector_index_path,
         model_cache_dir=settings.model_cache_dir / "fastembed",
         aliases_path=settings.person_aliases_path,

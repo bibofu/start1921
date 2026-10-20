@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "version": "keyword-storage-migration-v1-20261020",
+  "status": "frozen_before_backend_implementation",
+  "purpose": "Verify storage compatibility without changing Agent behavior or treating synthetic labels as historical Golden annotations.",
+  "baseline_commit": "55c9e025c2d5ef14f83fd2541b9c2039aee26d39",
+  "frozen_artifacts": {
+    "inventory": "data/reports/keyword-postgres-baseline.json",
+    "sqlite_index": "data/backups/keyword-to-postgres-20261020T061514Z/keyword_fts.db",
+    "legacy_keyword_module": "data/backups/keyword-to-postgres-20261020T061514Z/keyword_before.py",
+    "sqlite_index_sha256": "9ab3c36586931e37ece8daad73d3fca27bfb1461dedf9db6999fe5f58e3e05ec",
+    "legacy_keyword_module_sha256": "e05b436139ffecb938ddec2fb02314df440254b6edf83fbfb7143a5d93b531ad",
+    "chunk_count": 22338,
+    "document_count": 17
+  },
+  "annotation_inputs": [
+    {
+      "path": "evals/golden/development_annotations_v5.json",
+      "sha256": "fd8884af4987a37d679c00b391635470dc9f683fa3f76e4ddfb3b55e5a81010d"
+    },
+    {
+      "path": "evals/golden/development_protocols_v5.json",
+      "sha256": "1df929c72bcf465a652050e007ff89c31d5e3b9d92d90c4b0276ffd8658d86ec"
+    },
+    {
+      "path": "evals/golden/human_adjudications_v5.json",
+      "sha256": "0a77e74eb2cd3dc5ce5a5a528c8dc7a3193fdb692272c334d7f20661e854750f"
+    },
+    {
+      "path": "evals/golden/ranking_pools_v2.json",
+      "sha256": "96e3c46cdffc2797b211c4e336c72b8af3df2df7eca4ba1efa62e9f391ac64bc"
+    }
+  ],
+  "annotation_audit": {
+    "formal_30_case_golden_complete": false,
+    "development_cases": 20,
+    "execution_inputs": 21,
+    "answerable_cases": 17,
+    "refusal_cases": 3,
+    "human_approved_case_definitions": 8,
+    "pending_case_definitions": 12,
+    "required_facts": 85,
+    "evidence_groups": 90,
+    "candidate_judgments": 196,
+    "human_candidate_judgments": 0,
+    "candidate_judgment_basis": "agent_review",
+    "holdout_cases": 10,
+    "holdout_policy": "Do not execute, inspect answers, relabel, or use for tuning.",
+    "approval_scope": "Eight approvals cover question/evidence/facts/refusal boundaries, not candidate grades, ranking pools, or any newly captured answer."
+  },
+  "controlled_variables": {
+    "changed_variable": "keyword storage backend only",
+    "fixed": [
+      "PDF identities and content",
+      "chunk artifacts and text",
+      "tokenization and query understanding",
+      "BM25 definition and field boosts",
+      "person/year/document/section/scope filtering",
+      "vector index and embedding model",
+      "hybrid fusion/reranking/context policy",
+      "Agent prompts and model settings",
+      "annotation versions and applicable denominators"
+    ],
+    "identity_checks": "Save hashes of protocol, annotations, aliases, chunk files, original SQLite snapshot, vector artifacts, relevant source modules, model/settings public snapshot, Python/SQLite/PG versions, and Git revision. Never emit credentials."
+  },
+  "keyword_compatibility": {
+    "oracle": "Load frozen legacy_keyword_module by its verified file hash and query frozen SQLitePath; do not infer baseline from the new backend.",
+    "primary_inputs": "All 21 development execution inputs, retaining case and input_variant identity. Raw keyword receives original current question; history is recorded but not rewritten into keyword queries.",
+    "k_values": [1, 3, 5, 10, 20, 30, 100],
+    "exhaustive_k": 22338,
+    "filter_matrix": [
+      "default",
+      "include_out_of_scope=true",
+      "each of 17 individual document filters",
+      "two-document filter",
+      "nonexistent document filter",
+      "literal section substrings including percent, underscore and backslash",
+      "explicit RetrievalPlan years, year range, people and intent"
+    ],
+    "additional_queries": [
+      "",
+      "什么",
+      "毛泽东",
+      "周恩来 1954",
+      "邓小平 1952-1954",
+      "中国共产党",
+      "调查研究",
+      "毛泽东 周恩来 1949",
+      "百分号%下划线_反斜杠\\",
+      "\" OR *",
+      "Token-ABC cafe café",
+      "不存在的专用词zzqvxm"
+    ],
+    "comparison": [
+      "query intent/terms/years/range/people and filters",
+      "complete ordered chunk IDs",
+      "public scores exactly at existing six-decimal precision",
+      "full SearchHit field hashes",
+      "per-K ordered prefixes and counts",
+      "empty/error behavior"
+    ],
+    "tie_policy": "Report strict order and tie-only order differences separately. Do not hide tie drift: hybrid uses ranks, so production-stage parity remains required.",
+    "threshold": "Zero missing/extra results, unequal public scores, unequal hit fields or unexplained ordering changes in the frozen workload. This is compatibility evidence, not Golden answer quality."
+  },
+  "real_annotation_metrics": {
+    "implementation": "Reuse pilot_metrics.evaluate_stage(label_mode='approved') without changing labels.",
+    "recall": "Matched unique required evidence groups / fixed required group count, only for human-approved cases with valid PDF hashes and exact quoted anchors.",
+    "precision": "Relevant returned positions / K only when all returned positions have permissible human relevance judgments; otherwise null. Unreturned exhausted slots and unjudged returned positions are distinct.",
+    "mrr": "1 / first relevant rank only when earlier positions cannot change that rank; without human candidate judgments, null unless fully observed empty result is meaningful.",
+    "ndcg": "Only a completely human-judged fixed pool with validated binding; otherwise null.",
+    "aggregation": "Publish exact evaluable case IDs, numerator, denominator, unknown reasons and unchanged-unit intersection for deltas. Never score missing judgments as zero.",
+    "limitations": "The 196 existing agent-reviewed candidate labels may be inventoried but are not upgraded to approved labels or used to claim formal Golden Precision/MRR."
+  },
+  "synthetic_contract_metrics": {
+    "status": "Deterministic fully specified test corpus; not historical Golden and not human annotations.",
+    "construction": "Small fixed artificial records with explicit query-token, document, year, person, section and scope membership. Freeze complete per-query relevance grades before executing either backend.",
+    "required_coverage": [
+      "positive and negative candidates",
+      "fully judged returned ranks",
+      "document/person/year/range/scope/escaped-section filters",
+      "BM25 repetition and length effects",
+      "score ties and zero-hit queries"
+    ],
+    "metrics": "Actual Recall@K=unique relevant retrieved/relevant corpus units; Precision@K=relevant positions/K; MRR@K=1/first relevant rank or 0 if none. Empty relevant universe is N/A for Recall/MRR. Include grade-based nDCG only when its complete ideal set is specified.",
+    "separation": "Keep synthetic metrics in a separate report section; never aggregate with historical cases."
+  },
+  "process_and_answer_checks": {
+    "component": "20 main inputs plus one history-isolation control; candidate_k=30, hybrid top_k=20, answer_top_k=10. Compare keyword/vector candidates, fusion, reranking and selected-context stage IDs, ordered hit fields and returned counts.",
+    "local_end_to_end": "Run the existing recorded runtime with llm_api_key disabled on both backends. Capture route, constraints, production retrieval trace, extractive final answer, citation bundles and refusal behavior. Compare deterministic payloads excluding latency.",
+    "live_end_to_end": "When explicitly enabled, use identical recorded model settings on both sides and preserve planner/reflection/prompt-context/answer/citation artifacts and token costs. New semantic/fact/support judgments remain null until separately reviewed; stochastic output differences are not storage regression proof.",
+    "context_boundary": "Candidate context is not a prompt. Only captured generation_contexts can be called actual model prompt context; no-model runs mark model context and model token quality N/A.",
+    "answer_review": "Save reviewable outputs and required-fact IDs. Do not reuse 2026-10 historical answer reviews for new captures.",
+    "control_denominator": "The history-isolation control contributes execution cost, not an extra independent question."
+  },
+  "cost_and_delivery": {
+    "latency": "Record wall time per query/stage, distinguish cold/warm observations and report corpus workload counts. Avoid asserting speed gains from unmatched cache states.",
+    "tokens": "Record actual model usage if invoked; local no-model runs have zero external calls and semantic quality remains N/A.",
+    "artifacts": "Versioned protocol, immutable baseline/candidate captures, per-query/K compatibility diffs, strict human metric availability and denominators, separate synthetic metrics, stage/answer checks, and a concise final report.",
+    "no_overwrite": "Refuse an existing output path; retain source index and baseline artifacts."
+  }
+}

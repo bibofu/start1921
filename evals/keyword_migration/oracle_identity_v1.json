@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "purpose": "Correct the frozen protocol's conflation of source and SQLite backup artifact hashes without changing workloads, annotations, thresholds, or scoring.",
+  "source": {
+    "path": "data/indexes/keyword_fts.db",
+    "artifact_sha256": "9ab3c36586931e37ece8daad73d3fca27bfb1461dedf9db6999fe5f58e3e05ec"
+  },
+  "snapshot": {
+    "path": "data/backups/keyword-to-postgres-20261020T061514Z/keyword_fts.db",
+    "artifact_sha256": "1848ea3840f75d989c8b27fdfdf44f05912622f5ecff208576107ca1c3e0f711"
+  },
+  "verified_equal_logical_tables": {
+    "chunk_metadata": {
+      "rows": 22338,
+      "order_by": "chunk_id",
+      "sha256": "35e33c7a91a66dade8d4f8568ab6b227e9e8028642f0f329709c95989e067a49"
+    },
+    "chunk_fts": {
+      "rows": 22338,
+      "order_by": "rowid",
+      "sha256": "bd0fe246c40375da15013d92eae15e81bb9a26f1ce75230317717642926525e0"
+    }
+  },
+  "logical_hash_encoding": "SELECT * in listed order; UTF-8 json.dumps(row, ensure_ascii=False, separators=(',', ':')) plus LF for every row.",
+  "legacy_manifest_hash_note": "The legacy index_artifact_sha256 includes filename plus NUL plus file bytes and differs from raw file SHA-256. Its b5f430 prefix is not evidence of a stale manifest. This evaluation binds the raw backup SHA independently.",
+  "verified_equal_fts_tables": {
+    "fts_vocab": {
+      "rows": 10438350,
+      "sha256": "7773d6a475ed089d356523cfdfa0149e908068ca99f6d869e7590aeb0ed77b20"
+    },
+    "fts_docsize": {
+      "rows": 22338,
+      "sha256": "57d34c45c0bfc2c3b5d5bbe28384a9b6026b55e678b8d68ca0b521db79233de1"
+    }
+  },
+  "fts_hash_encoding": "Sorted fts5vocab instance term/doc/col/offset and docsize id/sz; same JSON row encoding, BLOB encoded as {blob: lowercase hex}."
+}

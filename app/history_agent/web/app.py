@@ -34,7 +34,7 @@ from history_agent.research.timeline import (
     TimelineReviewStatus,
     get_person_timeline,
 )
-from history_agent.web.readiness import _database_ready, readiness_snapshot
+from history_agent.web.readiness import _database_ready, keyword_index_ready, readiness_snapshot
 
 LOGGER = logging.getLogger(__name__)
 SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
@@ -113,7 +113,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except (OSError, *DATABASE_ERRORS):
             database_ready = False
         indexes = {
-            "keyword": active_settings.keyword_index_path.is_file(),
+            "keyword": (
+                keyword_index_ready(active_settings)
+                if active_settings.keyword_database_url
+                else active_settings.keyword_index_path.is_file()
+            ),
             "vector": active_settings.vector_index_path.is_dir(),
         }
         return {
@@ -123,6 +127,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "database_backend": active_settings.database_backend,
             "database_ready": database_ready,
             "conversation_database_backend": active_settings.conversation_database_backend,
+            "keyword_database_backend": active_settings.keyword_database_backend,
             "rag_execution_paths": ["llamaindex", "native"],
             "llamaindex_components": [
                 "workflow",

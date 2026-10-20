@@ -24,6 +24,8 @@ def test_settings_resolve_paths(work_path: Path) -> None:
     assert settings.database_target == settings.database_path
     assert settings.conversation_database_target == settings.conversation_database_path
     assert settings.database_backend == "sqlite"
+    assert settings.keyword_index_target == settings.keyword_index_path
+    assert settings.keyword_database_backend == "sqlite"
 
 
 def test_invalid_research_range_is_rejected(work_path: Path) -> None:
@@ -84,3 +86,30 @@ def test_postgres_url_environment_and_empty_fallback(monkeypatch, work_path: Pat
     assert fallback.database_target == fallback.database_path
     with pytest.raises(ValueError, match="PostgreSQL connection URL"):
         Settings(_env_file=None, database_url="mysql://localhost/history")
+
+
+def test_keyword_postgres_target_is_explicit_independent_and_secret(work_path: Path) -> None:
+    main_url = "postgresql://main:main-password@localhost/history"
+    keyword_url = "postgresql://keyword:keyword-password@localhost/keyword"
+    default = Settings(_env_file=None, project_root=work_path, database_url=main_url)
+    assert default.keyword_index_target == default.keyword_index_path
+    settings = Settings(
+        _env_file=None, project_root=work_path, database_url=main_url,
+        keyword_database_url=keyword_url,
+    )
+    assert settings.keyword_index_target == keyword_url
+    assert settings.keyword_database_backend == "postgresql"
+    assert settings.public_snapshot()["keyword_database_backend"] == "postgresql"
+    assert "keyword-password" not in str(settings.public_snapshot())
+    assert keyword_url not in repr(settings)
+    assert settings.keyword_index_path == work_path / "data" / "indexes" / "keyword_fts.db"
+
+
+def test_keyword_database_url_environment_and_validation(monkeypatch, work_path: Path) -> None:
+    monkeypatch.setenv("HISTORY_AGENT_KEYWORD_DATABASE_URL", "postgresql://localhost/keyword")
+    settings = Settings(_env_file=None, project_root=work_path)
+    assert settings.keyword_index_target == "postgresql://localhost/keyword"
+    fallback = Settings(_env_file=None, project_root=work_path, keyword_database_url=" ")
+    assert fallback.keyword_index_target == fallback.keyword_index_path
+    with pytest.raises(ValueError, match="keyword_database_url"):
+        Settings(_env_file=None, keyword_database_url="sqlite://keyword.db")

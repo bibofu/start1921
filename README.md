@@ -10,7 +10,8 @@
 - [任务规划](TASK_PLAN.md)：将需求拆分为里程碑、具体任务、依赖关系、交付物和质量闸门。
 - [RAG 实现说明](RAG-IMPL.md)：说明分片、双索引、召回、融合重排、Top-K、生成和引用校验的当前实现。
 - [结构化研究模型](RESEARCH_SCHEMA.md)：说明人物、事件、关系、时间精度、证据和人工复核约束。
-- [PostgreSQL 迁移与运行](POSTGRESQL.md)：主库与会话库的配置、保留数据迁移、验证和回退；关键词索引与 Qdrant 保持不变。
+- [PostgreSQL 迁移与运行](POSTGRESQL.md)：主库与会话库的配置、保留数据迁移、验证和回退。
+- [关键词索引迁移](KEYWORD_POSTGRESQL.md)：PostgreSQL 关键词索引、BM25 兼容性和迁移评测；Qdrant 保持不变。
 - [年谱抽取基线](evals/CHRONOLOGY_BASELINE.md)：记录首批规则抽取规模、人工页码抽查与已知限制。
 
 ## 快速启动
@@ -20,6 +21,8 @@
 主库和会话库支持 PostgreSQL；设置 `HISTORY_AGENT_DATABASE_URL` 后使用该数据库，
 会话默认共用同一连接。已有 SQLite 数据请按 [迁移说明](POSTGRESQL.md) 备份、导入并验证，
 再启动服务。使用本项目内的 PostgreSQL 实例时，先运行 `.\scripts\postgres.ps1 start`。
+关键词索引通过 `HISTORY_AGENT_KEYWORD_DATABASE_URL` 独立配置，可与主库共用数据库；
+已有索引先按 [关键词迁移说明](KEYWORD_POSTGRESQL.md) 导入和验证。
 
 ### 1. 准备环境
 
@@ -401,7 +404,7 @@ flowchart LR
 | 中文 OCR | PaddleOCR | 处理《西行漫记》和局部扫描页 |
 | API 服务 | FastAPI + Pydantic | 提供问答、人物和事件查询接口 |
 | RAG 编排 | LlamaIndex Core / Workflow | 统一 QueryBundle、TextNode、Retriever、NodePostprocessor 和有界检索反思循环 |
-| 关键词检索 | BM25 | 人名、地名、会议名称和精确术语召回 |
+| 关键词检索 | PostgreSQL 倒排词位 + BM25 | 保留中文二元切词、原 FTS5 计分、过滤和业务加权；SQLite 后端用于迁移对照 |
 | 向量模型 | BAAI/bge-small-zh-v1.5（当前） | 本地 CPU 中文语义检索；后续可评测 BGE-M3 |
 | 融合/重排 | RRF（当前）、BGE Reranker v2 M3（候选） | 合并 BM25 与向量结果、去除同页重复证据 |
 | 向量数据库 | Qdrant | 保存向量及日期、人物、文献等过滤字段 |
