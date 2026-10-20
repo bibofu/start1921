@@ -162,7 +162,7 @@ def test_llamaindex_workflow_runs_bounded_reflection_retry(work_path) -> None:
     retrieval_plan = RetrievalPlan(query_intent="event_overview", coverage="balanced_period")
     result = asyncio.run(
         run_retrieval_workflow(
-            settings=Settings(project_root=work_path),
+            settings=Settings(_env_file=None, project_root=work_path),
             request=QuestionRequest(question="周恩来在遵义会议前后做了什么"),
             plan=plan,
             primary_query="周恩来 遵义会议",

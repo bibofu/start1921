@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import sqlite3
 from collections.abc import Sequence
 from datetime import date
 from typing import Literal, cast
@@ -11,6 +10,7 @@ from typing import Literal, cast
 from pydantic import BaseModel, Field
 
 from history_agent.db import Database
+from history_agent.db_backend import Row
 from history_agent.errors import ResearchDataError
 from history_agent.research.availability import available_document_sql
 from history_agent.research.models import (
@@ -198,7 +198,7 @@ def _appointment_phrases(text: str, mention: str) -> list[str]:
     )
 
 
-def _load_event_rows(database: Database) -> list[sqlite3.Row]:
+def _load_event_rows(database: Database) -> Sequence[Row]:
     with database.connect() as connection:
         return connection.execute(
             """
@@ -211,7 +211,7 @@ def _load_event_rows(database: Database) -> list[sqlite3.Row]:
             JOIN event_evidence ee ON ee.event_id = e.event_id
             JOIN evidence_records er ON er.evidence_id = ee.evidence_id
             WHERE e.review_status != 'rejected'
-              AND (e.event_type = 'appointment' OR e.description GLOB '*任*')
+              AND (e.event_type = 'appointment' OR e.description LIKE '%任%')
             ORDER BY e.event_id, ep.person_id, er.evidence_id
             """
         ).fetchall()
@@ -331,7 +331,7 @@ def _temporal_bounds(value: str, precision: str, *, end: bool) -> date:
     return upper if end else lower
 
 
-def _overlaps_at(row: sqlite3.Row, at_start: date, at_end: date) -> bool:
+def _overlaps_at(row: Row, at_start: date, at_end: date) -> bool:
     if row["start_value"] is None or row["start_precision"] == "unknown":
         return False
     relation_start = _temporal_bounds(
@@ -407,11 +407,11 @@ def get_organization_relationships(
                   r.review_status != 'confirmed'
                   OR (r.start_value IS NOT NULL AND r.start_precision != 'unknown')
               )
-            ORDER BY r.start_value, r.relationship_id, er.evidence_id
+            ORDER BY r.start_value NULLS FIRST, r.relationship_id, er.evidence_id
             """,
             (person_id, *selected_types, *selected_statuses),
         ).fetchall()
-    grouped: dict[str, list[sqlite3.Row]] = {}
+    grouped: dict[str, list[Row]] = {}
     for row in rows:
         if at_period is not None and not _overlaps_at(row, *at_period):
             continue

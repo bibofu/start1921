@@ -1,9 +1,16 @@
 from __future__ import annotations
 
-import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+
+from history_agent.db_backend import (
+    Connection,
+    DatabaseTarget,
+    database_connection,
+    is_postgres_target,
+    postgres_schema,
+)
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;
@@ -381,26 +388,26 @@ CREATE TABLE IF NOT EXISTS research_revisions (
 """
 
 
+POSTGRES_SCHEMA = postgres_schema(SCHEMA)
+SCHEMA_VERSION = 6
+POSTGRES_SCHEMA_VERSION = 7
+
+
 class Database:
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, path: DatabaseTarget):
+        self.target = path
+        self.backend = "postgresql" if is_postgres_target(path) else "sqlite"
+        self.path = None if is_postgres_target(path) else Path(path)
 
     @contextmanager
-    def connect(self) -> Iterator[sqlite3.Connection]:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
-        connection.execute("PRAGMA foreign_keys = ON")
-        try:
+    def connect(self) -> Iterator[Connection]:
+        with database_connection(self.target) as connection:
             yield connection
-            connection.commit()
-        except Exception:
-            connection.rollback()
-            raise
-        finally:
-            connection.close()
 
     def initialize(self) -> None:
+        if self.backend == "postgresql":
+            self._initialize_postgres()
+            return
         with self.connect() as connection:
             connection.executescript(SCHEMA)
             relationship_columns = {
@@ -429,3 +436,56 @@ class Database:
                     "ADD COLUMN mention_source TEXT NOT NULL DEFAULT 'explicit'"
                 )
             connection.execute("PRAGMA user_version = 6")
+
+    def _initialize_postgres(self) -> None:
+        with self.connect() as connection:
+            # Concurrent web workers and import commands must not race DDL.
+            connection.execute("SELECT pg_advisory_xact_lock(1921, 6)")
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS history_schema_migrations ("
+                "version INTEGER PRIMARY KEY, "
+                "applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)"
+            )
+            row = connection.execute(
+                "SELECT COALESCE(MAX(version), 0) FROM history_schema_migrations"
+            ).fetchone()
+            version = int(row[0]) if row is not None else 0
+            if version > POSTGRES_SCHEMA_VERSION:
+                raise RuntimeError("Database schema is newer than this application supports")
+            if version == POSTGRES_SCHEMA_VERSION:
+                return
+            connection.executescript(POSTGRES_SCHEMA)
+            connection.execute(
+                "ALTER TABLE person_relationships "
+                "ADD COLUMN IF NOT EXISTS subject_mention_text TEXT"
+            )
+            connection.execute(
+                "ALTER TABLE person_relationships "
+                "ADD COLUMN IF NOT EXISTS object_mention_text TEXT"
+            )
+            connection.execute(
+                "ALTER TABLE event_participants "
+                "ADD COLUMN IF NOT EXISTS mention_source TEXT NOT NULL DEFAULT 'explicit'"
+            )
+            metadata_types = {
+                str(row[0]): str(row[1])
+                for row in connection.execute(
+                    "SELECT a.attname, t.typname FROM pg_attribute a "
+                    "JOIN pg_type t ON t.oid = a.atttypid "
+                    "WHERE a.attrelid = 'document_files'::regclass "
+                    "AND a.attname IN ('pdf_title', 'pdf_author') AND NOT a.attisdropped"
+                ).fetchall()
+            }
+            for column in ("pdf_title", "pdf_author"):
+                if metadata_types.get(column) == "text":
+                    connection.execute(
+                        f"ALTER TABLE document_files ALTER COLUMN {column} "
+                        f"TYPE BYTEA USING convert_to({column}, 'UTF8')"
+                    )
+                elif metadata_types.get(column) != "bytea":
+                    raise RuntimeError(f"Unsupported PDF metadata column type: {column}")
+            connection.execute(
+                "INSERT INTO history_schema_migrations (version) VALUES (?) "
+                "ON CONFLICT (version) DO NOTHING",
+                (POSTGRES_SCHEMA_VERSION,),
+            )

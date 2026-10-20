@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import re
-import sqlite3
-from contextlib import closing
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from threading import Lock
 
 from history_agent.answering.models import ConversationMessage
+from history_agent.db_backend import (
+    Connection,
+    database_connection,
+    is_postgres_target,
+    postgres_schema,
+)
 
 EVIDENCE_MARKER = re.compile(r"\[E[1-9]\d*\]")
 WHITESPACE = re.compile(r"[ \t]+")
@@ -149,38 +155,39 @@ def build_prompt_context(
 
 
 class ConversationStore:
-    """Small SQLite store isolated from the research database."""
+    """Transactional conversation storage using SQLite or PostgreSQL."""
 
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, path: Path | str):
+        self.target = path
+        self.path = None if is_postgres_target(path) else Path(path)
         self._initialized = False
         self._lock = Lock()
 
-    def _connect(self) -> sqlite3.Connection:
-        self._ensure_initialized()
-        connection = sqlite3.connect(self.path, timeout=5.0)
-        connection.row_factory = sqlite3.Row
-        connection.execute("PRAGMA foreign_keys = ON")
-        connection.execute("PRAGMA busy_timeout = 5000")
-        return connection
+    @contextmanager
+    def _connect(self) -> Iterator[Connection]:
+        self.initialize()
+        with database_connection(self.target) as connection:
+            yield connection
 
-    def _ensure_initialized(self) -> None:
+    def initialize(self) -> None:
         if self._initialized:
             return
         with self._lock:
             if self._initialized:
                 return
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            connection = sqlite3.connect(self.path, timeout=5.0)
-            try:
-                connection.executescript(CONVERSATION_SCHEMA)
-                connection.commit()
-            finally:
-                connection.close()
+            schema = (
+                postgres_schema(CONVERSATION_SCHEMA)
+                if is_postgres_target(self.target)
+                else CONVERSATION_SCHEMA
+            )
+            with database_connection(self.target) as connection:
+                if is_postgres_target(self.target):
+                    connection.execute("SELECT pg_advisory_xact_lock(1921, 7)")
+                connection.executescript(schema)
             self._initialized = True
 
     def messages(self, session_id: str, *, limit: int = 200) -> list[ConversationMessage]:
-        with closing(self._connect()) as connection:
+        with self._connect() as connection:
             rows = connection.execute(
                 "SELECT role, content FROM conversation_messages "
                 "WHERE session_id = ? ORDER BY message_id DESC LIMIT ?",
@@ -194,7 +201,7 @@ class ConversationStore:
     def append_exchange(self, session_id: str, question: str, answer: str) -> None:
         timestamp = _now()
         stored_answer = _truncate(answer, 10_000)
-        with closing(self._connect()) as connection:
+        with self._connect() as connection:
             connection.execute(
                 "INSERT INTO conversation_sessions(session_id, created_at, updated_at) "
                 "VALUES (?, ?, ?) ON CONFLICT(session_id) DO UPDATE SET "
@@ -215,11 +222,9 @@ class ConversationStore:
                 "ORDER BY message_id DESC LIMIT ?)",
                 (session_id, session_id, MAX_STORED_MESSAGES_PER_SESSION),
             )
-            connection.commit()
 
     def clear(self, session_id: str) -> None:
-        with closing(self._connect()) as connection:
+        with self._connect() as connection:
             connection.execute(
                 "DELETE FROM conversation_sessions WHERE session_id = ?", (session_id,)
             )
-            connection.commit()

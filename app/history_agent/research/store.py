@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 
 from history_agent.db import Database
+from history_agent.db_backend import INTEGRITY_ERRORS, Connection, Row
 from history_agent.errors import ResearchDataError
 from history_agent.research.models import (
     EvidenceReference,
@@ -49,7 +49,7 @@ class ResearchStore:
             )
             try:
                 self._insert_event(connection, event, now)
-            except sqlite3.IntegrityError as exc:
+            except INTEGRITY_ERRORS as exc:
                 raise ResearchDataError(f"Cannot save event {event.event_id}: {exc}") from exc
 
     def sync_generated_events(
@@ -96,7 +96,7 @@ class ResearchStore:
                         continue
                     self._update_generated_event(connection, event, now)
                     updated += 1
-            except sqlite3.IntegrityError as exc:
+            except INTEGRITY_ERRORS as exc:
                 raise ResearchDataError(f"Cannot save event batch: {exc}") from exc
         return created, updated, skipped
 
@@ -163,7 +163,7 @@ class ResearchStore:
                         """,
                         (relationship.relationship_id, evidence.evidence_id),
                     )
-            except sqlite3.IntegrityError as exc:
+            except INTEGRITY_ERRORS as exc:
                 raise ResearchDataError(
                     f"Cannot save relationship {relationship.relationship_id}: {exc}"
                 ) from exc
@@ -271,8 +271,8 @@ class ResearchStore:
 
     @staticmethod
     def _relationship_matches(
-        connection: sqlite3.Connection,
-        existing: sqlite3.Row,
+        connection: Connection,
+        existing: Row,
         relationship: HistoricalRelationship,
     ) -> bool:
         expected = (
@@ -330,7 +330,7 @@ class ResearchStore:
 
     @staticmethod
     def _insert_event(
-        connection: sqlite3.Connection, event: HistoricalEvent, now: str
+        connection: Connection, event: HistoricalEvent, now: str
     ) -> None:
         connection.execute(
             """
@@ -354,7 +354,7 @@ class ResearchStore:
 
     @staticmethod
     def _write_event_links(
-        connection: sqlite3.Connection, event: HistoricalEvent, now: str
+        connection: Connection, event: HistoricalEvent, now: str
     ) -> None:
         connection.executemany(
             """
@@ -382,8 +382,8 @@ class ResearchStore:
 
     @staticmethod
     def _event_matches(
-        connection: sqlite3.Connection,
-        existing: sqlite3.Row,
+        connection: Connection,
+        existing: Row,
         event: HistoricalEvent,
     ) -> bool:
         columns = (
@@ -436,7 +436,7 @@ class ResearchStore:
 
     @staticmethod
     def _update_generated_event(
-        connection: sqlite3.Connection, event: HistoricalEvent, now: str
+        connection: Connection, event: HistoricalEvent, now: str
     ) -> None:
         connection.execute(
             """
@@ -462,7 +462,7 @@ class ResearchStore:
 
     @staticmethod
     def _require_active_people(
-        connection: sqlite3.Connection, person_ids: list[str]
+        connection: Connection, person_ids: list[str]
     ) -> None:
         for person_id in set(person_ids):
             row = connection.execute(
@@ -475,7 +475,7 @@ class ResearchStore:
 
     @staticmethod
     def _validate_relationship_policy(
-        relation_type: sqlite3.Row, relationship: HistoricalRelationship
+        relation_type: Row, relationship: HistoricalRelationship
     ) -> None:
         object_kind = str(relation_type["object_kind"])
         if object_kind == "person" and relationship.object_person_id is None:
@@ -498,7 +498,7 @@ class ResearchStore:
 
     @staticmethod
     def _save_evidence(
-        connection: sqlite3.Connection, evidence: EvidenceReference, now: str
+        connection: Connection, evidence: EvidenceReference, now: str
     ) -> None:
         existing = connection.execute(
             "SELECT * FROM evidence_records WHERE evidence_id = ?",

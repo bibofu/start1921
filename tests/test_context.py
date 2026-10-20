@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import pytest
 from fastapi.testclient import TestClient
 from history_agent.answering.context import (
     ConversationStore,
@@ -12,6 +13,7 @@ from history_agent.answering.context import (
 from history_agent.answering.models import AnswerResponse, ConversationMessage, QuestionRequest
 from history_agent.answering.streaming import AnswerStreamEvent
 from history_agent.config import Settings
+from history_agent.db_backend import INTEGRITY_ERRORS
 from history_agent.web import app as web_module
 
 
@@ -72,6 +74,64 @@ def test_conversation_store_persists_and_clears_exchanges(work_path: Path) -> No
     ]
     reopened.clear("session-12345678")
     assert reopened.messages("session-12345678") == []
+
+
+def test_conversation_store_prunes_complete_turns_and_rolls_back_failed_exchange(
+    work_path: Path,
+) -> None:
+    store = ConversationStore(work_path / "conversations.db")
+    for number in range(102):
+        store.append_exchange("session-retained", f"问题{number}", f"回答{number}")
+    messages = store.messages("session-retained")
+    assert len(messages) == 200
+    assert messages[0].content == "问题2"
+    assert messages[-1].content == "回答101"
+    assert [item.role for item in messages] == ["user", "assistant"] * 100
+
+    # A constraint failure after creating the session must roll back the entire exchange.
+    with pytest.raises(INTEGRITY_ERRORS):
+        store.append_exchange("session-invalid", None, "回答")  # type: ignore[arg-type]
+    with store._connect() as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM conversation_sessions WHERE session_id=?",
+            ("session-invalid",),
+        ).fetchone()[0] == 0
+
+
+def test_web_conversation_store_uses_postgres_target(monkeypatch, work_path: Path) -> None:
+    targets: list[Path | str] = []
+    monkeypatch.setattr(web_module, "ConversationStore", lambda target: targets.append(target))
+    settings = Settings(
+        _env_file=None,
+        project_root=work_path,
+        database_url="postgresql://localhost/history",
+        conversation_database_url="postgresql://localhost/chat",
+    )
+
+    web_module.create_app(settings)
+
+    assert targets == ["postgresql://localhost/chat"]
+
+
+def test_health_probes_configured_database_target(monkeypatch, work_path: Path) -> None:
+    targets: list[Path | str] = []
+
+    def unavailable(target: Path | str) -> bool:
+        targets.append(target)
+        return False
+
+    monkeypatch.setattr(web_module, "_database_ready", unavailable)
+    settings = Settings(
+        _env_file=None,
+        project_root=work_path,
+        database_url="postgresql://research:password@localhost/history",
+    )
+    response = TestClient(web_module.create_app(settings)).get("/api/health")
+
+    assert targets == [settings.database_target]
+    assert response.json()["database_backend"] == "postgresql"
+    assert response.json()["database_ready"] is False
+    assert "password" not in response.text
 
 
 def test_web_session_uses_server_history_and_ignores_client_history(

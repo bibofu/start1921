@@ -49,6 +49,7 @@ def _catalog() -> PersonCatalog:
 
 def _settings(work_path: Path) -> Settings:
     return Settings(
+        _env_file=None,
         project_root=work_path,
         database_path=work_path / "history_agent.db",
         data_dir=work_path / "data",

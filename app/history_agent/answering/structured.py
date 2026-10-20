@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-import sqlite3
 
 from history_agent.answering.models import (
     AnswerResponse,
@@ -13,6 +12,7 @@ from history_agent.answering.models import (
 )
 from history_agent.config import Settings
 from history_agent.db import Database
+from history_agent.db_backend import DATABASE_ERRORS
 from history_agent.errors import ResearchDataError
 from history_agent.research.intersections import get_person_intersections
 from history_agent.research.people import resolve_person
@@ -95,9 +95,9 @@ def answer_structured_question(
         return _response(
             request, intent, f"研究范围为 {lower}—{upper} 年，请提供范围内且起止顺序正确的年份。"
         )
-    if not settings.database_path.is_file():
+    database = Database(settings.database_target)
+    if database.path is not None and not database.path.is_file():
         return _response(request, intent, "结构化研究库尚未就绪，请先初始化并抽取年谱事件。")
-    database = Database(settings.database_path)
     try:
         with database.connect() as connection:
             forms = {
@@ -233,7 +233,7 @@ def answer_structured_question(
             citations,
             limitations,
         )
-    except (ResearchDataError, sqlite3.Error):
+    except (ResearchDataError, *DATABASE_ERRORS):
         # A failed structured lookup must not become a broad RAG claim about joint participation.
         return _response(
             request,

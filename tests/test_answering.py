@@ -291,7 +291,9 @@ def test_compound_leading_people_are_checked_individually() -> None:
 
 
 def test_api_health_and_question_contract(monkeypatch: Any) -> None:
-    settings = Settings(project_root=Path.cwd(), data_dir=Path("test-data-that-does-not-exist"))
+    settings = Settings(
+        _env_file=None, project_root=Path.cwd(), data_dir=Path("test-data-that-does-not-exist")
+    )
 
     expected = AnswerResponse(
         question="周恩来在1956年做了什么？",

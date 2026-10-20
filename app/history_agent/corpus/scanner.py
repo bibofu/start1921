@@ -106,6 +106,14 @@ def _current_file(database: Database, document_id: str) -> Any | None:
         ).fetchone()
 
 
+def _pdf_metadata_parameter(database: Database, value: str | None) -> str | bytes | None:
+    # PDF metadata may contain embedded NUL characters, which PostgreSQL TEXT
+    # cannot represent. Its two metadata columns use BYTEA; reads decode UTF-8.
+    if database.backend == "postgresql" and value is not None:
+        return value.encode("utf-8")
+    return value
+
+
 def _save_file(
     database: Database,
     document_id: str,
@@ -149,8 +157,8 @@ def _save_file(
                 path.stat().st_size,
                 metadata["page_count"],
                 modified_at,
-                metadata["pdf_title"],
-                metadata["pdf_author"],
+                _pdf_metadata_parameter(database, metadata["pdf_title"]),
+                _pdf_metadata_parameter(database, metadata["pdf_author"]),
                 int(metadata["is_encrypted"]),
                 timestamp,
                 timestamp,

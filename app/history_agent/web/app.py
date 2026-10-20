@@ -19,6 +19,7 @@ from history_agent.answering.service import answer_question_async
 from history_agent.answering.streaming import AnswerStreamEvent, stream_answer_question
 from history_agent.config import Settings, get_settings
 from history_agent.db import Database
+from history_agent.db_backend import DATABASE_ERRORS
 from history_agent.errors import ResearchDataError, RetrievalError
 from history_agent.research.intersections import (
     PersonIntersectionResponse,
@@ -33,7 +34,7 @@ from history_agent.research.timeline import (
     TimelineReviewStatus,
     get_person_timeline,
 )
-from history_agent.web.readiness import readiness_snapshot
+from history_agent.web.readiness import _database_ready, readiness_snapshot
 
 LOGGER = logging.getLogger(__name__)
 SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
@@ -42,7 +43,7 @@ SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
 def create_app(settings: Settings | None = None) -> FastAPI:
     active_settings = settings or get_settings()
     static_dir = files("history_agent.web").joinpath("static")
-    conversations = ConversationStore(active_settings.conversation_database_path)
+    conversations = ConversationStore(active_settings.conversation_database_target)
 
     def with_server_context(request: QuestionRequest) -> QuestionRequest:
         if request.session_id is None:
@@ -107,6 +108,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @api.get("/api/health")
     def health() -> dict[str, object]:
+        try:
+            database_ready = _database_ready(active_settings.database_target)
+        except (OSError, *DATABASE_ERRORS):
+            database_ready = False
         indexes = {
             "keyword": active_settings.keyword_index_path.is_file(),
             "vector": active_settings.vector_index_path.is_dir(),
@@ -115,6 +120,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "status": "ok",
             "version": __version__,
             "rag_framework": "llamaindex",
+            "database_backend": active_settings.database_backend,
+            "database_ready": database_ready,
+            "conversation_database_backend": active_settings.conversation_database_backend,
             "rag_execution_paths": ["llamaindex", "native"],
             "llamaindex_components": [
                 "workflow",
@@ -249,7 +257,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         try:
             return get_person_timeline(
-                Database(active_settings.database_path),
+                Database(active_settings.database_target),
                 person_id=person_id,
                 start_year=start_year,
                 end_year=end_year,
@@ -282,7 +290,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 raise HTTPException(422, f"year must be within the research range {lower}-{upper}")
         try:
             return get_person_intersections(
-                Database(active_settings.database_path),
+                Database(active_settings.database_target),
                 person_id=person_id,
                 other_person_id=other_person_id,
                 start_year=start_year if start_year is not None else lower,
@@ -318,7 +326,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 raise HTTPException(422, f"at must be within the research range {lower}-{upper}")
         try:
             return get_organization_relationships(
-                Database(active_settings.database_path),
+                Database(active_settings.database_target),
                 person_id=person_id,
                 at=at,
                 relation_types=relation_type,

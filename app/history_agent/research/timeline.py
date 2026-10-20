@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 from collections import defaultdict
 from collections.abc import Sequence
 from typing import Any, Literal, cast
@@ -9,6 +8,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, Field
 
 from history_agent.db import Database
+from history_agent.db_backend import Connection, Row
 from history_agent.errors import ResearchDataError
 from history_agent.research.availability import available_document_sql, available_event_sql
 from history_agent.research.models import ReviewStatus, TemporalPoint
@@ -84,7 +84,7 @@ def _placeholders(values: Sequence[str]) -> str:
     return ", ".join("?" for _ in values)
 
 
-def _temporal_payload(row: sqlite3.Row, prefix: str) -> dict[str, Any] | None:
+def _temporal_payload(row: Row, prefix: str) -> dict[str, Any] | None:
     precision = row[f"{prefix}_precision"]
     if precision is None:
         return None
@@ -141,12 +141,12 @@ def _evenly_spaced_indexes(length: int, count: int) -> list[int]:
     return [round(index * (length - 1) / (count - 1)) for index in range(count)]
 
 
-def _representative_rows(rows: list[sqlite3.Row], limit: int) -> list[sqlite3.Row]:
+def _representative_rows(rows: list[Row], limit: int) -> list[Row]:
     """Choose strong records across the requested period instead of its first days."""
 
     if len(rows) <= limit:
         return rows
-    buckets: dict[str, list[sqlite3.Row]] = {}
+    buckets: dict[str, list[Row]] = {}
     for row in rows:
         value = str(row["start_value"] or "")
         bucket = value[:7] if len(value) >= 7 else value[:4] or "unknown"
@@ -160,7 +160,7 @@ def _representative_rows(rows: list[sqlite3.Row], limit: int) -> list[sqlite3.Ro
     )
     review_rank = {"confirmed": 2, "unreviewed": 1, "needs_review": 0}
 
-    def quality(row: sqlite3.Row) -> tuple[int, int, float, int]:
+    def quality(row: Row) -> tuple[int, int, float, int]:
         return (
             review_rank.get(str(row["review_status"]), 0),
             1 if row["record_kind"] == "canonical" else 0,
@@ -218,7 +218,7 @@ def _event_filters(
 
 
 def _load_event_rows(
-    connection: sqlite3.Connection,
+    connection: Connection,
     *,
     person_id: str,
     start_year: int | None,
@@ -227,7 +227,7 @@ def _load_event_rows(
     review_statuses: Sequence[str],
     other_person_id: str | None = None,
     subject_only: bool = False,
-) -> list[sqlite3.Row]:
+) -> list[Row]:
     canonical_filters, canonical_parameters = _event_filters(
         "c",
         start_year=start_year,
@@ -269,7 +269,7 @@ def _load_event_rows(
                 AND cp.person_id = ?
                 {canonical_subject_filter}
           )
-          AND (? IS NULL OR EXISTS (
+          AND (CAST(? AS TEXT) IS NULL OR EXISTS (
               SELECT 1 FROM canonical_event_participants cp2
               WHERE cp2.canonical_event_id = c.canonical_event_id
                 AND cp2.person_id = ?
@@ -290,7 +290,7 @@ def _load_event_rows(
               WHERE ep.event_id = e.event_id AND ep.person_id = ?
                 {source_subject_filter}
           )
-          AND (? IS NULL OR EXISTS (
+          AND (CAST(? AS TEXT) IS NULL OR EXISTS (
               SELECT 1 FROM event_participants ep2
               WHERE ep2.event_id = e.event_id AND ep2.person_id = ?
           ))
@@ -326,12 +326,12 @@ def _load_event_rows(
     )
 
 
-def _selected_ids(rows: list[sqlite3.Row], kind: TimelineRecordKind) -> list[str]:
+def _selected_ids(rows: list[Row], kind: TimelineRecordKind) -> list[str]:
     return [str(row["record_id"]) for row in rows if row["record_kind"] == kind]
 
 
 def _load_source_event_ids(
-    connection: sqlite3.Connection,
+    connection: Connection,
     canonical_ids: list[str],
     source_ids: list[str],
 ) -> dict[str, list[str]]:
@@ -351,7 +351,7 @@ def _load_source_event_ids(
 
 
 def _load_participants(
-    connection: sqlite3.Connection,
+    connection: Connection,
     canonical_ids: list[str],
     source_ids: list[str],
 ) -> dict[str, list[TimelineParticipant]]:
@@ -387,7 +387,7 @@ def _load_participants(
 
 
 def _load_evidence(
-    connection: sqlite3.Connection,
+    connection: Connection,
     canonical_ids: list[str],
     source_ids: list[str],
     *,
@@ -444,7 +444,7 @@ def _load_evidence(
 
 
 def _append_evidence(
-    result: dict[str, list[TimelineEvidence]], rows: list[sqlite3.Row]
+    result: dict[str, list[TimelineEvidence]], rows: Sequence[Row]
 ) -> None:
     for row in rows:
         payload = dict(row)

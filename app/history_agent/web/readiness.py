@@ -6,11 +6,19 @@ import sqlite3
 from pathlib import Path
 
 from history_agent.config import Settings
+from history_agent.db_backend import DATABASE_ERRORS, database_connection, is_postgres_target
 from history_agent.retrieval.keyword import search_keyword_index
 from history_agent.retrieval.vector import search_vector_index
 
 
-def _database_ready(path: Path) -> bool:
+def _database_ready(target: Path | str) -> bool:
+    if is_postgres_target(target):
+        with database_connection(target) as connection:
+            # Verify the configured research database and its schema, not a leftover local file.
+            connection.execute("SELECT document_id FROM documents LIMIT 1").fetchone()
+            connection.execute("SELECT person_id FROM persons LIMIT 1").fetchone()
+        return True
+    path = Path(target)
     if not path.is_file():
         return False
     connection = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
@@ -24,8 +32,8 @@ def _database_ready(path: Path) -> bool:
 def readiness_snapshot(settings: Settings) -> dict[str, object]:
     components: dict[str, bool] = {}
     try:
-        components["database"] = _database_ready(settings.database_path)
-    except (OSError, sqlite3.Error):
+        components["database"] = _database_ready(settings.database_target)
+    except (OSError, *DATABASE_ERRORS):
         components["database"] = False
     try:
         search_keyword_index(

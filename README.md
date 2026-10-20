@@ -10,11 +10,16 @@
 - [任务规划](TASK_PLAN.md)：将需求拆分为里程碑、具体任务、依赖关系、交付物和质量闸门。
 - [RAG 实现说明](RAG-IMPL.md)：说明分片、双索引、召回、融合重排、Top-K、生成和引用校验的当前实现。
 - [结构化研究模型](RESEARCH_SCHEMA.md)：说明人物、事件、关系、时间精度、证据和人工复核约束。
+- [PostgreSQL 迁移与运行](POSTGRESQL.md)：主库与会话库的配置、保留数据迁移、验证和回退；关键词索引与 Qdrant 保持不变。
 - [年谱抽取基线](evals/CHRONOLOGY_BASELINE.md)：记录首批规则抽取规模、人工页码抽查与已知限制。
 
 ## 快速启动
 
 项目命令统一使用 `start1921`，原 `history-agent` 命令保留为兼容入口。内部 Python 包 `history_agent`、`HISTORY_AGENT_` 环境变量前缀及既有数据库 `data/history_agent.db` 保持兼容，可继续复用现有配置和数据。
+
+主库和会话库支持 PostgreSQL；设置 `HISTORY_AGENT_DATABASE_URL` 后使用该数据库，
+会话默认共用同一连接。已有 SQLite 数据请按 [迁移说明](POSTGRESQL.md) 备份、导入并验证，
+再启动服务。使用本项目内的 PostgreSQL 实例时，先运行 `.\scripts\postgres.ps1 start`。
 
 ### 1. 准备环境
 
@@ -245,7 +250,7 @@ Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法
 .\.venv\Scripts\start1921.exe corpus scan --accept-changes
 ```
 
-首次构建向量索引会下载中文嵌入模型。运行数据保存在 `data/`：SQLite 数据库、逐页文本、OCR、chunks、年谱事件候选、检索索引、质量报告和任务运行记录都可以删除后重建，不提交 Git。
+首次构建向量索引会下载中文嵌入模型。逐页文本、OCR、chunks、检索索引、质量报告和任务记录保存在 `data/`，不提交 Git。派生索引可以重新构建；主库、会话库及人工复核记录需要单独备份。使用 PostgreSQL 后，主库和会话记录保存在配置的数据库服务中，原 SQLite 文件保留作迁移来源或回退备份。
 
 项目已接入 DeepSeek V4。所有问法默认先由 `deepseek-v4-flash` 以非思考 JSON 模式完成统一查询理解：规范化简称与别名，识别人物、事件、时间、意图、逐年/逐项/分阶段覆盖要求，并选择结构化研究库或混合 RAG。明确人物和完整年份/年份区间的时间线、交集问题可以选择结构化路线；月份、地点、否定、指定来源、命名历史时期或其他限制必须选择混合检索。“要求引用/直接原文支持”等回答形式不会被误判为缺少人物或年份。查询计划通过本地 Pydantic schema 后，由执行器把原问题和检索改写作为独立子查询运行，再以 RRF 合并；普通问题最多采用 2 条高价值改写，只有必须逐项覆盖的 `per_item` 问题才保留最多 8 条。每次查询的关键词与向量分支并行执行。人物、年份范围和覆盖策略作为类型化条件同时传给两个分支，月份、地点、否定、来源等约束会保留在子查询中。解析超时、返回非法 JSON 或不可用时自动退回原问题执行混合检索，不再由前置结构化正则拒答。
 
@@ -259,9 +264,9 @@ Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法
 DEEPSEEK_API_KEY=你的密钥
 ```
 
-保存后运行 `start1921 llm check` 验证连接，再重启 Web 服务。也可以在 `.env` 中将 `HISTORY_AGENT_LLM_MODEL` 改为 `deepseek-v4-flash`。没有配置密钥时，查询理解退回原问题，页面继续使用“证据摘录模式”；DeepSeek 超时、余额不足、认证失败、查询计划非法或返回虚构证据编号时，也会自动安全降级，不影响本地检索和引用展示。Web 会话通过浏览器保存的 `session_id` 与服务端 `data/conversations.db` 关联，刷新页面后可以恢复；送入查询理解和最终生成的历史由服务端统一按消息数、字符预算裁剪，旧回答中的证据编号会先失效化。历史对话仅用于解析指代和承接，不作为本轮史实证据；本轮生成仍只允许使用当前检索得到的证据包。
+保存后运行 `start1921 llm check` 验证连接，再重启 Web 服务。也可以在 `.env` 中将 `HISTORY_AGENT_LLM_MODEL` 改为 `deepseek-v4-flash`。没有配置密钥时，查询理解退回原问题，页面继续使用“证据摘录模式”；DeepSeek 超时、余额不足、认证失败、查询计划非法或返回虚构证据编号时，也会自动安全降级，不影响本地检索和引用展示。Web 会话通过浏览器保存的 `session_id` 与服务端会话库关联（PostgreSQL，或兼容模式下的 `data/conversations.db`），刷新页面后可以恢复；送入查询理解和最终生成的历史由服务端统一按消息数、字符预算裁剪，旧回答中的证据编号会先失效化。历史对话仅用于解析指代和承接，不作为本轮史实证据；本轮生成仍只允许使用当前检索得到的证据包。
 
-`research enrich-events` 是独立的批处理入口，默认一次最多处理 5 条，每个事件发送的全部证据正文合计硬限制为 1200 字符。它使用 DeepSeek JSON Output，但仍在本地执行严格 schema 与原文子串校验；模型不能修改日期、事件原文或证据页码，也不能直接把记录标为“已确认”。每次原始响应、模型与提示词版本、调用前后快照和 Token 用量都会写入 SQLite，结果统一进入复核队列。该命令会把选中事件的短证据发送到 DeepSeek；对资料出境有要求时，应只运行 `--dry-run`，或先完成相应授权与脱敏。JSON Output 参数以 [DeepSeek 官方说明](https://api-docs.deepseek.com/guides/json_mode/) 为准。
+`research enrich-events` 是独立的批处理入口，默认一次最多处理 5 条，每个事件发送的全部证据正文合计硬限制为 1200 字符。它使用 DeepSeek JSON Output，但仍在本地执行严格 schema 与原文子串校验；模型不能修改日期、事件原文或证据页码，也不能直接把记录标为“已确认”。每次原始响应、模型与提示词版本、调用前后快照和 Token 用量都会写入配置的主库，结果统一进入复核队列。该命令会把选中事件的短证据发送到 DeepSeek；对资料出境有要求时，应只运行 `--dry-run`，或先完成相应授权与脱敏。JSON Output 参数以 [DeepSeek 官方说明](https://api-docs.deepseek.com/guides/json_mode/) 为准。
 
 ## 项目定位
 
@@ -400,7 +405,7 @@ flowchart LR
 | 向量模型 | BAAI/bge-small-zh-v1.5（当前） | 本地 CPU 中文语义检索；后续可评测 BGE-M3 |
 | 融合/重排 | RRF（当前）、BGE Reranker v2 M3（候选） | 合并 BM25 与向量结果、去除同页重复证据 |
 | 向量数据库 | Qdrant | 保存向量及日期、人物、文献等过滤字段 |
-| 元数据存储 | SQLite（初期），PostgreSQL（后期） | 文献、篇章、事件、人物和证据关系 |
+| 业务数据存储 | PostgreSQL；保留 SQLite 兼容后端 | 文献、事件、人物、证据关系、复核记录和会话 |
 | 关系分析 | SQL 关系表 + NetworkX | 初期完成人物网络和路径查询 |
 | 图数据库 | Neo4j（可选） | 关系规模和查询复杂度上升后再引入 |
 | 大语言模型 | DeepSeek V4-Pro（默认，可切换 V4-Flash） | 基于本地证据生成答案、thinking/high、引用 ID 校验 |

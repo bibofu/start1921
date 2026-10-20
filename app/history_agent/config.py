@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     docs_dir: Path = Path("docs")
     data_dir: Path = Path("data")
     database_path: Path = Path("data/history_agent.db")
+    database_url: SecretStr | None = None
+    conversation_database_url: SecretStr | None = None
     catalog_path: Path = Path("config/corpus_catalog.json")
     person_aliases_path: Path = Path("config/person_aliases.json")
     relation_types_path: Path = Path("config/relation_types.json")
@@ -81,6 +83,16 @@ class Settings(BaseSettings):
                 setattr(self, field_name, value.resolve())
         if self.research_start > self.research_end:
             raise ValueError("research_start must be on or before research_end")
+        for field_name in ("database_url", "conversation_database_url"):
+            secret = getattr(self, field_name)
+            if secret is not None:
+                value = secret.get_secret_value().strip()
+                if not value:
+                    setattr(self, field_name, None)
+                elif not value.startswith(("postgresql://", "postgres://")):
+                    raise ValueError(f"{field_name} must be a PostgreSQL connection URL")
+                else:
+                    setattr(self, field_name, SecretStr(value))
         return self
 
     @property
@@ -131,6 +143,23 @@ class Settings(BaseSettings):
     def conversation_database_path(self) -> Path:
         return self.data_dir / "conversations.db"
 
+    @property
+    def database_target(self) -> Path | str:
+        return self.database_url.get_secret_value() if self.database_url else self.database_path
+
+    @property
+    def conversation_database_target(self) -> Path | str:
+        secret = self.conversation_database_url or self.database_url
+        return secret.get_secret_value() if secret else self.conversation_database_path
+
+    @property
+    def database_backend(self) -> str:
+        return "postgresql" if self.database_url else "sqlite"
+
+    @property
+    def conversation_database_backend(self) -> str:
+        return "postgresql" if self.conversation_database_url or self.database_url else "sqlite"
+
     def ensure_runtime_dirs(self) -> None:
         for path in (
             self.data_dir,
@@ -158,7 +187,9 @@ class Settings(BaseSettings):
             "project_root": str(self.project_root),
             "docs_dir": str(self.docs_dir),
             "data_dir": str(self.data_dir),
-            "database_path": str(self.database_path),
+            "database_backend": self.database_backend,
+            "conversation_database_backend": self.conversation_database_backend,
+            "database_path": None if self.database_url else str(self.database_path),
             "catalog_path": str(self.catalog_path),
             "person_aliases_path": str(self.person_aliases_path),
             "relation_types_path": str(self.relation_types_path),

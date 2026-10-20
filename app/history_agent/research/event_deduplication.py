@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import sqlite3
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,6 +12,7 @@ from uuid import uuid4
 from pydantic import BaseModel, Field
 
 from history_agent.db import Database
+from history_agent.db_backend import Connection, Row
 from history_agent.errors import ResearchDataError
 from history_agent.research.models import (
     EventParticipant,
@@ -127,7 +127,7 @@ def _text_similarity(
     return containment, jaccard
 
 
-def _temporal_payload(row: sqlite3.Row, prefix: str) -> dict[str, Any] | None:
+def _temporal_payload(row: Row, prefix: str) -> dict[str, Any] | None:
     precision = row[f"{prefix}_precision"]
     if precision is None:
         return None
@@ -139,7 +139,7 @@ def _temporal_payload(row: sqlite3.Row, prefix: str) -> dict[str, Any] | None:
     }
 
 
-def _load_source_events(connection: sqlite3.Connection) -> list[SourceEvent]:
+def _load_source_events(connection: Connection) -> list[SourceEvent]:
     event_rows = connection.execute(
         """
         SELECT * FROM historical_events
@@ -560,7 +560,7 @@ def _canonical_row_values(candidate: CanonicalCandidate) -> tuple[object, ...]:
 
 
 def _write_candidate_links(
-    connection: sqlite3.Connection, candidate: CanonicalCandidate, now: str
+    connection: Connection, candidate: CanonicalCandidate, now: str
 ) -> None:
     canonical_id = candidate.event.event_id
     representative_id = _representative(candidate.members).event.event_id
@@ -617,7 +617,7 @@ def _write_candidate_links(
 
 
 def _ensure_pending_review_queue(
-    connection: sqlite3.Connection,
+    connection: Connection,
     candidate: CanonicalCandidate,
     now: str,
     *,
@@ -877,7 +877,7 @@ def list_event_merge_review_queue(
             JOIN canonical_events c USING (canonical_event_id)
             JOIN canonical_event_members m USING (canonical_event_id)
             WHERE q.status = 'pending' AND c.is_active = 1
-            GROUP BY q.queue_id
+            GROUP BY q.queue_id, c.canonical_event_id
             ORDER BY q.priority DESC, c.merge_confidence DESC, q.created_at
             LIMIT ?
             """,

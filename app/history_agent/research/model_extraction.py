@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any, Literal
@@ -13,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from history_agent.config import Settings
 from history_agent.db import Database
+from history_agent.db_backend import Connection
 from history_agent.errors import ResearchDataError
 from history_agent.research.models import (
     EventParticipant,
@@ -347,7 +347,7 @@ def _merge_event(
 
 
 def _event_from_connection(
-    connection: sqlite3.Connection, event_id: str
+    connection: Connection, event_id: str
 ) -> tuple[HistoricalEvent, str]:
     row = connection.execute(
         "SELECT * FROM historical_events WHERE event_id = ?", (event_id,)
@@ -421,7 +421,7 @@ def _event_from_connection(
 
 
 def _candidate_event_ids(
-    connection: sqlite3.Connection,
+    connection: Connection,
     *,
     document_ids: list[str] | None,
     event_ids: list[str] | None,
@@ -447,13 +447,14 @@ def _candidate_event_ids(
         values.extend(event_ids)
     rows = connection.execute(
         f"""
-        SELECT DISTINCT e.event_id, e.extraction_confidence, e.review_status
+        SELECT DISTINCT e.event_id, e.extraction_confidence, e.review_status,
+               CASE e.review_status WHEN 'needs_review' THEN 0 ELSE 1 END AS review_priority
         FROM historical_events e
         JOIN event_evidence ee ON ee.event_id = e.event_id
         JOIN evidence_records er ON er.evidence_id = ee.evidence_id
         WHERE {' AND '.join(clauses)}
         ORDER BY
-            CASE e.review_status WHEN 'needs_review' THEN 0 ELSE 1 END,
+            review_priority,
             e.extraction_confidence,
             e.event_id
         """,
@@ -463,7 +464,7 @@ def _candidate_event_ids(
 
 
 def _has_prior_attempt(
-    connection: sqlite3.Connection,
+    connection: Connection,
     candidate: EventCandidate,
     model_name: str,
     retry_failed: bool,

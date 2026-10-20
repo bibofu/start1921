@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import json
 import re
-import sqlite3
 from datetime import UTC, datetime
 from typing import Literal, cast
 from uuid import uuid4
 
 from history_agent.db import Database
+from history_agent.db_backend import Connection
 from history_agent.errors import ResearchDataError
 from history_agent.research.models import (
     PersonCandidate,
@@ -216,7 +216,7 @@ def resolve_person(database: Database, name: str) -> PersonResolution:
 
 
 def _candidate_rows(
-    connection: sqlite3.Connection, person_ids: list[str], matched_form: str
+    connection: Connection, person_ids: list[str], matched_form: str
 ) -> list[PersonCandidate]:
     if not person_ids:
         return []
@@ -317,7 +317,7 @@ def review_person_merge(
         )
 
 
-def _require_active_person(connection: sqlite3.Connection, person_id: str) -> None:
+def _require_active_person(connection: Connection, person_id: str) -> None:
     row = connection.execute(
         "SELECT status FROM persons WHERE person_id = ?", (person_id,)
     ).fetchone()

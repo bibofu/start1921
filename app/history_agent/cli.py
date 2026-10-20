@@ -79,6 +79,9 @@ research_app = typer.Typer(
     help="Manage auditable people, events, and relationships.", no_args_is_help=True
 )
 people_app = typer.Typer(help="Manage stable people and aliases.", no_args_is_help=True)
+database_app = typer.Typer(
+    help="Migrate and verify persistent application data.", no_args_is_help=True
+)
 app.add_typer(corpus_app, name="corpus")
 app.add_typer(extract_app, name="extract")
 app.add_typer(process_app, name="process")
@@ -86,6 +89,7 @@ app.add_typer(index_app, name="index")
 app.add_typer(eval_app, name="eval")
 app.add_typer(llm_app, name="llm")
 app.add_typer(research_app, name="research")
+app.add_typer(database_app, name="database")
 research_app.add_typer(people_app, name="people")
 
 
@@ -97,6 +101,76 @@ def configure_console() -> None:
         reconfigure = getattr(stream, "reconfigure", None)
         if reconfigure is not None:
             reconfigure(encoding="utf-8", errors="replace")
+
+
+def _postgres_migration_target() -> str:
+    settings = get_settings()
+    if settings.database_url is None:
+        raise typer.BadParameter("Set HISTORY_AGENT_DATABASE_URL to the PostgreSQL target.")
+    target = settings.database_url.get_secret_value()
+    if (
+        settings.conversation_database_url is not None
+        and settings.conversation_database_url.get_secret_value() != target
+    ):
+        raise typer.BadParameter(
+            "Migration requires the main and conversation stores in one target."
+        )
+    return target
+
+
+@database_app.command("migrate-postgres")
+def migrate_postgres(
+    backup_dir: Annotated[Path, typer.Option(help="New directory for consistent SQLite backups.")],
+    source_database: Annotated[Path | None, typer.Option()] = None,
+    source_conversations: Annotated[Path | None, typer.Option()] = None,
+    report: Annotated[
+        Path | None, typer.Option(help="Save the verification report as JSON.")
+    ] = None,
+) -> None:
+    """Copy main and conversation SQLite stores to an empty PostgreSQL target.
+
+    Stop application writers first. Keyword and vector indexes are not modified.
+    """
+    from history_agent.migration import MigrationError, migrate_sqlite_to_postgres
+
+    settings = get_settings()
+    target = _postgres_migration_target()
+    try:
+        result = migrate_sqlite_to_postgres(
+            source_database=source_database or settings.database_path,
+            source_conversations=source_conversations or settings.conversation_database_path,
+            target_url=target,
+            backup_dir=backup_dir,
+        )
+    except MigrationError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    if report is not None:
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+@database_app.command("verify-postgres")
+def verify_postgres(
+    source_database: Annotated[Path | None, typer.Option()] = None,
+    source_conversations: Annotated[Path | None, typer.Option()] = None,
+) -> None:
+    """Read-only comparison of every source field against the PostgreSQL target."""
+    from history_agent.migration import MigrationError, verify_sqlite_to_postgres
+
+    settings = get_settings()
+    target = _postgres_migration_target()
+    try:
+        result = verify_sqlite_to_postgres(
+            source_database=source_database or settings.database_path,
+            source_conversations=source_conversations or settings.conversation_database_path,
+            target_url=target,
+        )
+    except MigrationError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 @app.command()
@@ -139,7 +213,7 @@ def corpus_scan(
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "corpus_scan", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         catalog = load_catalog(settings.catalog_path)
         summary = scan_corpus(
             database=database,
@@ -180,7 +254,7 @@ def corpus_export() -> None:
 
     settings = get_settings()
     settings.ensure_runtime_dirs()
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     database.initialize()
     json_path, csv_path = export_manifest(database, settings.reports_dir)
     typer.echo(str(json_path))
@@ -192,7 +266,7 @@ def corpus_diff(json_output: bool = typer.Option(False, "--json", help="Emit JSO
     """Show the latest completed corpus scan."""
 
     settings = get_settings()
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     database.initialize()
     payload = load_latest_diff(database)
     if payload is None:
@@ -215,13 +289,13 @@ def research_initialize(
 
     settings = get_settings()
     settings.ensure_runtime_dirs()
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     people = load_person_catalog(settings.person_aliases_path)
     relations = load_relation_type_catalog(settings.relation_types_path)
     payload = {
         **sync_person_catalog(database, people),
         **sync_relation_types(database, relations),
-        "database": str(settings.database_path),
+        "database_backend": settings.database_backend,
     }
     if json_output:
         typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -256,7 +330,7 @@ def research_extract_chronologies(
         settings.public_snapshot(),
     )
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         if not dry_run:
             sync_person_catalog(database, load_person_catalog(settings.person_aliases_path))
         summary = extract_chronology_events(
@@ -354,7 +428,7 @@ def research_enrich_events(
         },
     )
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         catalog = load_person_catalog(settings.person_aliases_path)
         sync_person_catalog(database, catalog)
         summary = enrich_events_with_model(
@@ -398,7 +472,7 @@ def research_review_queue(
     """List pending model-assisted event review items."""
 
     settings = get_settings()
-    rows = list_review_queue(Database(settings.database_path), limit=limit)
+    rows = list_review_queue(Database(settings.database_target), limit=limit)
     if json_output:
         typer.echo(json.dumps(rows, ensure_ascii=False, indent=2))
         return
@@ -456,7 +530,7 @@ def research_merge_events(
     )
     try:
         summary = merge_duplicate_events(
-            database=Database(settings.database_path),
+            database=Database(settings.database_target),
             reports_dir=settings.reports_dir,
             run_id=tracker.run_id,
             minimum_score=minimum_score,
@@ -493,7 +567,7 @@ def research_merge_review_queue(
     """List uncertain canonical-event merges awaiting human review."""
 
     settings = get_settings()
-    rows = list_event_merge_review_queue(Database(settings.database_path), limit=limit)
+    rows = list_event_merge_review_queue(Database(settings.database_target), limit=limit)
     if json_output:
         typer.echo(json.dumps(rows, ensure_ascii=False, indent=2))
         return
@@ -522,7 +596,7 @@ def research_review_event_merge(
 
     settings = get_settings()
     review_id = review_event_merge(
-        Database(settings.database_path),
+        Database(settings.database_target),
         canonical_event_id=canonical_event_id,
         decision=decision,
         reviewed_by=reviewed_by,
@@ -572,7 +646,7 @@ def research_timeline(
             raise typer.BadParameter(
                 f"{option_name} must be within the research range {lower}-{upper}"
             )
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     resolution = resolve_person(database, person)
     if resolution.status == "ambiguous":
         choices = ", ".join(item.person_id for item in resolution.candidates)
@@ -618,7 +692,7 @@ def research_extract_relationships(
     """Extract conservative, evidence-backed organization relationship candidates."""
 
     settings = get_settings()
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     sync_relation_types(database, load_relation_type_catalog(settings.relation_types_path))
     try:
         summary = extract_organization_relationships(database, dry_run=dry_run)
@@ -649,7 +723,7 @@ def research_relationships(
     """Query time-aware organization relationships with source evidence."""
 
     settings = get_settings()
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     resolution = resolve_person(database, person)
     if resolution.status == "ambiguous":
         raise typer.BadParameter("ambiguous person; use a stable person ID")
@@ -679,7 +753,8 @@ def research_relationships(
     )
     for item in result.relationships:
         sources = ", ".join(
-            f"{evidence.document_title} PDF {evidence.pdf_page_start}" for evidence in item.evidence
+            f"{evidence.document_title} PDF {evidence.pdf_page_start}"
+            for evidence in item.evidence
         )
         typer.echo(
             f"{item.start.value} [{item.verification_level}] "
@@ -698,7 +773,7 @@ def eval_intersections(
     """Evaluate the visually checked, source-local intersection sample (JSON)."""
     settings = get_settings()
     result = evaluate_intersections(
-        Database(settings.database_path), settings.project_root / case_set
+        Database(settings.database_target), settings.project_root / case_set
     )
     typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
 
@@ -731,7 +806,7 @@ def eval_comprehensive(
                 "structured_questions"
             ]
             structured_result = evaluate_structured_questions(
-                database=Database(settings.database_path),
+                database=Database(settings.database_target),
                 question_set_path=structured_path,
             )
             payload["structured_verification"] = structured_result
@@ -780,7 +855,7 @@ def prepare_intersection_review(
         raise typer.BadParameter("output already exists; use --overwrite to replace it")
     try:
         packet = build_intersection_review_packet(
-            Database(settings.database_path),
+            Database(settings.database_target),
             settings.project_root / development_set,
             seed=seed,
             pair_limit=pair_limit,
@@ -861,7 +936,7 @@ def research_intersections(
     end = year if year is not None else (end_year if end_year is not None else upper)
     if not lower <= start <= upper or not lower <= end <= upper:
         raise typer.BadParameter(f"year must be within the research range {lower}-{upper}")
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     person_ids = []
     for name in (person, other_person):
         resolution = resolve_person(database, name)
@@ -913,7 +988,7 @@ def people_resolve(
     """Resolve a name without forcing ambiguous aliases into one person."""
 
     settings = get_settings()
-    resolution = resolve_person(Database(settings.database_path), name)
+    resolution = resolve_person(Database(settings.database_target), name)
     if json_output:
         typer.echo(resolution.model_dump_json(indent=2))
         return
@@ -937,7 +1012,7 @@ def people_propose_merge(
 
     settings = get_settings()
     proposal_id = propose_person_merge(
-        Database(settings.database_path),
+        Database(settings.database_target),
         source_person_id=source_person_id,
         target_person_id=target_person_id,
         reason=reason,
@@ -957,7 +1032,7 @@ def people_review_merge(
 
     settings = get_settings()
     review_person_merge(
-        Database(settings.database_path),
+        Database(settings.database_target),
         proposal_id=proposal_id,
         decision=decision,
         reviewed_by=reviewed_by,
@@ -975,7 +1050,7 @@ def extract_sample(json_output: bool = typer.Option(False, "--json", help="Emit 
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "extract_sample", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         database.initialize()
         summary = extract_sample_pages(
             database=database,
@@ -1027,7 +1102,7 @@ def extract_text(
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "extract_text", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         database.initialize()
         summary = extract_all_text(
             database=database,
@@ -1073,7 +1148,7 @@ def extract_benchmark(
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "parser_benchmark", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         database.initialize()
         payload = benchmark_parsers(
             database=database,
@@ -1108,7 +1183,7 @@ def extract_report(
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "extraction_quality_report", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         database.initialize()
         payload = build_quality_report(
             database=database,
@@ -1164,7 +1239,7 @@ def extract_ocr(
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "extract_ocr", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         database.initialize()
         summary = extract_all_ocr(
             database=database,
@@ -1216,7 +1291,7 @@ def process_chunks(
     configure_logging(settings.log_level, json_output=json_output)
     tracker = RunTracker(settings.runs_dir, "build_chunks", settings.public_snapshot())
     try:
-        database = Database(settings.database_path)
+        database = Database(settings.database_target)
         database.initialize()
         summary = build_all_chunks(
             database=database,

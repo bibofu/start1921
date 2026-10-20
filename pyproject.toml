@@ -12,6 +12,7 @@ dependencies = [
     "llama-index-core>=0.14.24,<0.15",
     "markdown-it-py>=4,<5",
     "pdfplumber>=0.11",
+    "psycopg[binary]>=3.2,<4",
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "pymupdf>=1.25",

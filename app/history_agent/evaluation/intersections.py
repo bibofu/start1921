@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import re
-import sqlite3
 from collections import defaultdict
 from datetime import date
 from hashlib import sha256
@@ -13,6 +12,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from history_agent.db import Database
+from history_agent.db_backend import Row
 from history_agent.errors import ResearchDataError
 from history_agent.research.chronology import PROFILES
 from history_agent.research.intersections import RULE_VERSION, get_person_intersections
@@ -227,7 +227,7 @@ def build_intersection_review_packet(
             (start_year, end_year),
         ).fetchall()
     evidence_by_event: dict[str, list[ReviewEvidence]] = defaultdict(list)
-    anchors: dict[tuple[tuple[str, str], str], sqlite3.Row] = {}
+    anchors: dict[tuple[tuple[str, str], str], Row] = {}
     compact_names = {person_id: re.sub(r"\s+", "", name) for person_id, name in people.items()}
     for row in rows:
         event_id = str(row["event_id"])
