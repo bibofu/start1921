@@ -614,7 +614,7 @@ def capture_e2e_runtime(
                 keyword_index_path=(
                     snapshot if backend == "legacy" else settings.keyword_index_target
                 ),
-                vector_index_path=settings.vector_index_path,
+                vector_index_path=settings.vector_index_target,
                 model_cache_dir=settings.model_cache_dir / "fastembed",
                 aliases_path=settings.person_aliases_path,
                 query=variant["question"],

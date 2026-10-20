@@ -136,6 +136,12 @@ def _citation_check(
 def _index_versions(settings: Settings) -> dict[str, object]:
     versions: dict[str, object] = {}
     for name in ("keyword_index_latest.json", "vector_index_latest.json"):
+        if name == "vector_index_latest.json" and settings.qdrant_url:
+            versions["vector_index"] = {
+                "backend": "qdrant-service",
+                "artifact_verified": False,
+            }
+            continue
         if name == "keyword_index_latest.json" and settings.keyword_database_url:
             try:
                 metadata = load_keyword_index_metadata(

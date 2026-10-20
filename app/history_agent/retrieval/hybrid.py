@@ -16,7 +16,7 @@ from history_agent.retrieval.models import (
     SearchHit,
     SearchResponse,
 )
-from history_agent.retrieval.vector import search_vector_index
+from history_agent.retrieval.vector import VectorIndexTarget, search_vector_index
 
 RRF_K = 60
 INTENT_SOURCE_BONUS = 0.004
@@ -547,7 +547,7 @@ def _single_branch_response(
 def _search_one(
     *,
     keyword_index_path: Path | str,
-    vector_index_path: Path,
+    vector_index_path: VectorIndexTarget,
     model_cache_dir: Path,
     aliases_path: Path,
     query: str,
@@ -849,7 +849,7 @@ def _fuse_query_variants(
 def search_hybrid_index(
     *,
     keyword_index_path: Path | str,
-    vector_index_path: Path,
+    vector_index_path: VectorIndexTarget,
     model_cache_dir: Path,
     aliases_path: Path,
     query: str,

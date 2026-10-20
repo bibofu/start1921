@@ -86,7 +86,8 @@ Precision、MRR、nDCG 保留不可评及原因。独立受控语料的完整标
 
 开发测试通过 `HISTORY_AGENT_TEST_POSTGRES_URL` 使用独立数据库及随机 schema，
 随后运行 `scripts/check.ps1`。测试和旧索引比较仍保留 SQLite；本阶段不宣称整个项目
-已经完全移除 SQLite，Qdrant 嵌入式模式等依赖留待后续处理。
+已经完全移除 SQLite。关键词迁移之后的 Qdrant 服务迁移和剩余依赖边界见
+[Qdrant 独立服务](QDRANT_SERVICE.md)。
 
 ## 本地迁移与完整性记录（2026-10-20）
 

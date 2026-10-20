@@ -79,7 +79,7 @@ flowchart LR
 | 候选组件 | 当前结论 | 原因 |
 | --- | --- | --- |
 | `QueryFusionRetriever` | 暂不接入 | 当前后端已经并发执行 BM25、向量和多查询召回，并按人物硬过滤、年代覆盖与 RRF 统一融合；再套一层通用融合会重复计分并改变已有评测语义。 |
-| `QdrantVectorStore` | 暂不接管存储 | 现有 22,338 个点使用稳定 chunk UUID、完整可回填 `SearchHit` 的 payload、原子目录切换及专用过滤。直接迁移会要求重建索引且没有即时质量收益；扩库时应通过新 collection 双读评测后再切换。 |
+| `QdrantVectorStore` | 暂不接管存储 | 现有 22,338 个点使用稳定 chunk UUID、完整可回填 `SearchHit` 的 payload、服务 collection 的原子 alias 切换及专用过滤。当前保留领域适配器；框架存储适配迁移应单独评估。 |
 | Response Synthesizer | 暂不替换 | 项目需要分组摘要、事实级引用 ID、无引用段落删除、一次修复和确定性摘录降级；通用合成器不能直接保留这套失败语义。 |
 
 这里的原则不是排斥框架组件，而是只让框架接管具有统一生命周期和可观测性收益的部分。
@@ -108,7 +108,7 @@ PDF 页码及实际拼接的 chunk 数，不调用查询规划、混合召回或
 | 结构恢复 | PDF 目录或年份章节 | `data/processed/structure/*.json` |
 | 分片 | 每个文档一份 chunk JSONL | `data/processed/chunks/*.jsonl` |
 | 关键词索引 | PostgreSQL 倒排词位与 BM25；保留 SQLite 对照后端 | `HISTORY_AGENT_KEYWORD_DATABASE_URL`；旧文件 `data/indexes/keyword_fts.db` |
-| 向量索引 | 本地 Qdrant collection | `data/indexes/qdrant/` |
+| 向量索引 | 独立 Qdrant 服务 collection / alias | `HISTORY_AGENT_QDRANT_URL`；本机服务存储在 `data/qdrant-service/` |
 | 嵌入模型缓存 | FastEmbed 模型文件 | `data/models/fastembed/` |
 
 ## 2. PDF 抽取和 OCR
@@ -349,7 +349,7 @@ PostgreSQL 后端显式实现原 SQLite `bm25(chunk_fts)` 的计分规则：
 | 推理库 | FastEmbed |
 | 模型线程数 | `min(8, CPU逻辑核数)`，最少 1 |
 | 建库 batch size | 64，可通过 CLI 调整到 1—512 |
-| 向量库 | Qdrant 本地模式 |
+| 向量库 | Qdrant 独立服务；显式精确检索 |
 | collection | `history_chunks` |
 
 文档侧嵌入输入为：
@@ -366,7 +366,7 @@ chunk正文
 
 每个向量点同时保存 chunk ID、文档元数据、页码、章节、正文、年份、人物、范围状态和抽取方法，便于在 Qdrant 内过滤并直接还原 `SearchHit`。
 
-构建时创建临时 Qdrant 目录，分批 upsert，最后执行精确计数；点数必须等于 chunk 数。成功后先备份旧目录，再原子替换；替换失败会恢复备份。
+服务模式构建时创建新的 Qdrant collection，分批 upsert，最后执行精确计数；点数必须等于 chunk 数。成功后原子切换 `history_chunks` alias，保留旧 collection。旧本地目录模式仅用于迁移来源与兼容测试。
 
 ### 6.3 向量候选排序
 
@@ -652,7 +652,7 @@ RRF 后再按查询意图增加 0.004：
 | FastEmbed 版本 | 0.8.0 |
 | qdrant-client 版本 | 1.19.0 |
 
-当前 Qdrant 使用本地嵌入式模式，点数已经超过其运行时提示的 20,000 点建议阈值。它仍可运行，但随着语料增长，索引打开、查询并发和进程互斥会成为需要关注的工程限制。
+上述索引规模来自原本地构建报告。现已迁移至 Qdrant 独立服务，保留既有向量与 payload，查询使用 `exact=True`。服务配置与迁移记录见 [QDRANT_SERVICE.md](QDRANT_SERVICE.md)。
 
 ## 14. 构建、调试和验证命令
 
@@ -709,7 +709,7 @@ uv run start1921 eval answers --top-k 10
 9. **证据引文最多 420 字符。** 模型看不到完整 chunk 的全部上下文；扩大检索条数与扩大单条上下文是两个不同调参方向。
 10. **引用校验不是事实蕴含校验。** 它能拦截缺引用、非法编号和错误页码，不能证明结论与原文语义一致。
 11. **生成长度受多层影响。** 5000 tokens 只是模型上限；模型提前停止、修复删段和最多 5 条的摘录降级都会缩短最终答案。
-12. **本地 Qdrant 已超过 20,000 点。** 后续明显扩库时，宜评估独立 Qdrant 服务或其他可并发的持久化向量服务。
+12. **独立 Qdrant 使用精确检索。** 当前保留原本地检索语义；后续若切换近似检索，应作为独立优化评估召回变化。
 
 若要继续改善长时期问题，优先级通常应是：先评估分时期召回是否命中，再增加候选池或按时间子查询，随后考虑邻居扩展和 cross-encoder 重排。单纯不断增大 chunk，会把更多无关事件、人物和年份塞进同一证据，可能降低页码级可核验性。
 

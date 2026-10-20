@@ -9,6 +9,7 @@ from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
+from history_agent.config import QdrantServiceTarget
 from history_agent.errors import IndexBuildError, RetrievalError
 from history_agent.processing.chunks import index_artifact_manifest, load_person_aliases
 from history_agent.processing.models import ChunkRecord
@@ -31,6 +32,8 @@ MODEL_NAME = "BAAI/bge-small-zh-v1.5"
 VECTOR_SIZE = 512
 COLLECTION_NAME = "history_chunks"
 INDEX_VERSION = "qdrant-local-fastembed-v1"
+SERVICE_INDEX_VERSION = "qdrant-service-fastembed-v1"
+VectorIndexTarget = Path | QdrantServiceTarget
 
 
 def utc_now() -> str:
@@ -46,6 +49,46 @@ def _load_vector_dependencies() -> tuple[Any, Any, Any]:
             "Vector dependencies are missing. Run: uv sync --extra vector --group dev"
         ) from exc
     return TextEmbedding, QdrantClient, models
+
+
+def open_vector_client(target: VectorIndexTarget) -> Any:
+    """Service targets never open the legacy local Qdrant (SQLite) storage."""
+
+    _, QdrantClient, _ = _load_vector_dependencies()
+    if isinstance(target, QdrantServiceTarget):
+        return QdrantClient(
+            url=target.url,
+            api_key=target.api_key,
+            timeout=target.timeout_seconds,
+        )
+    return QdrantClient(path=str(target))
+
+
+def publish_vector_collection(client: Any, collection_name: str) -> None:
+    """Switch the serving alias in one operation; retain the previous collection."""
+
+    _, _, models = _load_vector_dependencies()
+    aliases = client.get_aliases().aliases
+    operations: list[Any] = []
+    if any(alias.alias_name == COLLECTION_NAME for alias in aliases):
+        operations.append(
+            models.DeleteAliasOperation(
+                delete_alias=models.DeleteAlias(alias_name=COLLECTION_NAME)
+            )
+        )
+    elif client.collection_exists(COLLECTION_NAME):
+        raise IndexBuildError(
+            "The serving name is a physical Qdrant collection. Preserve it and migrate "
+            "to a versioned collection plus alias before rebuilding."
+        )
+    operations.append(
+        models.CreateAliasOperation(
+            create_alias=models.CreateAlias(
+                collection_name=collection_name, alias_name=COLLECTION_NAME
+            )
+        )
+    )
+    client.update_collection_aliases(change_aliases_operations=operations)
 
 
 @lru_cache(maxsize=2)
@@ -108,7 +151,7 @@ def _replace_directory(source: Path, destination: Path) -> None:
 def build_vector_index(
     *,
     chunks_dir: Path,
-    index_path: Path,
+    index_path: VectorIndexTarget,
     model_cache_dir: Path,
     reports_dir: Path,
     run_id: str,
@@ -119,16 +162,23 @@ def build_vector_index(
     records = load_chunks(chunks_dir)
     if not records:
         raise IndexBuildError("No chunks are available for vector indexing.")
-    _, QdrantClient, models = _load_vector_dependencies()
+    _, _, models = _load_vector_dependencies()
     embedding_model = _embedding_model(model_cache_dir)
-    temporary_path = index_path.with_name(index_path.name + ".tmp")
-    if temporary_path.exists():
-        shutil.rmtree(temporary_path)
-    temporary_path.parent.mkdir(parents=True, exist_ok=True)
-    client = QdrantClient(path=str(temporary_path))
+    service_mode = isinstance(index_path, QdrantServiceTarget)
+    temporary_path: Path | None = None
+    collection_name = COLLECTION_NAME
+    if isinstance(index_path, Path):
+        temporary_path = index_path.with_name(index_path.name + ".tmp")
+        if temporary_path.exists():
+            shutil.rmtree(temporary_path)
+        temporary_path.parent.mkdir(parents=True, exist_ok=True)
+        client = open_vector_client(temporary_path)
+    else:
+        collection_name = f"{COLLECTION_NAME}_{uuid.uuid4().hex}"
+        client = open_vector_client(index_path)
     try:
         client.create_collection(
-            collection_name=COLLECTION_NAME,
+            collection_name=collection_name,
             vectors_config=models.VectorParams(
                 size=VECTOR_SIZE,
                 distance=models.Distance.COSINE,
@@ -150,43 +200,53 @@ def build_vector_index(
                 )
                 for record, vector in zip(batch, vectors, strict=True)
             ]
-            client.upsert(collection_name=COLLECTION_NAME, points=points, wait=True)
-        count = client.count(collection_name=COLLECTION_NAME, exact=True).count
+            client.upsert(collection_name=collection_name, points=points, wait=True)
+        count = client.count(collection_name=collection_name, exact=True).count
         if count != len(records):
             raise IndexBuildError(
                 f"Vector index count mismatch: expected {len(records)}, found {count}."
             )
+        if service_mode:
+            publish_vector_collection(client, collection_name)
     finally:
         client.close()
-    _replace_directory(temporary_path, index_path)
+    if temporary_path is not None and isinstance(index_path, Path):
+        _replace_directory(temporary_path, index_path)
     try:
         fastembed_version = version("fastembed")
         qdrant_version = version("qdrant-client")
     except PackageNotFoundError:
         fastembed_version = qdrant_version = "unknown"
+    index_version = SERVICE_INDEX_VERSION if service_mode else INDEX_VERSION
+    manifest = index_artifact_manifest(
+        chunks_dir=chunks_dir,
+        reports_dir=reports_dir,
+        project_root=project_root or reports_dir.parents[1],
+        run_id=run_id,
+        vector_index_version=(
+            f"{index_version}; fastembed={fastembed_version}; qdrant={qdrant_version}"
+        ),
+        embedding_model=MODEL_NAME,
+        index_path=index_path if isinstance(index_path, Path) else None,
+    )
+    if service_mode:
+        manifest.update(
+            vector_storage_backend="qdrant-service",
+            vector_collection=collection_name,
+        )
     summary = VectorIndexSummary(
         run_id=run_id,
         started_at=started_at,
         finished_at=utc_now(),
-        index_version=f"{INDEX_VERSION}; fastembed={fastembed_version}; qdrant={qdrant_version}",
+        index_version=f"{index_version}; fastembed={fastembed_version}; qdrant={qdrant_version}",
         model_name=MODEL_NAME,
         vector_size=VECTOR_SIZE,
         documents=len({record.document_id for record in records}),
         chunks=len(records),
         collection_name=COLLECTION_NAME,
         index_path=str(index_path),
-        size_bytes=_directory_size(index_path),
-        manifest=index_artifact_manifest(
-            chunks_dir=chunks_dir,
-            reports_dir=reports_dir,
-            project_root=project_root or reports_dir.parents[1],
-            run_id=run_id,
-            vector_index_version=(
-                f"{INDEX_VERSION}; fastembed={fastembed_version}; qdrant={qdrant_version}"
-            ),
-            embedding_model=MODEL_NAME,
-            index_path=index_path,
-        ),
+        size_bytes=_directory_size(index_path) if isinstance(index_path, Path) else 0,
+        manifest=manifest,
     )
     reports_dir.mkdir(parents=True, exist_ok=True)
     rendered = summary.model_dump_json(indent=2)
@@ -227,7 +287,7 @@ def _query_filter(
 
 def search_vector_index(
     *,
-    index_path: Path,
+    index_path: VectorIndexTarget,
     model_cache_dir: Path,
     aliases_path: Path,
     query: str,
@@ -236,7 +296,7 @@ def search_vector_index(
     include_out_of_scope: bool = False,
     plan: RetrievalPlan | None = None,
 ) -> SearchResponse:
-    if not index_path.is_dir():
+    if isinstance(index_path, Path) and not index_path.is_dir():
         raise RetrievalError(f"Vector index does not exist: {index_path}")
     aliases = load_person_aliases(aliases_path)
     query_people = (
@@ -259,7 +319,7 @@ def search_vector_index(
         plan.query_year_range if plan is not None else infer_year_range(query, query_years)
     )
     explicit_year_range = bool(plan and plan.query_year_range) or has_explicit_year_range(query)
-    _, QdrantClient, models = _load_vector_dependencies()
+    _, _, models = _load_vector_dependencies()
     embedding_model = _embedding_model(model_cache_dir)
     query_vector = next(iter(embedding_model.query_embed(query)))
     # Chronologies often mention nearby years in the body. Fetch a wider candidate
@@ -271,7 +331,7 @@ def search_vector_index(
     )
     if prefer_section_year:
         candidate_limit = min(500, max(100, top_k * 20))
-    client = QdrantClient(path=str(index_path))
+    client = open_vector_client(index_path)
     try:
         response = client.query_points(
             collection_name=COLLECTION_NAME,
@@ -285,6 +345,13 @@ def search_vector_index(
             ),
             limit=candidate_limit,
             with_payload=True,
+            # Local Qdrant performs an exact scan. Keep that behavior when moving
+            # the same vectors to a server, whose default may use an HNSW index.
+            **(
+                {"search_params": models.SearchParams(exact=True)}
+                if isinstance(index_path, QdrantServiceTarget)
+                else {}
+            ),
         )
     finally:
         client.close()

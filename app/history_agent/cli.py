@@ -10,7 +10,7 @@ import typer
 
 from history_agent import __version__
 from history_agent.answering.service import check_deepseek_connection
-from history_agent.config import get_settings
+from history_agent.config import QdrantServiceTarget, get_settings
 from history_agent.corpus.catalog import load_catalog
 from history_agent.corpus.exporter import export_diff, export_manifest, load_latest_diff
 from history_agent.corpus.scanner import scan_corpus
@@ -1443,7 +1443,7 @@ def index_build_vector(
     ] = 64,
     json_output: bool = typer.Option(False, "--json", help="Emit JSON."),
 ) -> None:
-    """Build an atomic local Qdrant index with a Chinese embedding model."""
+    """Build a Qdrant index on the configured backend with a Chinese embedding model."""
 
     settings = get_settings()
     settings.ensure_runtime_dirs()
@@ -1452,7 +1452,7 @@ def index_build_vector(
     try:
         summary = build_vector_index(
             chunks_dir=settings.chunks_dir,
-            index_path=settings.vector_index_path,
+            index_path=settings.vector_index_target,
             model_cache_dir=settings.model_cache_dir / "fastembed",
             reports_dir=settings.reports_dir,
             run_id=tracker.run_id,
@@ -1470,6 +1470,51 @@ def index_build_vector(
         typer.echo(f"vector index run: {summary.run_id}")
         typer.echo(f"model: {summary.model_name}; chunks: {summary.chunks}")
         typer.echo(f"index: {summary.index_path} ({summary.size_bytes} bytes)")
+
+
+@index_app.command("migrate-qdrant-service")
+def index_migrate_qdrant_service(
+    source_index: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            file_okay=False,
+            help="Backup of the stopped local Qdrant index; never use an actively written source.",
+        ),
+    ],
+    source_report: Annotated[
+        Path | None, typer.Option(help="Optional original vector-index report for provenance.")
+    ] = None,
+    report: Annotated[
+        Path | None, typer.Option(help="Save the migration result as JSON.")
+    ] = None,
+) -> None:
+    """Copy saved vectors into Qdrant service without re-embedding; retain the source backup."""
+    from history_agent.retrieval.vector_migration import migrate_qdrant_local
+
+    settings = get_settings()
+    target = settings.vector_index_target
+    if not isinstance(target, QdrantServiceTarget):
+        raise typer.BadParameter("Set HISTORY_AGENT_QDRANT_URL to the target Qdrant service.")
+    settings.ensure_runtime_dirs()
+    tracker = RunTracker(settings.runs_dir, "migrate_qdrant_service", settings.public_snapshot())
+    try:
+        result = migrate_qdrant_local(
+            source_path=source_index,
+            target=target,
+            reports_dir=settings.reports_dir,
+            run_id=tracker.run_id,
+            source_report=source_report,
+        )
+        tracker.finish(result)
+    except HistoryAgentError as exc:
+        tracker.fail(exc)
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    if report is not None:
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 @eval_app.command("retrieval")
@@ -1832,11 +1877,11 @@ def search_vector(
     ] = False,
     json_output: bool = typer.Option(False, "--json", help="Emit JSON."),
 ) -> None:
-    """Search local Qdrant vectors using the configured Chinese embedding model."""
+    """Search Qdrant vectors using the configured backend and Chinese embedding model."""
 
     settings = get_settings()
     response = search_vector_index(
-        index_path=settings.vector_index_path,
+        index_path=settings.vector_index_target,
         model_cache_dir=settings.model_cache_dir / "fastembed",
         aliases_path=settings.person_aliases_path,
         query=query,
@@ -1879,7 +1924,7 @@ def search_hybrid(
     settings = get_settings()
     response = search_hybrid_index(
         keyword_index_path=settings.keyword_index_target,
-        vector_index_path=settings.vector_index_path,
+        vector_index_path=settings.vector_index_target,
         model_cache_dir=settings.model_cache_dir / "fastembed",
         aliases_path=settings.person_aliases_path,
         query=query,

@@ -8,7 +8,11 @@ from pathlib import Path
 from history_agent.config import Settings
 from history_agent.db_backend import DATABASE_ERRORS, database_connection, is_postgres_target
 from history_agent.retrieval.keyword import search_keyword_index
-from history_agent.retrieval.vector import search_vector_index
+from history_agent.retrieval.vector import (
+    COLLECTION_NAME,
+    open_vector_client,
+    search_vector_index,
+)
 
 
 def _database_ready(target: Path | str) -> bool:
@@ -38,7 +42,7 @@ def readiness_snapshot(settings: Settings) -> dict[str, object]:
     components["keyword"] = keyword_index_ready(settings)
     try:
         search_vector_index(
-            index_path=settings.vector_index_path,
+            index_path=settings.vector_index_target,
             model_cache_dir=settings.model_cache_dir / "fastembed",
             aliases_path=settings.person_aliases_path,
             query="中国共产党",
@@ -64,5 +68,21 @@ def keyword_index_ready(settings: Settings) -> bool:
             top_k=1,
         )
         return True
+    except Exception:
+        return False
+
+
+def vector_index_ready(settings: Settings) -> bool:
+    """Check the configured service instead of a leftover local Qdrant directory."""
+    target = settings.vector_index_target
+    if isinstance(target, Path):
+        return target.is_dir()
+    try:
+        client = open_vector_client(target)
+        try:
+            client.get_collection(COLLECTION_NAME)
+            return True
+        finally:
+            client.close()
     except Exception:
         return False

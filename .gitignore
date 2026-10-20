@@ -15,6 +15,7 @@ pytest-cache-files-*/
 data/*
 !data/.gitkeep
 logs/
+.qdrant-initialized
 *.db
 *.db-shm
 *.db-wal

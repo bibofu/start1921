@@ -11,7 +11,8 @@
 - [RAG 实现说明](RAG-IMPL.md)：说明分片、双索引、召回、融合重排、Top-K、生成和引用校验的当前实现。
 - [结构化研究模型](RESEARCH_SCHEMA.md)：说明人物、事件、关系、时间精度、证据和人工复核约束。
 - [PostgreSQL 迁移与运行](POSTGRESQL.md)：主库与会话库的配置、保留数据迁移、验证和回退。
-- [关键词索引迁移](KEYWORD_POSTGRESQL.md)：PostgreSQL 关键词索引、BM25 兼容性和迁移评测；Qdrant 保持不变。
+- [关键词索引迁移](KEYWORD_POSTGRESQL.md)：PostgreSQL 关键词索引、BM25 兼容性和迁移评测。
+- [Qdrant 独立服务](QDRANT_SERVICE.md)：保留已有向量迁移、本地服务启动和 SQLite 退役边界。
 - [年谱抽取基线](evals/CHRONOLOGY_BASELINE.md)：记录首批规则抽取规模、人工页码抽查与已知限制。
 
 ## 快速启动
@@ -23,6 +24,8 @@
 再启动服务。使用本项目内的 PostgreSQL 实例时，先运行 `.\scripts\postgres.ps1 start`。
 关键词索引通过 `HISTORY_AGENT_KEYWORD_DATABASE_URL` 独立配置，可与主库共用数据库；
 已有索引先按 [关键词迁移说明](KEYWORD_POSTGRESQL.md) 导入和验证。
+向量索引通过 `HISTORY_AGENT_QDRANT_URL` 连接独立 Qdrant 服务；
+使用本机服务时先运行 `.\scripts\qdrant.ps1 start`，迁移方法见 [服务说明](QDRANT_SERVICE.md)。
 
 ### 1. 准备环境
 

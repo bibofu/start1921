@@ -1214,6 +1214,19 @@ def _load_index_metadata(settings: Settings) -> dict[str, Any]:
     reports: dict[str, Any] = {}
     warnings: list[str] = []
     for name in ("keyword_index_latest.json", "vector_index_latest.json"):
+        if name == "vector_index_latest.json" and settings.qdrant_url:
+            # A local directory/report does not identify the collection currently
+            # served by Qdrant, whose alias may have changed since that report.
+            reports["vector_index"] = {
+                "summary": {"backend": "qdrant-service"},
+                "manifest": None,
+                "artifact_verified": False,
+                "actual_index_artifact_sha256": None,
+            }
+            warnings.append(
+                "Qdrant service collection has no independently verified artifact manifest"
+            )
+            continue
         if name == "keyword_index_latest.json" and settings.keyword_database_url:
             try:
                 # The active PostgreSQL generation is authoritative. A local
@@ -1597,7 +1610,7 @@ def run_golden_benchmark(
             retrieval_started = perf_counter()
             retrieval_response = search_backend(
                 keyword_index_path=settings.keyword_index_target,
-                vector_index_path=settings.vector_index_path,
+                vector_index_path=settings.vector_index_target,
                 model_cache_dir=settings.model_cache_dir / "fastembed",
                 aliases_path=settings.person_aliases_path,
                 query=case.question,

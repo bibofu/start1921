@@ -3,7 +3,7 @@
 本项目支持将文献、人物、事件、证据、关系、复核记录和聊天记录放入
 PostgreSQL。主库迁移命令不重建或修改关键词和向量索引。
 关键词索引另行通过 [关键词迁移流程](KEYWORD_POSTGRESQL.md) 使用 PostgreSQL；
-向量检索继续使用原有 Qdrant。
+向量检索使用 [Qdrant 独立服务](QDRANT_SERVICE.md)，保留原有 embedding 与向量数据。
 
 ## 配置与启动
 

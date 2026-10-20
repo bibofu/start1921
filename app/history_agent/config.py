@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import urlsplit
 
 from pydantic import AliasChoices, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -11,6 +13,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 def default_project_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+@dataclass(frozen=True)
+class QdrantServiceTarget:
+    """Connection settings whose representation never exposes service credentials."""
+
+    url: str = field(repr=False)
+    api_key: str | None = field(default=None, repr=False)
+    timeout_seconds: int = 30
+
+    def __str__(self) -> str:
+        return "qdrant-service"
 
 
 class Settings(BaseSettings):
@@ -30,6 +44,9 @@ class Settings(BaseSettings):
     database_url: SecretStr | None = None
     conversation_database_url: SecretStr | None = None
     keyword_database_url: SecretStr | None = None
+    qdrant_url: SecretStr | None = None
+    qdrant_api_key: SecretStr | None = None
+    qdrant_timeout_seconds: int = Field(default=30, ge=1, le=600)
     catalog_path: Path = Path("config/corpus_catalog.json")
     person_aliases_path: Path = Path("config/person_aliases.json")
     relation_types_path: Path = Path("config/relation_types.json")
@@ -94,6 +111,20 @@ class Settings(BaseSettings):
                     raise ValueError(f"{field_name} must be a PostgreSQL connection URL")
                 else:
                     setattr(self, field_name, SecretStr(value))
+        if self.qdrant_url is not None:
+            value = self.qdrant_url.get_secret_value().strip()
+            if not value:
+                self.qdrant_url = None
+            else:
+                parsed = urlsplit(value)
+                if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+                    raise ValueError("qdrant_url must be an HTTP or HTTPS service URL")
+                if parsed.username or parsed.password or parsed.query or parsed.fragment:
+                    raise ValueError("qdrant_url must not contain credentials, query or fragment")
+                self.qdrant_url = SecretStr(value.rstrip("/"))
+        if self.qdrant_api_key is not None:
+            value = self.qdrant_api_key.get_secret_value().strip()
+            self.qdrant_api_key = SecretStr(value) if value else None
         return self
 
     @property
@@ -144,6 +175,20 @@ class Settings(BaseSettings):
     @property
     def vector_index_path(self) -> Path:
         return self.data_dir / "indexes" / "qdrant"
+
+    @property
+    def vector_index_target(self) -> Path | QdrantServiceTarget:
+        if self.qdrant_url is None:
+            return self.vector_index_path
+        return QdrantServiceTarget(
+            url=self.qdrant_url.get_secret_value(),
+            api_key=self.qdrant_api_key.get_secret_value() if self.qdrant_api_key else None,
+            timeout_seconds=self.qdrant_timeout_seconds,
+        )
+
+    @property
+    def vector_database_backend(self) -> str:
+        return "qdrant-service" if self.qdrant_url else "qdrant-local"
 
     @property
     def model_cache_dir(self) -> Path:
@@ -200,6 +245,7 @@ class Settings(BaseSettings):
             "database_backend": self.database_backend,
             "conversation_database_backend": self.conversation_database_backend,
             "keyword_database_backend": self.keyword_database_backend,
+            "vector_database_backend": self.vector_database_backend,
             "database_path": None if self.database_url else str(self.database_path),
             "catalog_path": str(self.catalog_path),
             "person_aliases_path": str(self.person_aliases_path),
