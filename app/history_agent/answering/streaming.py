@@ -28,7 +28,6 @@ from history_agent.answering.service import (
     _attach_query_planning,
     _citation_date_repair_payload,
     _clarification_response,
-    _deepseek_error_code,
     _finish_answer,
     _finish_structured_answer,
     _has_ambiguous_timeline_years,
@@ -46,6 +45,7 @@ from history_agent.answering.structured import (
 )
 from history_agent.answering.validation import validate_grounded_answer
 from history_agent.config import Settings
+from history_agent.errors import llm_http_error_code
 
 
 @dataclass(frozen=True)
@@ -97,7 +97,7 @@ async def _stream_completion(
                 if raw_finish_reason is not None:
                     finish_reason = str(raw_finish_reason)
     except httpx.HTTPError as exc:
-        yield LLMResult(answer=None, error_code=_deepseek_error_code(exc), usage=usage)
+        yield LLMResult(answer=None, error_code=llm_http_error_code(exc), usage=usage)
         return
     except (KeyError, IndexError, TypeError, ValueError, AttributeError):
         yield LLMResult(answer=None, error_code="invalid_response", usage=usage)

@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from history_agent.config import Settings
 from history_agent.db import Database
 from history_agent.db_backend import Connection
-from history_agent.errors import ResearchDataError
+from history_agent.errors import ResearchDataError, llm_http_error_code
 from history_agent.research.models import (
     EventParticipant,
     HistoricalEvent,
@@ -191,18 +191,6 @@ def _request_hash(event: HistoricalEvent) -> str:
     return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
 
 
-def _deepseek_error_code(exc: httpx.HTTPError) -> str:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return {
-            401: "authentication_failed",
-            402: "insufficient_balance",
-            429: "rate_limited",
-        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
-    if isinstance(exc, httpx.TimeoutException):
-        return "timeout"
-    return "network_error"
-
-
 def _call_deepseek_json(settings: Settings, messages: list[dict[str, str]]) -> DeepSeekResult:
     if not settings.llm_enabled:
         return DeepSeekResult(None, None, "not_configured", {})
@@ -241,7 +229,7 @@ def _call_deepseek_json(settings: Settings, messages: list[dict[str, str]]) -> D
             return DeepSeekResult(None, serialized, "empty_response", usage)
         return DeepSeekResult(content, serialized, None, usage)
     except httpx.HTTPError as exc:
-        return DeepSeekResult(None, None, _deepseek_error_code(exc), {})
+        return DeepSeekResult(None, None, llm_http_error_code(exc), {})
     except (KeyError, IndexError, TypeError, ValueError):
         return DeepSeekResult(None, None, "invalid_response", {})
 

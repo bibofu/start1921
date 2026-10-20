@@ -15,8 +15,8 @@ from history_agent.evaluation.pilot_review import CONFIRMATIONS, build, import_d
 
 
 @pytest.fixture
-def bundle(tmp_path: Path) -> dict[str, Any]:
-    pdf = tmp_path / "docs" / "测试 年谱.pdf"
+def bundle(work_path: Path) -> dict[str, Any]:
+    pdf = work_path / "docs" / "测试 年谱.pdf"
     pdf.parent.mkdir()
     pdf.write_bytes(b"%PDF-1.7\nlocal review test fixture\n")
     file_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
@@ -116,11 +116,11 @@ def bundle(tmp_path: Path) -> dict[str, Any]:
             }
         ],
     }
-    dataset_path = tmp_path / "draft.json"
-    capture_path = tmp_path / "capture.json"
+    dataset_path = work_path / "draft.json"
+    capture_path = work_path / "capture.json"
     write_json(dataset_path, dataset)
     write_json(capture_path, capture)
-    packet = build(dataset_path, capture_path, tmp_path / "review", project_root=tmp_path)
+    packet = build(dataset_path, capture_path, work_path / "review", project_root=work_path)
     decisions = {
         "schema_version": 1,
         "packet_sha256": packet["packet_sha256"],
@@ -148,7 +148,7 @@ def bundle(tmp_path: Path) -> dict[str, Any]:
         ],
     }
     return {
-        "root": tmp_path,
+        "root": work_path,
         "pdf": pdf,
         "dataset": dataset,
         "capture": capture,
@@ -156,9 +156,9 @@ def bundle(tmp_path: Path) -> dict[str, Any]:
         "decisions": decisions,
         "dataset_path": dataset_path,
         "capture_path": capture_path,
-        "packet_path": tmp_path / "review" / "packet.json",
-        "decisions_path": tmp_path / "decisions.json",
-        "output": tmp_path / "annotations.reviewed.json",
+        "packet_path": work_path / "review" / "packet.json",
+        "decisions_path": work_path / "decisions.json",
+        "output": work_path / "annotations.reviewed.json",
         "hits": hits,
         "file_hashes": file_hashes,
     }

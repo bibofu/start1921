@@ -83,7 +83,8 @@ def _load_records(
     return records
 
 
-def _write_final_records(path: Path, records: dict[int, PageRecord]) -> None:
+def write_page_records(path: Path, records: dict[int, PageRecord]) -> None:
+    """Atomically replace a page-record file, keeping pages in PDF order."""
     temporary_path = path.with_suffix(path.suffix + ".tmp")
     with temporary_path.open("w", encoding="utf-8", newline="\n") as stream:
         for pdf_page in sorted(records):
@@ -221,7 +222,7 @@ def extract_document(
             f"Page count mismatch for {document_id}: "
             f"{len(records)} records for {total_pages} pages."
         )
-    _write_final_records(output_path, records)
+    write_page_records(output_path, records)
     partial_path.unlink(missing_ok=True)
     if pymupdf_document is not None:
         pymupdf_document.close()

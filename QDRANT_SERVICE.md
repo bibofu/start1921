@@ -52,13 +52,6 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
 冒充当前服务索引摘要；严格的索引身份复现检查会标为尚未核验。
 本阶段仅做数量、样本、少量检索对照及服务可用性检查，不进行完整质量评测。
 
-## SQLite 退役边界
-
-业务数据读写、检索和业务测试均使用 PostgreSQL 与 Qdrant Server。
-SQLite 兼容分支、直接导入和迁移工具已删除，mypy 使用 JSON 缓存；
-向量客户端仅实现服务 HTTP 操作。旧数据库与本地向量索引保留为备份。
-完整清理范围与验证见 [SQLite 退役说明](SQLITE_RETIREMENT.md)。
-
 ## 本机迁移记录（2026-10-20）
 
 - 已复制 17 份文献对应的 22,338 个点，源数量、复制数量和服务精确计数一致。
@@ -73,7 +66,7 @@ SQLite 兼容分支、直接导入和迁移工具已删除，mypy 使用 JSON �
 - 32 项针对性测试及相关 Ruff/mypy 检查通过；未运行大型检索评测或全套测试。
 
 一致备份与切换前配置位于 `data/backups/qdrant-to-service-20261020T065622Z/`。
-配置备份含凭据，仅留本机。服务当前物理 collection 为
+配置备份含凭据，仅留本机。迁移完成时的物理 collection 为
 `history_chunks_import_004028549da44ef6af8e386ae87509c4`，
 通过 `history_chunks` alias 提供查询。
 

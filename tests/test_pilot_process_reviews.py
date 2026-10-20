@@ -65,8 +65,8 @@ def _reviewed(payload: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _protocol_file(tmp_path: Path, cases: list[dict[str, Any]]) -> Path:
-    path = tmp_path / "protocols.json"
+def _protocol_file(work_path: Path, cases: list[dict[str, Any]]) -> Path:
+    path = work_path / "protocols.json"
     path.write_text(
         json.dumps(
             {
@@ -241,9 +241,9 @@ def test_no_effective_trace_is_unscorable_even_if_review_claims_pass() -> None:
     }
 
 
-def test_bound_protocol_must_be_explicit_and_match_bytes_and_criterion(tmp_path: Path) -> None:
+def test_bound_protocol_must_be_explicit_and_match_bytes_and_criterion(work_path: Path) -> None:
     cases, capture, sha = _inputs()
-    path = _protocol_file(tmp_path, cases)
+    path = _protocol_file(work_path, cases)
     payload = _reviewed(prepare_process_reviews(cases, capture, sha, protocol_path=path))
     assert payload["protocol_file_sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     with pytest.raises(ValueError, match="bound protocol_path"):
@@ -263,9 +263,9 @@ def test_bound_protocol_must_be_explicit_and_match_bytes_and_criterion(tmp_path:
         evaluate_process_reviews(payload, cases, capture, sha, protocol_path=path)
 
 
-def test_protocol_case_binding_is_verified(tmp_path: Path) -> None:
+def test_protocol_case_binding_is_verified(work_path: Path) -> None:
     cases, capture, sha = _inputs()
-    path = _protocol_file(tmp_path, cases)
+    path = _protocol_file(work_path, cases)
     protocol = json.loads(path.read_text(encoding="utf8"))
     protocol["cases"][0]["case_definition_sha256"] = "a" * 64
     path.write_text(json.dumps(protocol), encoding="utf8")

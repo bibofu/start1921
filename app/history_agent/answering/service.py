@@ -37,6 +37,7 @@ from history_agent.answering.structured import (
 from history_agent.answering.timeline_evidence import filter_person_timeline_evidence
 from history_agent.answering.validation import remove_uncited_claim_blocks, validate_grounded_answer
 from history_agent.config import Settings
+from history_agent.errors import llm_http_error_code
 from history_agent.retrieval.hybrid import search_hybrid_index
 from history_agent.retrieval.models import SearchHit, SearchResponse
 
@@ -266,18 +267,6 @@ def _prefer_llm_result(
     )
 
 
-def _deepseek_error_code(exc: httpx.HTTPError) -> str:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return {
-            401: "authentication_failed",
-            402: "insufficient_balance",
-            429: "rate_limited",
-        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
-    if isinstance(exc, httpx.TimeoutException):
-        return "timeout"
-    return "network_error"
-
-
 def _merge_usage(*items: dict[str, int] | None) -> dict[str, int] | None:
     keys = {key for item in items if item for key in item}
     if not keys:
@@ -309,7 +298,7 @@ def _request_deepseek_completion(
         finish_reason = result.additional_kwargs.get("finish_reason")
         usage = response_usage(result) or {}
     except httpx.HTTPError as exc:
-        return LLMResult(answer=None, error_code=_deepseek_error_code(exc))
+        return LLMResult(answer=None, error_code=llm_http_error_code(exc))
     except (KeyError, IndexError, TypeError, ValueError):
         return LLMResult(answer=None, error_code="invalid_response")
     if finish_reason == "length":
@@ -916,7 +905,7 @@ def check_deepseek_connection(settings: Settings) -> dict[str, object]:
     except httpx.HTTPError as exc:
         return {
             **base,
-            "status": _deepseek_error_code(exc),
+            "status": llm_http_error_code(exc),
             "latency_ms": round((perf_counter() - started) * 1000),
         }
     except (KeyError, IndexError, TypeError, ValueError):

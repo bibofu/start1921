@@ -1,6 +1,8 @@
 # 开发集可重复评测流程
 
-2026-10-11人工复核更新：当前题目定义版本为 `development_annotations_v5.json`，必须配套显式指定 `development_protocols_v5.json`；前两批8题已批准、其余12题待审，详见 [第二批裁定记录](human_adjudications_v5.json)，其中继承了第一批v4裁定。当前入口可直接加载这对文件，无需修改Agent。下面的v3命令与`stable/`路径保留为已有采集的复现示例；新v5采集应使用新输出目录，并在全部采集/复核/评分步骤使用同一对v5文件。不得将旧capture或答案评审改哈希绑定到v5，也不因题目批准而自动批准候选或答案。定义变化题的特定校准提示会回落通用指导，应按v5协议人工边界复核，尤其保留知识分子的“绝大部分”限定和《矛盾论》准确篇内例证替代规则。该题的固定锚点Recall只衡量已标注证据，不是全部合格例证的穷尽召回。
+2026-10-11人工复核更新：当前题目定义版本为 `development_annotations_v5.json`，必须配套显式指定 `development_protocols_v5.json`；前两批8题已批准、其余12题待审，详见 [第二批裁定记录](human_adjudications_v5.json)，其中继承了第一批v4裁定。当前入口支持加载这对文件，无需修改Agent。下面的v3命令与`stable/`路径保留为已有采集的复现示例；任何新采集应使用新输出目录，并在全部采集/复核/评分步骤使用同一版本的标注和协议。不得将旧capture或答案评审改哈希绑定到v5，也不因题目批准而自动批准候选或答案。定义变化题的特定校准提示会回落通用指导，应按v5协议人工边界复核，尤其保留知识分子的“绝大部分”限定和《矛盾论》准确篇内例证替代规则。该题的固定锚点Recall只衡量已标注证据，不是全部合格例证的穷尽召回。
+
+当前新采集有一项已确认的前置缺口：v3/v4/v5的 `dev_refusal_einstein`、`dev_refusal_source_year` 仍绑定旧版 `REQUIREMENTS.md` 字节哈希，现有文件已变化。该失配在2026-10-20本轮文档清理前已存在，本轮保留需求文件与冻结JSON原件。`collect` 的 `validate_anchors` 会因此报 `project refusal basis changed`；旧capture的离线复核、评分不重新校验当前项目文档。下列采集命令说明历史流程，恢复新采集须先复核项目依据并发布配套新标注版本，不得直接修改旧哈希或跳过门禁。
 
 本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v5`），仅涉及评测工具。2026-10-11起，20题 `development_annotations_v3.json` 可与显式指定的 `development_protocols_v3.json` 一起运行；旧13题 schema v1 入口继续兼容。20题按21个输入采集：淮海题的带历史主臂和无历史控制臂分开执行，仍只占1个独立题。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
 

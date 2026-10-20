@@ -25,6 +25,7 @@ from history_agent.answering.models import QueryEntity, QueryPlan, QuestionReque
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.answering.time_ranges import parse_relative_year_range
 from history_agent.config import Settings
+from history_agent.errors import llm_http_error_code
 from history_agent.processing.chunks import load_person_aliases
 from history_agent.retrieval.keyword import PERIOD_RANGES
 from history_agent.retrieval.models import RetrievalPlan
@@ -63,18 +64,6 @@ class QueryExecution:
     primary_query: str
     additional_queries: tuple[str, ...]
     retrieval_plan: RetrievalPlan | None
-
-
-def _error_code(exc: httpx.HTTPError) -> str:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return {
-            401: "authentication_failed",
-            402: "insufficient_balance",
-            429: "rate_limited",
-        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
-    if isinstance(exc, httpx.TimeoutException):
-        return "timeout"
-    return "network_error"
 
 
 def _messages(settings: Settings, request: QuestionRequest) -> list[dict[str, str]]:
@@ -330,7 +319,7 @@ def plan_question(
         )
     except httpx.HTTPError as exc:
         return QueryPlanningResult(
-            None, "fallback", settings.llm_query_planner_model, error_code=_error_code(exc)
+            None, "fallback", settings.llm_query_planner_model, error_code=llm_http_error_code(exc)
         )
     except (KeyError, IndexError, TypeError, ValueError, ValidationError):
         return QueryPlanningResult(

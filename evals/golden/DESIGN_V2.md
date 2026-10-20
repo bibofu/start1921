@@ -1,13 +1,15 @@
 # Golden v2 设计与开发集进度
 
-截至2026-10-05，30题设计清单中的 **20道开发题已完成Agent原文/事实/边界预标注：17道可答、3道拒答**，共85个必要事实、90个证据组；人工批准仍为0。新增7题及原有13题的分批复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。新标注包尚未接入协议感知的采集器，不宣称20题已经运行。
+当前开发标注为 [development_annotations_v5.json](development_annotations_v5.json)，配套 [development_protocols_v5.json](development_protocols_v5.json)：**20道开发题，17道可答、3道拒答，85个必要事实、90个证据组**；截至2026-10-11，题目定义已批准8题、12题待审，候选等级与历史答案没有因此获批。分批复核进度见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。
 
-**以下文件说明和试点结果保留2026-09-23的13题可执行基线口径**：43个必要事实/证据组、196条候选判断、12个固定池累计124成员。原13题、原v1和六题样板保持独立，最新已有执行结果见 [DEVELOPMENT_BASELINE.md](DEVELOPMENT_BASELINE.md)。新7题没有新增候选等级、真实模型回答或正式指标。
+`reviewable-pilot-v5` 已支持20题协议及21个执行输入；v3的20题本地检索采集已完成，13题真实模型观察与新口径复核也已单独保留，入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md) 和 [当前总览](README.md)。当前新采集仍需先处理冻结拒答依据与现有 `REQUIREMENTS.md` 哈希不一致的问题；协议可加载不等于原文锚点校验通过。10道保留题仍隔离，尚未完成30题正式Golden。
 
-## 文件与当前状态
+**以下文件说明和试点结果保留2026-09-23的13题基线口径**：43个必要事实/证据组、196条候选判断、12个固定池累计124成员。原13题、原v1和六题样板保持独立，该次执行结果见 [DEVELOPMENT_BASELINE.md](DEVELOPMENT_BASELINE.md)。新7题没有新增候选等级、真实模型回答或正式指标。
 
-- `development_v2.json`：当前13题可执行开发集，保留原六题的定义及追加标签，新增七题。
-- `ranking_pools_v2.json`：当前12个完全分级的固定小池；v1保留初始123成员，v2补入Top-5对照中一个已有标签的池外负例，绑定候选身份、来源SHA、选择策略与封印；暂定Agent口径。
+## 历史基线文件
+
+- `development_v2.json`：13题历史开发集，保留原六题的定义及追加标签，新增七题。
+- `ranking_pools_v2.json`：12个完全分级的固定小池；v1保留初始123成员，v2补入Top-5对照中一个已有标签的池外负例，绑定候选身份、来源SHA、选择策略与封印；暂定Agent口径。
 - `answer_reviews_v1.json`：绑定上一轮六题真实采集及具体答案的逐事实/维度评审；提供可自动汇总的明确标签，不是自动语义裁判。
 - `design_v2.json`：30 个可直接提问的问题，记录任务类型、来源范围、诊断目的、指标、数据划分及复核状态。
 - `pilot_annotations.json`：6 个开发样板，含文件 SHA-256、PDF 物理页、原文短引、必要事实、证据组、禁止的结论与复核说明；已合入48条真实候选的 `agent_review` 暂定相关性标签。所有题的人工复核仍为pending，Agent判断不能冒充人工判断。

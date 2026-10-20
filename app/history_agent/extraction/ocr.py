@@ -14,7 +14,7 @@ import pymupdf
 
 from history_agent.db import Database
 from history_agent.errors import ExtractionError
-from history_agent.extraction.full import current_files
+from history_agent.extraction.full import current_files, write_page_records
 from history_agent.extraction.models import (
     OcrDocumentResult,
     OcrExtractionSummary,
@@ -130,14 +130,6 @@ def _load_reusable_records(
     return records
 
 
-def _write_final_records(path: Path, records: dict[int, PageRecord]) -> None:
-    temporary_path = path.with_suffix(path.suffix + ".tmp")
-    with temporary_path.open("w", encoding="utf-8", newline="\n") as stream:
-        for pdf_page in sorted(records):
-            stream.write(records[pdf_page].model_dump_json() + "\n")
-    os.replace(temporary_path, path)
-
-
 def extract_document_ocr(
     *,
     file_record: dict[str, Any],
@@ -235,7 +227,7 @@ def extract_document_ocr(
     finally:
         document.close()
 
-    _write_final_records(output_path, records)
+    write_page_records(output_path, records)
     partial_path.unlink(missing_ok=True)
     status_counts: dict[str, int] = {}
     confidences: list[float] = []

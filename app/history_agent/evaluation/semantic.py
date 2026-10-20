@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from history_agent.answering.models import Citation
 from history_agent.config import Settings
+from history_agent.errors import llm_http_error_code
 
 CLAIM_TOKEN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fffA-Za-z0-9]")
 SEMANTIC_CITATION_JUDGE_VERSION = "citation-entailment-v1"
@@ -119,18 +120,6 @@ def _validate_claim_spans(judgment: SemanticJudgment, answer: str) -> None:
         raise ValueError("unsupported claim was not copied from the answer")
 
 
-def _error_code(exc: httpx.HTTPError) -> str:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return {
-            401: "authentication_failed",
-            402: "insufficient_balance",
-            429: "rate_limited",
-        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
-    if isinstance(exc, httpx.TimeoutException):
-        return "timeout"
-    return "network_error"
-
-
 def judge_citation_semantics(
     settings: Settings,
     *,
@@ -188,7 +177,7 @@ def judge_citation_semantics(
             break
         except httpx.HTTPError as exc:
             return {
-                "status": _error_code(exc),
+                "status": llm_http_error_code(exc),
                 "verdict": None,
                 "unsupported_claims": [],
                 "rationale": "语义评测请求失败。",
@@ -300,7 +289,7 @@ def judge_fact_coverage(
             break
         except httpx.HTTPError as exc:
             return {
-                "status": _error_code(exc),
+                "status": llm_http_error_code(exc),
                 "decisions": [],
                 "latency_ms": round((perf_counter() - started) * 1000),
                 "usage": usage or None,

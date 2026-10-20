@@ -1,680 +1,190 @@
-# start1921 · 近现代史研究 Agent（1921—1978）
+# start1921 · 基于本地文档的近现代史研究 Agent
 
-一个面向中国近现代史学习与研究的本地知识库 Agent。项目以 1921—1978 年为时间边界，以中国共产党历史为主线，围绕毛泽东、周恩来、邓小平、林彪等关键人物组织史料，提供带原文出处的问答、时间线梳理、人物交集分析和观点检索。
+面向中国近现代史学习与研究的本地知识库 Agent，以 1921—1978 年为研究边界。项目先检索本地文献，再依据材料回答，重要事实附文献名和 PDF 页码；支持人物经历、人物交集、观点检索，以及通过 CLI/API 查询组织任职候选。
 
-项目不是让大模型凭记忆讲历史，而是要求它先检索本地文献，再依据检索到的材料回答；所有重要结论都应能追溯到具体文献和 PDF 页码。
+## 文档入口
 
-## 项目文档
+| 文档 | 职责 |
+| --- | --- |
+| [RAG 实现说明](RAG-IMPL.md) | 当前查询规划、分片、混合检索、排序、上下文、生成和引用校验 |
+| [结构化研究模型](RESEARCH_SCHEMA.md) | 人物、事件、关系、证据、复核状态及查询接口 |
+| [PostgreSQL](POSTGRESQL.md) / [关键词索引](KEYWORD_POSTGRESQL.md) / [Qdrant](QDRANT_SERVICE.md) | 当前服务配置、测试方法及历史迁移记录 |
+| [Golden 评测入口](evals/golden/README.md) / [可重复评测流程](evals/golden/REPEATABLE_WORKFLOW.md) | 数据版本、人工复核状态、分层指标与实验比较 |
+| [需求基线](REQUIREMENTS.md) | 原始需求目标与验收约束，部分内容尚未实现 |
+| [问答问题记录](badCase.md) | 已定位的问答问题、原因、修复及验证 |
 
-- [需求分析](REQUIREMENTS.md)：定义用户场景、功能需求、非功能需求、验收标准和 MVP 边界。
-- [任务规划](TASK_PLAN.md)：将需求拆分为里程碑、具体任务、依赖关系、交付物和质量闸门。
-- [RAG 实现说明](RAG-IMPL.md)：说明分片、双索引、召回、融合重排、Top-K、生成和引用校验的当前实现。
-- [结构化研究模型](RESEARCH_SCHEMA.md)：说明人物、事件、关系、时间精度、证据和人工复核约束。
-- [PostgreSQL 运行与迁移记录](POSTGRESQL.md)：主库与会话库的配置、测试和已有数据迁移记录。
-- [关键词索引迁移](KEYWORD_POSTGRESQL.md)：PostgreSQL 关键词索引、BM25 兼容性和迁移评测。
-- [Qdrant 独立服务](QDRANT_SERVICE.md)：服务启动、向量构建和已有数据迁移记录。
-- [SQLite 退役说明](SQLITE_RETIREMENT.md)：当前存储依赖、备份保留与简单功能验证。
-- [年谱抽取基线](evals/CHRONOLOGY_BASELINE.md)：记录首批规则抽取规模、人工页码抽查与已知限制。
+实现细节集中在对应专题文档，历史实验结果保留在 `evals/`。`REQUIREMENTS.md` 被评测拒答依据引用，本次保留原始字节；其中的 `TASK_PLAN.md` 是已移除的历史规划引用，旧技术选型、五类回答状态和后续版本描述不代表当前实现。当前接口以代码及服务的 `/docs`、`/openapi.json` 为准。
 
 ## 快速启动
 
-项目命令统一使用 `start1921`，原 `history-agent` 命令保留为兼容入口。内部 Python 包 `history_agent` 和 `HISTORY_AGENT_` 环境变量前缀不变。
-
-主库、会话库和关键词索引仅使用 PostgreSQL；必须设置 `HISTORY_AGENT_DATABASE_URL`，
-会话与关键词默认共用主库，也可分别设置对应的连接 URL。
-向量索引必须通过 `HISTORY_AGENT_QDRANT_URL` 连接独立 Qdrant 服务。
-本机现有数据已迁移，旧数据库和备份保留；当前代码不再提供 SQLite 回退或旧迁移命令。
-启动本项目内已配置的服务时，先运行 `.\scripts\postgres.ps1 start` 和
-`.\scripts\qdrant.ps1 start`；新机器需先准备 PostgreSQL 和 Qdrant 服务。
-
 ### 1. 准备环境
 
-- Python 3.11 或更高版本；
-- [uv](https://docs.astral.sh/uv/)；
-- PostgreSQL 与 Qdrant 独立服务（本机已验证 PostgreSQL 18.6 / Qdrant 1.19.2）；
-- DeepSeek API Key（可选；不配置时使用本地证据摘录模式）；
-- Git LFS：`docs/` 中登记的 PDF 史料通过 Git LFS 随仓库分发；生成索引仍在本地构建。
+需要 Python 3.11+、[uv](https://docs.astral.sh/uv/)、Git LFS、PostgreSQL 和独立 Qdrant 服务。DeepSeek API Key 可选；未配置时返回本地证据摘录。项目命令为 `start1921`，保留 `history-agent` 兼容入口；Python 包名和环境变量前缀仍为 `history_agent`、`HISTORY_AGENT_`。
 
 ```powershell
 git clone git@github.com:bibofu/start1921.git
 cd start1921
-
-# 为当前仓库启用 Git LFS，并下载 docs/ 中的原始 PDF
 git lfs install --local
 git lfs pull
-
-# 创建虚拟环境并安装 OCR、向量检索、Web 和开发依赖
 uv sync --extra ocr --extra vector --extra app --group dev
-```
-
-### 2. 配置数据库与 DeepSeek V4
-
-Windows PowerShell：
-
-```powershell
 Copy-Item .env.example .env
 ```
 
-macOS/Linux：
+macOS/Linux 使用 `cp .env.example .env`。PDF 通过 Git LFS 管理，源码压缩包可能只含指针；索引仍需本地构建。以 `uv sync` 为支持的安装方式，依赖排除配置见 [pyproject.toml](pyproject.toml)。
 
-```bash
-cp .env.example .env
-```
+### 2. 配置服务
 
-编辑 `.env`，填写：
+编辑 `.env`：
 
 ```dotenv
 HISTORY_AGENT_DATABASE_URL=postgresql://用户名:密码@127.0.0.1:55432/start1921
 HISTORY_AGENT_QDRANT_URL=http://127.0.0.1:6333
-# 可选；未设置时会话、关键词共用主库
+# 可选：会话、关键词默认共用主库
 # HISTORY_AGENT_CONVERSATION_DATABASE_URL=postgresql://...
 # HISTORY_AGENT_KEYWORD_DATABASE_URL=postgresql://...
 DEEPSEEK_API_KEY=你的密钥
 ```
 
-默认使用 `deepseek-v4-pro` 非思考模式。确认配置且不显示密钥：
+主库、会话库、关键词索引仅支持 PostgreSQL，向量索引仅支持 Qdrant 服务。旧 SQLite 文件和迁移备份只作归档，不会回退使用。新机器需先按服务文档准备数据库；本工作区的 Windows 本机后台进程可用以下脚本启动：
 
 ```powershell
+.\scripts\postgres.ps1 start
+.\scripts\qdrant.ps1 start
 uv run start1921 llm status
+# 配置密钥后验证真实连通性
 uv run start1921 llm check
 ```
 
-### 3. 放入史料并首次建库
+查询规划默认使用 `deepseek-v4-flash`，回答默认使用 `deepseek-v4-pro`，均关闭 thinking。配置字段及默认值见 [.env.example](.env.example) 和 [config.py](app/history_agent/config.py)。修改 `.env` 后需重启服务。
 
-完成 `git lfs pull` 后，`docs/` 中应为完整 PDF 文件。新增史料也放入 `docs/`，文件名应与 `config/corpus_catalog.json` 中登记的名称一致，然后执行：
+### 3. 首次建库或更新史料
+
+新增 PDF 放入 `docs/` 并登记到 [文献目录](config/corpus_catalog.json)。完成 LFS 下载后执行：
 
 ```powershell
-# 登记文献并提取全部页面
 uv run start1921 corpus scan
 uv run start1921 extract text
-
-# OCR 扫描页并生成质量报告
 uv run start1921 extract ocr
 uv run start1921 extract report
-
-# 清洗、切分并建立双索引
 uv run start1921 process chunks
 uv run start1921 index build-keyword
 uv run start1921 index build-vector
-
-# 初始化研究表，从周、林年谱及毛泽东年谱九卷生成带页码证据的事件候选
-uv run start1921 research init
-uv run start1921 research extract-chronologies
-
-# 只预览待模型处理的复杂/低置信度事件，不调用 DeepSeek
-uv run start1921 research enrich-events --dry-run --limit 5
-
-# 预览跨来源重复事件；确认规则输出后去重并保留全部来源证据
-uv run start1921 research merge-events --dry-run --json
-uv run start1921 research merge-events
 ```
 
-首次 OCR 和向量索引构建耗时较长，并会下载 PaddleOCR 与中文嵌入模型；任务支持复用已完成的页面结果。生成内容位于 `data/`，不会提交到 Git。
+首次 OCR 和向量构建需要下载模型，耗时较长。版本一致的已完成页面结果会复用。已登记 PDF 的哈希变化需先核对，再用 `corpus scan --accept-changes` 接受。停用文献的分片应移出活跃 `data/processed/chunks/` 后再重建双索引；结构化查询也会过滤停用或缺失来源。
 
-### 4. 启动问答页面
+结构化研究功能还需初始化人物等主数据并抽取事件：
 
-完成首次建库后，日常启动只需要：
+```powershell
+uv run start1921 research init
+uv run start1921 research extract-chronologies --document-id zhou_enlai_chronology_1949_1976
+1..9 | ForEach-Object {
+    uv run start1921 research extract-chronologies --document-id "mao_zedong_chronology_volume_$_"
+}
+uv run start1921 research merge-events --dry-run --json
+uv run start1921 research merge-events
+uv run start1921 research extract-relationships
+```
+
+以上为 PowerShell 示例；其他终端逐卷传入相应 `--document-id`，也可重复该选项一次处理多份。无参数抽取会包含已撤下的林彪年谱，缺少其页面文件时会中断，因此新建库需显式选择已有文献。目录中的邓小平年谱可用于全文检索，尚无对应结构化年谱抽取器。自动事件、交集和任职均为待复核候选，人名提及不等于共同参与，也不能据单次任命记载外推任期。
+
+可选的 `research enrich-events --dry-run --limit 5` 预览模型增强对象。去掉 `--dry-run` 会向 DeepSeek 发送所选事件的短证据并记录待复核结果；每事件证据正文合计上限为 1200 字符，详见 [模型事件抽取说明](evals/MODEL_EVENT_EXTRACTION.md)。
+
+### 4. 启动页面并检查
 
 ```powershell
 uv run start1921 serve
 ```
 
-浏览器打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)。停止服务按 `Ctrl+C`。如果修改了 `.env`，需要重启服务才能读取新配置。
-
-初始化并抽取研究事件后，聊天可直接问“毛泽东在1949年有哪些经历”“毛泽东与周恩来在1949年有哪些交集”。所有问题先由查询理解模型生成统一计划；明确人物和整年/年份区间的问题可由计划选择结构化研究库，按时间返回有限条候选及 PDF 引用，再由回答模型忠实归纳。普通观点问题继续走混合检索。
-
-也可直接问“毛泽东和周恩来在长征期间有哪些交集？”。已识别的时期名称（长征、抗日战争/全面抗战、解放战争、抗美援朝、大跃进、文化大革命/文革）会进入混合检索，配置 DeepSeek 后根据短引文综合回答；未配置或调用失败时返回证据摘录。时期对应年份仅用于召回，不能把同年活动、人名共现或后来回忆直接当作该时期的共同参与。月份、地点、否定和指定来源等限制由统一查询计划完整保留，并进入混合检索；真正含糊的人物或指代才要求澄清。更新代码后需重启已有服务。修复记录见 `evals/STRUCTURED_CHAT_BASELINE.md`。
-
-不限定年份时，也可直接问“毛泽东和张国焘的交集”。只要恰好包含两位可解析的人物且没有地点、月份、否定等额外限制，问题会进入全库混合检索与证据约束综合；这类回答仍只代表当前召回材料，不等于完整人物关系史。带明确整年或年份区间的交集继续走结构化候选查询。
-
-聊天回答支持流式输出：模型生成的文字会逐段出现，标题、加粗、列表、引用、表格和代码块按 Markdown 渲染。点击“停止生成”可取消当前回答；清空会话也会取消进行中的请求。生成中的文字会提示“引用待核查”，最终以核查后的回答为准；引用修复或模型失败时会替换草稿。只有最终回答进入后续会话上下文。结构化查询和证据摘录直接返回结果，不额外模拟打字延迟。实现与测试记录见 `evals/STREAMING_CHAT.md`。
-
-### 5. 启动检查与常见状态
+打开 [http://127.0.0.1:8000](http://127.0.0.1:8000)，按 `Ctrl+C` 停止。可问“毛泽东在1949年有哪些经历”“毛泽东和周恩来在长征期间有哪些交集”“毛泽东关于调查研究有哪些论述”。
 
 ```powershell
-# 检查文献目录、数据库和研究时间边界
 uv run start1921 health --json
+```
 
-# 检查 DeepSeek 配置与真实连通性
-uv run start1921 llm status
-uv run start1921 llm check
+`/api/health` 提供进程与配置摘要，`/api/ready` 实际探测数据库和双索引。索引未就绪时检查建库步骤；密钥未配置时使用摘录模式；模型调用失败时保留本地检索结果并降级。关键词或向量单路故障会标记检索不完整，双路均不可用会返回错误。
 
-# 执行代码质量检查和测试
+## 当前行为与边界
+
+- 查询规划可将人物明确、完整年份或年份区间的时间线/两人交集问题路由到结构化库。规划提示词要求月份、地点、否定、指定来源、命名历史时期等限制进入混合检索；组织任职的结构化入口目前为 CLI/API。
+- 普通问答检索由 LlamaIndex 编排，关键词和向量分支并行，使用 RRF 与领域规则排序。当前未接入交叉编码器重排模型、NetworkX 或图数据库。
+- 查询规划不可用时回退到原问题检索。复杂问题可进行一次有预算的证据覆盖反思与补检，具体条件和参数见 [RAG 实现说明](RAG-IMPL.md)。
+- 引用核查检查证据编号、文献页码及事实句引用覆盖，不能替代逐项人工语义核验。流式草稿标记“引用待核查”，最终核查结果可替换草稿；停止生成、清空会话及 Markdown 渲染见 [流式问答说明](evals/STREAMING_CHAT.md)。
+- 浏览器保存 `session_id`，会话正文存于 PostgreSQL。服务端按消息数和字符预算构造追问上下文；历史引用失效化，只有本轮证据可支撑本轮事实。仅最终答案写入会话。
+- 当前 `evidence_status` 为 `supported`、`partial`、`no_evidence`。限制与差异通过答案正文和 `limitations` 表达；尚未实现需求基线中的五类状态和独立 `conflicts` 字段。
+
+## 常用维护入口
+
+完整参数由 CLI 帮助维护，避免在多份文档中重复列举：
+
+```powershell
+uv run start1921 --help
+uv run start1921 research --help
+uv run start1921 eval --help
+
+uv run start1921 search-hybrid "毛泽东关于调查研究的观点" --top-k 8
+uv run start1921 research people resolve "伍豪" --json
+uv run start1921 research timeline 周恩来 --year 1956 --limit 50
+uv run start1921 research intersections 毛泽东 周恩来 --year 1949 --json
+uv run start1921 research relationships 周恩来 --at 1956 --json
+uv run start1921 research review-queue --limit 20 --json
+```
+
+HTTP 接口与命令行共用业务实现：
+
+| 接口 | 功能 |
+| --- | --- |
+| `POST /api/questions` | 问答及结构化引用 |
+| `POST /api/questions/stream` | SSE 流式问答 |
+| `GET /api/health` / `GET /api/ready` | 存活与依赖就绪检查 |
+| `GET /api/sessions/{session_id}` | 恢复会话 |
+| `DELETE /api/sessions/{session_id}` | 清空会话 |
+| `GET /api/people/{person_id}/timeline` | 人物时间线 |
+| `GET /api/people/{person_id}/intersections/{other_person_id}` | 两人共同动作候选 |
+| `GET /api/people/{person_id}/relationships` | 指定时间的组织任职候选 |
+
+请求/响应字段见 [问答模型](app/history_agent/answering/models.py)、[研究模型](app/history_agent/research/models.py) 和运行服务的 [API 文档](http://127.0.0.1:8000/docs)。
+
+## 评测与开发检查
+
+Golden 目标为 30 个高质量用例，目前 v5 有 20 道开发题，题目定义 8 题人工批准、12 题待审；另 10 道独立验收题仍隔离。候选相关等级和真实答案未随题目定义一起获批。最新 [13 题回答复核](evals/golden/observations/20261011_calibrated/README.md) 是对同一历史采集的重审，不代表新模型运行或正式 Golden 成绩。
+
+本轮清理前，拒答题绑定的 `REQUIREMENTS.md` 哈希已与现文件不一致，当前全量新采集会被锚点校验阻止；需单独复核并发布新标注版本。旧采集仍可按绑定版本离线评分，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。版本化标注、裁定、候选池和观测快照保留用于审计，不按重复文件删除。
+
+历史页级评测可通过 `eval retrieval`、`eval answers`、`eval comprehensive`、`eval golden` 运行，适用维度、分母和限制见各自报告。真实模型调用需显式启用相应参数。
+
+```powershell
 & .\scripts\check.ps1
 ```
 
-- 页面显示“DeepSeek 密钥未配置”：检查 `.env` 中的 `DEEPSEEK_API_KEY`，然后重启服务。
-- 页面显示索引未就绪：完成“首次建库”中的 `process chunks` 和两个 `index build-*` 命令。
-- DeepSeek 调用失败：系统会保留本地检索结果并自动降级为证据摘录，不会凭模型记忆补写。
+该脚本执行 Ruff、mypy、pytest，以及 Node.js 可用时的前端语法/流式检查。数据库测试需要 `HISTORY_AGENT_TEST_POSTGRES_URL` 指向独立测试库，否则明确跳过；配置方法见 [PostgreSQL 开发验证](POSTGRESQL.md#开发验证)。可选浏览器集成测试使用 `node scripts/test-chat-ui.mjs`，依赖安装方法见 [流式问答说明](evals/STREAMING_CHAT.md)。
 
-## 完整维护命令
+## 文献与运行数据
 
-以下命令用于文献更新、索引调试和评估。在 Windows PowerShell 中运行：
+文献登记以 [corpus_catalog.json](config/corpus_catalog.json) 为准。最近一次文献同步记录为 [2026-09-22 更新](evals/CORPUS_UPDATE_20260922.md)：17 份启用 PDF、15,130 页，包括党史两卷、毛泽东选集、周恩来年谱、邓小平年谱三册、西行漫记和毛泽东年谱九卷。已撤下的林彪年谱、邓小平文选仍保留历史登记与研究记录。
 
-```powershell
-# 创建虚拟环境；OCR、向量检索和 Web 界面均安装到本地环境
-uv sync --extra ocr --extra vector --extra app --group dev
+《毛泽东选集》保留本地民间整合版，引用时区分版本、卷次和来源。PDF 只读处理；OCR 和自动抽取不等于人工核验，重要引文需回到原页。目录中 `ocr_pages` 可指定强制 OCR 页，`full_required` 表示整本 OCR。
 
-# 检查环境和研究时间边界
-.\.venv\Scripts\start1921.exe health --json
+`data/` 保存逐页文本、OCR、切片、报告和本地服务运行文件；业务与会话数据存于 PostgreSQL，向量存于 Qdrant。派生索引可以重建，主库、会话及人工复核记录需要单独备份。`tmp/` 为本地草稿和临时产物，不纳入版本控制。
 
-# 扫描 docs/，更新文献数据库并导出清单和差异报告
-.\.venv\Scripts\start1921.exe corpus scan
-
-# 初始化人物主数据、别名和关系词表（幂等，可重复执行）
-.\.venv\Scripts\start1921.exe research init
-
-# 将历史别名解析为稳定 person_id；歧义名称不会被强制合并
-.\.venv\Scripts\start1921.exe research people resolve "伍豪" --json
-
-# 从已支持的十一份年谱 PDF 抽取事件；可加 --dry-run 预览，重复运行跳过相同记录
-.\.venv\Scripts\start1921.exe research extract-chronologies
-
-# 先预览候选；下一条命令会把所选事件的短证据发送给 DeepSeek
-.\.venv\Scripts\start1921.exe research enrich-events --dry-run --limit 5
-.\.venv\Scripts\start1921.exe research enrich-events --limit 5
-
-# 查看所有模型成功、无效或失败后生成的待复核项
-.\.venv\Scripts\start1921.exe research review-queue --limit 20 --json
-
-# 预览并生成跨来源规范事件；源事件和源证据不会被覆盖或删除
-.\.venv\Scripts\start1921.exe research merge-events --dry-run --json
-.\.venv\Scripts\start1921.exe research merge-events
-
-# 查看不确定合并，并按稳定 canonical_event_id 确认、驳回或重新打开
-.\.venv\Scripts\start1921.exe research merge-review-queue --limit 20 --json
-.\.venv\Scripts\start1921.exe research review-event-merge CANONICAL_EVENT_ID `
-  --decision confirmed --reviewed-by "研究者" --note "两份年谱记载同一事件"
-
-# 查询人物年度时间线；支持姓名、稳定 ID、年份区间、类型和复核状态
-.\.venv\Scripts\start1921.exe research timeline 周恩来 --year 1956 --limit 50
-.\.venv\Scripts\start1921.exe research timeline lin_biao `
-  --start-year 1942 --end-year 1943 --event-type correspondence --json
-
-# 查询两个人的共同动作候选；不是人名共现统计，全部仍需复核
-.\.venv\Scripts\start1921.exe research intersections 毛泽东 周恩来 --year 1949 --json
-
-# 复算经原页视觉核对的 26 条定向交集样本（JSON，不调用模型）
-.\.venv\Scripts\start1921.exe eval intersections
-
-# 生成不含预测和答案的 40 条独立复核包；复核流程见 evals/INTERSECTION_INDEPENDENT_REVIEW.md
-.\.venv\Scripts\start1921.exe eval prepare-intersection-review
-
-# 查看最近一次扫描结果
-.\.venv\Scripts\start1921.exe corpus diff
-
-# 导出当前文献清单 JSON/CSV
-.\.venv\Scripts\start1921.exe corpus export
-
-# 全量提取、OCR、清洗切分
-.\.venv\Scripts\start1921.exe extract text
-.\.venv\Scripts\start1921.exe extract ocr
-.\.venv\Scripts\start1921.exe extract report
-.\.venv\Scripts\start1921.exe process chunks
-
-# 构建 BM25 与 Qdrant 中文向量索引
-.\.venv\Scripts\start1921.exe index build-keyword
-.\.venv\Scripts\start1921.exe index build-vector
-
-# 调试三种检索方式；正式问答使用混合检索
-.\.venv\Scripts\start1921.exe search "周恩来在1956年主要有哪些经历" --top-k 5
-.\.venv\Scripts\start1921.exe search-vector "毛泽东关于调查研究的观点" --top-k 5
-.\.venv\Scripts\start1921.exe search-hybrid "毛泽东和周恩来在长征期间的交集" --top-k 8
-
-# 运行 44 道可回答题的目标文献/年份检索基线（另含 3 道拒答题）
-.\.venv\Scripts\start1921.exe eval retrieval --top-k 10
-
-# 运行 47 题页码、引用、事实覆盖与拒答的回答验收
-# 默认使用确定性的证据摘录模式，不消耗 DeepSeek Token
-.\.venv\Scripts\start1921.exe eval answers --top-k 10
-
-# 审计 M8.1 的 105 题综合评估集，并回归 18 个结构化查询
-.\.venv\Scripts\start1921.exe eval comprehensive --verify-structured
-
-# 用统一 Golden Dataset 分层评估 routing、retrieval、context、generation 与 citation
-.\.venv\Scripts\start1921.exe eval golden --dimension all --run-name baseline
-
-# 运行 v13 真实 DeepSeek 链路，并启用逐回答语义引文评判、错误校准集和延迟统计
-.\.venv\Scripts\start1921.exe eval answers --top-k 10 --with-llm
-
-# 检查 DeepSeek V4 配置与连通性
-.\.venv\Scripts\start1921.exe llm status
-.\.venv\Scripts\start1921.exe llm check
-
-# 启动本地问答页面：http://127.0.0.1:8000
-.\.venv\Scripts\start1921.exe serve
-
-# 执行静态检查、类型检查和测试
-& .\scripts\check.ps1
-```
-
-v13 的真实 LLM 评测方法、指标口径和首轮基线见
-[`evals/V13_LLM_EVALUATION.md`](evals/V13_LLM_EVALUATION.md)。
-Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法见
-[`evals/golden/README.md`](evals/golden/README.md)。
-当前v2开发集已完成20题原文/事实/边界预标注，人工复核分批入口见
-[`evals/golden/DEVELOPMENT_ANNOTATION_PROGRESS.md`](evals/golden/DEVELOPMENT_ANNOTATION_PROGRESS.md)。
-最新已完成[13题真实模型评测与逐事实评审](evals/golden/observations/20261005/README.md)；[历史检索基线](evals/golden/DEVELOPMENT_BASELINE.md)保留。新20题标注包尚未接入多轮协议，新增7题未运行，人工Golden仍待复核。
-
-如果扫描发现某份已登记 PDF 的 SHA-256 发生变化，程序会保留旧版本，不会直接接受新内容。确认差异后运行：
-
-```powershell
-.\.venv\Scripts\start1921.exe corpus scan --accept-changes
-```
-
-首次构建向量索引会下载中文嵌入模型。逐页文本、OCR、chunks、质量报告和任务记录保存在 `data/`，不提交 Git。主库、会话和关键词存于 PostgreSQL，向量存于 Qdrant 服务。派生索引可以重新构建；主库、会话库及人工复核记录需要单独备份。原 SQLite 文件和历史备份保留用于归档恢复，不参与当前运行。
-
-项目已接入 DeepSeek V4。所有问法默认先由 `deepseek-v4-flash` 以非思考 JSON 模式完成统一查询理解：规范化简称与别名，识别人物、事件、时间、意图、逐年/逐项/分阶段覆盖要求，并选择结构化研究库或混合 RAG。明确人物和完整年份/年份区间的时间线、交集问题可以选择结构化路线；月份、地点、否定、指定来源、命名历史时期或其他限制必须选择混合检索。“要求引用/直接原文支持”等回答形式不会被误判为缺少人物或年份。查询计划通过本地 Pydantic schema 后，由执行器把原问题和检索改写作为独立子查询运行，再以 RRF 合并；普通问题最多采用 2 条高价值改写，只有必须逐项覆盖的 `per_item` 问题才保留最多 8 条。每次查询的关键词与向量分支并行执行。人物、年份范围和覆盖策略作为类型化条件同时传给两个分支，月份、地点、否定、来源等约束会保留在子查询中。解析超时、返回非法 JSON 或不可用时自动退回原问题执行混合检索，不再由前置结构化正则拒答。
-
-证据回答默认使用 `deepseek-v4-pro` 非思考模式；这更适合“证据已检索、模型负责忠实组织”的 RAG 问答，也能显著降低等待时间。服务会检查引用编号、文献页码和事实引用覆盖。关键词或向量分支单独故障时会以另一分支继续服务并标记结果不完整。需要复杂综合时，可临时设置 `HISTORY_AGENT_LLM_THINKING=true` 和相应的 reasoning effort。查询理解器可分别通过 `HISTORY_AGENT_LLM_QUERY_PLANNING`、`HISTORY_AGENT_LLM_QUERY_PLANNER_MODEL` 和 `HISTORY_AGENT_LLM_QUERY_PLANNER_MAX_TOKENS` 配置。复杂问题默认启用一轮证据覆盖反思：首轮材料缺少核心方面时，系统以缺失方面构造最多三条定向查询，补充检索后再生成；可通过 `HISTORY_AGENT_LLM_RETRIEVAL_REFLECTION=false` 关闭，轮次和查询数由 `HISTORY_AGENT_LLM_RETRIEVAL_REFLECTION_MAX_ROUNDS`、`HISTORY_AGENT_LLM_RETRIEVAL_REFLECTION_MAX_QUERIES` 限制。`HISTORY_AGENT_REQUEST_TIMEOUT_SECONDS` 控制 planner、反思和回答共享的总时限，`HISTORY_AGENT_LLM_MAX_CONCURRENCY` 控制共享连接池的并发准入。将 DeepSeek API Key 写入已被 Git 忽略的 `.env`：
-
-生成答案如果只因部分事实要点漏写证据编号而未通过校验，系统会先删除漏引段落并重新校验；剩余答案有效时立即返回，不再为了恢复被删文字增加一次模型调用。只有无法安全裁剪时才把漏引要点反馈给 DeepSeek 修复一次。修复请求只允许使用原证据包，不得增加新事实。伪造证据编号、文献名或 PDF 页码等错误不会触发自动修复。
-
-`citation_repair_uncited_core_claim` 表示修复后仍被判有事实漏引，不是网络连接错误。校验按 Markdown 段落、引用块、列表项及表格行识别正文，单纯的资料不足说明无需引用。若仍因漏引降级，可展开“哪些语句缺少引用”查看未通过的具体草稿语句；这些语句不作为答案依据，也不进入后续会话上下文。JSON 与 SSE 最终结果中的 `llm_error_code`、`uncited_claims` 提供相同诊断。修复记录见 [引用校验回归记录](evals/CITATION_VALIDATION.md)。
-
-```dotenv
-DEEPSEEK_API_KEY=你的密钥
-```
-
-保存后运行 `start1921 llm check` 验证连接，再重启 Web 服务。也可以在 `.env` 中将 `HISTORY_AGENT_LLM_MODEL` 改为 `deepseek-v4-flash`。没有配置密钥时，查询理解退回原问题，页面继续使用“证据摘录模式”；DeepSeek 超时、余额不足、认证失败、查询计划非法或返回虚构证据编号时，也会自动安全降级，不影响本地检索和引用展示。Web 会话通过浏览器保存的 `session_id` 与服务端会话库关联（PostgreSQL，或兼容模式下的 `data/conversations.db`），刷新页面后可以恢复；送入查询理解和最终生成的历史由服务端统一按消息数、字符预算裁剪，旧回答中的证据编号会先失效化。历史对话仅用于解析指代和承接，不作为本轮史实证据；本轮生成仍只允许使用当前检索得到的证据包。
-
-`research enrich-events` 是独立的批处理入口，默认一次最多处理 5 条，每个事件发送的全部证据正文合计硬限制为 1200 字符。它使用 DeepSeek JSON Output，但仍在本地执行严格 schema 与原文子串校验；模型不能修改日期、事件原文或证据页码，也不能直接把记录标为“已确认”。每次原始响应、模型与提示词版本、调用前后快照和 Token 用量都会写入配置的主库，结果统一进入复核队列。该命令会把选中事件的短证据发送到 DeepSeek；对资料出境有要求时，应只运行 `--dry-run`，或先完成相应授权与脱敏。JSON Output 参数以 [DeepSeek 官方说明](https://api-docs.deepseek.com/guides/json_mode/) 为准。
-
-## 项目定位
-
-本项目主要解决四类问题：
-
-1. **人物经历**：某个人物在某一年、某一阶段经历了什么。
-2. **人物交集**：两个人物在哪些会议、事件、机构或地点中产生过交集。
-3. **组织关系**：某人在特定时间和机构中的上级、下属、同事及职务变化。
-4. **政治观点**：某个人物对战争、建设、党内关系、经济政策等问题有哪些公开论述。
-
-典型问题包括：
-
-- 1935 年毛泽东的主要经历有哪些？
-- 毛泽东与周恩来在长征期间有哪些可以被文献证实的交集？
-- 1956 年周恩来参加过哪些重要会议？
-- 林彪在不同时期担任过哪些职务？
-- 邓小平在 1975 年主要负责哪些工作？
-- 毛泽东关于调查研究有哪些论述？
-- 不同文献对同一事件的叙述有什么差异？
-
-## 研究边界
-
-- **时间范围**：1921 年至 1978 年。
-- **研究主线**：中国共产党历史及其关键人物、事件和组织变化。
-- **回答依据**：默认仅使用本地知识库已经收录的材料。
-- **时间过滤**：超出 1978 年的材料可以保留，但默认不参与回答。
-- **证据要求**：重要事实必须附文献名、卷次和 PDF 页码。
-- **无证据处理**：本地资料不足时明确说明“现有资料无法确认”，不使用模型常识补齐事实。
-
-本项目不试图替代专业历史研究，也不把任何单一文献视为全部事实。官方史料、人物文集、年谱、回忆材料和同时代观察具有不同性质，应保留来源标签并允许并列展示相互冲突的记载。
-
-## 当前文献
-
-当前文档库包含 17 份启用的 PDF，合计 15,130 页。2026-09-22 新增《邓小平年谱（1904—1974）》上、中、下三册共 2,098 页；《林彪年谱》和《邓小平文选》原 PDF 已移除并停用，保留历史登记与研究记录。更新与验证记录见 [本次文档库同步](evals/CORPUS_UPDATE_20260922.md)。
-
-| 文献 | 主要用途 | 入库说明 |
-| --- | --- | --- |
-| 《中国共产党历史》第一卷（1921—1949） | 1921—1949 年宏观历史主干 | 可直接提取正文 |
-| 《中国共产党历史》第二卷（1949—1978） | 1949—1978 年宏观历史主干 | 可直接提取正文 |
-| 《毛泽东选集》 | 毛泽东文章、讲话和政治观点 | 完整保留当前民间整合版，并记录来源系列、卷次和篇目日期 |
-| 《周恩来年谱（1949—1976）》 | 周恩来时间线、会议和人物交集 | 可直接提取正文，需保留卷次与 PDF 页码映射 |
-| 《邓小平年谱（1904—1974）》上、中、下三册 | 邓小平经历、任职和事件检索 | 扫描版，需完整 OCR；无效页码书签不作为时间依据，年份取自经校验的正文标题 |
-| 《西行漫记（红星照耀中国）》 | 早期人物经历和同时代外部观察 | 扫描版，需要完整 OCR |
-| 《毛泽东年谱》九卷（1893—1976） | 毛泽东经历、会议和历史事件检索 | 按卷登记、保留年份书签，对疑似坏文字层及章节起始页重新 OCR；1921 年以前的章节默认不参与检索 |
-
-原始 PDF 保存在 `docs/` 中，通过 Git LFS 管理。Git 提交保存文件指针，原始文件由 LFS 下载；普通源码压缩包不能保证包含 PDF 实体，应使用安装了 Git LFS 的仓库克隆并执行 `git lfs pull`。原始文件只读使用，不在预处理过程中覆盖或改写。
-
-停用或缺失文献的分片应移出活跃 `data/processed/chunks/` 目录后再重建双索引。结构化时间线、交集和组织关系查询也会排除停用或缺失的来源；涉及撤下来源的规范事件回退到仍有可用证据的源事件，历史数据与复核状态保持可追溯。
-
-文献目录中的可选 `ocr_pages` 指定需要重新 OCR 的 PDF 物理页码，即使页面已有文字层也会执行；`full_required` 则要求整本重新识别。修改清单后执行 `corpus scan`、`extract text`、`extract ocr`、`extract report`、`process chunks` 和两个 `index build-*` 命令即可重建。页码必须在文献页数以内，已完成且版本一致的 OCR 结果会复用。
-
-《毛泽东年谱》的逐页筛查清单不等于逐页人工校对，已有 OCR 文字层仍可能存在错别字，重要引文应回到 PDF 核验。九卷已新增 13,729 条结构化事件候选，全部标为待复核；当前源事件共 29,122 条，活跃规范事件组 280 个。抽取方法、幂等性与限制见 [毛泽东年谱事件抽取验收](evals/MAO_EVENT_EXTRACTION.md)。人名提及不能直接当作共同参与证据。
-
-### 文献版本原则
-
-《毛泽东选集》使用当前民间整合版，不做替换或删减。入库时必须显式记录：
-
-- `edition`: 民间整合版；
-- `source_series`: 静火、赤旗、草堂或其他可识别来源；
-- `volume`: 卷次；
-- `article_date`: 篇目形成或发表日期；
-- `original_source`: 能够确认时记录原始出处；
-- `verification_status`: 已核对、部分核对或来源待核。
-
-Agent 引用时应说明具体版本，例如“据本地知识库所收民间整合版《毛泽东选集》第六卷……”，避免把不同来源混同为一个统一版本。
-
-## 核心原则
-
-### 1. 回答必须可追溯
-
-每条核心结论至少关联一个证据片段。引用信息应包括：
-
-- 文献名称；
-- 卷次或章节；
-- PDF 页码；
-- 支撑结论的原文片段；
-- 文献版本和来源类型。
-
-### 2. 事实、观点和回忆分开处理
-
-- **事实陈述**：人物任职、会议时间、地点和公开事件。
-- **人物观点**：讲话、文章和批示中的主张。
-- **作者叙述**：年谱、党史或其他作者对事件的概括。
-- **回忆材料**：当事人多年后对事件的追述。
-
-系统不能把“某人回忆称”自动改写成“事实就是”。
-
-### 3. 关系具有时间和组织语境
-
-“直接下属”不是永久关系。任何组织关系至少需要保存：
-
-- 主体人物；
-- 关系类型；
-- 客体人物；
-- 开始和结束时间；
-- 所属机构或事件；
-- 证据出处。
-
-### 4. 展示冲突，不擅自消除冲突
-
-如果不同文献存在差异，Agent 应分别陈述各自记载，说明来源和差异点；只有证据充分时才能给出综合判断。
-
-## 技术方案
-
-项目采用 **LlamaIndex Agentic RAG + 结构化事件关系库**。LlamaIndex 负责查询、证据节点、检索器、后处理器和检索反思工作流，项目自定义的混合检索负责历史领域排序与过滤；结构化数据负责时间线、人物交集和组织关系查询。
-
-```mermaid
-flowchart LR
-    A[本地 PDF] --> B[文本提取与 OCR]
-    B --> C[版面清洗与篇章切分]
-    C --> D[文献元数据与页码映射]
-    D --> E[关键词与向量混合索引]
-    D --> F[人物/事件/关系抽取]
-    E --> L[LlamaIndex QueryBundle / BaseRetriever]
-    L --> G[首轮 TextNode 召回与后处理]
-    F --> H[时间线与关系查询]
-    G --> R{核心方面是否有证据}
-    R -->|不足且仍有预算| Q[针对缺失方面改写查询]
-    Q --> G
-    R -->|充分或达到上限| I[证据汇总]
-    H --> I
-    I --> J[带出处的回答]
-```
-
-### 推荐技术栈
-
-| 层次 | 技术选择 | 用途 |
-| --- | --- | --- |
-| 开发语言 | Python 3.11+ | 数据处理、检索、抽取和服务端 |
-| 依赖管理 | `uv` | 创建环境、锁定依赖和运行脚本 |
-| PDF 解析 | PyMuPDF、pdfplumber、pypdf | 正文提取、页码映射和文档检查 |
-| 中文 OCR | PaddleOCR | 处理《西行漫记》和局部扫描页 |
-| API 服务 | FastAPI + Pydantic | 提供问答、人物和事件查询接口 |
-| RAG 编排 | LlamaIndex Core / Workflow | 统一 QueryBundle、TextNode、Retriever、NodePostprocessor 和有界检索反思循环 |
-| 关键词检索 | PostgreSQL 倒排词位 + BM25 | 保留中文二元切词、原 FTS5 计分语义、过滤和业务加权 |
-| 向量模型 | BAAI/bge-small-zh-v1.5（当前） | 本地 CPU 中文语义检索；后续可评测 BGE-M3 |
-| 融合/重排 | RRF（当前）、BGE Reranker v2 M3（候选） | 合并 BM25 与向量结果、去除同页重复证据 |
-| 向量数据库 | Qdrant | 保存向量及日期、人物、文献等过滤字段 |
-| 业务数据存储 | PostgreSQL | 文献、事件、人物、证据关系、复核记录和会话 |
-| 关系分析 | SQL 关系表 + NetworkX | 初期完成人物网络和路径查询 |
-| 图数据库 | Neo4j（可选） | 关系规模和查询复杂度上升后再引入 |
-| 大语言模型 | DeepSeek V4-Pro（默认，可切换 V4-Flash） | 基于本地证据生成答案、thinking/high、引用 ID 校验 |
-| 初期界面 | FastAPI + 原生 HTML/CSS/JS | 单进程提供 API 和轻量会话页面 |
-| 测试评估 | pytest + 固定问题集 | 检查召回率、引用正确性和无依据回答 |
-
-### LlamaIndex 接入边界
-
-当前问答主链路基于 `llama-index-core 0.14.x`：自然语言计划通过
-`PydanticOutputParser` 解析和校验，查询进入 `QueryBundle`，本地混合召回实现为
-`BaseRetriever`，候选史料转换为带完整出处元数据的 `TextNode/NodeWithScore`，去重和
-数量限制由 `BaseNodePostprocessor` 执行，首轮检索、证据充分性评估和一次定向补检由
-LlamaIndex `Workflow` 的类型化事件编排。查询规划、证据评估、普通与流式生成统一通过
-自定义 LlamaIndex `LLM` 适配器，并接入应用级 `CallbackManager`；最终提示词使用
-`ChatPromptTemplate` 构造。工作流事件与 Context 中只保存可序列化的 Pydantic 数据，连接池、
-调用器和配置等运行时依赖由工作流实例注入。
-
-项目没有把领域逻辑强行换成框架默认值：BM25/Qdrant 融合、人物硬过滤、时间覆盖、页码
-映射和事实级引用校验仍是自定义组件，通过 LlamaIndex 扩展接口接入。这些能力直接决定
-历史问答的可核验性，也是与通用 RAG 示例的主要区别。
-
-本项目也没有为了框架覆盖率重复套用 `QueryFusionRetriever`、`QdrantVectorStore` 或通用
-Response Synthesizer：现有混合后端已经实现带人物/时间约束的多查询 RRF；已有 Qdrant
-payload、稳定点 ID 和原子重建协议需要兼容；生成端还有分组综合、引用修复与安全降级。
-这三项只有在双读评测证明质量或运维收益后才迁移。接口返回的 `rag_framework` 表示单次
-请求真实执行路径：普通混合 RAG 为 `llamaindex`，全文和结构化等旁路为 `native`。
-
-初期不强制使用图数据库。人物关系首先存入可审计的 SQL 表，并用 NetworkX 完成分析和可视化；只有当关系规模和多跳查询明显变复杂时，再迁移到 Neo4j。
-
-## 数据模型
-
-### 文献与片段
-
-每个检索片段至少保存以下字段：
+## 代码目录
 
 ```text
-document_id
-document_title
-source_type
-edition
-volume
-chapter
-pdf_page_start
-pdf_page_end
-printed_page
-text
-article_date
-people
-organizations
-locations
-verification_status
-content_hash
+app/history_agent/
+├── cli.py                # 命令行入口
+├── config.py             # 配置与服务连接目标
+├── db.py / db_backend.py # PostgreSQL 模型与访问
+├── corpus/               # 文献登记与扫描
+├── extraction/           # PDF 文本提取、OCR、报告
+├── processing/           # 清洗、篇章与切片
+├── retrieval/            # PostgreSQL BM25、Qdrant、融合与 LlamaIndex 适配
+├── research/             # 人物、事件、交集、组织任职与复核
+├── answering/            # 查询规划、上下文、生成、流式与引用校验
+├── evaluation/           # 分层评测、协议、复核与比较
+└── web/                  # FastAPI 与 static/ 单页会话界面
+config/                   # 文献目录、人物别名、关系词表、Qdrant 配置
+docs/                     # Git LFS 原始 PDF
+evals/                    # 评测集、冻结标注与历史报告
+scripts/                  # 服务管理、检查与离线复核辅助脚本
+tests/                    # 单元与集成测试
 ```
-
-`pdf_page` 与书中印刷页码应分别保存，避免引用错位。
-
-### 历史事件
-
-```text
-event_id
-event_name
-start_date + precision + certainty
-end_date + precision + certainty
-location
-participants
-organizations
-description
-evidence_chunk_ids
-extraction_confidence
-review_status
-```
-
-### 人物关系
-
-```text
-subject_person
-relation_type
-object_person
-subject_mention_text
-object_mention_text
-start_date + precision + certainty
-end_date + precision + certainty
-organization
-event_id
-evidence_chunk_ids
-review_status
-```
-
-事件和关系记录必须保存证据 ID，不能只保存模型抽取出的结论。
-
-## 检索与回答流程
-
-1. 识别问题类型：经历、交集、组织关系、人物观点或事件复盘。
-2. 解析人物、时间范围、地点、机构和事件名称。
-3. 应用 1921—1978 时间过滤和文献范围过滤。
-4. 同时执行 BM25 精确检索和向量语义检索。
-5. 合并结果并通过重排模型筛选最相关片段。
-6. 对人物交集和组织关系问题，同时查询结构化事件关系库。
-7. 将证据片段、关系记录和来源信息交给模型生成回答。
-8. 检查回答中的每个核心结论是否有对应证据。
-9. 输出答案、引用、证据状态和可能存在的文献分歧。
-
-建议的回答结构：
-
-```text
-结论
-
-按时间排列的主要事实
-
-人物关系或观点说明
-
-文献依据
-- 文献名，卷次，PDF 第 N 页
-
-资料限制或不同记载
-```
-
-## 使用方式
-
-基础 RAG 已可运行，当前提供三种入口：
-
-### 本地问答界面
-
-前端保持为简单的单页会话框。用户输入自然语言问题，Agent 在同一会话区返回答案和原文证据；支持加载状态、错误提示、追问和清空当前会话。
-
-页面不提供人物详情页、事件详情页、关系网络、管理后台或人工复核工作台。人物经历、人物交集、组织关系和观点研究统一通过会话提问完成。
-
-### 命令行
-
-用于批量导入文献、重建索引、执行测试问题和导出人物关系数据。
-
-### HTTP API
-
-当前已实现：
-
-```text
-POST /api/questions       基于本地资料问答
-POST /api/questions/stream 流式问答（SSE，status/delta/reset/done/error）
-GET  /api/health          进程存活探针及生成配置摘要
-GET  /api/ready           实际探测数据库、关键词索引和向量索引可用性
-GET  /api/people/{person_id}/timeline
-                           查询去重后的人物时间线和页码证据
-GET  /api/people/{person_id}/intersections/{other_person_id}
-                           查询两人的共同动作候选和逐来源证据
-GET  /api/people/{person_id}/relationships
-                           按时间点查询组织任职候选和页码证据
-```
-
-人物时间线、人物交集和组织任职接口均已实现。组织关系接口的 `at` 参数接受 `YYYY`、`YYYY-MM` 或 `YYYY-MM-DD`；没有结束时间证据时只匹配史料明确记载的任职日期范围，不能据此推断此后持续在任。时间线和人物交集已经接入会话路由，组织关系当前先通过 CLI/API 查询。
-
-问答接口应返回结构化证据，而不只返回一段文本：
-
-```json
-{
-  "answer": "……",
-  "evidence_status": "supported",
-  "citations": [
-    {
-      "document": "文献名称",
-      "volume": "卷次",
-      "pdf_page": 123,
-      "quote": "支撑回答的原文片段"
-    }
-  ],
-  "conflicts": []
-}
-```
-
-## 规划目录
-
-```text
-.
-├── README.md
-├── docs/                    # 原始 PDF，只读
-├── app/
-│   ├── api/                 # FastAPI 接口
-│   ├── ingestion/           # PDF 解析、OCR、清洗和切分
-│   ├── retrieval/           # BM25、向量检索和重排
-│   ├── extraction/          # 人物、事件和关系抽取
-│   ├── answering/           # 证据约束与回答生成
-│   └── models/              # 数据模型和数据库访问
-├── data/
-│   ├── processed/           # 清洗后的文本和页码映射
-│   └── indexes/             # 本地检索索引，不提交 Git
-├── evals/                   # 固定问题集和预期证据
-├── scripts/                 # 导入、重建和校验脚本
-└── tests/
-```
-
-## 开发路线
-
-### 第一阶段：可引用的基础 RAG
-
-- 建立文献清单和版本元数据；
-- 提取可解析 PDF 的文本；
-- 对扫描页执行 OCR；
-- 保留 PDF 页码和章节边界；
-- 建立 BM25 + 向量混合索引；
-- 实现只依据本地证据回答并引用页码。
-
-### 第二阶段：人物与事件抽取
-
-- 建立人物、别名、机构和地点规范表；
-- 从年谱和党史中抽取带时间的事件；
-- 生成个人时间线；
-- 支持两个人物交集查询。
-
-### 第三阶段：组织关系与观点研究
-
-- 抽取带任期和机构语境的人物关系；
-- 建立文章、观点主题和历史事件之间的关联；
-- 展示不同文献对同一事件的差异；
-- 让会话 Agent 能够调用时间线、人物交集和关系查询。
-
-### 第四阶段：评估与校正
-
-- 建立经历、交集、组织关系、观点四类基准问题；
-- 测试检索是否找到了正确页码；
-- 测试回答是否超出证据；
-- 对高价值事件和关系进行人工复核；
-- 保存每次索引和抽取所使用的模型、提示词及版本。
-
-## 数据与使用注意事项
-
-- 原始文献仅用于个人学习、研究和本地处理。
-- 不在仓库或公开服务中重新分发受版权保护的 PDF 和大段正文。
-- 对外展示时优先输出分析、短引文和明确出处。
-- 自动抽取的人物关系和事件不是最终史实，必须保留来源并允许人工复核。
-- 项目名称、界面和输出不应暗示由任何官方机构开发、授权或背书。
-
-## 当前状态
-
-- [x] 确定研究范围：1921—1978 年
-- [x] 确定首批 7 份文献
-- [x] 2026-09-05 接入《毛泽东年谱》九卷：新增 5,806 页、514 页定向 OCR 和 6,794 个切片；全库双索引为 16 份文献、24,036 条，九卷关键词/混合检索页码冒烟均 9/9 通过（见 [入库记录](evals/MAO_CHRONOLOGY_INGESTION.md)）
-- [x] 2026-09-22 同步更新本地文档库：新增《邓小平年谱》三卷的 2,098 页 OCR，停用两份已撤下文献；全库双索引现为 17 份文献、22,338 条，逐条一致性、三卷双路检索及服务健康验证通过（见 [更新记录](evals/CORPUS_UPDATE_20260922.md)）
-- [x] 完成文献可提取性和扫描质量初步检查
-- [x] 定义项目定位、证据原则和技术路线
-- [x] 建立文献清单、稳定 ID、哈希和元数据数据库
-- [x] 完成三类 PDF 的逐页数据模型和小样本提取验证
-- [x] 完成 10,138 页文本提取、498 个候选页 OCR 与质量报告
-- [x] 生成 17,242 个页码对齐 chunks
-- [x] 建立 SQLite FTS5/BM25 + 本地 Qdrant 中文向量混合索引
-- [x] 实现带页码引用的基础问答 API 和单页会话界面
-- [x] 接入 DeepSeek V4-Pro，支持可选 thinking、用量回传、段落/列表项级核心事实引用校验和失败降级
-- [x] 扩充为 38 题固定集；35 道可回答题的目标文献/年份基线 Recall@10 97.14%，MRR 0.9381
-- [x] 建立 38 题页码级人工金标准和 MVP 回答评估：关键页命中 91.43%，引用页一致 99.71%，必要事实覆盖 86.46%，拒答 100%
-- [x] 建立 25 位人物的稳定 ID、别名/歧义处理和人工合并审计流程
-- [x] 定义带时间精度、共同事件、原文提及、证据和复核状态的事件/关系模型及 7 类关系词表
-- [x] 从《周恩来年谱》《林彪年谱》抽取 15,393 条首批人物事件，保留日期确定性、年谱主体来源、原文和 PDF 页码证据
-- [x] 完成 DeepSeek 结构化事件增强、1200 字符送模硬上限、逐字段原文校验、调用审计和复核队列；2 条真实 API 冒烟全部成功且幂等复跑不消耗 Token
-- [x] 完成跨来源事件去重：从 15,393 条源事件生成 69 个可逆规范事件组（18 个高置信、51 个待审），保留 139 条来源成员快照和证据链接；幂等复跑零改动
-- [x] 实现人物时间线 CLI 与 API：联合规范事件和独立源事件，支持年份、类型、复核状态及分页过滤，并返回参与者、来源差异和 PDF 页码证据
-- [x] 扩充毛泽东年谱九卷：新增 13,729 条待复核事件；现有源事件 29,122 条、活跃规范组 280 个（前述 69 组为首批基线）
-- [x] 实现人物交集候选 CLI/API：逐来源检查共同动作、保留双方角色和证据；v4 支持紧邻普通名单成员及“中方有……、苏方有……”分组名单。26 条、9 组人物的 PDF 视觉核对定向样本为 TP=16、FP=0、FN=0、TN=10（开发集，非全库准确率），详见 [交集验收](evals/INTERSECTION_BASELINE.md)
-- [x] 完成人物交集独立包定稿：40 条覆盖 10 组人物、10 份文献和 23 个年份，与开发源事件零重合；复核者确认标签但授权豁免逐案理由，结果明确标为不可审计的确认集。40 条均为正例，v4 命中 20 条、Recall=50%；没有负例，不能评估误报率，详见 [独立复核说明](evals/INTERSECTION_INDEPENDENT_REVIEW.md)
-- [x] 接入保守的时间线/交集聊天路由：保留候选状态、显示总数与截断、按实际共同动作证据引用；不支持的条件要求澄清，详见 [聊天路由验收](evals/STRUCTURED_CHAT_BASELINE.md)
-- [x] 完成组织任职候选抽取与时间点查询：从 5,282 条相关事件抽取 72 条带日期、机构、源事件和 PDF 页码的候选，幂等复跑零改动；CLI/API 不外推缺少结束证据的任期，跨 3 份 PDF 的 5 页视觉抽查通过，详见 [组织关系验收](evals/ORGANIZATION_RELATION_BASELINE.md)
-- [x] 完成 M8.1 综合评估集：统一登记 100 个带证据问题，覆盖时间线、事件、观点、交集、组织关系、冲突和拒答；清单审计通过，18/18 个结构化问题命中指定源事件与 PDF 页码，39 个可回答题的检索 Recall@10=100%，详见 [综合评估验收](evals/M8_COMPREHENSIVE_BASELINE.md)
-- [ ] 加入可选交叉编码器重排并与当前 RRF 做效果/性能对比

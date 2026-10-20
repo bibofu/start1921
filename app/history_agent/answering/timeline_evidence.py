@@ -17,6 +17,7 @@ from history_agent.answering.llamaindex_llm import (
 )
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.config import Settings
+from history_agent.errors import llm_http_error_code
 from history_agent.retrieval.models import SearchHit, SearchResponse
 
 PROMPT_VERSION = "timeline-evidence-selection-v1"
@@ -123,18 +124,6 @@ def _request_payload(
     }
 
 
-def _error_code(exc: httpx.HTTPError) -> str:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return {
-            401: "authentication_failed",
-            402: "insufficient_balance",
-            429: "rate_limited",
-        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
-    if isinstance(exc, httpx.TimeoutException):
-        return "timeout"
-    return "network_error"
-
-
 def filter_person_timeline_evidence(
     settings: Settings,
     question: str,
@@ -214,7 +203,9 @@ def filter_person_timeline_evidence(
             usage=response_usage(response),
         )
     except httpx.HTTPError as exc:
-        return TimelineEvidenceFilterResult(retrieval, "fallback", error_code=_error_code(exc))
+        return TimelineEvidenceFilterResult(
+            retrieval, "fallback", error_code=llm_http_error_code(exc)
+        )
     except (KeyError, IndexError, TypeError, ValueError, ValidationError):
         return TimelineEvidenceFilterResult(
             retrieval, "fallback", error_code="invalid_selection"

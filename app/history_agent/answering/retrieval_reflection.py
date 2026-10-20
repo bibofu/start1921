@@ -18,6 +18,7 @@ from history_agent.answering.llamaindex_llm import (
 from history_agent.answering.models import QueryPlan, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.config import Settings
+from history_agent.errors import llm_http_error_code
 from history_agent.retrieval.models import SearchResponse
 
 PROMPT_VERSION = "retrieval-reflection-v1"
@@ -70,18 +71,6 @@ def should_reflect(
         or plan.intent in {"event_overview", "comparison", "causal_analysis"}
         or COMPLEX_QUESTION.search(request.question) is not None
     )
-
-
-def _error_code(exc: httpx.HTTPError) -> str:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return {
-            401: "authentication_failed",
-            402: "insufficient_balance",
-            429: "rate_limited",
-        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
-    if isinstance(exc, httpx.TimeoutException):
-        return "timeout"
-    return "network_error"
 
 
 def _evidence_text(retrieval: SearchResponse) -> str:
@@ -217,6 +206,6 @@ def assess_retrieval(
             )
         return ReflectionResult("retry", assessment, queries, usage)
     except httpx.HTTPError as exc:
-        return ReflectionResult("fallback", error_code=_error_code(exc))
+        return ReflectionResult("fallback", error_code=llm_http_error_code(exc))
     except (KeyError, IndexError, TypeError, ValueError, ValidationError):
         return ReflectionResult("fallback", error_code="invalid_assessment")

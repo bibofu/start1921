@@ -1,3 +1,19 @@
+import httpx
+
+
+def llm_http_error_code(exc: httpx.HTTPError) -> str:
+    """Use the same provider error labels for every LLM execution path."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        return {
+            401: "authentication_failed",
+            402: "insufficient_balance",
+            429: "rate_limited",
+        }.get(exc.response.status_code, f"http_{exc.response.status_code}")
+    if isinstance(exc, httpx.TimeoutException):
+        return "timeout"
+    return "network_error"
+
+
 class HistoryAgentError(Exception):
     """Base class for expected project errors."""
 

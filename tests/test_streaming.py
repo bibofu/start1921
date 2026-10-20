@@ -257,10 +257,22 @@ def test_stream_endpoint_sends_final_result_and_safe_error(monkeypatch: pytest.M
     assert "internal path" not in response.text
 
 
-def test_disabled_planner_uses_rag_without_generic_clarification() -> None:
+def test_disabled_planner_uses_rag_without_generic_clarification(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    queries: list[str] = []
+
+    def search(**kwargs: Any) -> Any:
+        queries.append(kwargs["query"])
+        return _response([], intent="timeline")
+
+    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", search)
     client = TestClient(create_app(_settings().model_copy(update={"llm_api_key": None})))
     response = client.post("/api/questions/stream", json={"question": "毛泽东有哪些经历"})
+    assert queries == ["毛泽东有哪些经历"]
+    assert response.status_code == 200
     assert "event: done\n" in response.text
+    assert "event: error\n" not in response.text
     assert "请明确人物和年份" not in response.text
 
 
