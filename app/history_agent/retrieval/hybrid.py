@@ -546,7 +546,7 @@ def _single_branch_response(
 
 def _search_one(
     *,
-    keyword_index_path: Path | str,
+    keyword_index_path: str,
     vector_index_path: VectorIndexTarget,
     model_cache_dir: Path,
     aliases_path: Path,
@@ -848,7 +848,7 @@ def _fuse_query_variants(
 
 def search_hybrid_index(
     *,
-    keyword_index_path: Path | str,
+    keyword_index_path: str,
     vector_index_path: VectorIndexTarget,
     model_cache_dir: Path,
     aliases_path: Path,

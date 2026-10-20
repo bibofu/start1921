@@ -1,7 +1,7 @@
-"""PostgreSQL inverted index preserving the legacy FTS5 ranking contract.
+"""PostgreSQL inverted index with the established positional BM25 ranking contract.
 
-No SQLite connection is used by this backend. BM25 follows SQLite's public
-ext/fts5/fts5_aux.c, including phrase document frequency and operation order.
+Preserves phrase document frequency, token lengths and floating-point operation
+order from the previously verified index.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ from history_agent.db_backend import (
 )
 from history_agent.errors import IndexBuildError, RetrievalError
 from history_agent.processing.chunks import index_artifact_manifest, load_person_aliases
-from history_agent.retrieval import keyword_legacy as legacy
+from history_agent.retrieval import keyword_common as common
 from history_agent.retrieval.models import (
     KeywordIndexSummary,
     RetrievalPlan,
@@ -384,7 +384,7 @@ def publish_keyword_generation(
             assert size_row is not None
             size = size_row[0]
             summary = KeywordIndexSummary(
-                run_id=run_id, started_at=started_at, finished_at=legacy.utc_now(),
+                run_id=run_id, started_at=started_at, finished_at=common.utc_now(),
                 index_version=INDEX_VERSION, documents=actual["document_count"],
                 chunks=actual["chunks_count"], index_path="postgresql:keyword",
                 size_bytes=int(size) + actual["positions_count"] * 4,
@@ -459,7 +459,7 @@ def _indexed_records(records: Sequence[Any]) -> Iterator[IndexedChunk]:
             json.dumps(record.year_mentions), record.scope_status,
             json.dumps(record.people, ensure_ascii=False), json.dumps(record.extraction_methods),
         )
-        terms = " ".join(legacy.tokenize_for_index(record.search_text))
+        terms = " ".join(common.tokenize_for_index(record.search_text))
         yield IndexedChunk(rowid, rowid, metadata, terms, len(unicode61_tokens(terms)))
 
 
@@ -467,8 +467,8 @@ def build_keyword_index(
     *, chunks_dir: Path, index_path: str, reports_dir: Path, run_id: str,
     project_root: Path | None = None,
 ) -> KeywordIndexSummary:
-    started_at = legacy.utc_now()
-    records = legacy.load_chunks(chunks_dir)
+    started_at = common.utc_now()
+    records = common.load_chunks(chunks_dir)
 
     def postings() -> Iterator[Posting]:
         for chunk in _indexed_records(records):
@@ -520,16 +520,16 @@ def search_keyword_index(
     document_ids: list[str] | None = None, include_out_of_scope: bool = False,
     section_path_contains: str | None = None, plan: RetrievalPlan | None = None,
 ) -> SearchResponse:
-    terms = legacy.tokenize_query(query)
-    query_intent = plan.query_intent if plan is not None else legacy.infer_query_intent(query)
+    terms = common.tokenize_query(query)
+    query_intent = plan.query_intent if plan is not None else common.infer_query_intent(query)
     query_years = (
         plan.query_years if plan is not None
-        else sorted({int(match.group(1)) for match in legacy.YEAR.finditer(query)})
+        else sorted({int(match.group(1)) for match in common.YEAR.finditer(query)})
     )
     query_year_range = (
-        plan.query_year_range if plan is not None else legacy.infer_year_range(query, query_years)
+        plan.query_year_range if plan is not None else common.infer_year_range(query, query_years)
     )
-    explicit_range = bool(plan and plan.query_year_range) or legacy.has_explicit_year_range(query)
+    explicit_range = bool(plan and plan.query_year_range) or common.has_explicit_year_range(query)
     aliases = load_person_aliases(aliases_path)
     query_people = (
         plan.query_people if plan is not None else sorted(
@@ -537,7 +537,7 @@ def search_keyword_index(
             if person in query or any(alias in query for alias in names)
         )
     )
-    filter_people = legacy.hard_filter_people(query_people, query_intent)
+    filter_people = common.hard_filter_people(query_people, query_intent)
     phrases = [unicode61_tokens(term) for term in terms]
     unique_terms = sorted({term for phrase in phrases for term in phrase})
     response = SearchResponse(

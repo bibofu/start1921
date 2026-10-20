@@ -10,7 +10,7 @@ if (-not (Test-Path -LiteralPath $python)) {
 & $python -m ruff check (Join-Path $projectRoot "app") (Join-Path $projectRoot "tests") --no-cache
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-& $python -m mypy --cache-dir (Join-Path $projectRoot "data\mypy-cache")
+& $python -m mypy --no-sqlite-cache --cache-dir (Join-Path $projectRoot "data\mypy-cache")
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 & $python -m pytest

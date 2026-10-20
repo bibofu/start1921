@@ -13,6 +13,7 @@ dependencies = [
     "markdown-it-py>=4,<5",
     "pdfplumber>=0.11",
     "psycopg[binary]>=3.2,<4",
+    "httpx>=0.28,<1",
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "pymupdf>=1.25",
@@ -26,11 +27,10 @@ ocr = [
     "paddlepaddle==3.2.0",
 ]
 vector = [
-    "qdrant-client[fastembed]>=1.14.2,<2",
+    "fastembed==0.8.0",
 ]
 app = [
     "fastapi>=0.115,<1",
-    "httpx>=0.28,<1",
     "uvicorn[standard]>=0.34,<1",
 ]
 
@@ -58,6 +58,11 @@ history_agent = ["py.typed", "web/static/*"]
 addopts = "-ra -p no:cacheprovider"
 testpaths = ["tests"]
 
+[tool.uv]
+# LlamaIndex declares this for SQL stores that this PostgreSQL-backed app never uses.
+# Keep uv sync/run as the supported installation path; pip ignores this exclusion.
+exclude-dependencies = ["aiosqlite"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
@@ -66,6 +71,7 @@ target-version = "py311"
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.mypy]
+sqlite_cache = false
 python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true

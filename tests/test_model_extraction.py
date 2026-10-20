@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import httpx
+import pytest
 from history_agent.config import Settings
 from history_agent.db import Database
 from history_agent.research.model_extraction import (
@@ -26,6 +27,8 @@ from history_agent.research.models import (
 )
 from history_agent.research.people import sync_person_catalog
 from history_agent.research.store import ResearchStore
+
+pytestmark = pytest.mark.usefixtures("postgres_settings")
 
 
 def _catalog() -> PersonCatalog:
@@ -51,7 +54,6 @@ def _settings(work_path: Path) -> Settings:
     return Settings(
         _env_file=None,
         project_root=work_path,
-        database_path=work_path / "history_agent.db",
         data_dir=work_path / "data",
         llm_api_key="test-key",
         llm_model="deepseek-v4-pro",
@@ -167,7 +169,7 @@ def test_model_enrichment_is_grounded_audited_and_idempotent(
     work_path: Path, monkeypatch: Any
 ) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database)
     captured: dict[str, object] = {}
 
@@ -273,7 +275,7 @@ def test_ungrounded_model_output_is_rejected_without_changing_event(
     work_path: Path, monkeypatch: Any
 ) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database)
     content = _valid_content()
     content["location_text"] = "上海"
@@ -309,7 +311,7 @@ def test_ungrounded_model_output_is_rejected_without_changing_event(
 
 def test_invalid_json_and_api_failure_are_audited(work_path: Path, monkeypatch: Any) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database)
     monkeypatch.setattr(
         "history_agent.research.model_extraction.httpx.post",
@@ -354,7 +356,7 @@ def test_invalid_json_and_api_failure_are_audited(work_path: Path, monkeypatch: 
 
 def test_dry_run_does_not_call_model_or_write_attempt(work_path: Path, monkeypatch: Any) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database)
 
     def unexpected_post(*args: Any, **kwargs: Any) -> _Response:
@@ -381,7 +383,7 @@ def test_dry_run_does_not_call_model_or_write_attempt(work_path: Path, monkeypat
 
 def test_confirmed_event_is_never_selected_even_when_explicit(work_path: Path) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database, review_status="confirmed")
 
     candidates, skipped = select_event_candidates(
@@ -398,7 +400,7 @@ def test_confirmed_event_is_never_selected_even_when_explicit(work_path: Path) -
 
 def test_unknown_person_mention_is_rejected(work_path: Path, monkeypatch: Any) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database)
     content = _valid_content()
     content["participants"] = [
@@ -430,7 +432,7 @@ def test_explicit_chronology_subject_role_survives_model_merge(
     work_path: Path, monkeypatch: Any
 ) -> None:
     settings = _settings(work_path)
-    database = Database(settings.database_path)
+    database = Database(settings.database_target)
     _prepare_event(database, subject_explicit=True)
     content = _valid_content()
     content["participants"] = [

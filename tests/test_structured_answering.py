@@ -21,6 +21,8 @@ from history_agent.web.app import create_app
 from pydantic import SecretStr
 from test_timeline import _prepare_timeline
 
+pytestmark = pytest.mark.usefixtures("postgres_settings")
+
 
 def _settings(work_path: Path) -> Settings:
     database, _ = _prepare_timeline(work_path)
@@ -28,7 +30,6 @@ def _settings(work_path: Path) -> Settings:
         _env_file=None,
         project_root=work_path,
         data_dir=work_path / "data",
-        database_path=database.path,
     )
 
 
@@ -413,7 +414,7 @@ def test_general_questions_still_use_rag_route(work_path: Path) -> None:
 
 def test_structured_missing_database_returns_actionable_message(work_path: Path) -> None:
     settings = Settings(
-        _env_file=None, project_root=work_path, database_path=work_path / "missing.db"
+        _env_file=None, project_root=work_path
     )
     question = "毛泽东在1949年有哪些经历"
     result = answer_structured_question(
@@ -422,13 +423,12 @@ def test_structured_missing_database_returns_actionable_message(work_path: Path)
         _plan(question, "timeline", ["毛泽东"], 1949, 1949),
     )
     assert result is not None
-    assert "尚未就绪" in result.answer
-    assert not settings.database_path.exists()
+    assert "请检查研究库初始化状态" in result.answer
 
 
 def test_chat_uses_actual_proof_and_full_page_range(work_path: Path) -> None:
     settings = _settings(work_path)
-    with Database(settings.database_path).connect() as connection:
+    with Database(settings.database_target).connect() as connection:
         connection.execute(
             "UPDATE evidence_records SET pdf_page_end=31 "
             "WHERE evidence_id='evidence_event_lin_message'"

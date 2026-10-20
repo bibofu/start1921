@@ -1,6 +1,7 @@
 # PostgreSQL 关键词索引
 
-关键词索引可以与主库共用 PostgreSQL，也可以使用独立数据库。
+关键词索引现在只支持 PostgreSQL，可以与主库共用，也可以使用独立数据库。
+原 SQLite 兼容实现和一次性迁移命令已移除，旧数据与备份继续保留。
 此变更只迁移关键词索引存储，不改变文献切分、embedding 模型、Qdrant、
 混合检索融合、重排、上下文选择或回答提示词。
 
@@ -22,51 +23,42 @@
 完整元数据和预分词文本使用 UTF-8 字节保存，避免 PostgreSQL TEXT 对空字符的限制。
 倒排表保存词项、原 FTS 行号和词位数组；原元数据行号也保留用于完整性核验。
 
-## 迁移与配置
+## 配置与构建
 
-先停止关键词索引构建任务，备份配置，再设置目标连接。应用服务应在验证完成后重启：
+关键词默认使用 `HISTORY_AGENT_DATABASE_URL` 指定的 PostgreSQL 数据库。
+需要单独配置时，在被 Git 忽略的 `.env` 中设置：
 
 ```dotenv
 HISTORY_AGENT_KEYWORD_DATABASE_URL=postgresql://用户名:密码@127.0.0.1:55432/start1921
 ```
 
-连接保存在被 Git 忽略的 `.env` 中，公开配置、运行记录与索引报告只显示后端及
-`postgresql:keyword`，不记录 URL。密码中的特殊字符应进行 URL 编码。
-迁移命令要求显式配置关键词目标，不会隐式推断主库地址。
+公开配置、运行记录与索引报告只显示后端及 `postgresql:keyword`，不记录 URL。
+密码中的特殊字符应进行 URL 编码。关键词 URL 和主库 URL 均缺失时会报错，
+不会读取旧的本地索引。修改服务连接后需重启应用。
 
-```powershell
-uv run start1921 index migrate-keyword-postgres `
-  --backup-dir data/backups `
-  --report data/reports/postgres-keyword-migration.json
-
-uv run start1921 index verify-keyword-postgres `
-  --report data/reports/postgres-keyword-verification.json
-```
-
-默认源为 `data/indexes/keyword_fts.db`，可用 `--source-index` 指定一致备份；
-`--source-report` 可指定对应的原构建报告。验证命令可使用 `--generation-id` 核对某个版本。
-
-迁移通过 SQLite backup API 创建一致快照，源文件保留不变。导入内容包括全部元数据、
-预分词原文、原始行号、文档长度和 `fts5vocab(instance)` 导出的词位。
-所有字段及全部词位的摘要、行数和词项统计校验通过后，才在同一 PostgreSQL 事务中
-切换活动版本。导入失败会回滚，之前活动版本继续可用。
-
-文件 SHA-256、原报告包含文件名的索引摘要、跨数据库的逻辑内容摘要是三种不同身份，
-不能混用。SQLite backup 可能改变文件头，即使逻辑内容一致，文件哈希也可能不同。
-只有原报告索引摘要与源文件按相同算法验证一致，才继承其切分来源等信息。
-
-后续重新构建仍使用原命令：
+后续重新构建使用：
 
 ```powershell
 uv run start1921 index build-keyword
 ```
 
-设置关键词 PostgreSQL URL 后，该命令直接从已有 chunk JSONL 创建新的 PostgreSQL
-索引版本，不需要旧 SQLite 索引。旧 PostgreSQL 版本保留；未实现自动清理策略。
-集群备份应同时覆盖关键词表，可使用 `pg_dump`。
+该命令直接从已有 chunk JSONL 创建新的 PostgreSQL 索引版本，不需要旧 SQLite
+索引或词法器。构建成功后在事务中切换活动版本；旧 PostgreSQL 版本保留，
+尚未实现自动清理策略。数据库备份应覆盖关键词表，可使用 `pg_dump`。
 
-若需要临时回退且原 SQLite 索引仍对应当前 chunks，可恢复旧配置并重启应用；
-不要将旧索引用于已经变化的文献切片。主库与会话库的 PostgreSQL 配置无需改变。
+## 已完成的迁移与历史存档
+
+旧迁移曾创建一致快照并导入全部元数据、预分词原文、原始行号、文档长度及词位。
+全部字段、词位摘要和行数验证通过后才发布 PostgreSQL 活动版本。
+原数据库文件和迁移备份均继续保留，下面的数量与摘要记录对应这次已完成的迁移。
+
+一次性迁移、旧库校验命令及 SQLite 回退已经从当前代码删除。
+原迁移工具可在 Git 提交 `24509b7` 中查阅；当前版本不能执行旧迁移命令，
+清空 PostgreSQL 配置也不会启用旧索引。历史报告可直接作为 JSON 阅读和比较。
+
+历史文件 SHA-256、包含文件名的索引摘要和跨数据库逻辑摘要是不同身份，不能混用。
+一致备份可能改变旧数据库文件头，因此文件哈希不同不一定代表逻辑内容变化。
+这些说明只用于解释既有迁移报告，当前构建和检索不再打开历史数据库。
 
 ## 评测边界
 
@@ -84,14 +76,16 @@ Precision、MRR、nDCG 保留不可评及原因。独立受控语料的完整标
 禁用模型的运行不代表真实模型答案质量或实际生成提示词上下文评测，
 新模型答案不能沿用旧人工评审结果。
 
-开发测试通过 `HISTORY_AGENT_TEST_POSTGRES_URL` 使用独立数据库及随机 schema，
-随后运行 `scripts/check.ps1`。测试和旧索引比较仍保留 SQLite；本阶段不宣称整个项目
-已经完全移除 SQLite。关键词迁移之后的 Qdrant 服务迁移和剩余依赖边界见
-[Qdrant 独立服务](QDRANT_SERVICE.md)。
+开发测试通过显式 `HISTORY_AGENT_TEST_POSTGRES_URL` 使用独立 PostgreSQL 数据库
+及随机 schema；未配置时数据库用例明确跳过。当前测试没有 SQLite 后端，
+旧索引捕获执行器已移除，JSON 结果比较与 PostgreSQL 合成语料测试继续保留。
+`scripts/check.ps1` 和 mypy 配置均禁用 SQLite 缓存，使用 JSON 文件缓存。
+向量部分见 [Qdrant 独立服务](QDRANT_SERVICE.md)。
 
 ## 本地迁移与完整性记录（2026-10-20）
 
-本机 PostgreSQL 活动索引版本为 `generation_id=1`，迁移保留：
+以下是首次关键词迁移的验收记录，本次依赖清理没有重新执行大批量检索评测。
+当时 PostgreSQL 活动索引版本为 `generation_id=1`，迁移保留：
 
 | 内容 | 数量 |
 | --- | ---: |

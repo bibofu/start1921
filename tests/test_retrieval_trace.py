@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from history_agent.config import QdrantServiceTarget
 from history_agent.errors import RetrievalError
 from history_agent.retrieval.hybrid import search_hybrid_index
 from history_agent.retrieval.models import (
@@ -35,7 +36,8 @@ def _response(query: str, hits: list[SearchHit], **updates: Any) -> SearchRespon
 
 def _search(**kwargs: Any) -> SearchResponse:
     return search_hybrid_index(
-        keyword_index_path=Path("unused.db"), vector_index_path=Path("unused-vector"),
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=Path("unused-models"), aliases_path=Path("unused-aliases.json"),
         **kwargs,
     )

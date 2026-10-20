@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 
 import pymupdf
+import pytest
+from history_agent.config import Settings
 from history_agent.corpus.catalog import load_catalog
 from history_agent.corpus.scanner import scan_corpus
 from history_agent.db import Database
@@ -14,6 +16,8 @@ from history_agent.processing.chunks import extract_dates, scope_status, split_t
 from history_agent.processing.cleaning import clean_page_text, is_table_of_contents_page
 from history_agent.retrieval.keyword import infer_query_intent, infer_year_range, tokenize_query
 from pypdf import PdfWriter
+
+pytestmark = pytest.mark.usefixtures("postgres_settings")
 
 
 def test_blank_page_is_marked_empty() -> None:
@@ -147,7 +151,7 @@ def test_full_extraction_is_resumable(work_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     scan_corpus(
         database=database,
         catalog=load_catalog(catalog_path),

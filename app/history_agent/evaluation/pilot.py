@@ -94,13 +94,8 @@ def source_fingerprint(project_root: Path) -> str:
 
 def corpus_snapshot(settings: Settings) -> dict[str, Any]:
     database = Database(settings.database_target)
-    if database.path is not None and not database.path.is_file():
-        raise FileNotFoundError(database.path)
     with database.connect() as connection:
-        if settings.database_backend == "postgresql":
-            connection.execute("SET TRANSACTION READ ONLY")
-        else:
-            connection.execute("PRAGMA query_only = ON")
+        connection.execute("SET TRANSACTION READ ONLY")
         rows = connection.execute(
             "SELECT d.document_id,d.title,f.sha256,f.relative_path,f.page_count "
             "FROM documents d JOIN document_files f ON f.document_id=d.document_id "

@@ -24,6 +24,8 @@ from history_agent.web.app import create_app
 from test_timeline import _prepare_database, _prepare_timeline, _save_event
 from typer.testing import CliRunner
 
+pytestmark = pytest.mark.usefixtures("postgres_settings")
+
 
 @pytest.mark.parametrize(
     "description,expected",
@@ -124,7 +126,6 @@ def test_intersection_api_and_cli(work_path: Path, monkeypatch: pytest.MonkeyPat
         _env_file=None,
         project_root=work_path,
         data_dir=work_path / "data",
-        database_path=database.path,
     )
     client = TestClient(create_app(settings))
     url = "/api/people/zhou_enlai/intersections/lin_biao"
@@ -446,7 +447,6 @@ def test_adjacent_evidence_is_source_local_single_page_and_chat_complete(
         _env_file=None,
         project_root=work_path,
         data_dir=work_path / "data",
-        database_path=database.path,
     )
     question = "毛泽东和周恩来在1956年有哪些交集"
     plan = QueryPlan(

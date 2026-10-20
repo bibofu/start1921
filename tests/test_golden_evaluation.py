@@ -31,7 +31,7 @@ from history_agent.evaluation.golden import (
     load_golden_dataset,
     run_golden_benchmark,
 )
-from history_agent.processing.chunks import index_artifact_manifest, index_artifact_sha256
+from history_agent.processing.chunks import index_artifact_manifest
 from history_agent.retrieval.models import SearchHit, SearchResponse
 from pydantic import ValidationError
 from typer.testing import CliRunner
@@ -570,7 +570,9 @@ def _search_response(hits: list[SearchHit]) -> SearchResponse:
     )
 
 
-def test_full_runner_uses_stub_backends_and_records_actual_metadata(work_path: Path) -> None:
+def test_full_runner_uses_stub_backends_and_records_actual_metadata(
+    work_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
     case = _gold_case().model_copy(
         update={"eval_dimensions": ["routing", "retrieval", "generation"]}
     )
@@ -583,10 +585,6 @@ def test_full_runner_uses_stub_backends_and_records_actual_metadata(work_path: P
     )
     settings = Settings(project_root=work_path, _env_file=None)
     settings.reports_dir.mkdir(parents=True)
-    settings.keyword_index_path.parent.mkdir(parents=True, exist_ok=True)
-    settings.keyword_index_path.write_bytes(b"keyword-index")
-    settings.vector_index_path.mkdir(parents=True)
-    (settings.vector_index_path / "segment.bin").write_bytes(b"vector-index")
     chunking = {
         "version": "manifest-v1",
         "target_chars": 650,
@@ -596,25 +594,19 @@ def test_full_runner_uses_stub_backends_and_records_actual_metadata(work_path: P
     keyword_manifest = {
         "chunking": chunking,
         "chunk_artifact_sha256": "abc",
-        "index_artifact_sha256": index_artifact_sha256(settings.keyword_index_path),
+        "index_artifact_sha256": "verified-pg-artifact",
         "build_run_id": "keyword-build",
         "git_commit": "commit",
         "keyword_index_version": "keyword-v1",
     }
-    vector_manifest = {
-        "chunking": chunking,
-        "chunk_artifact_sha256": "abc",
-        "index_artifact_sha256": index_artifact_sha256(settings.vector_index_path),
-        "build_run_id": "vector-build",
-        "git_commit": "commit",
-        "embedding_model": "embed-v1",
-        "vector_index_version": "vector-v1",
-    }
-    (settings.reports_dir / "keyword_index_latest.json").write_text(
-        json.dumps({"manifest": keyword_manifest}), encoding="utf-8"
-    )
-    (settings.reports_dir / "vector_index_latest.json").write_text(
-        json.dumps({"manifest": vector_manifest}), encoding="utf-8"
+    monkeypatch.setattr(
+        "history_agent.evaluation.golden.load_keyword_index_metadata",
+        lambda _: {
+            "summary": {"backend": "postgresql", "index_version": "keyword-v1"},
+            "manifest": keyword_manifest,
+            "artifact_verified": True,
+            "actual_index_artifact_sha256": "verified-pg-artifact",
+        },
     )
 
     payload = run_golden_benchmark(
@@ -628,11 +620,15 @@ def test_full_runner_uses_stub_backends_and_records_actual_metadata(work_path: P
     assert payload["results"][0]["generation"]["answer_correctness"] is True
     assert payload["run_metadata"]["evaluated_case_ids"] == ["case"]
     assert payload["run_metadata"]["retrieval_config"]["answer_top_k"] == 10
-    assert payload["run_metadata"]["chunking"] == chunking
-    assert payload["run_metadata"]["embedding_model"] == "embed-v1"
-    assert payload["run_metadata"]["chunk_artifact_sha256"] == "abc"
-    assert payload["run_metadata"]["index_manifest_consistent"] is True
-    assert payload["run_metadata"]["attribution_safe"] is True
+    indexes = payload["run_metadata"]["index_versions"]
+    assert indexes["keyword_index"]["manifest"] == keyword_manifest
+    assert indexes["keyword_index"]["artifact_verified"] is True
+    assert indexes["vector_index"]["artifact_verified"] is False
+    assert payload["run_metadata"]["chunking"] is None
+    assert payload["run_metadata"]["embedding_model"] is None
+    assert payload["run_metadata"]["chunk_artifact_sha256"] is None
+    assert payload["run_metadata"]["index_manifest_consistent"] is False
+    assert payload["run_metadata"]["attribution_safe"] is False
 
 
 def test_index_manifest_uses_actual_chunk_report(work_path: Path) -> None:
@@ -641,7 +637,7 @@ def test_index_manifest_uses_actual_chunk_report(work_path: Path) -> None:
     chunks.mkdir(parents=True)
     reports.mkdir(parents=True)
     (chunks / "doc.jsonl").write_text('{"text":"one"}\n', encoding="utf-8")
-    index_path = work_path / "keyword.db"
+    index_path = work_path / "index-artifact.bin"
     index_path.write_bytes(b"index")
     first = index_artifact_manifest(
         chunks_dir=chunks,

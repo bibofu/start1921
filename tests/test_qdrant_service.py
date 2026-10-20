@@ -7,11 +7,9 @@ from typing import Any
 
 import pytest
 from history_agent.config import QdrantServiceTarget, Settings
-from history_agent.errors import IndexBuildError
+from history_agent.errors import IndexBuildError, RetrievalError
 from history_agent.retrieval import vector
 from history_agent.retrieval.models import RetrievalPlan
-
-models = pytest.importorskip("qdrant_client").models
 
 
 def test_service_settings_select_explicit_target_and_hide_credentials(work_path: Path) -> None:
@@ -31,9 +29,9 @@ def test_service_settings_select_explicit_target_and_hide_credentials(work_path:
     for public in (repr(settings), repr(target), str(target), str(settings.public_snapshot())):
         assert "service-secret" not in public
         assert "http://127.0.0.1:6333" not in public
-    legacy = Settings(_env_file=None, project_root=work_path, qdrant_url=" ")
-    assert legacy.vector_index_target == legacy.vector_index_path
-    assert legacy.vector_database_backend == "qdrant-local"
+    missing = Settings(_env_file=None, project_root=work_path, qdrant_url=" ")
+    with pytest.raises(ValueError, match="HISTORY_AGENT_QDRANT_URL"):
+        _ = missing.vector_index_target
 
 
 @pytest.mark.parametrize(
@@ -45,19 +43,20 @@ def test_service_url_rejects_nonservice_or_embedded_credentials(url: str) -> Non
 
 
 def test_service_client_never_opens_local_storage(monkeypatch: pytest.MonkeyPatch) -> None:
-    received: list[dict[str, Any]] = []
+    received: list[QdrantServiceTarget] = []
     sentinel = object()
 
-    def client_factory(**kwargs: Any) -> object:
-        received.append(kwargs)
+    def client_factory(target: QdrantServiceTarget) -> object:
+        received.append(target)
         return sentinel
 
-    monkeypatch.setattr(
-        vector, "_load_vector_dependencies", lambda: (None, client_factory, models)
-    )
+    monkeypatch.setattr(vector, "QdrantServiceClient", client_factory)
     target = QdrantServiceTarget("http://localhost:6333", "test-key", 9)
     assert vector.open_vector_client(target) is sentinel
-    assert received == [{"url": target.url, "api_key": "test-key", "timeout": 9}]
+    assert received == [target]
+    with pytest.raises(RetrievalError, match="requires a Qdrant service target"):
+        vector.open_vector_client(Path("archived-data"))  # type: ignore[arg-type]
+    assert received == [target]
 
 
 def test_service_search_preserves_filters_and_section_year_order(
@@ -87,7 +86,6 @@ def test_service_search_preserves_filters_and_section_year_order(
     embedding = SimpleNamespace(
         query_embed=lambda query: [SimpleNamespace(tolist=lambda: [0.25, 0.75])]
     )
-    monkeypatch.setattr(vector, "_load_vector_dependencies", lambda: (None, None, models))
     monkeypatch.setattr(vector, "open_vector_client", lambda target: client)
     monkeypatch.setattr(vector, "_embedding_model", lambda path: embedding)
     response = vector.search_vector_index(
@@ -101,17 +99,15 @@ def test_service_search_preserves_filters_and_section_year_order(
     )
     assert captured["query"] == [0.25, 0.75]
     assert captured["limit"] == 100
-    assert captured["search_params"].exact is True
-    assert captured["query_filter"].must[0].match.any == ["doc"]
-    assert captured["query_filter"].must_not[0].match.value == "out_of_scope"
+    assert captured["search_params"] == {"exact": True}
+    assert captured["query_filter"]["must"][0]["match"]["any"] == ["doc"]
+    assert captured["query_filter"]["must_not"][0]["match"]["value"] == "out_of_scope"
     assert [hit.chunk_id for hit in response.hits] == ["year", "nearby"]
     assert [hit.score for hit in response.hits] == [0.8, 0.91]
     assert closed == [True]
 
 
-def test_collection_publish_changes_alias_atomically_without_deleting_data(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_collection_publish_changes_alias_atomically_without_deleting_data() -> None:
     operations: list[Any] = []
     client = SimpleNamespace(
         get_aliases=lambda: SimpleNamespace(
@@ -121,22 +117,19 @@ def test_collection_publish_changes_alias_atomically_without_deleting_data(
             kwargs["change_aliases_operations"]
         ),
     )
-    monkeypatch.setattr(vector, "_load_vector_dependencies", lambda: (None, None, models))
     vector.publish_vector_collection(client, "history_chunks_new")
     assert len(operations) == 1
-    assert [type(item) for item in operations[0]] == [
-        models.DeleteAliasOperation, models.CreateAliasOperation
+    assert operations[0] == [
+        {"delete_alias": {"alias_name": vector.COLLECTION_NAME}},
+        {"create_alias": {
+            "collection_name": "history_chunks_new", "alias_name": vector.COLLECTION_NAME,
+        }},
     ]
-    assert operations[0][1].create_alias.collection_name == "history_chunks_new"
-    assert operations[0][1].create_alias.alias_name == vector.COLLECTION_NAME
 
 
-def test_collection_publish_refuses_to_overwrite_physical_serving_collection(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_collection_publish_refuses_to_overwrite_physical_serving_collection() -> None:
     client = SimpleNamespace(
         get_aliases=lambda: SimpleNamespace(aliases=[]), collection_exists=lambda name: True
     )
-    monkeypatch.setattr(vector, "_load_vector_dependencies", lambda: (None, None, models))
     with pytest.raises(IndexBuildError, match="physical Qdrant collection"):
         vector.publish_vector_collection(client, "history_chunks_new")

@@ -1,11 +1,15 @@
 import json
 from pathlib import Path
 
+import pytest
+from history_agent.config import Settings
 from history_agent.corpus.catalog import load_catalog
 from history_agent.corpus.exporter import export_manifest, load_manifest
 from history_agent.corpus.scanner import scan_corpus
 from history_agent.db import Database
 from pypdf import PdfWriter
+
+pytestmark = pytest.mark.usefixtures("postgres_settings")
 
 
 def create_pdf(path: Path, pages: int = 2) -> None:
@@ -41,7 +45,7 @@ def test_scan_is_idempotent_and_exports_manifest(work_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     catalog = load_catalog(catalog_path)
 
     first = scan_corpus(
@@ -92,7 +96,7 @@ def test_changed_file_requires_explicit_acceptance(work_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     catalog = load_catalog(catalog_path)
     scan_corpus(
         database=database,

@@ -11,7 +11,8 @@
 
 ## 启动与配置
 
-本机使用官方 Qdrant `v1.19.2` Windows x64 程序，客户端版本为 `1.19.0`。
+本机使用官方 Qdrant `v1.19.2` Windows x64 程序。应用通过 `httpx` 调用服务 REST API，
+不再安装会加载本地 SQLite 后端的 `qdrant-client`。embedding 仍使用 `fastembed==0.8.0`。
 程序位于 `data/qdrant-runtime/v1.19.2/qdrant.exe`，仅监听本机。
 新机器可从 [官方发行页](https://github.com/qdrant/qdrant/releases/tag/v1.19.2)
 下载 `qdrant-x86_64-pc-windows-msvc.zip` 并解压至上述目录。
@@ -39,20 +40,13 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
 
 ## 迁移与后续构建
 
-先停止本地索引构建任务，备份整个旧 Qdrant 目录和对应构建报告；
-迁移命令要求显式传入备份目录，保留源数据：
+现有数据迁移已经完成，详见下方记录。为移除 SQLite 依赖，当前版本已删除
+`index migrate-qdrant-service` 及本地索引读取代码；历史实现可在提交 `24509b7` 查看。
+原始目录、一致备份和迁移报告继续保留。
 
-```powershell
-uv run start1921 index migrate-qdrant-service `
-  --source-index data/backups/某次备份/qdrant `
-  --source-report data/backups/某次备份/source_vector_report.json `
-  --report data/reports/qdrant-service-migration.json
-```
-
-数据分批复制到新的物理 collection。精确计数以及少量边界样本通过后，
-原子切换 `history_chunks` alias；旧 collection 和旧本地索引均保留。
-若导入未完成，服务 alias 不切换，失败的新 collection 留作排查。
-后续 `index build-vector` 也创建新 collection，并在成功后切换 alias。
+后续 `uv run start1921 index build-vector` 创建新的物理 collection，
+写入完成并核对精确计数后，原子切换 `history_chunks` alias。
+旧 collection 保留；构建失败不会切换 alias。
 
 服务索引不再有可由客户端直接读取的本地文件摘要。评测元数据不会将旧目录的摘要
 冒充当前服务索引摘要；严格的索引身份复现检查会标为尚未核验。
@@ -60,11 +54,10 @@ uv run start1921 index migrate-qdrant-service `
 
 ## SQLite 退役边界
 
-配置四项服务连接后，业务数据读写和检索使用 PostgreSQL 与 Qdrant Server。
-SQLite 迁移工具、本地兼容分支、部分测试和开发缓存仍保留；
-部分公共模块也仍导入 `sqlite3`。这些是下一步清理范围，
-本次不宣称项目代码和开发环境已经完全不依赖 SQLite。
-旧数据库与本地向量索引保留为备份，不能将删除文件等同于移除代码依赖。
+业务数据读写、检索和业务测试均使用 PostgreSQL 与 Qdrant Server。
+SQLite 兼容分支、直接导入和迁移工具已删除，mypy 使用 JSON 缓存；
+向量客户端仅实现服务 HTTP 操作。旧数据库与本地向量索引保留为备份。
+完整清理范围与验证见 [SQLite 退役说明](SQLITE_RETIREMENT.md)。
 
 ## 本机迁移记录（2026-10-20）
 

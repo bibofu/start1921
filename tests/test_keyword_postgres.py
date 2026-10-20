@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import random
-import sqlite3
 import string
 from dataclasses import replace
 from pathlib import Path
@@ -13,14 +13,22 @@ from history_agent.db_backend import database_connection
 from history_agent.errors import IndexBuildError
 from history_agent.retrieval import keyword_postgres as pg
 from history_agent.retrieval.keyword import build_keyword_index, search_keyword_index
-from history_agent.retrieval.keyword_legacy import tokenize_for_index
+from history_agent.retrieval.keyword_common import tokenize_for_index
 from history_agent.retrieval.models import RetrievalPlan
-from test_db_backend import postgres_target as postgres_target
+
+CONTRACT = json.loads(
+    (Path(__file__).parent / "fixtures/keyword_search_contract.json").read_text(encoding="utf-8")
+)
+
+
+def _digest(value: Any) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 @pytest.mark.parametrize(
-    "text",
-    [
+    ("case_number", "text"),
+    list(enumerate([
         "毛泽东在1949年作出决策。ANTI-imperialism foo_bar 1.25",
         "alpha alpha-beta alpha_beta βé🙂 1921年至1926年",
         " ".join(chr(i) for a, b in [(0x3400, 0x4DBF), (0x4E00, 0x9FFF)]
@@ -30,22 +38,18 @@ from test_db_backend import postgres_target as postgres_target
         "１２３４５ ١٢٣٤٥ 𝟙𝟚𝟛𝟜𝟝",
         " ".join(chr(i) for i in range(0x110000) if chr(i).isdecimal()),
         "١" * 20000,
-    ],
+    ])),
     ids=[
         "mixed", "punctuation", "all-cjk-characters", "token-byte-limit", "years",
         "unicode-numbers", "all-unicode-decimals", "unicode-token-byte-limit",
     ],
 )
-def test_prepared_unicode61_tokens_match_original_tokenizer(text: str) -> None:
+def test_prepared_unicode61_tokens_preserve_frozen_contract(case_number: int, text: str) -> None:
     prepared = " ".join(tokenize_for_index(text))
-    with sqlite3.connect(":memory:") as connection:
-        connection.execute(
-            "CREATE VIRTUAL TABLE f USING fts5(t, tokenize='unicode61 remove_diacritics 2')"
-        )
-        connection.execute("CREATE VIRTUAL TABLE v USING fts5vocab(f, instance)")
-        connection.execute("INSERT INTO f(t) VALUES (?)", (prepared,))
-        expected = [row[0] for row in connection.execute("SELECT term FROM v ORDER BY offset")]
-    assert pg.unicode61_tokens(prepared) == expected
+    tokens = pg.unicode61_tokens(prepared)
+    expected = CONTRACT["tokens"][case_number]
+    assert len(tokens) == expected["tokens_count"]
+    assert _digest(tokens) == expected["tokens_sha256"]
 
 
 def test_invalid_utf8_at_fts5_token_limit_is_rejected_explicitly() -> None:
@@ -99,67 +103,31 @@ def indexes(work_path: Path, postgres_target: str) -> dict[str, Any]:
         ]}, ensure_ascii=False),
         encoding="utf-8",
     )
-    sqlite_path = work_path / "keyword.db"
-    for target, name in ((sqlite_path, "sqlite"), (postgres_target, "postgres")):
-        build_keyword_index(
-            chunks_dir=chunks, index_path=target, reports_dir=work_path / name,
-            run_id=name, project_root=work_path,
-        )
+    build_keyword_index(
+        chunks_dir=chunks, index_path=postgres_target, reports_dir=work_path / "postgres",
+        run_id="postgres", project_root=work_path,
+    )
     return {
-        "sqlite": sqlite_path, "postgres": postgres_target, "aliases": aliases,
-        "chunks": chunks, "work": work_path,
+        "postgres": postgres_target, "aliases": aliases, "chunks": chunks, "work": work_path,
     }
 
 
-@pytest.mark.parametrize(
-    ("query", "options"),
-    [
-        ("调查研究", {}),
-        ("毛泽东调查研究观点", {}),
-        ("毛泽东1949年主要经历", {}),
-        ("毛泽东和周恩来共同政策", {}),
-        ("alpha-beta", {}),
-        ("alpha_beta", {}),
-        ("alpha-beta alpha_beta", {}),
-        ("1.25", {}),
-        ("１２３４５", {}),
-        ("١٢٣٤٥", {}),
-        ("𝟙𝟚𝟛𝟜𝟝", {}),
-        ("调查研究", {"document_ids": ["d1"]}),
-        ("调查研究", {"section_path_contains": "appendix_100%"}),
-        ("调查研究", {"section_path_contains": "\\"}),
-        ("调查研究", {"section_path_contains": "ä"}),
-        ("调查研究", {"section_path_contains": "Ä"}),
-        ("毛泽东1980年", {"include_out_of_scope": True}),
-        ("毛泽东1934-1949年政策", {}),
-        ("毛泽东长征期间经历", {}),
-        ("调查研究", {"top_k": 0}),
-        ("调查研究", {"top_k": -1}),
-        ("调查研究", {
-            "plan": RetrievalPlan(query_intent="viewpoint", query_year_range=[1949, 1949],
-                                  query_people=["毛泽东"]),
-        }),
-    ],
-)
-def test_postgres_search_matches_complete_legacy_response(
-    indexes: dict[str, Any], query: str, options: dict[str, Any]
+@pytest.mark.parametrize("case", CONTRACT["responses"], ids=lambda case: case["query"])
+def test_postgres_search_preserves_frozen_response(
+    indexes: dict[str, Any], case: dict[str, Any],
 ) -> None:
-    baseline = search_keyword_index(
-        index_path=indexes["sqlite"], aliases_path=indexes["aliases"], query=query, **options
+    options = dict(case["options"])
+    if "plan" in options:
+        options["plan"] = RetrievalPlan.model_validate(options["plan"])
+    response = search_keyword_index(
+        index_path=indexes["postgres"], aliases_path=indexes["aliases"],
+        query=case["query"], **options,
     )
-    candidate = search_keyword_index(
-        index_path=indexes["postgres"], aliases_path=indexes["aliases"], query=query, **options
-    )
-    assert candidate.model_dump() == baseline.model_dump()
+    assert [[hit.chunk_id, hit.score] for hit in response.hits] == case["hits"]
+    assert _digest(response.model_dump()) == case["response_sha256"]
 
 
-def test_postgres_runtime_build_and_search_do_not_open_sqlite(
-    indexes: dict[str, Any], monkeypatch: pytest.MonkeyPatch
-) -> None:
-    def forbidden(*args: Any, **kwargs: Any) -> Any:
-        raise AssertionError("PostgreSQL runtime must not open SQLite")
-
-    monkeypatch.setattr(sqlite3, "connect", forbidden)
+def test_postgres_runtime_build_search_and_metadata(indexes: dict[str, Any]) -> None:
     summary = build_keyword_index(
         chunks_dir=indexes["chunks"], index_path=indexes["postgres"],
         reports_dir=indexes["work"] / "rebuilt", run_id="rebuilt", project_root=indexes["work"],
@@ -178,7 +146,7 @@ def test_failed_publication_keeps_previous_generation_and_content(
     indexes: dict[str, Any],
 ) -> None:
     before = pg.load_keyword_index_metadata(indexes["postgres"])
-    records = pg.legacy.load_chunks(indexes["chunks"])
+    records = pg.common.load_chunks(indexes["chunks"])
     chunks = list(pg._indexed_records(records))
     chunks[0] = replace(chunks[0], doc_length=chunks[0].doc_length + 1)
     postings = [
@@ -219,25 +187,21 @@ def test_explicit_generation_fingerprint_rejects_missing_generation(
         pg.keyword_generation_fingerprint(target_url=postgres_target, generation_id=99999)
 
 
-def test_long_ascii_token_exceeding_btree_limit_matches_fts5(indexes: dict[str, Any]) -> None:
+def test_long_ascii_token_exceeding_btree_limit_is_searchable(indexes: dict[str, Any]) -> None:
     token = "".join(random.Random(1921).choices(string.ascii_lowercase, k=40000))
     (indexes["chunks"] / "long.jsonl").write_text(
         json.dumps(_record(13, token), ensure_ascii=False), encoding="utf-8"
     )
-    for target, name in ((indexes["sqlite"], "sqlite"), (indexes["postgres"], "postgres")):
-        build_keyword_index(
-            chunks_dir=indexes["chunks"], index_path=target,
-            reports_dir=indexes["work"] / name, run_id="long-token",
-            project_root=indexes["work"],
-        )
-    baseline = search_keyword_index(
-        index_path=indexes["sqlite"], aliases_path=indexes["aliases"], query=token
+    build_keyword_index(
+        chunks_dir=indexes["chunks"], index_path=indexes["postgres"],
+        reports_dir=indexes["work"] / "postgres", run_id="long-token",
+        project_root=indexes["work"],
     )
-    candidate = search_keyword_index(
+    response = search_keyword_index(
         index_path=indexes["postgres"], aliases_path=indexes["aliases"], query=token
     )
-    assert candidate.model_dump() == baseline.model_dump()
-    assert candidate.hits[0].chunk_id == "c13"
+    assert [hit.chunk_id for hit in response.hits] == ["c13"]
+    assert len(pg.unicode61_tokens(token)[0]) == 32768
 
 
 def test_index_upgrade_preserves_published_content(indexes: dict[str, Any]) -> None:

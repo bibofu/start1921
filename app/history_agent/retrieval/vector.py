@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import uuid
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -27,73 +26,52 @@ from history_agent.retrieval.models import (
     SearchResponse,
     VectorIndexSummary,
 )
+from history_agent.retrieval.qdrant_http import QdrantServiceClient
 
 MODEL_NAME = "BAAI/bge-small-zh-v1.5"
 VECTOR_SIZE = 512
 COLLECTION_NAME = "history_chunks"
-INDEX_VERSION = "qdrant-local-fastembed-v1"
-SERVICE_INDEX_VERSION = "qdrant-service-fastembed-v1"
-VectorIndexTarget = Path | QdrantServiceTarget
+INDEX_VERSION = "qdrant-service-fastembed-v1"
+VectorIndexTarget = QdrantServiceTarget
 
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def _load_vector_dependencies() -> tuple[Any, Any, Any]:
-    try:
-        from fastembed import TextEmbedding
-        from qdrant_client import QdrantClient, models
-    except ImportError as exc:
-        raise IndexBuildError(
-            "Vector dependencies are missing. Run: uv sync --extra vector --group dev"
-        ) from exc
-    return TextEmbedding, QdrantClient, models
-
-
-def open_vector_client(target: VectorIndexTarget) -> Any:
-    """Service targets never open the legacy local Qdrant (SQLite) storage."""
-
-    _, QdrantClient, _ = _load_vector_dependencies()
-    if isinstance(target, QdrantServiceTarget):
-        return QdrantClient(
-            url=target.url,
-            api_key=target.api_key,
-            timeout=target.timeout_seconds,
-        )
-    return QdrantClient(path=str(target))
+def open_vector_client(target: VectorIndexTarget) -> QdrantServiceClient:
+    """Connect only to the configured Qdrant HTTP service."""
+    if not isinstance(target, QdrantServiceTarget):
+        raise RetrievalError("Vector storage requires a Qdrant service target.")
+    return QdrantServiceClient(target)
 
 
 def publish_vector_collection(client: Any, collection_name: str) -> None:
     """Switch the serving alias in one operation; retain the previous collection."""
 
-    _, _, models = _load_vector_dependencies()
     aliases = client.get_aliases().aliases
-    operations: list[Any] = []
+    operations: list[dict[str, Any]] = []
     if any(alias.alias_name == COLLECTION_NAME for alias in aliases):
-        operations.append(
-            models.DeleteAliasOperation(
-                delete_alias=models.DeleteAlias(alias_name=COLLECTION_NAME)
-            )
-        )
+        operations.append({"delete_alias": {"alias_name": COLLECTION_NAME}})
     elif client.collection_exists(COLLECTION_NAME):
         raise IndexBuildError(
             "The serving name is a physical Qdrant collection. Preserve it and migrate "
             "to a versioned collection plus alias before rebuilding."
         )
-    operations.append(
-        models.CreateAliasOperation(
-            create_alias=models.CreateAlias(
-                collection_name=collection_name, alias_name=COLLECTION_NAME
-            )
-        )
-    )
+    operations.append({
+        "create_alias": {"collection_name": collection_name, "alias_name": COLLECTION_NAME}
+    })
     client.update_collection_aliases(change_aliases_operations=operations)
 
 
 @lru_cache(maxsize=2)
 def _embedding_model(model_cache_dir: Path) -> Any:
-    TextEmbedding, _, _ = _load_vector_dependencies()
+    try:
+        from fastembed import TextEmbedding
+    except ImportError as exc:
+        raise IndexBuildError(
+            "Embedding dependencies are missing. Run: uv sync --extra vector --group dev"
+        ) from exc
     model_cache_dir.mkdir(parents=True, exist_ok=True)
     return TextEmbedding(
         model_name=MODEL_NAME,
@@ -128,26 +106,6 @@ def _payload(record: ChunkRecord) -> dict[str, Any]:
     }
 
 
-def _directory_size(path: Path) -> int:
-    return sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
-
-
-def _replace_directory(source: Path, destination: Path) -> None:
-    backup = destination.with_name(destination.name + ".backup")
-    if backup.exists():
-        shutil.rmtree(backup)
-    if destination.exists():
-        os.replace(destination, backup)
-    try:
-        os.replace(source, destination)
-    except Exception:
-        if backup.exists() and not destination.exists():
-            os.replace(backup, destination)
-        raise
-    if backup.exists():
-        shutil.rmtree(backup)
-
-
 def build_vector_index(
     *,
     chunks_dir: Path,
@@ -162,27 +120,13 @@ def build_vector_index(
     records = load_chunks(chunks_dir)
     if not records:
         raise IndexBuildError("No chunks are available for vector indexing.")
-    _, _, models = _load_vector_dependencies()
     embedding_model = _embedding_model(model_cache_dir)
-    service_mode = isinstance(index_path, QdrantServiceTarget)
-    temporary_path: Path | None = None
-    collection_name = COLLECTION_NAME
-    if isinstance(index_path, Path):
-        temporary_path = index_path.with_name(index_path.name + ".tmp")
-        if temporary_path.exists():
-            shutil.rmtree(temporary_path)
-        temporary_path.parent.mkdir(parents=True, exist_ok=True)
-        client = open_vector_client(temporary_path)
-    else:
-        collection_name = f"{COLLECTION_NAME}_{uuid.uuid4().hex}"
-        client = open_vector_client(index_path)
+    collection_name = f"{COLLECTION_NAME}_{uuid.uuid4().hex}"
+    client = open_vector_client(index_path)
     try:
         client.create_collection(
             collection_name=collection_name,
-            vectors_config=models.VectorParams(
-                size=VECTOR_SIZE,
-                distance=models.Distance.COSINE,
-            ),
+            vectors_config={"size": VECTOR_SIZE, "distance": "Cosine"},
         )
         for start in range(0, len(records), batch_size):
             batch = records[start : start + batch_size]
@@ -193,11 +137,11 @@ def build_vector_index(
                 )
             )
             points = [
-                models.PointStruct(
-                    id=str(uuid.UUID(record.chunk_id)),
-                    vector=vector.tolist(),
-                    payload=_payload(record),
-                )
+                {
+                    "id": str(uuid.UUID(record.chunk_id)),
+                    "vector": vector.tolist(),
+                    "payload": _payload(record),
+                }
                 for record, vector in zip(batch, vectors, strict=True)
             ]
             client.upsert(collection_name=collection_name, points=points, wait=True)
@@ -206,46 +150,38 @@ def build_vector_index(
             raise IndexBuildError(
                 f"Vector index count mismatch: expected {len(records)}, found {count}."
             )
-        if service_mode:
-            publish_vector_collection(client, collection_name)
+        publish_vector_collection(client, collection_name)
     finally:
         client.close()
-    if temporary_path is not None and isinstance(index_path, Path):
-        _replace_directory(temporary_path, index_path)
     try:
         fastembed_version = version("fastembed")
-        qdrant_version = version("qdrant-client")
     except PackageNotFoundError:
-        fastembed_version = qdrant_version = "unknown"
-    index_version = SERVICE_INDEX_VERSION if service_mode else INDEX_VERSION
+        fastembed_version = "unknown"
+    index_version = f"{INDEX_VERSION}; fastembed={fastembed_version}; transport=http"
     manifest = index_artifact_manifest(
         chunks_dir=chunks_dir,
         reports_dir=reports_dir,
         project_root=project_root or reports_dir.parents[1],
         run_id=run_id,
-        vector_index_version=(
-            f"{index_version}; fastembed={fastembed_version}; qdrant={qdrant_version}"
-        ),
+        vector_index_version=index_version,
         embedding_model=MODEL_NAME,
-        index_path=index_path if isinstance(index_path, Path) else None,
     )
-    if service_mode:
-        manifest.update(
-            vector_storage_backend="qdrant-service",
-            vector_collection=collection_name,
-        )
+    manifest.update(
+        vector_storage_backend="qdrant-service",
+        vector_collection=collection_name,
+    )
     summary = VectorIndexSummary(
         run_id=run_id,
         started_at=started_at,
         finished_at=utc_now(),
-        index_version=f"{index_version}; fastembed={fastembed_version}; qdrant={qdrant_version}",
+        index_version=index_version,
         model_name=MODEL_NAME,
         vector_size=VECTOR_SIZE,
         documents=len({record.document_id for record in records}),
         chunks=len(records),
         collection_name=COLLECTION_NAME,
         index_path=str(index_path),
-        size_bytes=_directory_size(index_path) if isinstance(index_path, Path) else 0,
+        size_bytes=0,
         manifest=manifest,
     )
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -257,32 +193,25 @@ def build_vector_index(
 
 def _query_filter(
     *,
-    models: Any,
     document_ids: list[str] | None,
     query_people: list[str],
     query_year_range: list[int],
     include_out_of_scope: bool,
-) -> Any:
-    must: list[Any] = []
-    must_not: list[Any] = []
+) -> dict[str, Any]:
+    must: list[dict[str, Any]] = []
+    must_not: list[dict[str, Any]] = []
     if document_ids:
-        must.append(
-            models.FieldCondition(key="document_id", match=models.MatchAny(any=document_ids))
-        )
+        must.append({"key": "document_id", "match": {"any": document_ids}})
     for person in query_people:
-        must.append(models.FieldCondition(key="people", match=models.MatchValue(value=person)))
+        must.append({"key": "people", "match": {"value": person}})
     if query_year_range:
-        must.append(
-            models.FieldCondition(
-                key="year_mentions",
-                range=models.Range(gte=query_year_range[0], lte=query_year_range[1]),
-            )
-        )
+        must.append({
+            "key": "year_mentions",
+            "range": {"gte": query_year_range[0], "lte": query_year_range[1]},
+        })
     if not include_out_of_scope:
-        must_not.append(
-            models.FieldCondition(key="scope_status", match=models.MatchValue(value="out_of_scope"))
-        )
-    return models.Filter(must=must or None, must_not=must_not or None)
+        must_not.append({"key": "scope_status", "match": {"value": "out_of_scope"}})
+    return {"must": must or None, "must_not": must_not or None}
 
 
 def search_vector_index(
@@ -296,8 +225,6 @@ def search_vector_index(
     include_out_of_scope: bool = False,
     plan: RetrievalPlan | None = None,
 ) -> SearchResponse:
-    if isinstance(index_path, Path) and not index_path.is_dir():
-        raise RetrievalError(f"Vector index does not exist: {index_path}")
     aliases = load_person_aliases(aliases_path)
     query_people = (
         plan.query_people
@@ -319,7 +246,6 @@ def search_vector_index(
         plan.query_year_range if plan is not None else infer_year_range(query, query_years)
     )
     explicit_year_range = bool(plan and plan.query_year_range) or has_explicit_year_range(query)
-    _, _, models = _load_vector_dependencies()
     embedding_model = _embedding_model(model_cache_dir)
     query_vector = next(iter(embedding_model.query_embed(query)))
     # Chronologies often mention nearby years in the body. Fetch a wider candidate
@@ -337,7 +263,6 @@ def search_vector_index(
             collection_name=COLLECTION_NAME,
             query=query_vector.tolist(),
             query_filter=_query_filter(
-                models=models,
                 document_ids=document_ids,
                 query_people=filter_people,
                 query_year_range=query_year_range,
@@ -345,13 +270,8 @@ def search_vector_index(
             ),
             limit=candidate_limit,
             with_payload=True,
-            # Local Qdrant performs an exact scan. Keep that behavior when moving
-            # the same vectors to a server, whose default may use an HNSW index.
-            **(
-                {"search_params": models.SearchParams(exact=True)}
-                if isinstance(index_path, QdrantServiceTarget)
-                else {}
-            ),
+            # Preserve the established exact nearest-neighbor scan.
+            search_params={"exact": True},
         )
     finally:
         client.close()

@@ -134,45 +134,24 @@ def _citation_check(
 
 
 def _index_versions(settings: Settings) -> dict[str, object]:
-    versions: dict[str, object] = {}
-    for name in ("keyword_index_latest.json", "vector_index_latest.json"):
-        if name == "vector_index_latest.json" and settings.qdrant_url:
-            versions["vector_index"] = {
-                "backend": "qdrant-service",
-                "artifact_verified": False,
-            }
-            continue
-        if name == "keyword_index_latest.json" and settings.keyword_database_url:
-            try:
-                metadata = load_keyword_index_metadata(
-                    settings.keyword_database_url.get_secret_value()
-                )
-                versions["keyword_index"] = {
-                    **{
-                        key: metadata["summary"][key]
-                        for key in ("run_id", "index_version", "chunks")
-                        if key in metadata["summary"]
-                    },
-                    "backend": "postgresql",
-                    "generation_id": metadata.get("generation_id"),
-                    "artifact_verified": metadata.get("artifact_verified") is True,
-                    "actual_index_artifact_sha256": metadata.get("actual_index_artifact_sha256"),
-                }
-            except Exception:
-                versions["keyword_index"] = {
-                    "backend": "postgresql",
-                    "artifact_verified": False,
-                }
-            continue
-        path = settings.reports_dir / name
-        if not path.is_file():
-            continue
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        versions[name.removesuffix("_latest.json")] = {
-            key: payload.get(key)
-            for key in ("run_id", "index_version", "model_name", "chunks")
-            if payload.get(key) is not None
+    versions: dict[str, object] = {
+        "vector_index": {"backend": "qdrant-service", "artifact_verified": False}
+    }
+    try:
+        metadata = load_keyword_index_metadata(settings.keyword_index_target)
+        versions["keyword_index"] = {
+            **{
+                key: metadata["summary"][key]
+                for key in ("run_id", "index_version", "chunks")
+                if key in metadata["summary"]
+            },
+            "backend": "postgresql",
+            "generation_id": metadata.get("generation_id"),
+            "artifact_verified": metadata.get("artifact_verified") is True,
+            "actual_index_artifact_sha256": metadata.get("actual_index_artifact_sha256"),
         }
+    except Exception:
+        versions["keyword_index"] = {"backend": "postgresql", "artifact_verified": False}
     return versions
 
 

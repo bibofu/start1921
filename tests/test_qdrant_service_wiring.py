@@ -24,7 +24,7 @@ def _settings(work_path: Path) -> Settings:
         qdrant_url="http://127.0.0.1:6333",
         qdrant_api_key="test-secret",
     )
-    settings.vector_index_path.mkdir(parents=True)
+    (work_path / "data/indexes/qdrant").mkdir(parents=True)
     settings.reports_dir.mkdir(parents=True)
     (settings.reports_dir / "vector_index_latest.json").write_text(
         json.dumps({
@@ -79,6 +79,7 @@ def test_health_probes_service_even_with_local_directory(
 
     monkeypatch.setattr(readiness, "open_vector_client", open_client)
     monkeypatch.setattr(web_module, "_database_ready", lambda target: True)
+    monkeypatch.setattr(web_module, "keyword_index_ready", lambda settings: True)
     response = TestClient(web_module.create_app(settings)).get("/api/health")
     assert response.json()["indexes"]["vector"] is available
     assert response.json()["vector_database_backend"] == "qdrant-service"
@@ -104,10 +105,12 @@ def test_readiness_searches_service_target(monkeypatch, work_path: Path) -> None
 def test_service_metadata_never_reuses_local_hash(monkeypatch, work_path: Path) -> None:
     settings = _settings(work_path)
 
-    def reject_local_hash(path: Path) -> str:
-        raise AssertionError("the old local directory cannot identify a Qdrant service collection")
-
-    monkeypatch.setattr(golden, "index_artifact_sha256", reject_local_hash)
+    keyword_metadata = {
+        "summary": {"backend": "postgresql"}, "manifest": None,
+        "artifact_verified": True, "actual_index_artifact_sha256": "postgres-fingerprint",
+    }
+    for module in (golden, answers):
+        monkeypatch.setattr(module, "load_keyword_index_metadata", lambda _: keyword_metadata)
     metadata = golden._load_index_metadata(settings)
     vector_metadata = metadata["reports"]["vector_index"]
     assert vector_metadata["artifact_verified"] is False
@@ -118,30 +121,3 @@ def test_service_metadata_never_reuses_local_hash(monkeypatch, work_path: Path) 
         "backend": "qdrant-service", "artifact_verified": False,
     }
     assert "stale-local" not in str(metadata)
-
-
-def test_migration_cli_uses_explicit_backup_and_service(monkeypatch, work_path: Path) -> None:
-    from history_agent.retrieval import vector_migration
-
-    settings = _settings(work_path)
-    captured: dict[str, Any] = {}
-    backup = work_path / "qdrant-backup"
-    backup.mkdir()
-
-    def migrate(**kwargs: Any) -> dict[str, Any]:
-        captured.update(kwargs)
-        return {"status": "verified", "points": 3}
-
-    monkeypatch.setattr(cli, "get_settings", lambda: settings)
-    monkeypatch.setattr(vector_migration, "migrate_qdrant_local", migrate)
-    report = work_path / "migration.json"
-    result = CliRunner().invoke(cli.app, [
-        "index", "migrate-qdrant-service", "--source-index", str(backup),
-        "--report", str(report),
-    ])
-    assert result.exit_code == 0, result.output
-    assert captured["source_path"] == backup
-    assert captured["target"] == settings.vector_index_target
-    assert captured["source_report"] is None
-    assert json.loads(report.read_text(encoding="utf-8"))["status"] == "verified"
-    assert "test-secret" not in result.output

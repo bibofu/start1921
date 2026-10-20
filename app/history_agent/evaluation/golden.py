@@ -37,7 +37,6 @@ from history_agent.evaluation.semantic import (
     judge_citation_semantics,
     judge_fact_coverage,
 )
-from history_agent.processing.chunks import index_artifact_sha256
 from history_agent.retrieval.hybrid import RRF_K, search_hybrid_index
 from history_agent.retrieval.keyword import load_keyword_index_metadata
 from history_agent.retrieval.models import SearchHit, SearchResponse
@@ -1211,82 +1210,29 @@ def _git_metadata(project_root: Path) -> dict[str, Any]:
 
 
 def _load_index_metadata(settings: Settings) -> dict[str, Any]:
-    reports: dict[str, Any] = {}
-    warnings: list[str] = []
-    for name in ("keyword_index_latest.json", "vector_index_latest.json"):
-        if name == "vector_index_latest.json" and settings.qdrant_url:
-            # A local directory/report does not identify the collection currently
-            # served by Qdrant, whose alias may have changed since that report.
-            reports["vector_index"] = {
-                "summary": {"backend": "qdrant-service"},
-                "manifest": None,
-                "artifact_verified": False,
-                "actual_index_artifact_sha256": None,
-            }
-            warnings.append(
-                "Qdrant service collection has no independently verified artifact manifest"
-            )
-            continue
-        if name == "keyword_index_latest.json" and settings.keyword_database_url:
-            try:
-                # The active PostgreSQL generation is authoritative. A local
-                # report or the old SQLite file cannot identify the queried index.
-                keyword_metadata = load_keyword_index_metadata(
-                    settings.keyword_database_url.get_secret_value()
-                )
-                reports["keyword_index"] = keyword_metadata
-                if not keyword_metadata.get("artifact_verified"):
-                    warnings.append(
-                        "keyword_index manifest does not match the queried index artifact"
-                    )
-            except Exception:
-                reports["keyword_index"] = {
-                    "summary": {"backend": "postgresql"},
-                    "manifest": None,
-                    "artifact_verified": False,
-                    "actual_index_artifact_sha256": None,
-                }
-                warnings.append("PostgreSQL keyword index metadata could not be verified")
-            continue
-        path = settings.reports_dir / name
-        if not path.is_file():
-            warnings.append(f"missing index report: {name}")
-            continue
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError, TypeError):
-            warnings.append(f"unreadable index report: {name}")
-            continue
-        report_name = name.removesuffix("_latest.json")
-        manifest = payload.get("manifest")
-        reports[report_name] = {
-            "summary": {
-                key: payload.get(key)
-                for key in ("run_id", "index_version", "model_name", "chunks")
-                if payload.get(key) is not None
-            },
-            "manifest": manifest if isinstance(manifest, dict) else None,
+    # Service identities must come from the active services, never archived local files.
+    reports: dict[str, Any] = {
+        "vector_index": {
+            "summary": {"backend": "qdrant-service"},
+            "manifest": None,
+            "artifact_verified": False,
+            "actual_index_artifact_sha256": None,
         }
-        if not isinstance(manifest, dict):
-            warnings.append(f"{report_name} is legacy and has no artifact manifest")
-        else:
-            index_path = (
-                settings.keyword_index_path
-                if report_name == "keyword_index"
-                else settings.vector_index_path
-            )
-            expected_artifact = manifest.get("index_artifact_sha256")
-            try:
-                actual_artifact = index_artifact_sha256(index_path)
-            except OSError:
-                actual_artifact = None
-            verified = bool(expected_artifact) and expected_artifact == actual_artifact
-            reports[report_name]["artifact_verified"] = verified
-            reports[report_name]["actual_index_artifact_sha256"] = actual_artifact
-            if not expected_artifact:
-                warnings.append(f"{report_name} manifest cannot identify its index artifact")
-            elif not verified:
-                warnings.append(f"{report_name} manifest does not match the queried index artifact")
+    }
+    warnings = ["Qdrant service collection has no independently verified artifact manifest"]
+    try:
+        keyword_metadata = load_keyword_index_metadata(settings.keyword_index_target)
+        reports["keyword_index"] = keyword_metadata
+        if not keyword_metadata.get("artifact_verified"):
+            warnings.append("keyword_index manifest does not match the queried index artifact")
+    except Exception:
+        reports["keyword_index"] = {
+            "summary": {"backend": "postgresql"},
+            "manifest": None,
+            "artifact_verified": False,
+            "actual_index_artifact_sha256": None,
+        }
+        warnings.append("PostgreSQL keyword index metadata could not be verified")
     manifests = [
         item["manifest"] for item in reports.values() if isinstance(item.get("manifest"), dict)
     ]

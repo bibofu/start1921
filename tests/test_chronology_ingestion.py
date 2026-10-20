@@ -2,9 +2,13 @@ import json
 from pathlib import Path
 
 import pymupdf
+import pytest
+from history_agent.config import Settings
 from history_agent.extraction.text import build_page_record
 from history_agent.processing.chunks import build_document_chunks
 from history_agent.retrieval.keyword import build_keyword_index, search_keyword_index
+
+pytestmark = pytest.mark.usefixtures("postgres_settings")
 
 
 def test_chronology_section_controls_scope_even_with_later_year_mentions(work_path: Path) -> None:
@@ -54,7 +58,7 @@ def test_chronology_section_controls_scope_even_with_later_year_mentions(work_pa
     ]
     assert 1956 in rows[0]["year_mentions"]
 
-    index = work_path / "keyword.db"
+    index = Settings(_env_file=None).keyword_index_target
     build_keyword_index(
         chunks_dir=chunks, index_path=index, reports_dir=work_path / "reports", run_id="test"
     )
@@ -77,20 +81,19 @@ def test_chronology_section_controls_scope_even_with_later_year_mentions(work_pa
 
 def test_vector_year_filter_keeps_research_scope_constraint() -> None:
     from history_agent.retrieval.vector import _query_filter
-    from qdrant_client import models
 
     result = _query_filter(
-        models=models, document_ids=None, query_people=[],
+        document_ids=None, query_people=[],
         query_year_range=[1956, 1956], include_out_of_scope=False,
     )
-    assert result.must
-    assert result.must_not
-    assert result.must_not[0].key == "scope_status"
+    assert result["must"]
+    assert result["must_not"]
+    assert result["must_not"][0]["key"] == "scope_status"
     expanded = _query_filter(
-        models=models, document_ids=None, query_people=[],
+        document_ids=None, query_people=[],
         query_year_range=[1956, 1956], include_out_of_scope=True,
     )
-    assert not expanded.must_not
+    assert not expanded["must_not"]
 
 
 def test_chunks_exclude_scan_appendices_and_preserve_afterword_section(work_path: Path) -> None:

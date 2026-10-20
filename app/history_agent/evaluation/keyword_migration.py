@@ -1,35 +1,26 @@
-"""Frozen-oracle evaluation for a keyword storage migration, separate from Golden."""
+"""Compare archived migration reports and evaluate PostgreSQL keyword fixtures.
 
+The retired source-database capture runner is intentionally unavailable. Existing
+JSON captures remain readable without loading the retired backend or its code.
+"""
 from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
-import io
 import json
 import math
-import os
-import sqlite3
-import subprocess
-import sys
-import zipfile
 from collections.abc import Callable
-from datetime import UTC, datetime
 from pathlib import Path
-from time import perf_counter
 from typing import Any
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
-from uuid import uuid4
 
-from history_agent.config import Settings, get_settings
-from history_agent.db import Database
+from history_agent.config import get_settings
 from history_agent.errors import RetrievalError
 from history_agent.evaluation.pilot_metrics import evaluate_stage
 from history_agent.evaluation.pilot_protocols import load_inputs
+from history_agent.retrieval import keyword
 from history_agent.retrieval.models import RetrievalPlan
 
 PROTOCOL = Path("evals/keyword_migration/protocol_v1.json")
-ORACLE_IDENTITY = Path("evals/keyword_migration/oracle_identity_v1.json")
 DATASET = Path("evals/golden/development_annotations_v5.json")
 CASE_PROTOCOLS = Path("evals/golden/development_protocols_v5.json")
 SYNTHETIC = Path("evals/keyword_migration/synthetic_v1.json")
@@ -47,29 +38,6 @@ def digest(value: Any) -> str:
     ).hexdigest()
 
 
-def corpus_snapshot(settings: Settings) -> dict[str, Any]:
-    """Verify actual corpus files without importing the Agent implementation."""
-    with Database(settings.database_target).connect() as connection:
-        connection.execute(
-            "SET TRANSACTION READ ONLY"
-            if settings.database_backend == "postgresql"
-            else "PRAGMA query_only = ON"
-        )
-        rows = connection.execute(
-            "SELECT d.document_id,d.title,f.sha256,f.relative_path,f.page_count "
-            "FROM documents d JOIN document_files f ON f.document_id=d.document_id "
-            "WHERE d.enabled=1 AND f.is_current=1 AND f.is_present=1 ORDER BY d.document_id"
-        ).fetchall()
-    documents = [dict(row) for row in rows]
-    for item in documents:
-        path = (settings.project_root / item["relative_path"]).resolve()
-        if not path.is_relative_to(settings.docs_dir.resolve()):
-            raise ValueError("Corpus path is outside docs directory.")
-        if file_sha(path) != item["sha256"]:
-            raise ValueError(f"PDF changed since corpus scan: {item['document_id']}")
-    return {"documents": documents, "sha256": digest(documents)}
-
-
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -82,125 +50,12 @@ def write_new(path: Path, payload: Any) -> None:
 
 
 def load_contract(root: Path) -> dict[str, Any]:
+    """Verify frozen annotation inputs without opening retired storage artifacts."""
     contract: dict[str, Any] = read_json(root / PROTOCOL)
     for artifact in contract["annotation_inputs"]:
         if file_sha(root / artifact["path"]) != artifact["sha256"]:
             raise ValueError(f"Frozen annotation changed: {artifact['path']}")
-    frozen = contract["frozen_artifacts"]
-    oracle = read_json(root / ORACLE_IDENTITY)
-    if (
-        oracle["source"]["artifact_sha256"] != frozen["sqlite_index_sha256"]
-        or oracle["snapshot"]["path"] != frozen["sqlite_index"]
-    ):
-        raise ValueError("Oracle identity addendum is not bound to the frozen protocol.")
-    for path_key, hash_key in (
-        ("sqlite_index", "sqlite_index_sha256"),
-        ("legacy_keyword_module", "legacy_keyword_module_sha256"),
-    ):
-        expected = (
-            oracle["snapshot"]["artifact_sha256"]
-            if path_key == "sqlite_index"
-            else frozen[hash_key]
-        )
-        if file_sha(root / frozen[path_key]) != expected:
-            raise ValueError(f"Frozen oracle artifact changed: {path_key}")
-    inventory = read_json(root / frozen["inventory"])
-    for relative, expected in inventory["files"].items():
-        portable = relative.replace("\\", "/")
-        if (
-            portable.startswith("data/processed/chunks/")
-            or portable == "config/person_aliases.json"
-        ) and file_sha(root / portable) != expected:
-            raise ValueError(f"Frozen corpus/query artifact changed: {portable}")
     return contract
-
-
-def legacy_module(root: Path, contract: dict[str, Any]) -> Any:
-    path = root / contract["frozen_artifacts"]["legacy_keyword_module"]
-    spec = importlib.util.spec_from_file_location("_frozen_keyword_migration_oracle", path)
-    if spec is None or spec.loader is None:
-        raise ValueError("Cannot load frozen keyword oracle.")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-def build_workload(
-    inputs: Any, document_ids: list[str], contract: dict[str, Any]
-) -> list[dict[str, Any]]:
-    """Build compatibility inputs; document filters do not alter Golden questions."""
-    workload = []
-    for case in inputs.dataset.cases:
-        for variant in inputs.variants[case.id]:
-            base = {
-                "case_id": case.id,
-                "variant_id": variant["id"],
-                "question": variant["question"],
-                "history": variant["history"],
-            }
-            filters: list[tuple[str, dict[str, Any]]] = [
-                ("default", {}),
-                ("include_out_of_scope", {"include_out_of_scope": True}),
-                ("two_documents", {"document_ids": document_ids[:2]}),
-                ("missing_document", {"document_ids": ["__missing_migration_document__"]}),
-            ]
-            filters.extend(
-                (f"document_{index:02d}", {"document_ids": [document_id]})
-                for index, document_id in enumerate(document_ids)
-            )
-            for name, options in filters:
-                workload.append(
-                    {
-                        **base,
-                        "id": f"{case.id}/{variant['id']}/{name}",
-                        "filter_id": name,
-                        "options": options,
-                    }
-                )
-    for index, query in enumerate(contract["keyword_compatibility"]["additional_queries"]):
-        workload.append(
-            {
-                "id": f"compatibility/query_{index:02d}",
-                "case_id": None,
-                "variant_id": None,
-                "question": query,
-                "history": [],
-                "filter_id": "default",
-                "options": {},
-            }
-        )
-    for index, section in enumerate(("1935", "%", "_", "\\")):
-        workload.append(
-            {
-                "id": f"compatibility/section_{index:02d}",
-                "case_id": None,
-                "variant_id": None,
-                "question": "中国共产党",
-                "history": [],
-                "filter_id": "literal_section",
-                "options": {"section_path_contains": section},
-            }
-        )
-    for index, plan in enumerate(
-        (
-            {"query_intent": "general", "query_years": [1935]},
-            {"query_intent": "timeline", "query_year_range": [1921, 1949]},
-            {"query_intent": "intersection", "query_people": ["毛泽东", "周恩来"]},
-            {"query_intent": "viewpoint", "query_people": ["毛泽东"]},
-        )
-    ):
-        workload.append(
-            {
-                "id": f"compatibility/plan_{index:02d}",
-                "case_id": None,
-                "variant_id": None,
-                "question": "中国共产党",
-                "history": [],
-                "filter_id": "explicit_plan",
-                "options": {"plan": plan},
-            }
-        )
-    return workload
 
 
 def hit_signature(hit: dict[str, Any]) -> dict[str, Any]:
@@ -252,161 +107,6 @@ def strict_aggregate(cases: list[dict[str, Any]]) -> dict[str, Any]:
                 if not case["metrics"][name]["evaluable"]
             },
         }
-    return result
-
-
-def capture_keyword(
-    output: Path,
-    *,
-    backend: str,
-    target: Path | str | None = None,
-    settings: Settings | None = None,
-) -> dict[str, Any]:
-    checkpoint = output.with_suffix(".checkpoint.jsonl")
-    if output.exists() or checkpoint.exists():
-        raise FileExistsError("Use a new output path.")
-    settings = settings or get_settings()
-    root = settings.project_root
-    contract = load_contract(root)
-    inputs = load_inputs(root / DATASET, root / CASE_PROTOCOLS)
-    corpus = corpus_snapshot(settings)
-    file_hashes = {item["document_id"]: item["sha256"] for item in corpus["documents"]}
-    workload = build_workload(inputs, sorted(file_hashes), contract)
-    if backend == "legacy":
-        search: Callable[..., Any] = legacy_module(root, contract).search_keyword_index
-        target = root / contract["frozen_artifacts"]["sqlite_index"]
-        engine_paths = [root / contract["frozen_artifacts"]["legacy_keyword_module"]]
-        index_identity = read_json(root / ORACLE_IDENTITY)["snapshot"]
-    elif backend == "candidate":
-        from history_agent.retrieval.keyword import (
-            load_keyword_index_metadata,
-            search_keyword_index,
-        )
-
-        search = search_keyword_index
-        if target is None:
-            raise ValueError("Candidate capture requires an explicit target.")
-        engine_paths = [
-            root / f"app/history_agent/retrieval/{name}.py"
-            for name in ("keyword", "keyword_postgres", "keyword_legacy")
-        ]
-        index_identity = load_keyword_index_metadata(str(target))
-    else:
-        raise ValueError("backend must be legacy or candidate")
-    k_values = tuple(contract["keyword_compatibility"]["k_values"])
-    exhaustive_k = contract["keyword_compatibility"]["exhaustive_k"]
-    by_case = {case.id: case.model_dump(mode="json") for case in inputs.dataset.cases}
-    observed_main: set[str] = set()
-    strict_cases = []
-    results = []
-    engine_identity = {path.name: file_sha(path) for path in engine_paths}
-    started = perf_counter()
-    checkpoint.parent.mkdir(parents=True, exist_ok=True)
-    with checkpoint.open("x", encoding="utf8") as stream:
-        stream.write(
-            json.dumps(
-                {
-                    "backend": backend,
-                    "protocol_sha256": file_sha(root / PROTOCOL),
-                    "oracle_identity_sha256": file_sha(root / ORACLE_IDENTITY),
-                    "dataset_sha256": inputs.dataset_sha256,
-                }
-            )
-            + "\n"
-        )
-    for number, item in enumerate(workload, 1):
-        options = dict(item["options"])
-        if "plan" in options:
-            options["plan"] = RetrievalPlan.model_validate(options["plan"])
-        call = {
-            "index_path": target,
-            "aliases_path": settings.person_aliases_path,
-            "query": item["question"],
-            **options,
-        }
-        begin = perf_counter()
-        metadata, hits = observed_response(search, {**call, "top_k": exhaustive_k})
-        all_ms = (perf_counter() - begin) * 1000
-        signatures = [hit_signature(hit) for hit in hits]
-        per_k = {}
-        for k in k_values:
-            begin = perf_counter()
-            small_metadata, small_hits = observed_response(search, {**call, "top_k": k})
-            small_signatures = [hit_signature(hit) for hit in small_hits]
-            per_k[str(k)] = {
-                "elapsed_ms": (perf_counter() - begin) * 1000,
-                "hits": small_signatures,
-                "metadata": small_metadata,
-                "matches_exhaustive_prefix": small_signatures == signatures[:k],
-            }
-        metric_report = None
-        case_id = item["case_id"]
-        if case_id and item["filter_id"] == "default":
-            if "error" in metadata:
-                raise ValueError(f"Unexpected default Golden retrieval error: {case_id}")
-            metric_report = evaluate_stage(
-                by_case[case_id],
-                hits[: max(k_values)],
-                file_hashes,
-                k_values,
-                label_mode="approved",
-            )
-            # The lower-bound diagnostic is not an exact MRR quality metric.
-            metric_report["metrics"] = {
-                name: metric
-                for name, metric in metric_report["metrics"].items()
-                if not name.startswith("annotated_mrr_lower_bound")
-            }
-            metric_report.pop("units", None)
-            if case_id not in observed_main:
-                strict_cases.append(metric_report)
-                observed_main.add(case_id)
-        results.append(
-            {
-                "input": item,
-                "input_sha256": digest(item),
-                "metadata": metadata,
-                "hits": signatures,
-                "all_results_ms": all_ms,
-                "at_k": per_k,
-                "human_metrics": metric_report,
-            }
-        )
-        with checkpoint.open("a", encoding="utf8") as stream:
-            stream.write(json.dumps(results[-1], ensure_ascii=False) + "\n")
-        if number % 50 == 0 or number == len(workload):
-            print(f"keyword {backend}: {number}/{len(workload)}", flush=True)
-    result = {
-        "schema_version": 1,
-        "scope": "storage_compatibility_and_strict_human_metric_availability",
-        "created_at": datetime.now(UTC).isoformat(),
-        "backend": backend,
-        "engine_sha256_before": engine_identity,
-        "engine_sha256_after": {path.name: file_sha(path) for path in engine_paths},
-        "index_identity": index_identity,
-        "protocol_sha256": file_sha(root / PROTOCOL),
-        "oracle_identity_sha256": file_sha(root / ORACLE_IDENTITY),
-        "dataset_sha256": inputs.dataset_sha256,
-        "corpus_sha256": corpus["sha256"],
-        "file_hashes": file_hashes,
-        "aliases_sha256": file_sha(settings.person_aliases_path),
-        "baseline_inventory_sha256": file_sha(root / contract["frozen_artifacts"]["inventory"]),
-        "k_values": k_values,
-        "exhaustive_k": exhaustive_k,
-        "independent_cases": len(inputs.dataset.cases),
-        "execution_inputs": sum(map(len, inputs.variants.values())),
-        "workload_count": len(workload),
-        "elapsed_ms": (perf_counter() - started) * 1000,
-        "sqlite_version": sqlite3.sqlite_version,
-        "python_version": sys.version,
-        "historical_quality_limit": (
-            "No human candidate relevance judgments; unavailable Precision/MRR/nDCG remain null. "
-            "Strict empty-result zeros follow the existing metric definition."
-        ),
-        "strict_human_aggregate": strict_aggregate(strict_cases),
-        "queries": results,
-    }
-    write_new(output, result)
     return result
 
 
@@ -516,170 +216,6 @@ def normalize_execution(value: Any) -> Any:
     if isinstance(value, list):
         return [normalize_execution(item) for item in value]
     return value
-
-
-def capture_e2e(output: Path, *, backend: str, root: Path) -> None:
-    """Run the unchanged baseline code in a child process, with no model calls."""
-    contract = load_contract(root)
-    if output.exists() or output.with_suffix(".partial.json").exists():
-        raise FileExistsError("Use a new end-to-end output path.")
-    runtime = root / "data/backups/keyword-to-postgres-20261020T061514Z/runtime"
-    if backend == "legacy" and not runtime.exists():
-        archive = subprocess.run(
-            [
-                "git",
-                "-c",
-                f"safe.directory={root.as_posix()}",
-                "archive",
-                "--format=zip",
-                contract["baseline_commit"],
-                "app",
-            ],
-            cwd=root,
-            capture_output=True,
-            check=True,
-        ).stdout
-        with zipfile.ZipFile(io.BytesIO(archive)) as source:
-            for member in source.infolist():
-                if not (runtime / member.filename).resolve().is_relative_to(runtime.resolve()):
-                    raise ValueError("Unsafe archive member.")
-            source.extractall(runtime)
-    child = """
-import importlib.util, sys
-from pathlib import Path
-root, output, backend, runtime, snapshot = map(Path, sys.argv[1:])
-sys.path.insert(0, str((runtime if str(backend) == "legacy" else root) / "app"))
-spec = importlib.util.spec_from_file_location(
-    "migration_capture", root / "app/history_agent/evaluation/keyword_migration.py")
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
-module.capture_e2e_runtime(root, output, str(backend), runtime, snapshot)
-"""
-    environment = os.environ.copy()
-    environment.pop("PYTHONPATH", None)
-    subprocess.run(
-        [
-            sys.executable,
-            "-c",
-            child,
-            str(root),
-            str(output.resolve()),
-            backend,
-            str(runtime),
-            str(root / contract["frozen_artifacts"]["sqlite_index"]),
-        ],
-        cwd=root,
-        env=environment,
-        check=True,
-    )
-
-
-def capture_e2e_runtime(
-    root: Path, output: Path, backend: str, runtime: Path, snapshot: Path
-) -> None:
-    """Compatibility inputs are not asserted to be current Golden quality labels."""
-    import asyncio
-
-    from history_agent.answering.models import QuestionRequest
-    from history_agent.answering.service import PROMPT_VERSION, answer_question
-    from history_agent.evaluation import pilot
-    from history_agent.evaluation.pilot_protocols import capture_contract
-    from history_agent.evaluation.pilot_runtime import RecordedLLMRuntime
-    from history_agent.retrieval.hybrid import search_hybrid_index
-
-    class FrozenSettings(Settings):
-        @property
-        def keyword_index_path(self) -> Path:
-            return snapshot
-
-    settings = (FrozenSettings if backend == "legacy" else Settings)(
-        project_root=root, llm_api_key=None
-    )
-    inputs = load_inputs(root / DATASET, root / CASE_PROTOCOLS)
-    corpus = corpus_snapshot(settings)
-    validation_error = None
-    try:
-        pilot.validate_anchors(inputs.dataset, settings, corpus)
-    except ValueError as exc:
-        validation_error = str(exc)
-    results: list[dict[str, Any]] = []
-    controls: list[dict[str, Any]] = []
-    source_root = runtime if backend == "legacy" else root
-    source_before = pilot.source_fingerprint(source_root)
-    for case in inputs.dataset.cases:
-        for index, variant in enumerate(inputs.variants[case.id]):
-            print(f"compatibility {backend}: {case.id}/{variant['id']}", flush=True)
-            begin = perf_counter()
-            response = search_hybrid_index(
-                keyword_index_path=(
-                    snapshot if backend == "legacy" else settings.keyword_index_target
-                ),
-                vector_index_path=settings.vector_index_target,
-                model_cache_dir=settings.model_cache_dir / "fastembed",
-                aliases_path=settings.person_aliases_path,
-                query=variant["question"],
-                top_k=20,
-                candidate_k=30,
-                capture_trace=True,
-            )
-            retrieval_ms = (perf_counter() - begin) * 1000
-            trace = [item.model_dump(mode="json") for item in response.trace or []]
-            request = QuestionRequest(
-                question=variant["question"], history=variant["history"], top_k=10
-            )
-            recorder = RecordedLLMRuntime(settings.llm_max_concurrency)
-            begin = perf_counter()
-            try:
-                answer = answer_question(settings, request, runtime=recorder).model_dump(
-                    mode="json"
-                )
-            finally:
-                asyncio.run(recorder.aclose())
-            item = {
-                "case_id": case.id,
-                "input_variant_id": variant["id"],
-                "input_sha256": digest(
-                    {"question": variant["question"], "history": variant["history"]}
-                ),
-                "request": request.model_dump(mode="json"),
-                "retrieval": response.model_dump(mode="json"),
-                "stages": trace,
-                "production_stages": pilot.production_stages(recorder.retrieval_calls),
-                "generation_contexts": pilot.generation_contexts(
-                    recorder.calls, corpus["documents"]
-                ),
-                "answer": answer,
-                "llm_calls": recorder.calls,
-                "retrieval_ms": retrieval_ms,
-                "answer_ms": (perf_counter() - begin) * 1000,
-            }
-            (results if index == 0 else controls).append(item)
-    report = {
-        "schema_version": 1,
-        "scope": "deterministic_no_llm_storage_compatibility",
-        "backend": backend,
-        "dataset_sha256": inputs.dataset_sha256,
-        "execution_contract": capture_contract(inputs),
-        "corpus": corpus,
-        "config": {
-            "candidate_k": 30,
-            "top_k": 20,
-            "answer_top_k": 10,
-            "with_llm": False,
-            "component_query": "raw_question",
-            "prompt_version": PROMPT_VERSION,
-        },
-        "source_sha256": source_before,
-        "source_sha256_after_collection": pilot.source_fingerprint(source_root),
-        "annotation_validation_error": validation_error,
-        "quality_limit": (
-            "This capture compares execution behavior only. Historical refusal project-file "
-            "hashes may no longer match; no semantic, factual, or refusal quality is inferred."
-        ),
-        "cases": results,
-        "control_cases": controls,
-    }
-    write_new(output, report)
 
 
 def compare_e2e(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
@@ -833,20 +369,14 @@ def synthetic_metrics(ranked_ids: list[str], grades: dict[str, int], k: int) -> 
 
 
 def capture_synthetic(
-    output: Path, *, backend: str, work_dir: Path, target: Path | str, root: Path
+    output: Path, *, work_dir: Path, target: str, root: Path
 ) -> dict[str, Any]:
     """Caller owns the isolated target; this function never drops a database."""
     from history_agent.processing.models import ChunkRecord
 
     if output.exists() or work_dir.exists():
         raise FileExistsError("Use new synthetic output and work directories.")
-    contract = load_contract(root)
     fixture = read_json(root / SYNTHETIC)
-    engine = (
-        legacy_module(root, contract)
-        if backend == "legacy"
-        else importlib.import_module("history_agent.retrieval.keyword")
-    )
     chunks = work_dir / "chunks"
     chunks.mkdir(parents=True)
     for index, item in enumerate(fixture["records"]):
@@ -877,7 +407,7 @@ def capture_synthetic(
         )
         with (chunks / "synthetic.jsonl").open("a", encoding="utf8") as stream:
             stream.write(record.model_dump_json() + "\n")
-    engine.build_keyword_index(
+    keyword.build_keyword_index(
         chunks_dir=chunks,
         index_path=target,
         reports_dir=work_dir / "reports",
@@ -891,7 +421,7 @@ def capture_synthetic(
             options["plan"] = RetrievalPlan.model_validate(options["plan"])
         rows = {}
         for k in fixture["k_values"]:
-            response = engine.search_keyword_index(
+            response = keyword.search_keyword_index(
                 index_path=target,
                 aliases_path=root / "config/person_aliases.json",
                 query=query["question"],
@@ -907,7 +437,7 @@ def capture_synthetic(
         results.append({"id": query["id"], "at_k": rows})
     report = {
         "scope": "fully_specified_synthetic_contract_not_historical_golden",
-        "backend": backend,
+        "backend": "postgresql",
         "fixture_sha256": file_sha(root / SYNTHETIC),
         "queries": results,
         "records": len(fixture["records"]),
@@ -916,74 +446,14 @@ def capture_synthetic(
     return report
 
 
-def capture_synthetic_pair(output_dir: Path, *, root: Path) -> dict[str, Any]:
-    """Use an explicitly configured test database and a fresh disposable schema."""
-    import psycopg
-    from psycopg import sql
-
-    url = os.environ.get("HISTORY_AGENT_TEST_POSTGRES_URL")
-    if not url:
-        raise ValueError("Set HISTORY_AGENT_TEST_POSTGRES_URL to a test database.")
-    output_dir.mkdir(parents=True, exist_ok=False)
-    schema = "keyword_evaluation_" + uuid4().hex
-    parsed = urlsplit(url)
-    parameters = dict(parse_qsl(parsed.query, keep_blank_values=True))
-    parameters["options"] = (parameters.get("options", "") + f" -csearch_path={schema}").strip()
-    target = urlunsplit(parsed._replace(query=urlencode(parameters)))
-    with psycopg.connect(url, autocommit=True) as connection:
-        connection.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
-        try:
-            before = capture_synthetic(
-                output_dir / "baseline.json",
-                backend="legacy",
-                work_dir=output_dir / "legacy-work",
-                target=output_dir / "legacy.sqlite",
-                root=root,
-            )
-            after = capture_synthetic(
-                output_dir / "candidate.json",
-                backend="candidate",
-                work_dir=output_dir / "postgres-work",
-                target=target,
-                root=root,
-            )
-        finally:
-            connection.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)))
-    result = {
-        "scope": "synthetic_not_historical_golden",
-        "fixture_sha256": before["fixture_sha256"],
-        "passed": (
-            before["fixture_sha256"] == after["fixture_sha256"]
-            and before["queries"] == after["queries"]
-        ),
-        "queries": len(before["queries"]),
-        "records": before["records"],
-        "baseline": "baseline.json",
-        "candidate": "candidate.json",
-    }
-    write_new(output_dir / "comparison.json", result)
-    return result
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    capture = sub.add_parser("capture")
-    capture.add_argument("--backend", choices=("legacy", "candidate"), required=True)
-    capture.add_argument("--output", type=Path, required=True)
-    capture_end = sub.add_parser("capture-e2e")
-    capture_end.add_argument("--backend", choices=("legacy", "candidate"), required=True)
-    capture_end.add_argument("--output", type=Path, required=True)
-    compare = sub.add_parser("compare")
-    compare.add_argument("left", type=Path)
-    compare.add_argument("right", type=Path)
-    compare.add_argument("--output", type=Path, required=True)
-    e2e = sub.add_parser("compare-e2e")
-    e2e.add_argument("left", type=Path)
-    e2e.add_argument("right", type=Path)
-    e2e.add_argument("--output", type=Path, required=True)
-    synthetic = sub.add_parser("capture-synthetic")
-    synthetic.add_argument("--output-dir", type=Path, required=True)
+    for name in ("compare", "compare-e2e"):
+        command = sub.add_parser(name)
+        command.add_argument("left", type=Path)
+        command.add_argument("right", type=Path)
+        command.add_argument("--output", type=Path, required=True)
     score = sub.add_parser("score-e2e")
     score.add_argument("capture", type=Path)
     score.add_argument("--output", type=Path, required=True)
@@ -992,20 +462,6 @@ def main() -> None:
         result = score_e2e_availability(read_json(args.capture), root=get_settings().project_root)
         write_new(args.output, result)
         print(json.dumps({"cases": len(result["cases"]), "output": str(args.output)}))
-    elif args.command == "capture-synthetic":
-        result = capture_synthetic_pair(args.output_dir, root=get_settings().project_root)
-        print(json.dumps({"passed": result["passed"], "output": str(args.output_dir)}))
-        if not result["passed"]:
-            raise SystemExit(1)
-    elif args.command == "capture-e2e":
-        capture_e2e(args.output, backend=args.backend, root=get_settings().project_root)
-    elif args.command == "capture":
-        settings = get_settings()
-        target = getattr(settings, "keyword_index_target", None)
-        result = capture_keyword(
-            args.output, backend=args.backend, target=target, settings=settings
-        )
-        print(json.dumps({"workloads": result["workload_count"], "output": str(args.output)}))
     else:
         function = compare_keyword if args.command == "compare" else compare_e2e
         result = function(read_json(args.left), read_json(args.right))

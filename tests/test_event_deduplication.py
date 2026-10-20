@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+from history_agent.config import Settings
 from history_agent.db import Database
 from history_agent.research.event_deduplication import (
     discover_event_merge_candidates,
@@ -19,9 +21,11 @@ from history_agent.research.models import (
 from history_agent.research.people import sync_person_catalog
 from history_agent.research.store import ResearchStore
 
+pytestmark = pytest.mark.usefixtures("postgres_settings")
+
 
 def _prepare_database(work_path: Path) -> Database:
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     sync_person_catalog(
         database,
         PersonCatalog.model_validate(

@@ -107,7 +107,7 @@ PDF 页码及实际拼接的 chunk 数，不调用查询规划、混合召回或
 | OCR | 需要 OCR 的页面记录 | `data/processed/ocr/*.jsonl` |
 | 结构恢复 | PDF 目录或年份章节 | `data/processed/structure/*.json` |
 | 分片 | 每个文档一份 chunk JSONL | `data/processed/chunks/*.jsonl` |
-| 关键词索引 | PostgreSQL 倒排词位与 BM25；保留 SQLite 对照后端 | `HISTORY_AGENT_KEYWORD_DATABASE_URL`；旧文件 `data/indexes/keyword_fts.db` |
+| 关键词索引 | PostgreSQL 倒排词位与 BM25 | `HISTORY_AGENT_KEYWORD_DATABASE_URL`，默认共用主库 |
 | 向量索引 | 独立 Qdrant 服务 collection / alias | `HISTORY_AGENT_QDRANT_URL`；本机服务存储在 `data/qdrant-service/` |
 | 嵌入模型缓存 | FastEmbed 模型文件 | `data/models/fastembed/` |
 
@@ -279,21 +279,16 @@ chunk正文 + 文献标题 + section_path + 规范人物名 + “YYYY年”
 
 ### 5.1 索引结构
 
-配置关键词 PostgreSQL URL 后，索引版本为 `postgresql-fts5-bm25-compatible-v1`。
+关键词索引仅使用 PostgreSQL，索引版本为 `postgresql-fts5-bm25-compatible-v1`。
 `keyword_chunks` 保存完整元数据、原预分词文本、长度和原始行号；
 `keyword_postings` 保存倒排词项及词位。`keyword_generations` 与 `keyword_active`
 管理索引版本，完整数据校验通过后在同一事务中切换活动版本。
 构建、搜索及评测通过统一入口选择目标，详见 [迁移与评测说明](KEYWORD_POSTGRESQL.md)。
 
-迁移对照后端保留原 `sqlite-fts5-cjk-bigram-v1`，包含：
-
-- `chunk_metadata` 普通表：保存文档、页码、章节、正文、年份、人物、范围状态等完整元数据；
-- `chunk_fts` FTS5 虚拟表：保存不参与搜索的 `chunk_id` 和预分词后的 `terms`。
-
 原 FTS5 的底层 tokenizer 是 `unicode61 remove_diacritics 2`。中文切词由应用层预先完成。
 PostgreSQL 后端以纯 Python 保留预分词结果的词法及短语语义，不调用 SQLite 词法器。
+原 SQLite 对照后端和迁移代码已移除，冻结的迁移评测结果仍保留。
 
-旧 SQLite 后端构建时先写临时数据库，运行 `PRAGMA integrity_check` 后原子替换。
 PostgreSQL 后端构建新版本并核对全部元数据和词位摘要，失败时保留原活动版本。
 
 ### 5.2 中文和非中文分词
@@ -650,9 +645,11 @@ RRF 后再按查询意图增加 0.004：
 | 关键词索引大小 | 218,415,104 bytes，约 208.3 MiB |
 | 向量索引大小 | 184,447,536 bytes，约 175.9 MiB |
 | FastEmbed 版本 | 0.8.0 |
-| qdrant-client 版本 | 1.19.0 |
+| 历史构建时 qdrant-client 版本 | 1.19.0；现已移除 |
 
-上述索引规模来自原本地构建报告。现已迁移至 Qdrant 独立服务，保留既有向量与 payload，查询使用 `exact=True`。服务配置与迁移记录见 [QDRANT_SERVICE.md](QDRANT_SERVICE.md)。
+上述索引规模来自原本地构建报告。现已迁移至 Qdrant 独立服务，通过 HTTP 调用，
+保留既有向量与 payload，查询使用 `exact=True`。
+服务配置与迁移记录见 [QDRANT_SERVICE.md](QDRANT_SERVICE.md)。
 
 ## 14. 构建、调试和验证命令
 

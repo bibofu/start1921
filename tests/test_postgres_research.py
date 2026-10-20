@@ -1,14 +1,9 @@
-"""Run the same business queries against SQLite and an isolated PostgreSQL schema."""
+"""Check business queries against an isolated PostgreSQL schema."""
 
 from __future__ import annotations
 
-import os
-from collections.abc import Iterator
 from pathlib import Path
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
-from uuid import uuid4
 
-import psycopg
 import pytest
 from history_agent.corpus.models import CorpusCatalog
 from history_agent.corpus.scanner import scan_corpus
@@ -32,7 +27,6 @@ from history_agent.research.organization import get_organization_relationships
 from history_agent.research.people import sync_person_catalog, sync_relation_types
 from history_agent.research.store import ResearchStore
 from history_agent.research.timeline import get_person_timeline
-from psycopg import sql
 from pypdf import PdfWriter
 
 ZHOU_DOCUMENT = "zhou_enlai_chronology_1949_1976"
@@ -51,64 +45,46 @@ def _catalog() -> PersonCatalog:
     )
 
 
-@pytest.fixture(params=["sqlite", "postgresql"])
-def research_database(request: pytest.FixtureRequest, work_path: Path) -> Iterator[Database]:
-    target = os.environ.get("HISTORY_AGENT_TEST_POSTGRES_URL")
-    schema: str | None = None
-    if request.param == "postgresql":
-        if not target:
-            pytest.skip("Set HISTORY_AGENT_TEST_POSTGRES_URL for PostgreSQL business SQL checks")
-        schema = f"test_research_{uuid4().hex}"
-        with psycopg.connect(target, autocommit=True) as connection:
-            connection.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
-        parsed = urlsplit(target)
-        query = dict(parse_qsl(parsed.query))
-        query["options"] = f"{query.get('options', '')} -csearch_path={schema}".strip()
-        database = Database(urlunsplit(parsed._replace(query=urlencode(query))))
-    else:
-        database = Database(work_path / "research.sqlite")
-    try:
-        sync_person_catalog(database, _catalog())
-        sync_relation_types(
-            database,
-            RelationTypeCatalog.model_validate(
-                {
-                    "relation_types": [
-                        {
-                            "relation_type": "held_position",
-                            "label": "任职",
-                            "object_kind": "organization",
-                            "extraction_policy": "allowed",
-                            "description": "任职关系测试",
-                        }
-                    ]
-                }
-            ),
-        )
-        with database.connect() as connection:
-            for document_id, title in (
-                (ZHOU_DOCUMENT, "周恩来年谱"),
-                (LIN_DOCUMENT, "林彪年谱"),
-            ):
-                connection.execute(
-                    "INSERT INTO documents "
-                    "(document_id, title, creators_json, source_type, source_series_json, "
-                    "verification_status, enabled, ocr_strategy, created_at, updated_at) "
-                    "VALUES (?, ?, '[]', 'chronology', '[]', 'verified', 1, 'none', 'now', 'now')",
-                    (document_id, title),
-                )
-                connection.execute(
-                    "INSERT INTO document_files "
-                    "(document_id, relative_path, filename, sha256, size_bytes, page_count, "
-                    "modified_at, is_encrypted, first_seen_at, last_seen_at) "
-                    "VALUES (?, ?, ?, ?, 100, 100, 'now', 0, 'now', 'now')",
-                    (document_id, f"{document_id}.pdf", f"{document_id}.pdf", document_id),
-                )
-        yield database
-    finally:
-        if schema is not None and target is not None:
-            with psycopg.connect(target, autocommit=True) as connection:
-                connection.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)))
+@pytest.fixture
+def research_database(postgres_target: str) -> Database:
+    database = Database(postgres_target)
+    sync_person_catalog(database, _catalog())
+    sync_relation_types(
+        database,
+        RelationTypeCatalog.model_validate(
+            {
+                "relation_types": [
+                    {
+                        "relation_type": "held_position",
+                        "label": "任职",
+                        "object_kind": "organization",
+                        "extraction_policy": "allowed",
+                        "description": "任职关系测试",
+                    }
+                ]
+            }
+        ),
+    )
+    with database.connect() as connection:
+        for document_id, title in (
+            (ZHOU_DOCUMENT, "周恩来年谱"),
+            (LIN_DOCUMENT, "林彪年谱"),
+        ):
+            connection.execute(
+                "INSERT INTO documents "
+                "(document_id, title, creators_json, source_type, source_series_json, "
+                "verification_status, enabled, ocr_strategy, created_at, updated_at) "
+                "VALUES (?, ?, '[]', 'chronology', '[]', 'verified', 1, 'none', 'now', 'now')",
+                (document_id, title),
+            )
+            connection.execute(
+                "INSERT INTO document_files "
+                "(document_id, relative_path, filename, sha256, size_bytes, page_count, "
+                "modified_at, is_encrypted, first_seen_at, last_seen_at) "
+                "VALUES (?, ?, ?, ?, 100, 100, 'now', 0, 'now', 'now')",
+                (document_id, f"{document_id}.pdf", f"{document_id}.pdf", document_id),
+            )
+    return database
 
 
 def _save_event(

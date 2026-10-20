@@ -10,27 +10,28 @@
 - [任务规划](TASK_PLAN.md)：将需求拆分为里程碑、具体任务、依赖关系、交付物和质量闸门。
 - [RAG 实现说明](RAG-IMPL.md)：说明分片、双索引、召回、融合重排、Top-K、生成和引用校验的当前实现。
 - [结构化研究模型](RESEARCH_SCHEMA.md)：说明人物、事件、关系、时间精度、证据和人工复核约束。
-- [PostgreSQL 迁移与运行](POSTGRESQL.md)：主库与会话库的配置、保留数据迁移、验证和回退。
+- [PostgreSQL 运行与迁移记录](POSTGRESQL.md)：主库与会话库的配置、测试和已有数据迁移记录。
 - [关键词索引迁移](KEYWORD_POSTGRESQL.md)：PostgreSQL 关键词索引、BM25 兼容性和迁移评测。
-- [Qdrant 独立服务](QDRANT_SERVICE.md)：保留已有向量迁移、本地服务启动和 SQLite 退役边界。
+- [Qdrant 独立服务](QDRANT_SERVICE.md)：服务启动、向量构建和已有数据迁移记录。
+- [SQLite 退役说明](SQLITE_RETIREMENT.md)：当前存储依赖、备份保留与简单功能验证。
 - [年谱抽取基线](evals/CHRONOLOGY_BASELINE.md)：记录首批规则抽取规模、人工页码抽查与已知限制。
 
 ## 快速启动
 
-项目命令统一使用 `start1921`，原 `history-agent` 命令保留为兼容入口。内部 Python 包 `history_agent`、`HISTORY_AGENT_` 环境变量前缀及既有数据库 `data/history_agent.db` 保持兼容，可继续复用现有配置和数据。
+项目命令统一使用 `start1921`，原 `history-agent` 命令保留为兼容入口。内部 Python 包 `history_agent` 和 `HISTORY_AGENT_` 环境变量前缀不变。
 
-主库和会话库支持 PostgreSQL；设置 `HISTORY_AGENT_DATABASE_URL` 后使用该数据库，
-会话默认共用同一连接。已有 SQLite 数据请按 [迁移说明](POSTGRESQL.md) 备份、导入并验证，
-再启动服务。使用本项目内的 PostgreSQL 实例时，先运行 `.\scripts\postgres.ps1 start`。
-关键词索引通过 `HISTORY_AGENT_KEYWORD_DATABASE_URL` 独立配置，可与主库共用数据库；
-已有索引先按 [关键词迁移说明](KEYWORD_POSTGRESQL.md) 导入和验证。
-向量索引通过 `HISTORY_AGENT_QDRANT_URL` 连接独立 Qdrant 服务；
-使用本机服务时先运行 `.\scripts\qdrant.ps1 start`，迁移方法见 [服务说明](QDRANT_SERVICE.md)。
+主库、会话库和关键词索引仅使用 PostgreSQL；必须设置 `HISTORY_AGENT_DATABASE_URL`，
+会话与关键词默认共用主库，也可分别设置对应的连接 URL。
+向量索引必须通过 `HISTORY_AGENT_QDRANT_URL` 连接独立 Qdrant 服务。
+本机现有数据已迁移，旧数据库和备份保留；当前代码不再提供 SQLite 回退或旧迁移命令。
+启动本项目内已配置的服务时，先运行 `.\scripts\postgres.ps1 start` 和
+`.\scripts\qdrant.ps1 start`；新机器需先准备 PostgreSQL 和 Qdrant 服务。
 
 ### 1. 准备环境
 
 - Python 3.11 或更高版本；
 - [uv](https://docs.astral.sh/uv/)；
+- PostgreSQL 与 Qdrant 独立服务（本机已验证 PostgreSQL 18.6 / Qdrant 1.19.2）；
 - DeepSeek API Key（可选；不配置时使用本地证据摘录模式）；
 - Git LFS：`docs/` 中登记的 PDF 史料通过 Git LFS 随仓库分发；生成索引仍在本地构建。
 
@@ -46,7 +47,7 @@ git lfs pull
 uv sync --extra ocr --extra vector --extra app --group dev
 ```
 
-### 2. 配置 DeepSeek V4
+### 2. 配置数据库与 DeepSeek V4
 
 Windows PowerShell：
 
@@ -63,6 +64,11 @@ cp .env.example .env
 编辑 `.env`，填写：
 
 ```dotenv
+HISTORY_AGENT_DATABASE_URL=postgresql://用户名:密码@127.0.0.1:55432/start1921
+HISTORY_AGENT_QDRANT_URL=http://127.0.0.1:6333
+# 可选；未设置时会话、关键词共用主库
+# HISTORY_AGENT_CONVERSATION_DATABASE_URL=postgresql://...
+# HISTORY_AGENT_KEYWORD_DATABASE_URL=postgresql://...
 DEEPSEEK_API_KEY=你的密钥
 ```
 
@@ -256,7 +262,7 @@ Unified RAG Golden Benchmark 的标注规则、指标分母和实验对比方法
 .\.venv\Scripts\start1921.exe corpus scan --accept-changes
 ```
 
-首次构建向量索引会下载中文嵌入模型。逐页文本、OCR、chunks、检索索引、质量报告和任务记录保存在 `data/`，不提交 Git。派生索引可以重新构建；主库、会话库及人工复核记录需要单独备份。使用 PostgreSQL 后，主库和会话记录保存在配置的数据库服务中，原 SQLite 文件保留作迁移来源或回退备份。
+首次构建向量索引会下载中文嵌入模型。逐页文本、OCR、chunks、质量报告和任务记录保存在 `data/`，不提交 Git。主库、会话和关键词存于 PostgreSQL，向量存于 Qdrant 服务。派生索引可以重新构建；主库、会话库及人工复核记录需要单独备份。原 SQLite 文件和历史备份保留用于归档恢复，不参与当前运行。
 
 项目已接入 DeepSeek V4。所有问法默认先由 `deepseek-v4-flash` 以非思考 JSON 模式完成统一查询理解：规范化简称与别名，识别人物、事件、时间、意图、逐年/逐项/分阶段覆盖要求，并选择结构化研究库或混合 RAG。明确人物和完整年份/年份区间的时间线、交集问题可以选择结构化路线；月份、地点、否定、指定来源、命名历史时期或其他限制必须选择混合检索。“要求引用/直接原文支持”等回答形式不会被误判为缺少人物或年份。查询计划通过本地 Pydantic schema 后，由执行器把原问题和检索改写作为独立子查询运行，再以 RRF 合并；普通问题最多采用 2 条高价值改写，只有必须逐项覆盖的 `per_item` 问题才保留最多 8 条。每次查询的关键词与向量分支并行执行。人物、年份范围和覆盖策略作为类型化条件同时传给两个分支，月份、地点、否定、来源等约束会保留在子查询中。解析超时、返回非法 JSON 或不可用时自动退回原问题执行混合检索，不再由前置结构化正则拒答。
 
@@ -407,11 +413,11 @@ flowchart LR
 | 中文 OCR | PaddleOCR | 处理《西行漫记》和局部扫描页 |
 | API 服务 | FastAPI + Pydantic | 提供问答、人物和事件查询接口 |
 | RAG 编排 | LlamaIndex Core / Workflow | 统一 QueryBundle、TextNode、Retriever、NodePostprocessor 和有界检索反思循环 |
-| 关键词检索 | PostgreSQL 倒排词位 + BM25 | 保留中文二元切词、原 FTS5 计分、过滤和业务加权；SQLite 后端用于迁移对照 |
+| 关键词检索 | PostgreSQL 倒排词位 + BM25 | 保留中文二元切词、原 FTS5 计分语义、过滤和业务加权 |
 | 向量模型 | BAAI/bge-small-zh-v1.5（当前） | 本地 CPU 中文语义检索；后续可评测 BGE-M3 |
 | 融合/重排 | RRF（当前）、BGE Reranker v2 M3（候选） | 合并 BM25 与向量结果、去除同页重复证据 |
 | 向量数据库 | Qdrant | 保存向量及日期、人物、文献等过滤字段 |
-| 业务数据存储 | PostgreSQL；保留 SQLite 兼容后端 | 文献、事件、人物、证据关系、复核记录和会话 |
+| 业务数据存储 | PostgreSQL | 文献、事件、人物、证据关系、复核记录和会话 |
 | 关系分析 | SQL 关系表 + NetworkX | 初期完成人物网络和路径查询 |
 | 图数据库 | Neo4j（可选） | 关系规模和查询复杂度上升后再引入 |
 | 大语言模型 | DeepSeek V4-Pro（默认，可切换 V4-Flash） | 基于本地证据生成答案、thinking/high、引用 ID 校验 |

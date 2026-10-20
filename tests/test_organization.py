@@ -22,9 +22,11 @@ from history_agent.research.people import sync_person_catalog, sync_relation_typ
 from history_agent.research.store import ResearchStore
 from history_agent.web.app import create_app
 
+pytestmark = pytest.mark.usefixtures("postgres_settings")
+
 
 def _database(work_path: Path) -> Database:
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     sync_person_catalog(
         database,
         PersonCatalog.model_validate(
@@ -129,7 +131,6 @@ def test_relationship_api_filters_research_range(work_path: Path) -> None:
         _env_file=None,
         project_root=work_path,
         data_dir=work_path / "data",
-        database_path=database.path,
     )
     client = TestClient(create_app(settings))
 

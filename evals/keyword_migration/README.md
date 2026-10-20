@@ -21,11 +21,30 @@
 `partial-keyword-comparison.json`、`final-e2e-comparison.json`、
 两个 `stage-metrics.json` 和 `final-synthetic/`。这些大文件不进入版本库。
 
-独立执行器为 `python -m history_agent.evaluation.keyword_migration`，提供 `capture`、
-`capture-e2e`、`compare`、`compare-e2e`、`score-e2e` 和 `capture-synthetic`。
-所有新运行必须使用新输出路径；候选连接来自 `HISTORY_AGENT_KEYWORD_DATABASE_URL`，
-合成比较仅使用显式的 `HISTORY_AGENT_TEST_POSTGRES_URL` 并创建、清理随机隔离 schema。
-本次已经按用户要求停止，不继续运行剩余评测。
+## 当前可用的报告工具
+
+`python -m history_agent.evaluation.keyword_migration` 现在仅提供 `compare`、
+`compare-e2e` 和 `score-e2e`，读取已有 JSON 结果，不打开旧索引或加载旧实现。
+每次输出应使用新路径，避免覆盖保留结果。例如：
+
+```powershell
+python -m history_agent.evaluation.keyword_migration compare-e2e `
+  data/reports/keyword-migration-v1/baseline-e2e.json `
+  data/reports/keyword-migration-v1/final-candidate-e2e.json `
+  --output data/reports/keyword-e2e-review.json
+```
+
+以上输入应以本地实际保留的捕获文件为准。原 `capture`、`capture-e2e`、
+`capture-synthetic` 双后端执行命令已退休，历史实现可在 Git 提交 `24509b7` 查阅；
+当前版本不能重启原 SQLite 基线采集。协议、标注、结果 JSON 和备份均保留。
+
+PostgreSQL 合成语料测试通过公共 fixture 使用显式的
+`HISTORY_AGENT_TEST_POSTGRES_URL`，每个数据库测试创建并清理随机隔离 schema，
+未配置时明确跳过；它不再与 SQLite 实时对比。JSON 比较和指标单元测试不需要数据库。
+工具链已禁用 mypy SQLite 缓存，改用 JSON 文件缓存。
+本次按用户要求只进行简单功能检查，不继续剩余历史检索评测。
+
+## 首次迁移时的验证记录
 
 已完成验证：7 项评测测试通过（含真实 PostgreSQL 差分），新增阶段后处理的 21 份结果完全相等，
 并通过独立只读指标复核。项目检查先前通过 975 项 Python 测试、3 项前端测试及 Ruff/mypy；

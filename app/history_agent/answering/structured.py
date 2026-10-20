@@ -96,8 +96,6 @@ def answer_structured_question(
             request, intent, f"研究范围为 {lower}—{upper} 年，请提供范围内且起止顺序正确的年份。"
         )
     database = Database(settings.database_target)
-    if database.path is not None and not database.path.is_file():
-        return _response(request, intent, "结构化研究库尚未就绪，请先初始化并抽取年谱事件。")
     try:
         with database.connect() as connection:
             forms = {

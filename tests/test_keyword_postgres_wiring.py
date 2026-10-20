@@ -11,7 +11,6 @@ from history_agent.errors import RetrievalError
 from history_agent.evaluation import answers, golden
 from history_agent.web import app as web_module
 from history_agent.web import readiness
-from typer.testing import CliRunner
 
 
 def _settings(work_path: Path) -> Settings:
@@ -20,14 +19,12 @@ def _settings(work_path: Path) -> Settings:
         project_root=work_path,
         keyword_database_url="postgresql://keyword:password@localhost/keyword",
     )
-    settings.keyword_index_path.parent.mkdir(parents=True)
-    settings.keyword_index_path.write_bytes(b"stale sqlite index must not mask postgres failure")
     settings.reports_dir.mkdir(parents=True)
     (settings.reports_dir / "keyword_index_latest.json").write_text(
         json.dumps({
-            "index_version": "stale-sqlite-version",
+            "index_version": "archived-index-version",
             "chunks": 100,
-            "manifest": {"index_artifact_sha256": "old-sqlite-hash"},
+            "manifest": {"index_artifact_sha256": "archived-index-hash"},
         }),
         encoding="utf-8",
     )
@@ -51,14 +48,16 @@ def test_workflow_passes_the_keyword_database_target(work_path: Path) -> None:
     settings = _settings(work_path)
     arguments = _search_kwargs(settings, None)
     assert arguments["keyword_index_path"] == settings.keyword_index_target
-    assert arguments["vector_index_path"] == settings.vector_index_path
+    assert arguments["vector_index_path"] == settings.vector_index_target
 
 
-def test_readiness_and_health_do_not_use_stale_sqlite_index(monkeypatch, work_path: Path) -> None:
+def test_readiness_and_health_probe_postgres_instead_of_archived_report(
+    monkeypatch, work_path: Path,
+) -> None:
     settings = _settings(work_path)
-    targets: list[Path | str] = []
+    targets: list[str] = []
 
-    def unavailable(*, index_path: Path | str, **kwargs: Any) -> Any:
+    def unavailable(*, index_path: str, **kwargs: Any) -> Any:
         targets.append(index_path)
         raise RetrievalError("unavailable")
 
@@ -68,6 +67,7 @@ def test_readiness_and_health_do_not_use_stale_sqlite_index(monkeypatch, work_pa
     snapshot = readiness.readiness_snapshot(settings)
     assert snapshot["components"]["keyword"] is False
     monkeypatch.setattr(web_module, "_database_ready", lambda target: True)
+    monkeypatch.setattr(web_module, "vector_index_ready", lambda settings: True)
     response = TestClient(web_module.create_app(settings)).get("/api/health")
     assert response.json()["indexes"]["keyword"] is False
     assert response.json()["keyword_database_backend"] == "postgresql"
@@ -85,19 +85,15 @@ def test_golden_metadata_uses_verified_active_postgres_generation(
         targets.append(target)
         return _metadata()
 
-    def reject_old_file(path: Path) -> str:
-        raise AssertionError("the old SQLite artifact must not be read for PostgreSQL")
-
     monkeypatch.setattr(golden, "load_keyword_index_metadata", metadata)
-    monkeypatch.setattr(golden, "index_artifact_sha256", reject_old_file)
     result = golden._load_index_metadata(settings)
     assert result["reports"]["keyword_index"] == _metadata()
     assert targets == [settings.keyword_index_target]
-    assert "stale-sqlite-version" not in str(result)
+    assert "archived-index-version" not in str(result)
     assert "password" not in str(result)
 
 
-def test_metadata_failure_does_not_fall_back_to_stale_sqlite_report(
+def test_metadata_failure_does_not_fall_back_to_archived_report(
     monkeypatch, work_path: Path,
 ) -> None:
     settings = _settings(work_path)
@@ -110,7 +106,7 @@ def test_metadata_failure_does_not_fall_back_to_stale_sqlite_report(
     result = golden._load_index_metadata(settings)
     assert result["reports"]["keyword_index"]["artifact_verified"] is False
     assert result["reports"]["keyword_index"]["manifest"] is None
-    assert "stale-sqlite-version" not in str(result)
+    assert "archived-index-version" not in str(result)
     versions = answers._index_versions(settings)
     assert versions["keyword_index"] == {"backend": "postgresql", "artifact_verified": False}
 
@@ -122,57 +118,3 @@ def test_answer_evaluation_records_active_generation(monkeypatch, work_path: Pat
     assert versions["keyword_index"]["index_version"] == "postgres-keyword"
     assert versions["keyword_index"]["generation_id"] == "active-generation"
     assert versions["keyword_index"]["artifact_verified"] is True
-
-
-def test_keyword_migration_cli_uses_explicit_target_and_sqlite_source(
-    monkeypatch, work_path: Path,
-) -> None:
-    from history_agent import cli
-    from history_agent.retrieval import keyword_migration
-
-    settings = _settings(work_path)
-    captured: dict[str, Any] = {}
-
-    def migrate(**kwargs: Any) -> dict[str, Any]:
-        captured.update(kwargs)
-        return {"status": "verified", "generation_id": "new-generation"}
-
-    monkeypatch.setattr(cli, "get_settings", lambda: settings)
-    monkeypatch.setattr(keyword_migration, "migrate_keyword_index", migrate)
-    report = work_path / "migration-result.json"
-    result = CliRunner().invoke(cli.app, [
-        "index", "migrate-keyword-postgres",
-        "--backup-dir", str(work_path / "backup"),
-        "--report", str(report),
-    ])
-    assert result.exit_code == 0, result.output
-    assert captured["source_index"] == settings.keyword_index_path
-    assert captured["target_url"] == settings.keyword_index_target
-    assert captured["source_report"] == settings.reports_dir / "keyword_index_latest.json"
-    assert json.loads(report.read_text(encoding="utf-8"))["status"] == "verified"
-    assert "password" not in result.output
-
-
-def test_keyword_verification_cli_uses_requested_generation(monkeypatch, work_path: Path) -> None:
-    from history_agent import cli
-    from history_agent.retrieval import keyword_migration
-
-    settings = _settings(work_path)
-    captured: dict[str, Any] = {}
-
-    def verify(**kwargs: Any) -> dict[str, Any]:
-        captured.update(kwargs)
-        return {"status": "verified"}
-
-    monkeypatch.setattr(cli, "get_settings", lambda: settings)
-    monkeypatch.setattr(keyword_migration, "verify_keyword_index", verify)
-    result = CliRunner().invoke(cli.app, [
-        "index", "verify-keyword-postgres", "--generation-id", "7",
-    ])
-    assert result.exit_code == 0, result.output
-    assert captured == {
-        "source_index": settings.keyword_index_path,
-        "target_url": settings.keyword_index_target,
-        "generation_id": 7,
-    }
-    assert "password" not in result.output

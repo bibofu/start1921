@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+from history_agent.config import Settings
 from history_agent.db import Database
 from history_agent.extraction.models import PageRecord
 from history_agent.research.catalog import load_person_catalog
@@ -13,6 +15,8 @@ from history_agent.research.chronology import (
 )
 from history_agent.research.models import PersonCatalog
 from history_agent.research.people import sync_person_catalog
+
+pytestmark = pytest.mark.usefixtures("postgres_settings")
 
 
 def test_chronology_date_rules_preserve_uncertainty() -> None:
@@ -162,7 +166,7 @@ def test_chronology_extraction_is_page_audited_and_idempotent(work_path: Path) -
         json.dumps(structure, ensure_ascii=False), encoding="utf-8"
     )
 
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     _insert_documents(database)
     aliases_path = Path.cwd() / "config" / "person_aliases.json"
     sync_person_catalog(database, load_person_catalog(aliases_path))

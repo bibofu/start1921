@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import pytest
-from history_agent.db import Database
+from history_agent.config import Settings
+from history_agent.db import POSTGRES_SCHEMA_VERSION, Database
 from history_agent.errors import ResearchDataError
 from history_agent.research.catalog import load_person_catalog, load_relation_type_catalog
 from history_agent.research.models import (
@@ -22,6 +23,8 @@ from history_agent.research.people import (
 )
 from history_agent.research.store import ResearchStore
 from pydantic import ValidationError
+
+pytestmark = pytest.mark.usefixtures("postgres_settings")
 
 
 def _people_catalog() -> PersonCatalog:
@@ -120,7 +123,7 @@ def test_project_person_and_relation_catalogs_are_valid() -> None:
 
 
 def test_database_migrates_existing_relationship_table(work_path: Path) -> None:
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     with database.connect() as connection:
         connection.execute(
             """
@@ -137,36 +140,48 @@ def test_database_migrates_existing_relationship_table(work_path: Path) -> None:
 
     with database.connect() as connection:
         columns = {
-            row["name"]
+            row["column_name"]
             for row in connection.execute(
-                "PRAGMA table_info(person_relationships)"
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema=current_schema() "
+                "AND table_name='person_relationships'"
             ).fetchall()
         }
         participant_columns = {
-            row["name"]
+            row["column_name"]
             for row in connection.execute(
-                "PRAGMA table_info(event_participants)"
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema=current_schema() "
+                "AND table_name='event_participants'"
             ).fetchall()
         }
         attempt_columns = {
-            row["name"]
+            row["column_name"]
             for row in connection.execute(
-                "PRAGMA table_info(event_extraction_attempts)"
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema=current_schema() "
+                "AND table_name='event_extraction_attempts'"
             ).fetchall()
         }
         review_columns = {
-            row["name"]
+            row["column_name"]
             for row in connection.execute(
-                "PRAGMA table_info(event_review_queue)"
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema=current_schema() "
+                "AND table_name='event_review_queue'"
             ).fetchall()
         }
         canonical_columns = {
-            row["name"]
+            row["column_name"]
             for row in connection.execute(
-                "PRAGMA table_info(canonical_events)"
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema=current_schema() "
+                "AND table_name='canonical_events'"
             ).fetchall()
         }
-        version = connection.execute("PRAGMA user_version").fetchone()[0]
+        version = connection.execute(
+            "SELECT MAX(version) FROM history_schema_migrations"
+        ).fetchone()[0]
     assert {"subject_mention_text", "object_mention_text"}.issubset(columns)
     assert "mention_source" in participant_columns
     assert {"model_name", "prompt_version", "before_event_json"}.issubset(
@@ -181,11 +196,11 @@ def test_database_migrates_existing_relationship_table(work_path: Path) -> None:
         "input_hash",
         "is_active",
     }.issubset(canonical_columns)
-    assert version == 6
+    assert version == POSTGRES_SCHEMA_VERSION
 
 
 def test_ambiguous_alias_is_not_forced_and_merge_is_audited(work_path: Path) -> None:
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     sync_person_catalog(database, _people_catalog())
 
     resolution = resolve_person(database, "同 名")
@@ -275,7 +290,7 @@ def test_temporal_and_high_risk_relationship_validation() -> None:
 
 
 def test_event_and_relationship_require_shared_evidence(work_path: Path) -> None:
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     sync_person_catalog(database, _people_catalog())
     sync_relation_types(database, _relation_catalog())
     _insert_document(database)
@@ -331,7 +346,7 @@ def test_event_and_relationship_require_shared_evidence(work_path: Path) -> None
 
 
 def test_database_rejects_evidence_for_unknown_document(work_path: Path) -> None:
-    database = Database(work_path / "history_agent.db")
+    database = Database(Settings(_env_file=None).database_target)
     sync_person_catalog(database, _people_catalog())
     event = HistoricalEvent(
         event_id="event_unknown_source",
@@ -344,7 +359,7 @@ def test_database_rejects_evidence_for_unknown_document(work_path: Path) -> None
         extraction_confidence=0.5,
     )
 
-    with pytest.raises(ResearchDataError, match="FOREIGN KEY"):
+    with pytest.raises(ResearchDataError, match="(?i)foreign key"):
         ResearchStore(database).save_event(event)
 
     with database.connect() as connection:

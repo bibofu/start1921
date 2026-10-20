@@ -1,6 +1,7 @@
 from threading import Barrier
 
 import pytest
+from history_agent.config import QdrantServiceTarget
 from history_agent.errors import RetrievalError
 from history_agent.retrieval.hybrid import (
     _career_relevant_hits,
@@ -290,8 +291,8 @@ def test_hybrid_search_runs_a_section_targeted_query_for_each_congress(
     )
 
     result = search_hybrid_index(
-        keyword_index_path=work_path / "keyword.db",
-        vector_index_path=work_path / "vector",
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=work_path / "models",
         aliases_path=work_path / "aliases.json",
         query="中共一大到中共六大，介绍一下每次会议",
@@ -384,8 +385,8 @@ def test_hybrid_search_degrades_to_keyword_when_vector_is_unavailable(
     )
 
     result = search_hybrid_index(
-        keyword_index_path=work_path / "keyword.db",
-        vector_index_path=work_path / "vector",
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=work_path / "models",
         aliases_path=work_path / "aliases.json",
         query="测试问题",
@@ -409,8 +410,8 @@ def test_hybrid_search_degrades_to_vector_when_keyword_is_unavailable(
     )
 
     result = search_hybrid_index(
-        keyword_index_path=work_path / "keyword.db",
-        vector_index_path=work_path / "vector",
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=work_path / "models",
         aliases_path=work_path / "aliases.json",
         query="测试问题",
@@ -432,8 +433,8 @@ def test_hybrid_search_fails_only_when_both_branches_are_unavailable(
 
     with pytest.raises(RetrievalError):
         search_hybrid_index(
-            keyword_index_path=work_path / "keyword.db",
-            vector_index_path=work_path / "vector",
+            keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+            vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
             model_cache_dir=work_path / "models",
             aliases_path=work_path / "aliases.json",
             query="测试问题",
@@ -459,8 +460,8 @@ def test_planned_queries_run_independently_and_preserve_per_item_coverage(
     plan = RetrievalPlan(query_intent="comparison", coverage="per_item")
 
     result = search_hybrid_index(
-        keyword_index_path=work_path / "keyword.db",
-        vector_index_path=work_path / "vector",
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=work_path / "models",
         aliases_path=work_path / "aliases.json",
         query="原问题",
@@ -486,8 +487,8 @@ def test_planned_retrieval_reports_empty_coverage_groups(monkeypatch, work_path)
         lambda **kwargs: _response([]).model_copy(update={"query": kwargs["query"]}),
     )
     result = search_hybrid_index(
-        keyword_index_path=work_path / "keyword.db",
-        vector_index_path=work_path / "vector",
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=work_path / "models",
         aliases_path=work_path / "aliases.json",
         query="原问题",
@@ -514,8 +515,8 @@ def test_keyword_and_vector_branches_run_concurrently(monkeypatch, work_path) ->
     monkeypatch.setattr("history_agent.retrieval.hybrid.search_vector_index", vector_search)
 
     result = search_hybrid_index(
-        keyword_index_path=work_path / "keyword.db",
-        vector_index_path=work_path / "vector",
+        keyword_index_path="postgresql://test:test@127.0.0.1:1/test",
+        vector_index_path=QdrantServiceTarget(url="http://127.0.0.1:1"),
         model_cache_dir=work_path / "models",
         aliases_path=work_path / "aliases.json",
         query="测试问题",

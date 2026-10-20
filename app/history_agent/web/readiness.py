@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import sqlite3
-from pathlib import Path
-
 from history_agent.config import Settings
-from history_agent.db_backend import DATABASE_ERRORS, database_connection, is_postgres_target
+from history_agent.db_backend import DATABASE_ERRORS, database_connection
 from history_agent.retrieval.keyword import search_keyword_index
 from history_agent.retrieval.vector import (
     COLLECTION_NAME,
@@ -15,22 +12,11 @@ from history_agent.retrieval.vector import (
 )
 
 
-def _database_ready(target: Path | str) -> bool:
-    if is_postgres_target(target):
-        with database_connection(target) as connection:
-            # Verify the configured research database and its schema, not a leftover local file.
-            connection.execute("SELECT document_id FROM documents LIMIT 1").fetchone()
-            connection.execute("SELECT person_id FROM persons LIMIT 1").fetchone()
-        return True
-    path = Path(target)
-    if not path.is_file():
-        return False
-    connection = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
-    try:
-        connection.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone()
-        return True
-    finally:
-        connection.close()
+def _database_ready(target: str) -> bool:
+    with database_connection(target) as connection:
+        connection.execute("SELECT document_id FROM documents LIMIT 1").fetchone()
+        connection.execute("SELECT person_id FROM persons LIMIT 1").fetchone()
+    return True
 
 
 def readiness_snapshot(settings: Settings) -> dict[str, object]:
@@ -59,7 +45,7 @@ def readiness_snapshot(settings: Settings) -> dict[str, object]:
 
 
 def keyword_index_ready(settings: Settings) -> bool:
-    """Probe the configured index instead of a leftover SQLite backup."""
+    """Probe the configured PostgreSQL keyword index."""
     try:
         search_keyword_index(
             index_path=settings.keyword_index_target,
@@ -75,8 +61,6 @@ def keyword_index_ready(settings: Settings) -> bool:
 def vector_index_ready(settings: Settings) -> bool:
     """Check the configured service instead of a leftover local Qdrant directory."""
     target = settings.vector_index_target
-    if isinstance(target, Path):
-        return target.is_dir()
     try:
         client = open_vector_client(target)
         try:

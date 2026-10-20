@@ -118,11 +118,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except (OSError, *DATABASE_ERRORS):
             database_ready = False
         indexes = {
-            "keyword": (
-                keyword_index_ready(active_settings)
-                if active_settings.keyword_database_url
-                else active_settings.keyword_index_path.is_file()
-            ),
+            "keyword": keyword_index_ready(active_settings),
             "vector": vector_index_ready(active_settings),
         }
         return {

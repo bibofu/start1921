@@ -63,11 +63,12 @@ def test_prompt_context_enforces_character_budget_on_long_messages() -> None:
     assert context[-1].content.endswith("[内容已截断]")
 
 
-def test_conversation_store_persists_and_clears_exchanges(work_path: Path) -> None:
-    path = work_path / "conversations.db"
-    ConversationStore(path).append_exchange("session-12345678", "第一个问题", "回答。[E1]")
+def test_conversation_store_persists_and_clears_exchanges(postgres_target: str) -> None:
+    ConversationStore(postgres_target).append_exchange(
+        "session-12345678", "第一个问题", "回答。[E1]"
+    )
 
-    reopened = ConversationStore(path)
+    reopened = ConversationStore(postgres_target)
     assert [item.content for item in reopened.messages("session-12345678")] == [
         "第一个问题",
         "回答。[E1]",
@@ -77,9 +78,9 @@ def test_conversation_store_persists_and_clears_exchanges(work_path: Path) -> No
 
 
 def test_conversation_store_prunes_complete_turns_and_rolls_back_failed_exchange(
-    work_path: Path,
+    postgres_target: str,
 ) -> None:
-    store = ConversationStore(work_path / "conversations.db")
+    store = ConversationStore(postgres_target)
     for number in range(102):
         store.append_exchange("session-retained", f"问题{number}", f"回答{number}")
     messages = store.messages("session-retained")
@@ -99,7 +100,7 @@ def test_conversation_store_prunes_complete_turns_and_rolls_back_failed_exchange
 
 
 def test_web_conversation_store_uses_postgres_target(monkeypatch, work_path: Path) -> None:
-    targets: list[Path | str] = []
+    targets: list[str] = []
     monkeypatch.setattr(web_module, "ConversationStore", lambda target: targets.append(target))
     settings = Settings(
         _env_file=None,
@@ -114,9 +115,9 @@ def test_web_conversation_store_uses_postgres_target(monkeypatch, work_path: Pat
 
 
 def test_health_probes_configured_database_target(monkeypatch, work_path: Path) -> None:
-    targets: list[Path | str] = []
+    targets: list[str] = []
 
-    def unavailable(target: Path | str) -> bool:
+    def unavailable(target: str) -> bool:
         targets.append(target)
         return False
 
@@ -134,6 +135,7 @@ def test_health_probes_configured_database_target(monkeypatch, work_path: Path) 
     assert "password" not in response.text
 
 
+@pytest.mark.usefixtures("postgres_settings")
 def test_web_session_uses_server_history_and_ignores_client_history(
     monkeypatch: Any, work_path: Path
 ) -> None:
@@ -186,6 +188,7 @@ def test_sanitize_history_content_only_rewrites_evidence_markers() -> None:
     )
 
 
+@pytest.mark.usefixtures("postgres_settings")
 def test_streaming_endpoint_persists_only_completed_answers(
     monkeypatch: Any, work_path: Path
 ) -> None:
@@ -213,6 +216,7 @@ def test_streaming_endpoint_persists_only_completed_answers(
     ]
 
 
+@pytest.mark.usefixtures("postgres_settings")
 def test_context_storage_failure_does_not_break_answering(
     monkeypatch: Any, work_path: Path
 ) -> None:

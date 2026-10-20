@@ -40,7 +40,6 @@ class Settings(BaseSettings):
     project_root: Path = Field(default_factory=default_project_root)
     docs_dir: Path = Path("docs")
     data_dir: Path = Path("data")
-    database_path: Path = Path("data/history_agent.db")
     database_url: SecretStr | None = None
     conversation_database_url: SecretStr | None = None
     keyword_database_url: SecretStr | None = None
@@ -89,7 +88,6 @@ class Settings(BaseSettings):
         for field_name in (
             "docs_dir",
             "data_dir",
-            "database_path",
             "catalog_path",
             "person_aliases_path",
             "relation_types_path",
@@ -160,26 +158,22 @@ class Settings(BaseSettings):
         return self.data_dir / "processed" / "events"
 
     @property
-    def keyword_index_path(self) -> Path:
-        return self.data_dir / "indexes" / "keyword_fts.db"
-
-    @property
-    def keyword_index_target(self) -> Path | str:
-        secret = self.keyword_database_url
-        return secret.get_secret_value() if secret else self.keyword_index_path
+    def keyword_index_target(self) -> str:
+        secret = self.keyword_database_url or self.database_url
+        if secret is None:
+            raise ValueError(
+                "Configure HISTORY_AGENT_KEYWORD_DATABASE_URL or HISTORY_AGENT_DATABASE_URL."
+            )
+        return secret.get_secret_value()
 
     @property
     def keyword_database_backend(self) -> str:
-        return "postgresql" if self.keyword_database_url else "sqlite"
+        return "postgresql"
 
     @property
-    def vector_index_path(self) -> Path:
-        return self.data_dir / "indexes" / "qdrant"
-
-    @property
-    def vector_index_target(self) -> Path | QdrantServiceTarget:
+    def vector_index_target(self) -> QdrantServiceTarget:
         if self.qdrant_url is None:
-            return self.vector_index_path
+            raise ValueError("Configure HISTORY_AGENT_QDRANT_URL for the Qdrant service.")
         return QdrantServiceTarget(
             url=self.qdrant_url.get_secret_value(),
             api_key=self.qdrant_api_key.get_secret_value() if self.qdrant_api_key else None,
@@ -188,32 +182,34 @@ class Settings(BaseSettings):
 
     @property
     def vector_database_backend(self) -> str:
-        return "qdrant-service" if self.qdrant_url else "qdrant-local"
+        return "qdrant-service"
 
     @property
     def model_cache_dir(self) -> Path:
         return self.data_dir / "models"
 
     @property
-    def conversation_database_path(self) -> Path:
-        return self.data_dir / "conversations.db"
+    def database_target(self) -> str:
+        if self.database_url is None:
+            raise ValueError("Configure HISTORY_AGENT_DATABASE_URL for PostgreSQL.")
+        return self.database_url.get_secret_value()
 
     @property
-    def database_target(self) -> Path | str:
-        return self.database_url.get_secret_value() if self.database_url else self.database_path
-
-    @property
-    def conversation_database_target(self) -> Path | str:
+    def conversation_database_target(self) -> str:
         secret = self.conversation_database_url or self.database_url
-        return secret.get_secret_value() if secret else self.conversation_database_path
+        if secret is None:
+            raise ValueError(
+                "Configure HISTORY_AGENT_CONVERSATION_DATABASE_URL or HISTORY_AGENT_DATABASE_URL."
+            )
+        return secret.get_secret_value()
 
     @property
     def database_backend(self) -> str:
-        return "postgresql" if self.database_url else "sqlite"
+        return "postgresql"
 
     @property
     def conversation_database_backend(self) -> str:
-        return "postgresql" if self.conversation_database_url or self.database_url else "sqlite"
+        return "postgresql"
 
     def ensure_runtime_dirs(self) -> None:
         for path in (
@@ -226,9 +222,7 @@ class Settings(BaseSettings):
             self.structure_dir,
             self.chunks_dir,
             self.events_dir,
-            self.keyword_index_path.parent,
             self.model_cache_dir,
-            self.database_path.parent,
         ):
             path.mkdir(parents=True, exist_ok=True)
 
@@ -246,7 +240,6 @@ class Settings(BaseSettings):
             "conversation_database_backend": self.conversation_database_backend,
             "keyword_database_backend": self.keyword_database_backend,
             "vector_database_backend": self.vector_database_backend,
-            "database_path": None if self.database_url else str(self.database_path),
             "catalog_path": str(self.catalog_path),
             "person_aliases_path": str(self.person_aliases_path),
             "relation_types_path": str(self.relation_types_path),

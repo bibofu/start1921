@@ -10,7 +10,7 @@ import typer
 
 from history_agent import __version__
 from history_agent.answering.service import check_deepseek_connection
-from history_agent.config import QdrantServiceTarget, get_settings
+from history_agent.config import get_settings
 from history_agent.corpus.catalog import load_catalog
 from history_agent.corpus.exporter import export_diff, export_manifest, load_latest_diff
 from history_agent.corpus.scanner import scan_corpus
@@ -79,9 +79,6 @@ research_app = typer.Typer(
     help="Manage auditable people, events, and relationships.", no_args_is_help=True
 )
 people_app = typer.Typer(help="Manage stable people and aliases.", no_args_is_help=True)
-database_app = typer.Typer(
-    help="Migrate and verify persistent application data.", no_args_is_help=True
-)
 app.add_typer(corpus_app, name="corpus")
 app.add_typer(extract_app, name="extract")
 app.add_typer(process_app, name="process")
@@ -89,7 +86,6 @@ app.add_typer(index_app, name="index")
 app.add_typer(eval_app, name="eval")
 app.add_typer(llm_app, name="llm")
 app.add_typer(research_app, name="research")
-app.add_typer(database_app, name="database")
 research_app.add_typer(people_app, name="people")
 
 
@@ -101,76 +97,6 @@ def configure_console() -> None:
         reconfigure = getattr(stream, "reconfigure", None)
         if reconfigure is not None:
             reconfigure(encoding="utf-8", errors="replace")
-
-
-def _postgres_migration_target() -> str:
-    settings = get_settings()
-    if settings.database_url is None:
-        raise typer.BadParameter("Set HISTORY_AGENT_DATABASE_URL to the PostgreSQL target.")
-    target = settings.database_url.get_secret_value()
-    if (
-        settings.conversation_database_url is not None
-        and settings.conversation_database_url.get_secret_value() != target
-    ):
-        raise typer.BadParameter(
-            "Migration requires the main and conversation stores in one target."
-        )
-    return target
-
-
-@database_app.command("migrate-postgres")
-def migrate_postgres(
-    backup_dir: Annotated[Path, typer.Option(help="New directory for consistent SQLite backups.")],
-    source_database: Annotated[Path | None, typer.Option()] = None,
-    source_conversations: Annotated[Path | None, typer.Option()] = None,
-    report: Annotated[
-        Path | None, typer.Option(help="Save the verification report as JSON.")
-    ] = None,
-) -> None:
-    """Copy main and conversation SQLite stores to an empty PostgreSQL target.
-
-    Stop application writers first. Keyword and vector indexes are not modified.
-    """
-    from history_agent.migration import MigrationError, migrate_sqlite_to_postgres
-
-    settings = get_settings()
-    target = _postgres_migration_target()
-    try:
-        result = migrate_sqlite_to_postgres(
-            source_database=source_database or settings.database_path,
-            source_conversations=source_conversations or settings.conversation_database_path,
-            target_url=target,
-            backup_dir=backup_dir,
-        )
-    except MigrationError as exc:
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(1) from exc
-    if report is not None:
-        report.parent.mkdir(parents=True, exist_ok=True)
-        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
-
-
-@database_app.command("verify-postgres")
-def verify_postgres(
-    source_database: Annotated[Path | None, typer.Option()] = None,
-    source_conversations: Annotated[Path | None, typer.Option()] = None,
-) -> None:
-    """Read-only comparison of every source field against the PostgreSQL target."""
-    from history_agent.migration import MigrationError, verify_sqlite_to_postgres
-
-    settings = get_settings()
-    target = _postgres_migration_target()
-    try:
-        result = verify_sqlite_to_postgres(
-            source_database=source_database or settings.database_path,
-            source_conversations=source_conversations or settings.conversation_database_path,
-            target_url=target,
-        )
-    except MigrationError as exc:
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(1) from exc
-    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 @app.command()
@@ -206,7 +132,7 @@ def corpus_scan(
         help="Register PDFs whose content hash changed after reviewing the diff.",
     ),
 ) -> None:
-    """Scan docs/, update SQLite metadata, and write manifest/diff reports."""
+    """Scan docs/, update PostgreSQL metadata, and write manifest/diff reports."""
 
     settings = get_settings()
     settings.ensure_runtime_dirs()
@@ -250,7 +176,7 @@ def corpus_scan(
 
 @corpus_app.command("export")
 def corpus_export() -> None:
-    """Export the current SQLite corpus manifest to JSON and CSV."""
+    """Export the current PostgreSQL corpus manifest to JSON and CSV."""
 
     settings = get_settings()
     settings.ensure_runtime_dirs()
@@ -1326,84 +1252,6 @@ def process_chunks(
             )
 
 
-def _keyword_postgres_target() -> str:
-    settings = get_settings()
-    if settings.keyword_database_url is None:
-        raise typer.BadParameter(
-            "Set HISTORY_AGENT_KEYWORD_DATABASE_URL to the PostgreSQL keyword target."
-        )
-    return settings.keyword_database_url.get_secret_value()
-
-
-@index_app.command("migrate-keyword-postgres")
-def index_migrate_keyword_postgres(
-    backup_dir: Annotated[
-        Path, typer.Option(help="Directory for a consistent SQLite index backup.")
-    ],
-    source_index: Annotated[Path | None, typer.Option()] = None,
-    source_report: Annotated[Path | None, typer.Option()] = None,
-    report: Annotated[
-        Path | None, typer.Option(help="Save the verification result as JSON.")
-    ] = None,
-) -> None:
-    """Copy the existing keyword index into PostgreSQL and verify its records."""
-    from history_agent.retrieval.keyword_migration import migrate_keyword_index
-
-    settings = get_settings()
-    target = _keyword_postgres_target()
-    settings.ensure_runtime_dirs()
-    tracker = RunTracker(
-        settings.runs_dir, "migrate_keyword_postgres", settings.public_snapshot()
-    )
-    existing_report = settings.reports_dir / "keyword_index_latest.json"
-    try:
-        result = migrate_keyword_index(
-            source_index=source_index or settings.keyword_index_path,
-            target_url=target,
-            backup_dir=backup_dir,
-            reports_dir=settings.reports_dir,
-            run_id=tracker.run_id,
-            source_report=source_report or (existing_report if existing_report.is_file() else None),
-        )
-        tracker.finish(result)
-    except HistoryAgentError as exc:
-        tracker.fail(exc)
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(1) from exc
-    if report is not None:
-        report.parent.mkdir(parents=True, exist_ok=True)
-        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
-
-
-@index_app.command("verify-keyword-postgres")
-def index_verify_keyword_postgres(
-    source_index: Annotated[Path | None, typer.Option()] = None,
-    generation_id: Annotated[int | None, typer.Option(min=1)] = None,
-    report: Annotated[
-        Path | None, typer.Option(help="Save the verification result as JSON.")
-    ] = None,
-) -> None:
-    """Compare SQLite keyword records with the active or specified PostgreSQL generation."""
-    from history_agent.retrieval.keyword_migration import verify_keyword_index
-
-    settings = get_settings()
-    target = _keyword_postgres_target()
-    try:
-        result = verify_keyword_index(
-            source_index=source_index or settings.keyword_index_path,
-            target_url=target,
-            generation_id=generation_id,
-        )
-    except HistoryAgentError as exc:
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(1) from exc
-    if report is not None:
-        report.parent.mkdir(parents=True, exist_ok=True)
-        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
-
-
 @index_app.command("build-keyword")
 def index_build_keyword(
     json_output: bool = typer.Option(False, "--json", help="Emit JSON."),
@@ -1470,51 +1318,6 @@ def index_build_vector(
         typer.echo(f"vector index run: {summary.run_id}")
         typer.echo(f"model: {summary.model_name}; chunks: {summary.chunks}")
         typer.echo(f"index: {summary.index_path} ({summary.size_bytes} bytes)")
-
-
-@index_app.command("migrate-qdrant-service")
-def index_migrate_qdrant_service(
-    source_index: Annotated[
-        Path,
-        typer.Option(
-            exists=True,
-            file_okay=False,
-            help="Backup of the stopped local Qdrant index; never use an actively written source.",
-        ),
-    ],
-    source_report: Annotated[
-        Path | None, typer.Option(help="Optional original vector-index report for provenance.")
-    ] = None,
-    report: Annotated[
-        Path | None, typer.Option(help="Save the migration result as JSON.")
-    ] = None,
-) -> None:
-    """Copy saved vectors into Qdrant service without re-embedding; retain the source backup."""
-    from history_agent.retrieval.vector_migration import migrate_qdrant_local
-
-    settings = get_settings()
-    target = settings.vector_index_target
-    if not isinstance(target, QdrantServiceTarget):
-        raise typer.BadParameter("Set HISTORY_AGENT_QDRANT_URL to the target Qdrant service.")
-    settings.ensure_runtime_dirs()
-    tracker = RunTracker(settings.runs_dir, "migrate_qdrant_service", settings.public_snapshot())
-    try:
-        result = migrate_qdrant_local(
-            source_path=source_index,
-            target=target,
-            reports_dir=settings.reports_dir,
-            run_id=tracker.run_id,
-            source_report=source_report,
-        )
-        tracker.finish(result)
-    except HistoryAgentError as exc:
-        tracker.fail(exc)
-        typer.echo(str(exc), err=True)
-        raise typer.Exit(1) from exc
-    if report is not None:
-        report.parent.mkdir(parents=True, exist_ok=True)
-        report.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    typer.echo(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 @eval_app.command("retrieval")

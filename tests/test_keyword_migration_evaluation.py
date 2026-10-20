@@ -1,17 +1,12 @@
 from __future__ import annotations
 
 import copy
-import os
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
-from uuid import uuid4
 
 import pytest
 from history_agent.errors import RetrievalError
 from history_agent.evaluation import keyword_migration as evaluation
-from history_agent.retrieval import keyword_legacy
 
 
 def test_expected_empty_query_error_is_captured_but_unexpected_errors_propagate() -> None:
@@ -153,40 +148,13 @@ def test_end_to_end_compares_answers_and_all_stages_excluding_latency() -> None:
     assert report["semantic_answer_quality"] is None
 
 
-@pytest.fixture
-def postgres_url() -> Iterator[str]:
-    url = os.environ.get("HISTORY_AGENT_TEST_POSTGRES_URL")
-    if not url:
-        pytest.skip("Set HISTORY_AGENT_TEST_POSTGRES_URL for an isolated PostgreSQL schema.")
-    psycopg = pytest.importorskip("psycopg")
-    schema = "test_keyword_evaluation_" + uuid4().hex
-    parsed = urlsplit(url)
-    parameters = dict(parse_qsl(parsed.query, keep_blank_values=True))
-    parameters["options"] = (parameters.get("options", "") + f" -csearch_path={schema}").strip()
-    isolated = urlunsplit(parsed._replace(query=urlencode(parameters)))
-    with psycopg.connect(url, autocommit=True) as connection:
-        connection.execute(
-            psycopg.sql.SQL("CREATE SCHEMA {}").format(psycopg.sql.Identifier(schema))
-        )
-        try:
-            yield isolated
-        finally:
-            connection.execute(
-                psycopg.sql.SQL("DROP SCHEMA {} CASCADE").format(psycopg.sql.Identifier(schema))
-            )
-
-
-def test_actual_synthetic_retrieval_has_complete_labels(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
+def test_actual_postgres_synthetic_retrieval_has_complete_labels(
+    work_path: Path, postgres_target: str,
 ) -> None:
-    monkeypatch.setattr(evaluation, "load_contract", lambda _: {})
-    monkeypatch.setattr(evaluation, "legacy_module", lambda *_: keyword_legacy)
     report = evaluation.capture_synthetic(
-        tmp_path / "result.json",
-        backend="legacy",
-        work_dir=tmp_path / "run",
-        target=tmp_path / "index.sqlite",
+        work_path / "result.json",
+        work_dir=work_path / "run",
+        target=postgres_target,
         root=Path(__file__).resolve().parents[1],
     )
     default = report["queries"][0]["at_k"]["10"]["metrics"]
@@ -196,35 +164,6 @@ def test_actual_synthetic_retrieval_has_complete_labels(
     assert len(report["queries"]) == 10
     with pytest.raises(FileExistsError):
         evaluation.capture_synthetic(
-            tmp_path / "result.json",
-            backend="legacy",
-            work_dir=tmp_path / "run",
-            target=tmp_path / "index.sqlite",
-            root=Path(__file__).resolve().parents[1],
+            work_path / "result.json", work_dir=work_path / "run",
+            target=postgres_target, root=Path(__file__).resolve().parents[1],
         )
-
-
-def test_actual_postgres_synthetic_matches_frozen_sqlite(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    postgres_url: str,
-) -> None:
-    monkeypatch.setattr(evaluation, "load_contract", lambda _: {})
-    monkeypatch.setattr(evaluation, "legacy_module", lambda *_: keyword_legacy)
-    root = Path(__file__).resolve().parents[1]
-    before = evaluation.capture_synthetic(
-        tmp_path / "before.json",
-        backend="legacy",
-        work_dir=tmp_path / "legacy",
-        target=tmp_path / "index.sqlite",
-        root=root,
-    )
-    after = evaluation.capture_synthetic(
-        tmp_path / "after.json",
-        backend="candidate",
-        work_dir=tmp_path / "pg",
-        target=postgres_url,
-        root=root,
-    )
-    assert before["fixture_sha256"] == after["fixture_sha256"]
-    assert before["queries"] == after["queries"]
