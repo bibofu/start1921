@@ -1,0 +1,43 @@
+# Install after provisioning this domain's certificate and password file.
+# Keep the existing service's virtual hosts and default server unchanged.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name start1921.chat;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/start1921-acme;
+        default_type text/plain;
+    }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name start1921.chat;
+
+    ssl_certificate /etc/letsencrypt/live/start1921.chat/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/start1921.chat/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    auth_basic "start1921";
+    auth_basic_user_file /etc/nginx/start1921.htpasswd;
+
+    client_max_body_size 1m;
+    access_log /var/log/nginx/start1921.access.log;
+    error_log /var/log/nginx/start1921.error.log;
+
+    location / {
+        proxy_pass http://127.0.0.1:18021;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        # Streaming answers use SSE.
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 180s;
+        proxy_send_timeout 180s;
+    }
+}

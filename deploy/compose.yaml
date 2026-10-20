@@ -1,0 +1,136 @@
+name: start1921
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  app:
+    image: ${START1921_APP_IMAGE:-start1921:local}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file:
+      - ${START1921_ENV_FILE:-/etc/start1921/start1921.env}
+    environment:
+      HISTORY_AGENT_PROJECT_ROOT: /app
+      HISTORY_AGENT_DOCS_DIR: /app/docs
+      HISTORY_AGENT_DATA_DIR: /app/data
+      HISTORY_AGENT_ENVIRONMENT: production
+      HISTORY_AGENT_DATABASE_URL: postgresql://start1921:${START1921_POSTGRES_PASSWORD:?Set START1921_POSTGRES_PASSWORD}@postgres:5432/start1921
+      HISTORY_AGENT_CONVERSATION_DATABASE_URL: postgresql://start1921:${START1921_POSTGRES_PASSWORD:?Set START1921_POSTGRES_PASSWORD}@postgres:5432/start1921
+      HISTORY_AGENT_KEYWORD_DATABASE_URL: postgresql://start1921:${START1921_POSTGRES_PASSWORD:?Set START1921_POSTGRES_PASSWORD}@postgres:5432/start1921
+      HISTORY_AGENT_QDRANT_URL: http://qdrant:6333
+      HISTORY_AGENT_QDRANT_API_KEY: ${START1921_QDRANT_API_KEY:?Set START1921_QDRANT_API_KEY}
+      HISTORY_AGENT_LLM_MAX_CONCURRENCY: "2"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+    ports:
+      - "127.0.0.1:18021:8000"
+    volumes:
+      - type: bind
+        source: ${START1921_STORAGE_ROOT:-/opt/start1921/runtime}/data
+        target: /app/data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${START1921_STORAGE_ROOT:-/opt/start1921/runtime}/docs
+        target: /app/docs
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - backend
+      - outbound
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 1024m
+    cpus: 1.0
+    pids_limit: 192
+    stop_grace_period: 120s
+    healthcheck:
+      test: ["CMD", "python", "/app/deploy/healthcheck.py"]
+      interval: 30s
+      timeout: 15s
+      start_period: 60s
+      retries: 3
+    logging: *logging
+
+  postgres:
+    image: ${START1921_POSTGRES_IMAGE:-postgres:18.6-bookworm}
+    environment:
+      POSTGRES_USER: start1921
+      POSTGRES_PASSWORD: ${START1921_POSTGRES_PASSWORD:?Set START1921_POSTGRES_PASSWORD}
+      POSTGRES_DB: start1921
+      PGDATA: /var/lib/postgresql/18/docker
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    command:
+      - postgres
+      - -c
+      - shared_buffers=64MB
+      - -c
+      - work_mem=2MB
+      - -c
+      - maintenance_work_mem=32MB
+      - -c
+      - max_connections=30
+    volumes:
+      - postgres:/var/lib/postgresql
+    networks:
+      - backend
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.5
+    shm_size: 128m
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U start1921 -d start1921"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.2
+    environment:
+      QDRANT__SERVICE__API_KEY: ${START1921_QDRANT_API_KEY:?Set START1921_QDRANT_API_KEY}
+      QDRANT__SERVICE__HOST: 0.0.0.0
+      QDRANT__SERVICE__ENABLE_CORS: "false"
+      QDRANT__TELEMETRY_DISABLED: "true"
+      QDRANT__STORAGE__PERFORMANCE__MAX_SEARCH_THREADS: "1"
+      QDRANT__STORAGE__OPTIMIZERS__MAX_OPTIMIZATION_THREADS: "1"
+    volumes:
+      - qdrant:/qdrant/storage
+      - qdrant_snapshots:/qdrant/snapshots
+    networks:
+      - backend
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.75
+    stop_grace_period: 60s
+    logging: *logging
+
+networks:
+  backend:
+    internal: true
+  outbound:
+
+volumes:
+  postgres:
+  qdrant:
+  qdrant_snapshots:

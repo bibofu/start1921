@@ -9,6 +9,7 @@
 | [RAG 实现说明](RAG-IMPL.md) | 当前查询规划、分片、混合检索、排序、上下文、生成和引用校验 |
 | [结构化研究模型](RESEARCH_SCHEMA.md) | 人物、事件、关系、证据、复核状态及查询接口 |
 | [PostgreSQL](POSTGRESQL.md) / [关键词索引](KEYWORD_POSTGRESQL.md) / [Qdrant](QDRANT_SERVICE.md) | 当前服务配置、测试方法及历史迁移记录 |
+| [Linux 部署](deploy/README.md) | Docker 服务隔离、数据迁移、HTTPS 入口、健康检查与升级回滚 |
 | [Golden 评测入口](evals/golden/README.md) / [可重复评测流程](evals/golden/REPEATABLE_WORKFLOW.md) | 数据版本、人工复核状态、分层指标与实验比较 |
 | [需求基线](REQUIREMENTS.md) | 原始需求目标与验收约束，部分内容尚未实现 |
 | [问答问题记录](badCase.md) | 已定位的问答问题、原因、修复及验证 |

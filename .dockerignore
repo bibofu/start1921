@@ -1,0 +1,16 @@
+# Build from an allowlist: runtime data, PDFs, .env, Git and local virtualenvs
+# must never enter an image layer or the build context.
+**
+!pyproject.toml
+!uv.lock
+!README.md
+!app/
+!app/**
+!config/
+!config/*.json
+!deploy/
+!deploy/Dockerfile
+!deploy/healthcheck.py
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
