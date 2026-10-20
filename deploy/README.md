@@ -115,14 +115,13 @@ curl --fail http://127.0.0.1:18021/api/ready
 映射到 `/var/www/start1921-acme`，其他路径暂返 503。用 Certbot webroot 模式签发
 证书并配置续期 reload；该流程不需要停止现有 nginx。
 
-准备 `/etc/nginx/start1921.htpasswd`（仅 root 和 nginx 组可读）后，再采用
-[nginx.conf.example](nginx.conf.example) 中的 HTTPS、重定向及 Basic Auth 配置；
+证书准备好后，采用
+[nginx.conf.example](nginx.conf.example) 中的 HTTPS 及重定向配置；
 先 `nginx -t` 再 reload，保留现有服务的 vhost 和默认站点。示例依赖已经存在的
-证书和密码文件，不会自动创建它们。SSE 必须关闭代理缓冲。
+证书，不会自动创建证书。SSE 必须关闭代理缓冲。
 
-当前应用没有内置用户认证，Basic Auth 应覆盖 API 与网页，并始终通过 HTTPS 使用。
-不要把应用端口改成
-`0.0.0.0:18021` 来绕过代理控制。
+网站页面和 API 公开访问，无需用户名和密码；nginx 显式设置 `auth_basic off`。
+应用端口保持 `127.0.0.1:18021`，由 nginx 提供 HTTPS 入口。
 
 ## 运维与升级
 
@@ -167,10 +166,11 @@ curl --fail http://127.0.0.1:18021/api/ready
 测试会话已删除。这些是部署连通性检查，不代替 Golden 集质量验收或负载测试。
 验证期间三个容器均无 OOM 或重启。
 
-网站和 API 统一使用 HTTPS Basic Auth。用户名为 `start1921`，密码保存在部署操作机
-的 `data/deployment/20261020/access.json` 及服务器 `/etc/start1921/access.json`，
-不进入 Git。证书由 Certbot 自动续期，成功后 reload nginx。
-HTTP 跳转 HTTPS，未认证访问返回 401；认证后页面、静态文件和 API 均验证成功。
+根据访问需求，同日取消网站和 API 的 Basic Auth，无需用户名和密码。
+HTTP 跳转 HTTPS，页面、静态文件和 API 均已通过无认证访问验证。
+证书由 Certbot 自动续期，成功后 reload nginx。
+此次访问方式变更的验证记录保存在 `/opt/start1921/transfer/public-access-verification.json`；
+首次部署记录中的认证检查保留为历史结果。
 原有 `limitupagent.xyz`、`limituplab.tech` 的 nginx 配置哈希保持不变，部署后仍返回 200。
 
 参考：[uv Docker 指南](https://docs.astral.sh/uv/guides/integration/docker/)、
