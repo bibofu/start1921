@@ -46,7 +46,7 @@ HISTORY_AGENT_QDRANT_URL=http://127.0.0.1:6333
 DEEPSEEK_API_KEY=你的密钥
 ```
 
-主库、会话库、关键词索引仅支持 PostgreSQL，向量索引仅支持 Qdrant 服务。旧 SQLite 文件和迁移备份只作归档，不会回退使用。新机器需先按服务文档准备数据库；本工作区的 Windows 本机后台进程可用以下脚本启动：
+主库、会话库、关键词索引仅支持 PostgreSQL，向量索引仅支持 Qdrant 服务。原 SQLite 库与迁移备份已于 2026-10-21 清理，只保留 PostgreSQL dump 与 Qdrant snapshot 作为可恢复归档，运行路径不会回退到本地文件，详见 [清理记录](POSTGRESQL.md#2026-10-21-sqlite-资产清理)。新机器需先按服务文档准备数据库；本工作区的 Windows 本机后台进程可用以下脚本启动：
 
 ```powershell
 .\scripts\postgres.ps1 start

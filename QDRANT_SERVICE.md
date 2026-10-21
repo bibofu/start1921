@@ -34,7 +34,8 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
 ```
 
 `config/qdrant.yaml` 配置本地监听、存储和快照目录。
-运行数据位于 `data/qdrant-service/`，不要与旧的 `data/indexes/qdrant/` 混用。
+运行数据位于 `data/qdrant-service/`；旧的本地目录 `data/indexes/qdrant/` 已于
+2026-10-21 删除，见 [PostgreSQL 清理记录](POSTGRESQL.md#2026-10-21-sqlite-资产清理)。
 管理命令为 `scripts/qdrant.ps1 start|status|stop`；停止前先结束应用及索引写入任务。
 辅助脚本后台启动进程，不注册 Windows 服务；重启电脑后需重新启动数据库和应用。
 
@@ -42,7 +43,8 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
 
 现有数据迁移已经完成，详见下方记录。为移除 SQLite 依赖，当前版本已删除
 `index migrate-qdrant-service` 及本地索引读取代码；历史实现可在提交 `24509b7` 查看。
-原始目录、一致备份和迁移报告继续保留。
+原始目录与一致备份已于 2026-10-21 删除；迁移报告与
+`data/deployment/20261020/qdrant.snapshot` 归档保留。
 
 后续 `uv run start1921 index build-vector` 创建新的物理 collection，
 写入完成并核对精确计数后，原子切换 `history_chunks` alias。
@@ -65,8 +67,9 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
   `/api/ready` 三个组件均正常。原本地索引的完整目录指纹未变。
 - 32 项针对性测试及相关 Ruff/mypy 检查通过；未运行大型检索评测或全套测试。
 
-一致备份与切换前配置位于 `data/backups/qdrant-to-service-20261020T065622Z/`。
-配置备份含凭据，仅留本机。迁移完成时的物理 collection 为
+一致备份与切换前配置原位于 `data/backups/qdrant-to-service-20261020T065622Z/`
+（配置备份曾含凭据），该目录已于 2026-10-21 删除；可恢复副本为
+`data/deployment/20261020/qdrant.snapshot`。迁移完成时的物理 collection 为
 `history_chunks_import_004028549da44ef6af8e386ae87509c4`，
 通过 `history_chunks` alias 提供查询。
 

@@ -1,7 +1,8 @@
 # PostgreSQL 关键词索引
 
 关键词索引现在只支持 PostgreSQL，可以与主库共用，也可以使用独立数据库。
-原 SQLite 兼容实现和一次性迁移命令已移除，旧数据与备份继续保留。
+原 SQLite 兼容实现和一次性迁移命令已移除，旧数据与迁移备份已于 2026-10-21 清理
+（见 [PostgreSQL 清理记录](POSTGRESQL.md#2026-10-21-sqlite-资产清理)）。
 此变更只迁移关键词索引存储，不改变文献切分、embedding 模型、Qdrant、
 混合检索融合、重排、上下文选择或回答提示词。
 
@@ -50,7 +51,7 @@ uv run start1921 index build-keyword
 
 旧迁移曾创建一致快照并导入全部元数据、预分词原文、原始行号、文档长度及词位。
 全部字段、词位摘要和行数验证通过后才发布 PostgreSQL 活动版本。
-原数据库文件和迁移备份均继续保留，下面的数量与摘要记录对应这次已完成的迁移。
+原数据库文件和迁移备份已于 2026-10-21 删除，下面的数量与摘要记录对应当时已完成的迁移。
 
 一次性迁移、旧库校验命令及 SQLite 回退已经从当前代码删除。
 原迁移工具可在 Git 提交 `24509b7` 中查阅；当前版本不能执行旧迁移命令，
@@ -100,10 +101,12 @@ Precision、MRR、nDCG 保留不可评及原因。独立受控语料的完整标
 与 SQLite 源索引一致。从现有 17 份 chunk JSONL 使用 PostgreSQL 构建路径重新计算，
 也得到相同的完整逻辑摘要，验证后续重建不需要调用 SQLite。
 
-原数据库、切片、别名、既有人工标注和 Qdrant 等 27 个保留文件的 SHA-256 均未改变。
-迁移备份位于 `data/backups/keyword-to-postgres-20261020T062453Z-90b0ab4e/`；
-独立对照基线及切换前配置备份位于
-`data/backups/keyword-to-postgres-20261020T061514Z/`。配置备份含凭据，仅在本机保管。
+迁移当时原数据库、切片、别名、既有人工标注和 Qdrant 等 27 个保留文件的 SHA-256
+均未改变；这些指纹记录在 `data/reports/postgres-keyword-preservation.json`。
+迁移备份原位于 `data/backups/keyword-to-postgres-20261020T062453Z-90b0ab4e/`，
+独立对照基线及切换前配置备份原位于
+`data/backups/keyword-to-postgres-20261020T061514Z/`（曾含凭据）；
+两个目录均已于 2026-10-21 删除。
 
 本地完整性报告：
 

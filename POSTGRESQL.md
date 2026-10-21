@@ -2,7 +2,8 @@
 
 主库、会话库和[关键词索引](KEYWORD_POSTGRESQL.md)现在只支持 PostgreSQL。
 向量检索使用 [Qdrant 独立服务](QDRANT_SERVICE.md)。当前代码已移除 SQLite 驱动导入、
-本地数据库兼容分支和旧迁移命令；保留的原数据库与备份不会在运行时打开。
+本地数据库兼容分支和旧迁移命令；原数据库与迁移备份已于 2026-10-21 清理，
+详见文末[清理记录](#2026-10-21-sqlite-资产清理)。
 
 ## 配置与启动
 
@@ -48,8 +49,10 @@ uv run start1921 serve
 
 一次性迁移和旧库对照校验命令已经从当前 CLI 删除，不能在当前版本执行。
 若需审计原迁移过程，可查看 Git 提交 `24509b7` 中的历史代码和下方保留的报告。
-原 SQLite 文件与一致备份继续保留为历史存档；清空连接配置不会重新启用它们。
-不要把旧备份直接当作当前数据，因为它们不包含迁移后的新增记录。
+原 SQLite 文件与一致备份已于 2026-10-21 删除；清空连接配置仍不会回退到本地文件。
+历史数据以 `data/deployment/20261020/postgres.dump` 和 `qdrant.snapshot` 归档，
+可按 [Linux 部署](deploy/README.md)的恢复流程还原。不要把归档直接当作当前数据，
+因为它不包含迁移后新增的会话记录。
 
 当前数据库应持续使用 PostgreSQL 备份工具（如 `pg_dump`）备份；覆盖范围应包括
 主库、会话及关键词表。功能检查可使用 `/api/health` 和 `/api/ready`，再做一次
@@ -71,7 +74,7 @@ $env:HISTORY_AGENT_TEST_POSTGRES_URL = "postgresql://测试用户:密码@127.0.0
 覆盖内容包括事务回滚、外键、64 位数值、参数绑定、元数据保存与会话恢复。
 
 `scripts/check.ps1` 使用 mypy 的 JSON 文件缓存（`--no-sqlite-cache`），
-`pyproject.toml` 同时设置 `sqlite_cache = false`。既有缓存和数据备份无需删除。
+`pyproject.toml` 同时设置 `sqlite_cache = false`。缓存目录可随时删除，检查时会按需重建。
 
 ## 本地迁移验收记录（2026-10-20）
 
@@ -90,12 +93,51 @@ $env:HISTORY_AGENT_TEST_POSTGRES_URL = "postgresql://测试用户:密码@127.0.0
   真实模型流式问答完成，返回 12 条引用；新会话写入、回读和清空通过。
   清理临时测试会话后再次进行只读全量校验，25 张表仍与原 SQLite 数据一致。
 
-迁移快照保存在 `data/backups/sqlite-to-postgres-20261020T060148Z-7c40a035/`，
-其中包括两份 SQLite 一致备份及切换前的配置备份。配置备份含凭据，应仅在本机保管。
-原数据库文件也继续保留。验收报告位于：
+迁移快照原保存在 `data/backups/sqlite-to-postgres-20261020T060148Z-7c40a035/`，
+其中包括两份 SQLite 一致备份及切换前的配置备份；该目录已于 2026-10-21 随 SQLite
+清理删除，其中配置备份曾含凭据。原数据库文件同样已删除。验收报告保留在：
 
 - `data/reports/postgres-migration.json`：导入和全字段校验。
 - `data/reports/postgres-final-verification.json`：功能测试结束后的全量复核。
 - `data/reports/postgres-behavior.json`：76 项业务对照。
 - `data/reports/postgres-http.json`：实际服务与问答验证。
 - `data/reports/postgres-preservation.json`：原数据库和索引文件指纹复核。
+- `data/reports/postgres-source-hashes.json`：被清理 SQLite 文件的原始指纹。
+
+## 2026-10-21 SQLite 资产清理
+
+删除前置条件已核验：`data/deployment/20261020/deployment-verification.json` 记录线上
+服务（镜像 `start1921:20261020`）关键词表与 Qdrant 均为 22,338 条，30 张表计数与
+数据 manifest 一致；同目录保留 `postgres.dump`（约 150 MB）与 `qdrant.snapshot`
+（约 517 MB）作为可恢复归档。
+
+| 已删除 | 清理前大小 | 内容 |
+| --- | ---: | --- |
+| `data/history_agent.db` | 81.5 MB | 旧主库，24 张表 |
+| `data/conversations.db` | 0.1 MB | 旧会话库，1 个会话、18 条消息 |
+| `data/indexes/keyword_fts.db` | 208.3 MB | 旧 FTS5 关键词索引 |
+| `data/indexes/qdrant/collection/history_chunks/storage.sqlite` | 175.9 MB | 旧本地向量存储 |
+| `data/backups/` | 1,524.2 MB | 6 个迁移备份，含两份 SQLite 一致备份与配置备份 |
+| `data/postgres-runtime/behavior-source/` | 81.6 MB | 迁移对照用旧库快照 |
+| `tmp/keyword-evaluation-tests-20261020-*` | 0.9 MB | 迁移评测临时索引目录 |
+| `.mypy_cache/`、`data/mypy-cache/`、`data/mypy-cache-qdrant-service/` | 206.6 MB | mypy 缓存（非业务数据） |
+| `data/sqlite_retirement_smoke.py` | 4 KB | 一次性退役校验脚本，已由 `tests/test_storage_dependencies.py` 覆盖 |
+| `data/reports/keyword-migration-v1/**/legacy.sqlite` | 80 KB | 两个合成语料夹具；结论 JSON 保留 |
+
+合计回收约 2.28 GB。删除前已留痕：
+
+- 六个数据库文件的字节数与 SHA-256 写入
+  `data/archive/20261021/sqlite-deletion-manifest.json`。
+- 本地 1 个会话、18 条消息导出为 `data/archive/20261021/local-conversations.json`
+  （部署时按设计未迁移本地会话）。
+- 文件名、大小与历史指纹仍可在 `data/reports/postgres-source-hashes.json` 和
+  `data/reports/postgres-preservation.json` 中核对。
+
+保留的迁移评测 JSON（`data/reports/keyword-migration-v1/`，约 327 MB）与验收报告
+未删除；它们只读，不参与运行。上述两个 `data/archive/` 归档位于被 Git 忽略的
+`data/` 下，不随仓库分发。需要重放旧数据时以 `postgres.dump` 和 `qdrant.snapshot`
+为准，不能依赖已删除的 SQLite 文件。
+
+依赖层只剩一处 uv 专属处理：`llama-index-core` 声明了 `aiosqlite`，项目通过
+`[tool.uv] exclude-dependencies` 排除，`uv sync` 后不会安装；该字段 pip 不识别，
+用 pip 安装的环境需自行确认 `aiosqlite` 未被使用。

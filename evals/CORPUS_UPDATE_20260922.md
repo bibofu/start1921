@@ -17,9 +17,11 @@
 ## 处理与恢复记录
 
 - 扫描、文字提取、OCR 及本次验证结果保存在 `data/reports/`；专项日志位于 `data/reports/corpus_update_20260922/`。
-- 两份撤下资料的旧分片归档于 `data/backups/corpus_update_20260922/retired_chunks/`，不再由索引构建器读取。
-- 同目录保留研究数据库及旧关键词索引的 SQLite 备份。
-- 切换前的完整关键词和向量索引保存在 `data/backups/corpus_update_20260922/live_indexes/`。新索引先在隔离目录构建并验证，再停服务成对切换；原始暂存报告和报告迁移记录均保留。
+- 两份撤下资料的旧分片曾归档于 `data/backups/corpus_update_20260922/retired_chunks/`，不再由索引构建器读取。
+- 同目录曾保留研究数据库及旧关键词索引的 SQLite 备份。
+- 切换前的完整关键词和向量索引曾保存在 `data/backups/corpus_update_20260922/live_indexes/`。新索引先在隔离目录构建并验证，再停服务成对切换；原始暂存报告和报告迁移记录均保留。
+- 2026-10-21 清理 SQLite 时删除整个 `data/backups/`（含上述归档），当前数据以 PostgreSQL
+  与 Qdrant 服务为准，见 [PostgreSQL 清理记录](../POSTGRESQL.md#2026-10-21-sqlite-资产清理)。
 - 结构化查询根据文献是否启用及当前文件是否存在过滤证据，不删除历史事件，也不改变人工复核结论。
 - 新三册本次接入文本检索；没有将 OCR 文本直接冒充已复核的结构化事件。
 - 三卷共 2,098 页均完成 OCR，失败页为 0；上、中、下卷分别为 655、690、753 页。页序已核对，无缺页或重复页。

@@ -19,7 +19,9 @@
 完整本地产物保留在 `data/reports/keyword-migration-v1/`：
 `baseline-keyword.json`、`final-candidate-keyword.checkpoint.jsonl`、
 `partial-keyword-comparison.json`、`final-e2e-comparison.json`、
-两个 `stage-metrics.json` 和 `final-synthetic/`。这些大文件不进入版本库。
+两个 `stage-metrics.json`。这些大文件不进入版本库。2026-10-21 清理 SQLite 时删除了
+`synthetic-legacy.sqlite` 与 `final-synthetic/legacy.sqlite` 两个 40 KB 夹具，
+其余 JSON 结果保留；旧夹具可用提交 `24509b7` 的历史实现重放。
 
 ## 当前可用的报告工具
 
@@ -36,7 +38,8 @@ python -m history_agent.evaluation.keyword_migration compare-e2e `
 
 以上输入应以本地实际保留的捕获文件为准。原 `capture`、`capture-e2e`、
 `capture-synthetic` 双后端执行命令已退休，历史实现可在 Git 提交 `24509b7` 查阅；
-当前版本不能重启原 SQLite 基线采集。协议、标注、结果 JSON 和备份均保留。
+当前版本不能重启原 SQLite 基线采集。协议、标注和结果 JSON 保留；SQLite 备份与合成
+夹具已于 2026-10-21 删除。
 
 PostgreSQL 合成语料测试通过公共 fixture 使用显式的
 `HISTORY_AGENT_TEST_POSTGRES_URL`，每个数据库测试创建并清理随机隔离 schema，
