@@ -43,8 +43,8 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
 
 现有数据迁移已经完成，详见下方记录。为移除 SQLite 依赖，当前版本已删除
 `index migrate-qdrant-service` 及本地索引读取代码；历史实现可在提交 `24509b7` 查看。
-原始目录与一致备份已于 2026-10-21 删除；迁移报告与
-`data/deployment/20261020/qdrant.snapshot` 归档保留。
+原始目录与一致备份已于 2026-10-21 删除；迁移报告保留，快照只在服务目录
+`data/qdrant-service/snapshots/` 下保留一份（部署副本 `qdrant.snapshot` 同日删除）。
 
 后续 `uv run start1921 index build-vector` 创建新的物理 collection，
 写入完成并核对精确计数后，原子切换 `history_chunks` alias。
@@ -68,8 +68,9 @@ HISTORY_AGENT_QDRANT_TIMEOUT_SECONDS=30
 - 32 项针对性测试及相关 Ruff/mypy 检查通过；未运行大型检索评测或全套测试。
 
 一致备份与切换前配置原位于 `data/backups/qdrant-to-service-20261020T065622Z/`
-（配置备份曾含凭据），该目录已于 2026-10-21 删除；可恢复副本为
-`data/deployment/20261020/qdrant.snapshot`。迁移完成时的物理 collection 为
+（配置备份曾含凭据），该目录已于 2026-10-21 删除；可恢复副本为服务目录下的
+`data/qdrant-service/snapshots/history_chunks_import_004028549da44ef6af8e386ae87509c4/`。
+迁移完成时的物理 collection 为
 `history_chunks_import_004028549da44ef6af8e386ae87509c4`，
 通过 `history_chunks` alias 提供查询。
 

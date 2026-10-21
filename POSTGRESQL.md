@@ -50,8 +50,9 @@ uv run start1921 serve
 一次性迁移和旧库对照校验命令已经从当前 CLI 删除，不能在当前版本执行。
 若需审计原迁移过程，可查看 Git 提交 `24509b7` 中的历史代码和下方保留的报告。
 原 SQLite 文件与一致备份已于 2026-10-21 删除；清空连接配置仍不会回退到本地文件。
-历史数据以 `data/deployment/20261020/postgres.dump` 和 `qdrant.snapshot` 归档，
-可按 [Linux 部署](deploy/README.md)的恢复流程还原。不要把归档直接当作当前数据，
+历史数据以 `data/deployment/20261020/postgres.dump` 归档，向量数据以
+`data/qdrant-service/snapshots/` 下的同一份快照归档，可按
+[Linux 部署](deploy/README.md)的恢复流程还原。不要把归档直接当作当前数据，
 因为它不包含迁移后新增的会话记录。
 
 当前数据库应持续使用 PostgreSQL 备份工具（如 `pg_dump`）备份；覆盖范围应包括
@@ -108,8 +109,8 @@ $env:HISTORY_AGENT_TEST_POSTGRES_URL = "postgresql://测试用户:密码@127.0.0
 
 删除前置条件已核验：`data/deployment/20261020/deployment-verification.json` 记录线上
 服务（镜像 `start1921:20261020`）关键词表与 Qdrant 均为 22,338 条，30 张表计数与
-数据 manifest 一致；同目录保留 `postgres.dump`（约 150 MB）与 `qdrant.snapshot`
-（约 517 MB）作为可恢复归档。
+数据 manifest 一致；同目录保留 `postgres.dump`（约 143 MB）作为数据库恢复归档。
+向量快照在同一轮第二批清理中只保留服务目录内的一份，见下文。
 
 | 已删除 | 清理前大小 | 内容 |
 | --- | ---: | --- |
@@ -135,9 +136,25 @@ $env:HISTORY_AGENT_TEST_POSTGRES_URL = "postgresql://测试用户:密码@127.0.0
 
 保留的迁移评测 JSON（`data/reports/keyword-migration-v1/`，约 327 MB）与验收报告
 未删除；它们只读，不参与运行。上述两个 `data/archive/` 归档位于被 Git 忽略的
-`data/` 下，不随仓库分发。需要重放旧数据时以 `postgres.dump` 和 `qdrant.snapshot`
-为准，不能依赖已删除的 SQLite 文件。
+`data/` 下，不随仓库分发。需要重放旧数据时以 `postgres.dump` 和
+`data/qdrant-service/snapshots/` 下的快照为准，不能依赖已删除的 SQLite 文件。
 
 依赖层只剩一处 uv 专属处理：`llama-index-core` 声明了 `aiosqlite`，项目通过
-`[tool.uv] exclude-dependencies` 排除，`uv sync` 后不会安装；该字段 pip 不识别，
+`[tool.uv] exclude-dependencies` 排除，`uv sync` 后不会安装；该字段不识别，
 用 pip 安装的环境需自行确认 `aiosqlite` 未被使用。
+
+## 2026-10-21 冗余资产清理（第二批）
+
+同日完成的只读盘点随后删除了 A+B 两档共 3,434 MB 的冗余产物，清单与哈希保存在
+`data/archive/20261021-redundancy/deletion-manifest.json`。
+
+| 类别 | 回收 | 内容 |
+| --- | ---: | --- |
+| A 明确冗余 | 2,866 MB | 10 个 `*.partial.json` 采集检查点（均已存在完整件）、PostgreSQL/Qdrant 安装包与分片 494 MB、`data/uv-cache` 614 MB、部署上传包 `runtime.tar.gz` 758 MB、与 service 目录逐字节相同的 `qdrant.snapshot` 493 MB、`data/test-work` 与 `tmp/pytest-*` 49 MB |
+| B 无引用旧报告 | 568 MB | `eval_development20_20261011` 的非 stable 运行（capture/report/legacy13_report）、`live_report_initial`、`browser_roundtrip_report`、`offline_rescored_report` |
+
+B 档删除只删大文件，对应的 `*.summary.json`、`*.md` 与 `stable/` 目录保留，文档引用的
+`stable/capture.json`、`eval_pilot_v2/live_capture.json`、`eval_expansion_20260923/top*_capture.json`
+和 `keyword-migration-v1/*.json` 均未改动。向量快照因此只在
+`data/qdrant-service/snapshots/history_chunks_import_004028549da44ef6af8e386ae87509c4/`
+保留一份，其 SHA-256 与删除的部署副本一致（`F84479A6A92BCD62C53F84DCDA3FFA3016BD626A02400CB442B877807CDD5119`）。
