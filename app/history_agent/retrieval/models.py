@@ -17,6 +17,7 @@ class RetrievalPlan(BaseModel):
         "observation",
         "comparison",
         "causal_analysis",
+        "out_of_scope",
     ]
     query_years: list[int] = Field(default_factory=list)
     query_year_range: list[int] = Field(default_factory=list, max_length=2)

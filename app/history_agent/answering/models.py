@@ -44,6 +44,7 @@ class QueryPlan(BaseModel):
         "observation",
         "comparison",
         "causal_analysis",
+        "out_of_scope",
     ] = "general"
     retrieval_route: Literal["structured", "hybrid"] = "hybrid"
     normalized_question: str = Field(min_length=2, max_length=500)

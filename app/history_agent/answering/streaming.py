@@ -33,6 +33,7 @@ from history_agent.answering.service import (
     _has_ambiguous_timeline_years,
     _llm_request_payload,
     _merge_usage,
+    _out_of_scope_response,
     _prefer_llm_result,
     _prepare_hierarchical_answer,
     _repair_request_payload,
@@ -282,6 +283,11 @@ async def stream_answer_question(
     if settings.llm_query_planning and settings.llm_enabled:
         yield AnswerStreamEvent("status", {"message": "正在理解问题并规划检索…"})
     planning = await run_in_threadpool(plan_question, settings, request, runtime, budget)
+    if planning.plan is not None and planning.plan.intent == "out_of_scope":
+        yield AnswerStreamEvent(
+            "done", _out_of_scope_response(settings, request, planning).model_dump()
+        )
+        return
     if planning.plan is not None and planning.plan.needs_clarification:
         yield AnswerStreamEvent("done", _clarification_response(request, planning).model_dump())
         return

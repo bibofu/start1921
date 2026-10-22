@@ -1301,6 +1301,32 @@ def _clarification_response(
     )
 
 
+def _out_of_scope_response(
+    settings: Settings, request: QuestionRequest, planning: QueryPlanningResult
+) -> AnswerResponse:
+    start_year, end_year = settings.research_start.year, settings.research_end.year
+    return AnswerResponse(
+        question=request.question,
+        answer=(
+            f"这个问题超出本地知识库的史料范围，暂不回答。当前库只收录{start_year}—"
+            f"{end_year}年中国近现代史相关史料。如需查询，请改问该时段内的人物、"
+            "事件或文献。"
+        ),
+        evidence_status="no_evidence",
+        generator_mode="extractive",
+        llm_status="not_applicable",
+        query_plan=planning.plan,
+        query_planner_status=planning.status,
+        query_planner_model=planning.model_name,
+        query_planner_usage=planning.usage,
+        query_planner_error_code=planning.error_code,
+        retrieval_mode="out_of_scope",
+        query_intent="out_of_scope",
+        citations=[],
+        limitations=[f"研究范围限定为{start_year}—{end_year}年，范围外问题不进入检索和生成。"],
+    )
+
+
 async def answer_question_async(
     settings: Settings,
     request: QuestionRequest,
@@ -1309,6 +1335,8 @@ async def answer_question_async(
 ) -> AnswerResponse:
     budget = budget or RequestBudget.start(settings.request_timeout_seconds)
     planning = await asyncio.to_thread(plan_question, settings, request, runtime, budget)
+    if planning.plan is not None and planning.plan.intent == "out_of_scope":
+        return _out_of_scope_response(settings, request, planning)
     if planning.plan is not None and planning.plan.needs_clarification:
         return _clarification_response(request, planning)
     full_text = await asyncio.to_thread(answer_full_text_question, settings, request)

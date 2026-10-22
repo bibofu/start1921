@@ -70,7 +70,7 @@ def _messages(settings: Settings, request: QuestionRequest) -> list[dict[str, st
     schema = {
         "intent": (
             "general|event_overview|timeline|intersection|viewpoint|observation|comparison|"
-            "causal_analysis"
+            "causal_analysis|out_of_scope"
         ),
         "retrieval_route": "structured|hybrid",
         "normalized_question": "完整保留约束并规范化简称、别名和指代后的问题",
@@ -108,6 +108,11 @@ def _messages(settings: Settings, request: QuestionRequest) -> list[dict[str, st
         "要求引用、直接原文支持、详细说明或按观点组织只是回答形式要求，不妨碍使用structured。"
         "只有人物、指代或限制条件确实无法确定时才needs_clarification；宽泛问题本身不需要澄清。"
         f"研究时间边界是{settings.research_start.year}—{settings.research_end.year}年。"
+        "若问题的核心对象或回答所需事实明确不属于上述时间范围内的中国近现代史"
+        "（例如辛亥革命、唐代科举、爱因斯坦狭义相对论、2024年考察行程），"
+        "intent必须设为out_of_scope，needs_clarification设为false，search_queries留空。"
+        "若问题以范围内的人物、事件或文献为主体，只是顺带提及范围外背景，则按范围内的"
+        "意图正常规划，不要标记out_of_scope。"
         f"输出字段示意：{json.dumps(schema, ensure_ascii=False)}"
     )
     history_items = request.history if requires_conversation_context(request.question) else []
@@ -243,6 +248,18 @@ def _validated_plan(content: str) -> QueryPlan:
         and plan.start_year > plan.end_year
     ):
         raise ValueError("reversed_year_range")
+    if plan.intent == "out_of_scope":
+        # Refusal short-circuits before retrieval, so the plan carries neither
+        # retrieval queries nor a pending clarification.
+        return plan.model_copy(
+            update={
+                "retrieval_route": "hybrid",
+                "search_queries": [],
+                "coverage": "relevance",
+                "needs_clarification": False,
+                "clarification_question": None,
+            }
+        )
     if plan.needs_clarification and not (plan.clarification_question or "").strip():
         raise ValueError("missing_clarification_question")
     if not plan.needs_clarification and plan.clarification_question:

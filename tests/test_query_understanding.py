@@ -422,6 +422,80 @@ def test_answer_question_uses_semantic_plan_for_hybrid_retrieval(monkeypatch: An
     assert result.query_planner_usage == {"total_tokens": 100}
 
 
+def test_out_of_scope_plan_drops_retrieval_and_clarification_state(
+    monkeypatch: Any,
+) -> None:
+    payload = _plan_payload()
+    payload.update(
+        {
+            "intent": "out_of_scope",
+            "normalized_question": "介绍辛亥革命的情况",
+            "search_queries": ["辛亥革命 经过 结果"],
+            "entities": [{"type": "event", "text": "辛亥革命", "canonical": "辛亥革命"}],
+            "start_year": 1911,
+            "end_year": 1911,
+            "needs_clarification": True,
+            "clarification_question": "请问要了解哪一方面？",
+        }
+    )
+
+    def fake_post(url: str, **kwargs: Any) -> httpx.Response:
+        return httpx.Response(
+            200,
+            request=httpx.Request("POST", url),
+            json={"choices": [{"message": {"content": json.dumps(payload, ensure_ascii=False)}}]},
+        )
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    result = plan_question(
+        Settings(_env_file=None, llm_api_key="sk-test"),
+        QuestionRequest(question="介绍辛亥革命的情况"),
+    )
+
+    assert result.status == "used"
+    assert result.plan is not None
+    assert result.plan.intent == "out_of_scope"
+    assert result.plan.retrieval_route == "hybrid"
+    assert result.plan.search_queries == []
+    assert result.plan.coverage == "relevance"
+    assert result.plan.needs_clarification is False
+    assert result.plan.clarification_question is None
+    # The planner may infer 1911 from common knowledge, but the guard keeps
+    # only years stated in the current question.
+    assert result.plan.start_year is None
+    assert result.plan.end_year is None
+    assert [entity.canonical for entity in result.plan.entities] == ["辛亥革命"]
+
+
+def test_out_of_scope_answer_skips_retrieval(monkeypatch: Any) -> None:
+    plan = QueryPlan(
+        intent="out_of_scope",
+        normalized_question="爱因斯坦狭义相对论什么时候发表的",
+        entities=[QueryEntity(type="other", text="相对论", canonical="狭义相对论")],
+    )
+    planning = QueryPlanningResult(plan, "used", model_name="deepseek-v4-flash")
+
+    def unexpected(**kwargs: Any) -> None:
+        raise AssertionError("out-of-scope question must not start retrieval")
+
+    monkeypatch.setattr("history_agent.answering.service.plan_question", lambda *a: planning)
+    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", unexpected)
+    result = answer_question(
+        Settings(_env_file=None, llm_api_key=None),
+        QuestionRequest(question="爱因斯坦狭义相对论什么时候发表的"),
+    )
+
+    assert result.retrieval_mode == "out_of_scope"
+    assert result.query_intent == "out_of_scope"
+    assert result.evidence_status == "no_evidence"
+    assert result.generator_mode == "extractive"
+    assert result.citations == []
+    assert "1921—1978" in result.answer
+    assert result.query_plan == plan
+    assert result.query_planner_status == "used"
+    assert any("范围外问题不进入检索和生成" in item for item in result.limitations)
+
+
 def test_answer_question_returns_planner_clarification_without_retrieval(
     monkeypatch: Any,
 ) -> None:

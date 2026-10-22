@@ -276,6 +276,31 @@ def test_disabled_planner_uses_rag_without_generic_clarification(
     assert "请明确人物和年份" not in response.text
 
 
+def test_stream_out_of_scope_stops_before_retrieval(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plan = QueryPlan(
+        intent="out_of_scope",
+        normalized_question="介绍辛亥革命的情况",
+    )
+    planning = QueryPlanningResult(plan, "used")
+    monkeypatch.setattr("history_agent.answering.streaming.plan_question", lambda *a: planning)
+
+    async def unexpected(*args: object, **kwargs: object) -> AnswerContext:
+        raise AssertionError("out-of-scope question must not start retrieval")
+
+    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", unexpected)
+    events = _events(_settings().model_copy(update={"llm_query_planning": True}))
+
+    assert events[-1].event == "done"
+    assert events[-1].data["retrieval_mode"] == "out_of_scope"
+    assert events[-1].data["evidence_status"] == "no_evidence"
+    assert events[-1].data["citations"] == []
+    assert events[-1].data["query_plan"]["intent"] == "out_of_scope"
+    assert events[-1].data["answer"].startswith("这个问题超出本地知识库的史料范围")
+    assert all(event.event != "delta" for event in events)
+
+
 def test_structured_summary_streams_through_llm(monkeypatch: pytest.MonkeyPatch) -> None:
     structured = AnswerResponse(
         question="周恩来在1956年主要有哪些经历？",
