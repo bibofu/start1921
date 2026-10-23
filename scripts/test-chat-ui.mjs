@@ -73,7 +73,7 @@ const server = createServer(async (req, res) => {
     json(res, {
       visitor: {label: "v_fixture"},
       csrf_token: "fixture-csrf",
-      quota: {daily_questions: 20, used_today: 0, enabled: false},
+      quota: {daily_questions: 100, used_today: 0, enabled: false},
       limits: {max_sessions: 50, max_messages_per_session: 1000}
     });
     return;

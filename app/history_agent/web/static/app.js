@@ -17,10 +17,8 @@ const loadMoreSessions = document.querySelector("#load-more-sessions");
 const currentTitle = document.querySelector("#current-title");
 const renameSessionButton = document.querySelector("#rename-session");
 const deleteSessionButton = document.querySelector("#delete-session");
-const visitorLabel = document.querySelector("#visitor-label");
 const quotaLabel = document.querySelector("#quota");
 const cookieWarning = document.querySelector("#cookie-warning");
-const deleteAllDataButton = document.querySelector("#delete-all-data");
 const toast = document.querySelector("#toast");
 
 const CURRENT_SESSION_KEY = "start1921-current-session-v2";
@@ -29,7 +27,6 @@ const CHANNEL_NAME = "start1921-sessions";
 
 const state = {
   csrf: "",
-  visitorLabel: "",
   sessions: [],
   hasMore: false,
   offset: 0,
@@ -492,12 +489,8 @@ async function ask(question) {
 async function refreshVisitorInfo() {
   try {
     const info = await api("/api/visitor");
-    state.visitorLabel = info.visitor?.label || "";
-    if (visitorLabel) visitorLabel.textContent = `本浏览器工作区 · ${state.visitorLabel}`;
     if (quotaLabel && info.quota) {
-      quotaLabel.textContent = info.quota.enabled
-        ? `今日提问 ${info.quota.used_today}/${info.quota.daily_questions}`
-        : "配额限制未启用";
+      quotaLabel.textContent = `今日提问 ${info.quota.used_today}/${info.quota.daily_questions}`;
     }
   } catch { /* best effort */ }
 }
@@ -576,22 +569,6 @@ function newSession({push = true} = {}) {
   input.focus();
 }
 
-async function deleteAllData() {
-  if (!window.confirm("删除本浏览器工作区的全部会话？此操作不可撤销。")) return;
-  if (state.activeRun) stopGeneration();
-  try {
-    await api("/api/visitor/data", {method: "DELETE"});
-    state.sessions = [];
-    state.hasMore = false;
-    renderSessions();
-    newSession();
-    notifySessionsChanged();
-    showToast("全部会话已删除");
-  } catch (error) {
-    showToast(error.message || "删除失败");
-  }
-}
-
 async function claimLegacySession() {
   let legacy = null;
   try { legacy = localStorage.getItem(LEGACY_SESSION_KEY); } catch { return; }
@@ -615,12 +592,8 @@ async function bootstrap() {
   try {
     const info = await api("/api/visitor");
     state.csrf = info.csrf_token || "";
-    state.visitorLabel = info.visitor?.label || "";
-    if (visitorLabel) visitorLabel.textContent = `本浏览器工作区 · ${state.visitorLabel}`;
     if (quotaLabel && info.quota) {
-      quotaLabel.textContent = info.quota.enabled
-        ? `今日提问 ${info.quota.used_today}/${info.quota.daily_questions}`
-        : "配额限制未启用";
+      quotaLabel.textContent = `今日提问 ${info.quota.used_today}/${info.quota.daily_questions}`;
     }
   } catch (error) {
     statusDot.className = "bad";
@@ -684,7 +657,6 @@ function bindEvents() {
   deleteSessionButton?.addEventListener("click", () => {
     if (state.currentSessionId) deleteSession(state.currentSessionId);
   });
-  deleteAllDataButton?.addEventListener("click", deleteAllData);
   sessionSearch?.addEventListener("input", () => {
     clearTimeout(sessionSearch._timer);
     sessionSearch._timer = setTimeout(async () => {

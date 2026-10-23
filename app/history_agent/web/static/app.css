@@ -258,22 +258,6 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
 .session-menu button:hover { background: #f2e9dc; }
 .sidebar-foot { padding: 8px 4px 0; border-top: 1px solid var(--line); }
 .sidebar-foot .meta { margin: 4px 0; }
-.data-menu { margin-top: 6px; }
-.data-menu summary { cursor: pointer; color: var(--red-dark); font-size: 13px; font-weight: 650; }
-.data-menu-body { display: grid; gap: 5px; padding: 8px 0 0; }
-.data-menu-body a, .link-button, .danger-link {
-  display: block;
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: var(--red-dark);
-  text-align: left;
-  padding: 3px 0;
-  font-size: 12px;
-  text-decoration: none;
-}
-.danger-link { color: var(--red); }
-.link-button { color: var(--red-dark); }
 .banner {
   margin: 12px 4px 0;
   padding: 10px 12px;
