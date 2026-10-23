@@ -114,7 +114,7 @@ h1 { margin: 0; font-family: "Noto Serif SC", SimSun, serif; font-size: clamp(28
 .composer {
   position: fixed;
   z-index: 2;
-  bottom: 0;
+  bottom: 18px;
   left: calc(var(--sidebar-width) + (100% - var(--sidebar-width)) / 2);
   transform: translateX(-50%);
   width: min(960px, calc(100% - var(--sidebar-width) - 32px));
@@ -122,11 +122,10 @@ h1 { margin: 0; font-family: "Noto Serif SC", SimSun, serif; font-size: clamp(28
   grid-template-columns: 1fr auto;
   gap: 10px;
   padding: 16px 18px 12px;
-  background: rgba(249,245,237,.9);
+  background: rgba(249,245,237,.92);
   border: 1px solid var(--line);
-  border-bottom: 0;
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -12px 40px rgba(55,43,27,.08);
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(55,43,27,.12);
   backdrop-filter: blur(16px);
 }
 textarea { resize: none; min-height: 48px; max-height: 150px; padding: 12px 14px; border: 1px solid #cfc3b2; border-radius: 12px; background: #fffdf8; color: var(--ink); outline: none; line-height: 1.5; }
@@ -300,7 +299,13 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
     box-shadow: 18px 0 40px rgba(55,43,27,.16);
   }
   .sidebar.open { transform: translateX(0); }
-  .composer { left: 50%; width: 100%; }
+  .composer {
+    left: 50%;
+    width: calc(100% - 24px);
+    bottom: 12px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
   .topbar { flex-wrap: wrap; }
   .topbar-actions { margin-left: 50px; }
 }
