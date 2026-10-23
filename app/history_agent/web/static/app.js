@@ -360,12 +360,8 @@ function stopGeneration() {
   if (!state.activeRun) return;
   const run = state.activeRun;
   run.completed = false;
-  run.finalizing = false;
   run.controller.abort();
   cancelAnimationFrame(run.frame);
-  const resolveFinalize = run.finalizeResolve;
-  run.finalizeResolve = null;
-  if (resolveFinalize) resolveFinalize();
   run.status = "已停止输出。";
   renderDraft(run);
   run.pending.removeAttribute("aria-busy");
@@ -377,7 +373,8 @@ function stopGeneration() {
 function renderDraft(run) {
   if (!run) return;
   const follow = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220;
-  run.bubble.innerHTML = `<p class="meta stream-status" role="status"><span class="typing"><i></i><i></i><i></i></span>${escapeHtml(run.status)}</p>`;
+  const body = run.text ? `<div class="markdown-body">${renderMarkdown(run.text)}</div>` : "";
+  run.bubble.innerHTML = `<p class="meta stream-status" role="status"><span class="typing"><i></i><i></i><i></i></span>${escapeHtml(run.status)}</p>${body}`;
   if (follow) run.pending.scrollIntoView({block: "end"});
 }
 
@@ -386,38 +383,6 @@ function scheduleDraft(run) {
   run.frame = requestAnimationFrame(() => {
     run.frame = null;
     renderDraft(run);
-  });
-}
-
-function streamFinalAnswer(run, data) {
-  const answer = String(data.answer || "");
-  return new Promise(resolve => {
-    let index = 0;
-    const stepSize = Math.max(3, Math.ceil(answer.length / 150));
-    const finish = () => {
-      run.finalizing = false;
-      run.finalizeResolve = null;
-      resolve();
-    };
-    run.finalizeResolve = finish;
-    run.finalizing = true;
-    const step = () => {
-      if (!run.finalizing) {
-        finish();
-        return;
-      }
-      index = Math.min(answer.length, index + stepSize);
-      const follow = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220;
-      run.bubble.innerHTML = `<p class="meta stream-status" role="status">正在输出最终回答…</p><div class="markdown-body">${renderMarkdown(answer.slice(0, index))}</div>`;
-      if (follow) run.pending.scrollIntoView({block: "end"});
-      if (index >= answer.length) {
-        run.bubble.innerHTML = renderAnswer(data);
-        finish();
-        return;
-      }
-      run.frame = requestAnimationFrame(step);
-    };
-    run.frame = requestAnimationFrame(step);
   });
 }
 
@@ -472,8 +437,8 @@ async function ask(question) {
         run.status = data.message;
         scheduleDraft(run);
       } else if (event === "delta") {
-        // Keep the draft off-screen until the final, validated answer arrives.
         run.text += data.text;
+        scheduleDraft(run);
       } else if (event === "reset") {
         cancelAnimationFrame(run.frame);
         run.frame = null;
@@ -485,9 +450,7 @@ async function ask(question) {
       } else if (event === "done") {
         cancelAnimationFrame(run.frame);
         run.frame = null;
-        run.finalData = data;
-        run.status = "正在输出最终回答…";
-        renderDraft(run);
+        run.bubble.innerHTML = renderAnswer(data);
         run.completed = true;
         completed = true;
         return false;
@@ -495,7 +458,6 @@ async function ask(question) {
       return true;
     });
     if (!completed && state.activeRun === run) throw new Error("连接中断，回答未完成，请重新发送问题");
-    if (run.finalData && state.activeRun === run) await streamFinalAnswer(run, run.finalData);
   } catch (error) {
     if (error.name === "AbortError") {
       run.bubble.innerHTML = `<p class="meta">${escapeHtml(run.status || "已停止输出。")}</p>`;

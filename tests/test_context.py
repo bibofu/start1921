@@ -291,14 +291,14 @@ def test_streaming_interruption_keeps_user_question_as_aborted(
 
 
 @pytest.mark.usefixtures("postgres_settings")
-def test_web_stream_does_not_forward_draft_deltas(
+def test_web_stream_forwards_live_draft_deltas(
     monkeypatch: Any, work_path: Path
 ) -> None:
     settings = _settings(work_path)
 
     async def fake_stream(*args: object) -> Any:
-        yield AnswerStreamEvent("delta", {"text": "不应展示的草稿"})
-        yield AnswerStreamEvent("status", {"message": "正在核查引用…"})
+        yield AnswerStreamEvent("delta", {"text": "边生成边输出的正文"})
+        yield AnswerStreamEvent("status", {"message": "正在生成回答…"})
         yield AnswerStreamEvent("done", _answer("最终问题").model_dump())
 
     monkeypatch.setattr(web_module, "stream_answer_question", fake_stream)
@@ -307,8 +307,8 @@ def test_web_stream_does_not_forward_draft_deltas(
     response = client.post("/api/questions/stream", json={"question": "最终问题"})
 
     assert response.status_code == 200
-    assert "不应展示的草稿" not in response.text
-    assert "event: delta" not in response.text
+    assert "边生成边输出的正文" in response.text
+    assert "event: delta" in response.text
     assert "event: status" in response.text
     assert "event: done" in response.text
     assert "服务端记录的回答" in response.text
