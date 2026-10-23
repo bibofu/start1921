@@ -560,12 +560,6 @@ async function deleteSession(sessionId) {
     renderSessions();
     if (wasCurrent) newSession();
     notifySessionsChanged();
-    showToast("会话已删除", "撤销", async () => {
-      await api(`/api/sessions/${encodeURIComponent(sessionId)}/restore`, {method: "POST"});
-      await loadSessions();
-      await selectSession(sessionId);
-      notifySessionsChanged();
-    });
   } catch (error) {
     showToast(error.message || "删除失败");
   }

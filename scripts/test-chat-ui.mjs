@@ -220,6 +220,7 @@ try {
   await page.locator(".message.welcome").waitFor();
   assert.equal(await page.locator(".session-item").count(), 1);
   assert.equal(dialogs, 0);
+  assert.equal(await page.getByText("会话已删除").count(), 0);
   assert.deepEqual(errors, []);
   console.log("PASS: multi-session create/switch, sidebar, mobile drawer, streaming answer, citations, delete.");
 } finally {
