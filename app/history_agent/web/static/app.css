@@ -267,6 +267,7 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
   line-height: 1.6;
 }
 .load-older { display: block; margin: 0 auto 18px; }
+.toast[hidden] { display: none; }
 .toast {
   position: fixed;
   z-index: 20;
