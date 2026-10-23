@@ -33,10 +33,7 @@ from history_agent.answering.synthesis import (
     _extractive_answer,
 )
 from history_agent.answering.task_executor import HistoryTaskExecutor
-from history_agent.answering.validation import (
-    remove_uncited_claim_blocks,
-    validate_grounded_answer,
-)
+from history_agent.answering.validation import validate_grounded_answer
 from history_agent.config import Settings
 from history_agent.retrieval.models import RetrievalPlan, SearchHit, SearchResponse
 from history_agent.web import app as web_module
@@ -531,21 +528,6 @@ def test_validation_rejects_uncited_core_fact_line() -> None:
     assert result.valid is False
     assert result.error_code == "uncited_core_claim"
     assert result.uncited_claims == ("随后主持科学规划工作。",)
-
-
-def test_uncited_markdown_label_is_removed_without_collapsing_cited_answer() -> None:
-    draft = (
-        "# 毛泽东对蒋介石的评价\n\n"
-        "**晚年：称蒋介石为“老朋友”，主张和平谈判**\n\n"
-        "1960年，毛泽东称蒋介石为老朋友。[E1]"
-    )
-    validation = validate_grounded_answer(draft, [_citation()])
-
-    assert validation.error_code == "uncited_core_claim"
-    assert validation.uncited_claims == ("晚年：称蒋介石为“老朋友”，主张和平谈判",)
-    salvaged = remove_uncited_claim_blocks(draft, validation.uncited_claims)
-    assert salvaged == ("# 毛泽东对蒋介石的评价\n\n1960年，毛泽东称蒋介石为老朋友。[E1]")
-    assert validate_grounded_answer(salvaged, [_citation()]).valid
 
 
 def test_validation_accepts_wrapped_fact_with_citation_in_same_list_item() -> None:

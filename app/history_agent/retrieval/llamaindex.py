@@ -159,32 +159,3 @@ def retrieve_with_llamaindex(
         raise RuntimeError("LlamaIndex retriever completed without a search response")
     hits = [node_to_search_hit(node, rank) for rank, node in enumerate(nodes, start=1)]
     return retriever.last_response.model_copy(update={"hits": hits, "rag_framework": "llamaindex"})
-
-
-async def aretrieve_with_llamaindex(
-    *,
-    search_backend: SearchBackend,
-    query: str,
-    additional_queries: list[str],
-    top_k: int,
-    search_kwargs: dict[str, Any],
-    callback_manager: CallbackManager | None = None,
-) -> SearchResponse:
-    """Asynchronously execute one retrieval round without blocking the event loop."""
-
-    manager = callback_manager or CallbackManager()
-    retriever = HistoryHybridRetriever(
-        search_backend=search_backend,
-        search_kwargs={**search_kwargs, "top_k": top_k},
-        additional_queries=additional_queries,
-        callback_manager=manager,
-    )
-    bundle = QueryBundle(query_str=query)
-    nodes = await retriever.aretrieve(bundle)
-    nodes = await HistoryEvidencePostprocessor(
-        max_nodes=top_k, callback_manager=manager
-    ).apostprocess_nodes(nodes, query_bundle=bundle)
-    if retriever.last_response is None:
-        raise RuntimeError("LlamaIndex retriever completed without a search response")
-    hits = [node_to_search_hit(node, rank) for rank, node in enumerate(nodes, start=1)]
-    return retriever.last_response.model_copy(update={"hits": hits, "rag_framework": "llamaindex"})

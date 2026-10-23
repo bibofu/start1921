@@ -7,7 +7,6 @@ retained for evaluation metrics and historical regression checks.
 from __future__ import annotations
 
 import re
-from collections import Counter
 from dataclasses import dataclass
 
 from markdown_it import MarkdownIt
@@ -380,28 +379,3 @@ def validate_grounded_answer(answer: str, citations: list[Citation]) -> AnswerVa
         valid=True,
         used_evidence_ids=used_evidence_ids,
     )
-
-
-def remove_uncited_claim_blocks(answer: str, uncited_claims: tuple[str, ...]) -> str | None:
-    """Remove only source blocks rejected for missing citations.
-
-    The caller must validate the returned Markdown again before using it. Returning
-    ``None`` keeps the safe extractive fallback for structures without source maps.
-    """
-
-    remaining = Counter(uncited_claims)
-    removed_lines: set[int] = set()
-    for block in _claim_blocks(answer):
-        claim = _claim_text(block.text)
-        if not remaining[claim]:
-            continue
-        if block.start_line is None or block.end_line is None:
-            return None
-        removed_lines.update(range(block.start_line, block.end_line))
-        remaining[claim] -= 1
-    if any(remaining.values()) or not removed_lines:
-        return None
-    lines = answer.splitlines(keepends=True)
-    candidate = "".join(line for index, line in enumerate(lines) if index not in removed_lines)
-    candidate = re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", candidate).strip()
-    return candidate or None

@@ -485,16 +485,3 @@ def query_execution(question: str, plan: QueryPlan | None, aliases_path: Path) -
         else 2
     )
     return QueryExecution(question, tuple(unique[:query_limit]), retrieval_plan)
-
-
-def retrieval_query(question: str, plan: QueryPlan | None) -> str:
-    """Compatibility helper returning the visible aggregate of planned query variants."""
-
-    if plan is None:
-        return question
-    parts = [question, plan.normalized_question, *plan.search_queries]
-    parts.extend(entity.canonical for entity in plan.entities if entity.canonical != entity.text)
-    hint = INTENT_HINTS.get(plan.intent)
-    if hint:
-        parts.append(hint)
-    return " ".join(dict.fromkeys(" ".join(part.split()) for part in parts if part.strip()))

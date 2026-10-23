@@ -10,7 +10,6 @@ from history_agent.answering.context import (
     ConversationMessage,
     ConversationStore,
     SessionNotFound,
-    estimate_tokens,
     sanitize_history_content,
 )
 from history_agent.processing.chunks import extract_people, load_person_aliases
@@ -155,7 +154,3 @@ def maybe_compress_session(
         model="extractive-v1",
     )
     return saved is not None
-
-
-def summary_token_count(content: str) -> int:
-    return estimate_tokens(content)

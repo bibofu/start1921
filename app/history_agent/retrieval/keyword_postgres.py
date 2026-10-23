@@ -201,17 +201,6 @@ class _Fingerprinter:
         return result
 
 
-def fingerprint_keyword_data(
-    chunks: Iterable[IndexedChunk], postings: Iterable[Posting]
-) -> dict[str, Any]:
-    result = _Fingerprinter()
-    for chunk in chunks:
-        result.add_chunk(chunk)
-    for posting in postings:
-        result.add_posting(posting)
-    return result.result()
-
-
 def _postgres(connection: Any) -> PostgresConnection:
     if not isinstance(connection, PostgresConnection):
         raise IndexBuildError("Keyword destination must be a PostgreSQL URL")

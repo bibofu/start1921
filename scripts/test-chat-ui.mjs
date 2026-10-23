@@ -130,15 +130,6 @@ const server = createServer(async (req, res) => {
       return;
     }
   }
-  if (url.pathname === "/api/visitor/export") {
-    json(res, {sessions: [...sessions.values()].map(session => ({session: sessionPayload(session), messages: session.messages}))});
-    return;
-  }
-  if (url.pathname === "/api/visitor/data" && req.method === "DELETE") {
-    sessions.clear();
-    json(res, {deleted_sessions: 0});
-    return;
-  }
   if (url.pathname === "/api/questions/stream") {
     let body = "";
     for await (const chunk of req) body += chunk;
