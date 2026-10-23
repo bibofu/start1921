@@ -135,7 +135,7 @@ curl --fail http://127.0.0.1:18021/api/ready
 - `HISTORY_AGENT_QUOTA_ENABLED=true` 及每日问题/token 限额。
 
 Cookie 丢失、换浏览器或清站点数据会得到新的空 workspace，旧会话仍在库中但应用内
-不可见；页面提供“导出全部会话”。不存在账号找回或跨设备同步。nginx 示例已加
+不可见。不存在账号找回或跨设备同步。nginx 示例已加
 HSTS/CSP；生产建议在 `http{}` 定义 `limit_req_zone`/`limit_conn_zone`，对
 `/api/visitor` 和 `/api/questions` 单独限流。应用不会信任任意代理头，Dockerfile
 只信任私有网段转发的 `X-Forwarded-For`。

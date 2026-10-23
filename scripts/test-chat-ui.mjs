@@ -173,7 +173,9 @@ try {
   browser = await chromium.launch({channel: "msedge", headless: true});
   const page = await browser.newPage({viewport: {width: 1200, height: 1000}});
   const errors = [];
+  let dialogs = 0;
   page.on("pageerror", error => errors.push(error.message));
+  page.on("dialog", dialog => { dialogs += 1; dialog.accept(); });
   await page.route("**/*", route => {
     if (!route.request().url().startsWith(base)) return route.abort();
     return route.continue();
@@ -214,10 +216,10 @@ try {
   await page.screenshot({path: fileURLToPath(new URL("../data/reports/multisession-mobile.png", import.meta.url)), fullPage: true});
   await page.setViewportSize({width: 1200, height: 1000});
 
-  page.once("dialog", dialog => dialog.accept());
   await page.getByRole("button", {name: "删除会话"}).click();
   await page.locator(".message.welcome").waitFor();
   assert.equal(await page.locator(".session-item").count(), 1);
+  assert.equal(dialogs, 0);
   assert.deepEqual(errors, []);
   console.log("PASS: multi-session create/switch, sidebar, mobile drawer, streaming answer, citations, delete.");
 } finally {

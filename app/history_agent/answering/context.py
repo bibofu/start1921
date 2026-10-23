@@ -708,12 +708,11 @@ class ConversationStore:
         limit: int = 50,
         offset: int = 0,
         query: str = "",
-        status: str = "active",
     ) -> tuple[list[SessionRecord], bool]:
         limit = max(1, min(limit, 100))
         offset = max(0, offset)
-        where = ["visitor_id = ?", "status = ?"]
-        parameters: list[Any] = [visitor_id, status]
+        where = ["visitor_id = ?", "status = 'active'"]
+        parameters: list[Any] = [visitor_id]
         if query:
             escaped = query.replace("%", "\\%").replace("_", "\\_")
             like = f"%{escaped}%"
@@ -765,19 +764,6 @@ class ConversationStore:
                 "UPDATE conversation_sessions SET pinned = ?, updated_at = ?, "
                 "version = version + 1 WHERE session_id = ? AND visitor_id = ? RETURNING *",
                 (pinned, now, session_id, visitor_id),
-            ).fetchone()
-            if row is None:
-                self._raise_update_error(connection, visitor_id, session_id, None)
-        return _session_from_row(row)
-
-    def set_archived(self, visitor_id: str, session_id: str, archived: bool) -> SessionRecord:
-        now = _now()
-        with self._connect() as connection:
-            row = connection.execute(
-                "UPDATE conversation_sessions SET status = ?, updated_at = ?, "
-                "version = version + 1 WHERE session_id = ? AND visitor_id = ? "
-                "AND status <> 'deleted' RETURNING *",
-                ("archived" if archived else "active", now, session_id, visitor_id),
             ).fetchone()
             if row is None:
                 self._raise_update_error(connection, visitor_id, session_id, None)
@@ -1167,35 +1153,6 @@ class ConversationStore:
                 "DELETE FROM conversation_sessions WHERE visitor_id = ?", (visitor_id,)
             )
         return int(result.rowcount or 0)
-
-    def export_visitor(self, visitor_id: str) -> dict[str, object]:
-        sessions, _ = self.list_sessions(visitor_id, limit=100, offset=0, status="active")
-        archived, _ = self.list_sessions(visitor_id, limit=100, offset=0, status="archived")
-        payload: list[dict[str, object]] = []
-        for session in [*sessions, *archived]:
-            messages = self.session_messages(
-                visitor_id, session.session_id, limit=200, include_unfinished=True
-            )
-            payload.append(
-                {
-                    "session": session.as_dict(),
-                    "messages": [
-                        {
-                            "message_id": message.message_id,
-                            "role": message.role,
-                            "content": message.content,
-                            "status": message.status,
-                            "created_at": message.created_at,
-                        }
-                        for message in messages
-                    ],
-                }
-            )
-        return {
-            "visitor_label": self.get_visitor_label(visitor_id),
-            "exported_at": _now(),
-            "sessions": payload,
-        }
 
     # ------------------------------------------------------------------
     # Quotas

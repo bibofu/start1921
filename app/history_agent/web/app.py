@@ -7,7 +7,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import aclosing, asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from importlib.resources import files
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any
 from urllib.parse import urlsplit
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
@@ -75,7 +75,6 @@ class SessionCreate(BaseModel):
 class SessionUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=120)
     pinned: bool | None = None
-    status: Literal["active", "archived"] | None = None
     version: int | None = Field(default=None, ge=0)
 
 
@@ -350,19 +349,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             },
         }
 
-    @api.get("/api/visitor/export")
-    def export_visitor(
-        visitor: Annotated[VisitorContext, Depends(current_visitor)],
-    ) -> JSONResponse:
-        payload = conversations.export_visitor(visitor.visitor_id)
-        return JSONResponse(
-            payload,
-            headers={
-                "Content-Disposition": 'attachment; filename="start1921-export.json"',
-                "Cache-Control": "no-store",
-            },
-        )
-
     @api.delete("/api/visitor/data")
     def delete_visitor_data(
         request: Request,
@@ -376,7 +362,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def list_sessions(
         visitor: Annotated[VisitorContext, Depends(current_visitor)],
         q: Annotated[str, Query(max_length=200)] = "",
-        status: Literal["active", "archived"] = "active",
         limit: Annotated[int, Query(ge=1, le=100)] = 50,
         offset: Annotated[int, Query(ge=0)] = 0,
     ) -> dict[str, object]:
@@ -385,7 +370,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             limit=limit,
             offset=offset,
             query=q,
-            status=status,
         )
         return {
             "items": [_session_payload(item) for item in items],
@@ -494,10 +478,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             if payload.pinned is not None:
                 session = conversations.set_pinned(
                     visitor.visitor_id, session_id, payload.pinned
-                )
-            if payload.status is not None:
-                session = conversations.set_archived(
-                    visitor.visitor_id, session_id, payload.status == "archived"
                 )
         except VersionConflict as exc:
             raise HTTPException(status_code=409, detail="会话已被其他标签页修改") from exc

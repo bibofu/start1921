@@ -20,9 +20,7 @@ const deleteSessionButton = document.querySelector("#delete-session");
 const visitorLabel = document.querySelector("#visitor-label");
 const quotaLabel = document.querySelector("#quota");
 const cookieWarning = document.querySelector("#cookie-warning");
-const exportData = document.querySelector("#export-data");
 const deleteAllDataButton = document.querySelector("#delete-all-data");
-const toggleArchived = document.querySelector("#toggle-archived");
 const toast = document.querySelector("#toast");
 
 const CURRENT_SESSION_KEY = "start1921-current-session-v2";
@@ -36,7 +34,6 @@ const state = {
   hasMore: false,
   offset: 0,
   query: "",
-  status: "active",
   currentSessionId: null,
   currentSession: null,
   messages: [],
@@ -258,7 +255,6 @@ function sessionItemHtml(session) {
       <div class="session-menu">
         <button type="button" data-action="rename">重命名</button>
         <button type="button" data-action="${session.pinned ? "unpin" : "pin"}">${session.pinned ? "取消置顶" : "置顶"}</button>
-        <button type="button" data-action="${state.status === "archived" ? "unarchive" : "archive"}">${state.status === "archived" ? "移回会话" : "归档"}</button>
         <button type="button" data-action="delete">删除</button>
       </div>
     </details>
@@ -268,7 +264,7 @@ function sessionItemHtml(session) {
 function renderSessions() {
   if (!sessionList) return;
   if (!state.sessions.length) {
-    sessionList.innerHTML = `<p class="sidebar-empty">${state.query ? "没有匹配的会话" : state.status === "archived" ? "没有归档会话" : "还没有会话"}</p>`;
+    sessionList.innerHTML = `<p class="sidebar-empty">${state.query ? "没有匹配的会话" : "还没有会话"}</p>`;
     return;
   }
   sessionList.innerHTML = state.sessions.map(sessionItemHtml).join("");
@@ -280,7 +276,7 @@ async function loadSessions({append = false} = {}) {
   state.loadingSessions = true;
   try {
     if (!append) state.offset = 0;
-    const params = new URLSearchParams({limit: "50", offset: String(state.offset), status: state.status});
+    const params = new URLSearchParams({limit: "50", offset: String(state.offset)});
     if (state.query) params.set("q", state.query);
     const data = await api(`/api/sessions?${params.toString()}`);
     const items = Array.isArray(data.items) ? data.items : [];
@@ -555,26 +551,7 @@ async function pinSession(sessionId, pinned) {
   }
 }
 
-async function archiveSession(sessionId, archived) {
-  if (archived && state.currentSessionId === sessionId && state.activeRun) {
-    if (!window.confirm("当前会话正在生成，归档会停止生成。继续？")) return;
-    stopGeneration();
-  }
-  try {
-    await api(`/api/sessions/${encodeURIComponent(sessionId)}`, {
-      method: "PATCH",
-      body: JSON.stringify({status: archived ? "archived" : "active"})
-    });
-    await loadSessions();
-    notifySessionsChanged();
-    if (archived && state.currentSessionId === sessionId) newSession();
-  } catch (error) {
-    showToast(error.message || "操作失败");
-  }
-}
-
 async function deleteSession(sessionId) {
-  if (!window.confirm("删除这个会话？30 天内可以撤销。")) return;
   if (state.currentSessionId === sessionId && state.activeRun) stopGeneration();
   try {
     await api(`/api/sessions/${encodeURIComponent(sessionId)}`, {method: "DELETE"});
@@ -713,13 +690,7 @@ function bindEvents() {
   deleteSessionButton?.addEventListener("click", () => {
     if (state.currentSessionId) deleteSession(state.currentSessionId);
   });
-  exportData?.addEventListener("click", () => closeSidebar());
   deleteAllDataButton?.addEventListener("click", deleteAllData);
-  toggleArchived?.addEventListener("click", async () => {
-    state.status = state.status === "active" ? "archived" : "active";
-    toggleArchived.textContent = state.status === "active" ? "查看归档" : "返回会话";
-    await loadSessions();
-  });
   sessionSearch?.addEventListener("input", () => {
     clearTimeout(sessionSearch._timer);
     sessionSearch._timer = setTimeout(async () => {
@@ -742,8 +713,6 @@ function bindEvents() {
         await renameCurrentSession();
       } else if (action === "pin" || action === "unpin") {
         await pinSession(sessionId, action === "pin");
-      } else if (action === "archive" || action === "unarchive") {
-        await archiveSession(sessionId, action === "archive");
       } else if (action === "delete") {
         await deleteSession(sessionId);
       }

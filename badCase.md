@@ -452,13 +452,13 @@
 - 根因：会话表只有 `session_id`，没有访客归属、标题、状态、版本和列表查询；前端只持久化一个 ID；没有 visitor cookie/CSRF；消息只在最终回答后原子写入，停止/失败时问题丢失。
 - 解决方案：
   - 新增 `visitors`/`visitor_tokens`，服务端签发 HttpOnly 匿名 workspace token，DB 只存 HMAC；会话和消息统一按 `visitor_id + session_id` 校验，跨访客 404。
-  - `conversation_sessions` 增加 `visitor_id/title/title_source/status/pinned/last_message_at/message_count/last_message_preview/search_text/active_run_id/version/deleted_at`；新增会话列表、新建、重命名、置顶、归档、软删除/恢复、认领旧会话和导出接口。
+  - `conversation_sessions` 增加 `visitor_id/title/title_source/status/pinned/last_message_at/message_count/last_message_preview/search_text/active_run_id/version/deleted_at`；新增会话列表、新建、重命名、置顶、软删除/恢复和认领旧会话接口。
   - `conversation_messages` 增加 `status/client_request_id`；生成开始先写 user `pending`，完成/停止/失败分别更新，停止或断流不再丢失问题。
-  - 前端增加会话侧边栏、搜索、新建/切换/重命名/置顶/归档/删除撤销、URL 路由 `/s/{id}`、移动端抽屉和多标签 BroadcastChannel。
+  - 前端增加会话侧边栏、搜索、新建/切换/重命名/置顶/删除撤销、URL 路由 `/s/{id}`、移动端抽屉和多标签 BroadcastChannel。
   - 新增 visitor/IP/global 配额与 reserve/settle/release；生产开启 CSRF、Secure `__Host-` cookie 和 nginx 限流。
   - 移除 200 条消息物理裁剪；完整回答入库，上下文仍沿用现有消息数/字符预算。
 - 验证结果：`tests/test_context.py` 覆盖访客隔离、会话 CRUD/搜索/置顶/软删恢复、旧会话认领、配额 429、CSRF 403、流式完成和存储故障不静默；`scripts/test-chat-ui.mjs` 覆盖多会话创建/切换、侧边栏、移动端抽屉、流式回答、引用和删除。全项目 1063 项 Python 测试、Ruff、mypy、前端语法及 3 项 SSE 解析测试通过。
-- 残留限制：不做登录，清 Cookie/换设备会丢失历史，应用内只能导出，不能找回；匿名用户可通过清 Cookie 重置 visitor 配额，生产必须依赖 IP/global 限额和 nginx 限流；M1 上下文压缩尚未实施。
+- 残留限制：不做登录，清 Cookie/换设备会丢失历史，应用内不能找回；匿名用户可通过清 Cookie 重置 visitor 配额，生产必须依赖 IP/global 限额和 nginx 限流；M1 上下文压缩尚未实施。
 
 ## BC-040：长会话历史线性增长，旧上下文只能被截断
 
@@ -472,6 +472,6 @@
   - `compression.py` 从问题、助手线索、人物别名、年份、用户约束生成 ≤1,800 字的摘要，明确标注“自动压缩，不是史实证据”，并清除旧 `[E#]`。
   - `build_prompt_context` 新增 token 预算（默认 8,000，可配置 `context_max_tokens`）和 summary 参数；上下文由摘要 + 摘要之后的最近消息组成，摘要不再重复旧问题索引。
   - 同步/流式回答完成后调用压缩，失败只记录日志，不阻塞回答；摘要落库幂等（`session_id + through_message_id` 唯一）。
-  - 完整消息仍保留，不做物理裁剪；导出接口包含完整消息。
+  - 完整消息仍保留，不做物理裁剪。
 - 验证结果：新增 token 预算、摘要非证据标记、滚动摘要替换旧消息的测试；全项目 1063 项 Python 测试、Ruff、mypy、前端语法及 SSE 解析测试通过。
 - 残留限制：当前摘要为确定性抽取，不是语义摘要；没有层级摘要/长期记忆；摘要只覆盖已经完成的消息，进行中的问题不压缩；摘要质量仍需 Golden 多轮人工复核。

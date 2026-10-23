@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     visitor_cookie_secure: bool = False
     csrf_enabled: bool = False
     quota_enabled: bool = True
-    visitor_daily_questions: int = Field(default=20, ge=1, le=10_000)
+    visitor_daily_questions: int = Field(default=100, ge=1, le=10_000)
     visitor_daily_tokens: int = Field(default=200_000, ge=1_000, le=100_000_000)
     ip_daily_questions: int = Field(default=60, ge=1, le=100_000)
     ip_daily_tokens: int = Field(default=600_000, ge=1_000, le=1_000_000_000)

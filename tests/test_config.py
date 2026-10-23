@@ -27,6 +27,8 @@ def test_settings_resolve_paths(work_path: Path) -> None:
     assert settings.llm_retrieval_reflection is True
     assert settings.llm_query_planner_max_tokens == 2000
     assert settings.llm_retrieval_reflection_max_queries == 3
+    assert settings.visitor_daily_questions == 100
+    assert settings.context_max_tokens == 8000
     assert settings.database_target == "postgresql://localhost/history"
     assert settings.conversation_database_target == settings.database_target
     assert settings.database_backend == "postgresql"
