@@ -579,13 +579,13 @@ RRF 后再按查询意图增加 0.004：
 | `max_tokens` | 5000 |
 | 单次生成超时 | 120 秒，但受整次请求剩余预算约束 |
 | 整次请求预算 | 90 秒，涵盖规划、检索相关模型调用与生成 |
-| 网页会话上下文 | 默认最多 12 条、合计 12,000 字符，仅明确追问时进入模型提示词 |
+| 网页会话上下文 | 默认最多 12 条、8,000 tokens，并叠加滚动摘要；仅明确追问时进入模型提示词 |
 
 查询规划器默认使用 `deepseek-v4-flash`、关闭 thinking、JSON Output、`max_tokens=2000`、超时 20 秒，使用同一份受限对话上下文。2000 是代码默认值，已有 `.env` 中显式设置的 `HISTORY_AGENT_LLM_QUERY_PLANNER_MAX_TOKENS` 继续生效，不会被重构自动改写。提示词按该上限缩小初始任务数量。API 通过 `research_plan` 与 `execution_summary` 暴露真实计划和执行结果；保留 `query_plan`、`query_planner_status`、模型、用量和错误诊断字段。`llm_usage` 包括答案分组、综合与修复的已返回用量，各阶段完整汇总见 `execution_summary.usage_by_stage`。
 
 证据充分性模型检查仍由 `llm_retrieval_reflection` 控制启用，只对覆盖计划、比较/原因分析等需要检查的问题调用；旧的单轮反思上限配置已删除。增补次数、工具重试和停止统一由主 Workflow 决定，不能在检查器、工具或合成器内部另开循环。
 
-网页提交问题、`top_k=12` 与 `session_id`，由服务从 PostgreSQL 会话库读取历史并按消息数和字符预算构建上下文；浏览器只保存当前会话 ID。服务端为每个浏览器签发 HttpOnly 匿名 workspace cookie，会话按 `visitor_id` 隔离；跨访客访问统一返回 404。没有登录，清 Cookie/换设备会丢失历史，页面提供导出和提示。直接 API 请求可在不传 `session_id` 时提供最多 12 条历史消息；有 `session_id` 时忽略客户端历史。明确指代或省略式追问才会使用历史，旧 `[E#]` 被替换为历史引用标记，历史回答不能充当当前史实证据。会话消息不再按 200 条物理裁剪；完整回答入库，上下文仍受消息数和字符预算约束。
+网页提交问题、`top_k=12` 与 `session_id`，由服务从 PostgreSQL 会话库读取历史并按消息数、字符数和 token 预算构建上下文；浏览器只保存当前会话 ID。服务端为每个浏览器签发 HttpOnly 匿名 workspace cookie，会话按 `visitor_id` 隔离；跨访客访问统一返回 404。没有登录，清 Cookie/换设备会丢失历史，页面提供导出和提示。直接 API 请求可在不传 `session_id` 时提供最多 12 条历史消息；有 `session_id` 时忽略客户端历史。明确指代或省略式追问才会使用历史，旧 `[E#]` 被替换为历史引用标记，历史回答不能充当当前史实证据。会话消息不再按 200 条物理裁剪；完整回答入库。每 6 条完成消息触发一次确定性滚动摘要（保留最近 2 条），摘要明确标注“不是史实证据”并带人物、年份、用户约束和旧结论线索；后续上下文由摘要加最近消息组成，避免历史线性增长。
 
 系统提示词要求模型：
 
@@ -749,5 +749,6 @@ uv run start1921 eval answers --top-k 10
 | 引用校验与删段 | `app/history_agent/answering/validation.py` |
 | 结构化候选证据收集 | `app/history_agent/answering/structured.py` |
 | 会话持久化、访客隔离与上下文预算 | `app/history_agent/answering/context.py` |
+| 确定性滚动摘要与压缩 | `app/history_agent/answering/compression.py` |
 | Web API | `app/history_agent/web/app.py` |
 | 前端流式与 Markdown | `app/history_agent/web/static/app.js`、`markdown.js` |

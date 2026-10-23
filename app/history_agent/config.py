@@ -80,6 +80,7 @@ class Settings(BaseSettings):
     llm_retrieval_reflection_timeout_seconds: float = Field(default=15.0, ge=5.0, le=60.0)
     context_max_messages: int = Field(default=12, ge=4, le=50)
     context_max_chars: int = Field(default=12_000, ge=1000, le=100_000)
+    context_max_tokens: int = Field(default=8_000, ge=1_000, le=100_000)
     visitor_token_pepper: SecretStr = SecretStr("start1921-dev-visitor-pepper")
     visitor_cookie_name: str = "start1921_vid"
     visitor_cookie_secure: bool = False
@@ -288,6 +289,7 @@ class Settings(BaseSettings):
             ),
             "context_max_messages": self.context_max_messages,
             "context_max_chars": self.context_max_chars,
+            "context_max_tokens": self.context_max_tokens,
             "visitor_cookie_name": self.visitor_cookie_name,
             "visitor_cookie_secure": self.visitor_cookie_secure,
             "csrf_enabled": self.csrf_enabled,

@@ -5,9 +5,11 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from history_agent.answering.compression import build_extractive_summary
 from history_agent.answering.context import (
     ConversationStore,
     build_prompt_context,
+    estimate_tokens,
     sanitize_history_content,
 )
 from history_agent.answering.models import AnswerResponse, ConversationMessage, QuestionRequest
@@ -387,3 +389,63 @@ def test_question_storage_failure_does_not_silently_answer(
         "/api/questions", json={"question": "存储故障问题", "session_id": session_id}
     )
     assert response.status_code == 500
+
+
+def test_build_prompt_context_respects_token_budget() -> None:
+    messages = [
+        ConversationMessage(role="user", content="前情" * 2_000),
+        ConversationMessage(role="assistant", content="回答" * 2_000),
+    ]
+    context = build_prompt_context(
+        messages,
+        max_messages=12,
+        max_chars=100_000,
+        max_tokens=120,
+    )
+    assert context
+    assert sum(estimate_tokens(item.content) for item in context) <= 120
+
+
+def test_extractive_summary_is_labeled_as_non_evidence() -> None:
+    summary = build_extractive_summary(
+        previous="",
+        messages=[
+            ConversationMessage(role="user", content="毛泽东在1935年的职务。[E1]"),
+            ConversationMessage(role="assistant", content="助手回答。[E2]"),
+        ],
+        max_chars=2_000,
+    )
+    assert "不是史实证据" in summary
+    assert "[E" not in summary
+    assert "1935" in summary
+
+
+@pytest.mark.usefixtures("postgres_settings")
+def test_rolling_summary_replaces_old_messages_in_context(
+    monkeypatch: Any, work_path: Path
+) -> None:
+    settings = _settings(work_path, context_max_tokens=8_000)
+    received: list[QuestionRequest] = []
+
+    async def fake_answer(active_settings: Settings, request: QuestionRequest) -> AnswerResponse:
+        received.append(request)
+        return _answer(request.question)
+
+    monkeypatch.setattr(web_module, "answer_question_async", fake_answer)
+    client = TestClient(web_module.create_app(settings))
+    session_id = _create_session(client)
+
+    for number in range(1, 5):
+        response = client.post(
+            "/api/questions",
+            json={"question": f"第{number}个问题", "session_id": session_id},
+        )
+        assert response.status_code == 200, response.text
+
+    fourth_history = received[3].history
+    assert fourth_history
+    assert fourth_history[0].role == "assistant"
+    assert fourth_history[0].content.startswith("会话摘要")
+    assert all(item.content != "第1个问题" for item in fourth_history)
+    assert any(item.content == "第3个问题" for item in fourth_history)
+    assert sum(estimate_tokens(item.content) for item in fourth_history) <= 8_000

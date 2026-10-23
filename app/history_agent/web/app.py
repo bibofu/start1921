@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from history_agent import __version__
+from history_agent.answering.compression import maybe_compress_session
 from history_agent.answering.context import (
     COOKIE_CHECK_NAME,
     ConversationMessage,
@@ -251,6 +252,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except SessionNotFound as exc:
             raise HTTPException(status_code=404, detail="会话不存在") from exc
 
+    def compress_session(visitor_id: str, session_id: str) -> None:
+        try:
+            maybe_compress_session(
+                conversations,
+                visitor_id,
+                session_id,
+                person_aliases_path=active_settings.person_aliases_path,
+            )
+        except Exception:
+            LOGGER.exception("conversation compression failed")
+
     def with_session_context(
         visitor: VisitorContext,
         request: QuestionRequest,
@@ -263,12 +275,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(status_code=503, detail="会话服务暂不可用")
         session = session_or_404(visitor, request.session_id)
         del session
+        summary = conversations.latest_summary(visitor.visitor_id, request.session_id)
         try:
             persisted = conversations.session_messages(
                 visitor.visitor_id,
                 request.session_id,
+                after=summary.through_message_id if summary else None,
                 before=before_message_id,
-                limit=200,
+                limit=1_000,
                 include_unfinished=False,
             )
         except SessionNotFound as exc:
@@ -277,6 +291,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             persisted,
             max_messages=active_settings.context_max_messages,
             max_chars=active_settings.context_max_chars,
+            max_tokens=active_settings.context_max_tokens,
+            summary=summary.content if summary else None,
         )
         return request.model_copy(update={"history": history})
 
@@ -564,7 +580,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     RequestBudget.start(active_settings.request_timeout_seconds),
                 )
             if start is not None and payload.session_id is not None:
-                conversations.complete_question(
+                saved = conversations.complete_question(
                     visitor.visitor_id,
                     payload.session_id,
                     start.message_id,
@@ -572,6 +588,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     start.run_id,
                     client_request_id=payload.client_request_id,
                 )
+                if saved:
+                    compress_session(visitor.visitor_id, payload.session_id)
             prompt_tokens, completion_tokens = _usage_from_response(response)
             conversations.settle_quota(
                 reservation,
@@ -696,6 +714,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                                 )
                             else:
                                 completed = True
+                            if completed and start is not None and payload.session_id is not None:
+                                compress_session(visitor.visitor_id, payload.session_id)
                             prompt_tokens, completion_tokens = _usage_from_event(data)
                             conversations.settle_quota(
                                 reservation,
