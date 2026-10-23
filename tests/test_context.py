@@ -12,7 +12,12 @@ from history_agent.answering.context import (
     estimate_tokens,
     sanitize_history_content,
 )
-from history_agent.answering.models import AnswerResponse, ConversationMessage, QuestionRequest
+from history_agent.answering.models import (
+    AnswerResponse,
+    Citation,
+    ConversationMessage,
+    QuestionRequest,
+)
 from history_agent.answering.streaming import AnswerStreamEvent
 from history_agent.config import Settings
 from history_agent.db_backend import INTEGRITY_ERRORS
@@ -217,8 +222,25 @@ def test_streaming_endpoint_persists_completed_answers(
     settings = _settings(work_path)
 
     async def fake_stream(*args: object) -> Any:
+        answer = _answer("流式问题").model_copy(
+            update={
+                "citations": [
+                    Citation(
+                        evidence_id="E1",
+                        document_id="doc",
+                        document="周恩来年谱",
+                        pdf_page=12,
+                        section=[],
+                        quote="测试原文。",
+                        source_type="chronology",
+                        verification_status="verified",
+                        extraction_methods=["pymupdf"],
+                    )
+                ]
+            }
+        )
         yield AnswerStreamEvent("delta", {"text": "回答"})
-        yield AnswerStreamEvent("done", _answer("流式问题").model_dump())
+        yield AnswerStreamEvent("done", answer.model_dump())
 
     monkeypatch.setattr(web_module, "stream_answer_question", fake_stream)
     client = TestClient(web_module.create_app(settings))
@@ -237,6 +259,9 @@ def test_streaming_endpoint_persists_completed_answers(
         "服务端记录的回答。[E1]",
     ]
     assert [item["status"] for item in restored] == ["completed", "completed"]
+    assert restored[1]["metadata"]["citations"][0]["evidence_id"] == "E1"
+    assert restored[1]["metadata"]["retrieval_mode"] == "hybrid_rrf"
+    assert "answer" not in restored[1]["metadata"]
 
 
 @pytest.mark.usefixtures("postgres_settings")

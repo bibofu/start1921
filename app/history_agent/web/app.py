@@ -97,7 +97,13 @@ def _message_payload(message: ConversationMessage) -> dict[str, object]:
         "content": message.content,
         "status": message.status,
         "created_at": message.created_at,
+        "metadata": message.metadata,
     }
+
+
+def _answer_metadata(payload: AnswerResponse | dict[str, object]) -> dict[str, object]:
+    data = payload.model_dump() if isinstance(payload, AnswerResponse) else dict(payload)
+    return {key: value for key, value in data.items() if key not in {"answer", "question"}}
 
 
 def _next_before(messages: list[ConversationMessage], limit: int) -> int | None:
@@ -565,6 +571,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     response.answer,
                     start.run_id,
                     client_request_id=payload.client_request_id,
+                    metadata=_answer_metadata(response),
                 )
                 if saved:
                     compress_session(visitor.visitor_id, payload.session_id)
@@ -694,6 +701,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                                     str(data["answer"]),
                                     start.run_id,
                                     client_request_id=payload.client_request_id,
+                                    metadata=_answer_metadata(data),
                                 )
                             else:
                                 completed = True

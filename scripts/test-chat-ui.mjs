@@ -41,8 +41,8 @@ function createSession() {
 function getSession(id) {
   return sessions.get(id) || null;
 }
-function addMessage(session, role, content) {
-  session.messages.push({message_id: session.messages.length + 1, role, content, status: "completed", created_at: new Date().toISOString()});
+function addMessage(session, role, content, metadata = {}) {
+  session.messages.push({message_id: session.messages.length + 1, role, content, status: "completed", created_at: new Date().toISOString(), metadata});
   session.updatedAt = new Date().toISOString();
   session.lastMessageAt = session.updatedAt;
   session.version += 1;
@@ -151,8 +151,10 @@ const server = createServer(async (req, res) => {
     send(res, "status", {message: "正在生成，引用待核查…"});
     send(res, "delta", {text: "## 研究结论\n\n"});
     setTimeout(() => {
-      addMessage(session, "assistant", final(data.question).answer);
-      send(res, "done", final(data.question));
+      const answer = final(data.question);
+      const {answer: _answer, ...metadata} = answer;
+      addMessage(session, "assistant", answer.answer, metadata);
+      send(res, "done", answer);
       res.end();
     }, 250);
     return;
@@ -205,6 +207,8 @@ try {
 
   await page.locator(".session-item").filter({hasText: "第一问"}).locator(".session-select").click();
   await page.locator(".message.user", {hasText: "第一问"}).waitFor();
+  await page.locator(".evidence summary").last().waitFor();
+  assert.equal(await page.locator(".evidence summary").count(), 1);
   assert.match(await page.locator("#current-title").textContent(), /第一问/);
 
   await page.setViewportSize({width: 390, height: 844});

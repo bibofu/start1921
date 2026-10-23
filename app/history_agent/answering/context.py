@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import re
 import secrets
 from collections.abc import Iterator
@@ -118,6 +119,7 @@ CREATE TABLE IF NOT EXISTS conversation_messages (
     content TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'completed',
     client_request_id TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL
 );
 
@@ -181,6 +183,7 @@ ALTER TABLE conversation_sessions ADD COLUMN IF NOT EXISTS deleted_at TEXT;
 ALTER TABLE conversation_sessions ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE conversation_messages ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'completed';
 ALTER TABLE conversation_messages ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+ALTER TABLE conversation_messages ADD COLUMN IF NOT EXISTS metadata_json TEXT NOT NULL DEFAULT '{}';
 CREATE INDEX IF NOT EXISTS idx_conversation_sessions_visitor
     ON conversation_sessions(visitor_id, status, last_message_at DESC, session_id DESC);
 CREATE INDEX IF NOT EXISTS idx_conversation_sessions_pinned
@@ -236,6 +239,16 @@ def _title_from_question(question: str) -> str:
 
 def _preview(value: str, limit: int = MAX_PREVIEW_CHARS) -> str:
     return _clean_text(value, limit)
+
+
+def _decode_message_metadata(value: object) -> dict[str, Any]:
+    if not value:
+        return {}
+    try:
+        parsed = json.loads(str(value))
+    except (TypeError, ValueError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
 
 
 def _parse_time(value: str | None) -> datetime | None:
@@ -849,8 +862,10 @@ class ConversationStore:
                 where.append("status NOT IN ('aborted', 'failed')")
             parameters.append(limit)
             rows = connection.execute(
-                "SELECT message_id, role, content, status, created_at FROM conversation_messages "
-                "WHERE " + " AND ".join(where) + " ORDER BY message_id DESC LIMIT ?",
+                "SELECT message_id, role, content, status, metadata_json, created_at "
+                "FROM conversation_messages WHERE "
+                + " AND ".join(where)
+                + " ORDER BY message_id DESC LIMIT ?",
                 tuple(parameters),
             ).fetchall()
         messages = [
@@ -859,6 +874,7 @@ class ConversationStore:
                 role=row["role"],
                 content=str(row["content"]),
                 status=row["status"],
+                metadata=_decode_message_metadata(row["metadata_json"]),
                 created_at=str(row["created_at"]),
             )
             for row in rows
@@ -1021,6 +1037,7 @@ class ConversationStore:
         run_id: str,
         *,
         client_request_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> bool:
         now = _now()
         with self._connect() as connection:
@@ -1042,9 +1059,16 @@ class ConversationStore:
             )
             connection.execute(
                 "INSERT INTO conversation_messages(session_id, role, content, status, "
-                "client_request_id, created_at) VALUES (?, 'assistant', ?, 'completed', ?, ?) "
+                "client_request_id, metadata_json, created_at) "
+                "VALUES (?, 'assistant', ?, 'completed', ?, ?, ?) "
                 "ON CONFLICT DO NOTHING",
-                (session_id, answer[:MAX_MESSAGE_CHARS], client_request_id, now),
+                (
+                    session_id,
+                    answer[:MAX_MESSAGE_CHARS],
+                    client_request_id,
+                    json.dumps(metadata or {}, ensure_ascii=False, separators=(",", ":")),
+                    now,
+                ),
             )
             connection.execute(
                 "UPDATE conversation_sessions SET message_count = message_count + 1, "

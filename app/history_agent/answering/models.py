@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -15,6 +15,7 @@ class ConversationMessage(BaseModel):
     content: str = Field(min_length=1, max_length=100_000)
     status: MessageStatus = Field(default="completed", exclude=True)
     created_at: str | None = Field(default=None, exclude=True)
+    metadata: dict[str, Any] = Field(default_factory=dict, exclude=True)
 
 
 class QuestionRequest(BaseModel):

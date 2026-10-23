@@ -163,8 +163,11 @@ function renderAnswer(data) {
   return `<p class="meta">${mode}${planner}${research}</p><div class="markdown-body">${renderMarkdown(data.answer || "")}</div>${tasks}<div class="evidence">${evidence}</div>${limits}${diagnostics}`;
 }
 
-function renderRestoredAnswer(content) {
-  return `<p class="meta">已恢复的回答 · 历史引用未保存</p><div class="markdown-body">${renderMarkdown(content)}</div>`;
+function renderRestoredAnswer(content, metadata = {}) {
+  if (metadata && (metadata.retrieval_mode || metadata.generator_mode)) {
+    return renderAnswer({...metadata, answer: content});
+  }
+  return `<p class="meta">已恢复的回答 · 这条历史消息未保存引用元数据</p><div class="markdown-body">${renderMarkdown(content)}</div>`;
 }
 
 function welcomeHtml() {
@@ -215,7 +218,7 @@ function renderHistory({keepScroll = false} = {}) {
         ? `<p class="meta">${message.status === "failed" ? "生成失败" : "已停止"}，这个问题未完成。</p>` : "";
       addMessage("user", `<p>${escapeHtml(message.content)}</p>${pending}${aborted}`, {scroll: false});
     } else {
-      addMessage("assistant", renderRestoredAnswer(message.content), {scroll: false});
+      addMessage("assistant", renderRestoredAnswer(message.content, message.metadata), {scroll: false});
     }
   }
   if (keepScroll) {

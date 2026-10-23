@@ -494,3 +494,19 @@
   - `validation.py` 识别章节标题、范围说明和资料限制类非事实段落，避免它们触发未引用事实修复；同时保留“现有证据只覆盖某年某人主持会议”这类真实事实的拦截。
 - 验证结果：真实流式接口重跑原问题，`generator_mode=llm`、`llm_status=used`、`llm_error_code=null`，返回 12 条引用、约 2,207 字完整回答；结构化引用 E1/E2/E3 的 `event_date` 分别为 1956-01-02、1956-02-09、1956-03-04，`year_mentions=[1956]`。新增结构化日期校验、日期降级、标题/范围说明测试；`test_answering.py` 与 `test_structured_answering.py` 117 项通过；全项目 1066 项 Python 测试、Ruff、mypy、前端语法及 SSE 解析测试通过。
 - 残留限制：`event_date` 只在结构化索引提供日期时存在；普通文献仍依赖 quote/中文数字归一化。日期是否为事件真实发生日仍取决于上游年谱抽取，不把结构化索引日期当作绝对事实。
+
+## BC-042：刷新页面后回答的引用资料消失
+
+- 记录日期：2026-10-23；状态：已修复，真实浏览器刷新验证；不是 Golden 评测。
+- 问题：Agent 回答完成后刷新页面，正文恢复，但引用列表、页码和资料限制消失。
+- 糟糕表现：`conversation_messages` 只保存 assistant 的 `content`，没有保存 `AnswerResponse` 的 `citations`、`evidence_status`、`generator_mode`、`limitations` 等字段。历史接口 `_message_payload()` 只返回 `content/status/created_at`，前端 `renderRestoredAnswer()` 只能显示“历史引用未保存”的纯正文。
+- 期望表现：刷新后恢复与完成时一致的引用列表、页码、来源、证据状态和限制说明，且不把引用元数据送入下一轮提示词。
+- 根因：消息表缺少回答元数据列；完成回答时只写正文；历史 API 不返回引用；前端历史渲染走降级分支。
+- 解决方案：
+  - `conversation_messages` 新增 `metadata_json TEXT NOT NULL DEFAULT '{}'`，并加入启动迁移；
+  - `complete_question()` 接收并保存 `AnswerResponse` 去掉 `answer/question` 后的元数据；
+  - `session_messages()` 解码 `metadata_json` 到 `ConversationMessage.metadata`；
+  - `/api/sessions/{id}` 和 `/messages` 的 `_message_payload()` 返回 `metadata`；
+  - 前端 `renderRestoredAnswer()` 在存在 `retrieval_mode/generator_mode` 时复用 `renderAnswer()`，恢复引用和限制；旧消息没有元数据时继续显示兼容提示。
+- 验证结果：真实浏览器完成周恩来 1956 问题后，刷新前后引用条目均为 12 条，最后一条均为 `[E12] 《周恩来年谱（1949—1976）》PDF 第 736 页`。`tests/test_context.py` 19 项通过，UI 测试通过；元数据不进入 `ConversationMessage` 的提示词序列化（`exclude=True`）。
+- 残留限制：修复前已写入的旧 assistant 消息没有 `metadata_json`，无法凭正文重建引用；只能显示“这条历史消息未保存引用元数据”。
