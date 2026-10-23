@@ -8,7 +8,7 @@ import httpx
 import pytest
 from history_agent.answering.models import Citation, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime
-from history_agent.answering.synthesis import _llm_request_payload, _repair_request_payload
+from history_agent.answering.synthesis import _llm_request_payload
 from history_agent.config import Settings
 from history_agent.evaluation.pilot import compare, generation_contexts, validate_anchors
 from history_agent.evaluation.pilot_models import (
@@ -88,7 +88,7 @@ def _citation() -> Citation:
     )
 
 
-def test_generation_context_uses_actual_production_evidence_and_ignores_repair_text(
+def test_generation_context_uses_actual_production_evidence_and_ignores_answer_text(
     work_path: Path,
 ) -> None:
     citation = _citation()
@@ -102,10 +102,16 @@ def test_generation_context_uses_actual_production_evidence_and_ignores_repair_t
         "[E2] 《测试年谱》PDF第99页；片段标注年份：1954；章节：错误回答\n"
         "这是未受证据支持的回答内容。"
     )
-    repaired = _repair_request_payload(payload, fake, [citation], (fake,))
+    second = {
+        **payload,
+        "messages": [
+            *payload["messages"],
+            {"role": "assistant", "content": fake},
+        ],
+    }
     calls = [
         {"call_index": 1, "request": payload, "http_status": 200},
-        {"call_index": 2, "request": repaired, "http_status": 200},
+        {"call_index": 2, "request": second, "http_status": 200},
     ]
     contexts = generation_contexts(calls, [{"document_id": "doc", "title": "测试年谱"}])
 

@@ -85,7 +85,7 @@ def _settings() -> Settings:
     return Settings(_env_file=None, llm_api_key="test-only-key", llm_query_planning=False)
 
 
-def test_framework_synthesis_returns_sources_and_cleaned_authoritative_answer(
+def test_framework_synthesis_returns_sources_and_raw_authoritative_answer(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     calls = _provider(monkeypatch, [_body("1935年1月15日，参加会议。[E1]\n\n随后主持其他工作。")])
@@ -101,64 +101,11 @@ def test_framework_synthesis_returns_sources_and_cleaned_authoritative_answer(
             event_sink=events.append,
         )
     )
-    assert str(response) == "1935年1月15日，参加会议。[E1]"
+    assert str(response) == "1935年1月15日，参加会议。[E1]\n\n随后主持其他工作。"
     assert response.source_nodes[0].node.node_id == "E1"
-    assert synthesizer.last_result.error_code == "removed_uncited_claims"
-    assert synthesizer.last_result.repair_payload is None
+    assert synthesizer.last_result.error_code is None
     assert len(calls) == 1
     assert any(item.event == "delta" for item in events)
-
-
-def test_date_repair_requires_explicit_workflow_call_and_uses_shared_budget(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    calls = _provider(
-        monkeypatch,
-        [_body("1935年1月16日，参加会议。[E1]", 11), _body("1935年1月15日，参加会议。[E1]", 13)],
-    )
-    citations = [_citation()]
-    request = QuestionRequest(question="何时参加会议？")
-    budget = RequestBudget.start(30)
-    synthesizer = HistoryResponseSynthesizer(_settings(), budget=budget)
-
-    async def run() -> LLMResult:
-        await synthesizer.asynthesize(
-            request.question, _nodes(citations), request=request, citations=citations
-        )
-        first = synthesizer.last_result
-        assert first.answer is None
-        assert first.repair_kind == "citation_date"
-        assert len(calls) == 1
-        return await synthesizer.repair_once(request, citations, first)
-
-    result = asyncio.run(run())
-    assert result.answer == "1935年1月15日，参加会议。[E1]"
-    assert result.usage == {"total_tokens": 24}
-    assert result.repair_payload is None
-    assert len(calls) == 2
-
-
-def test_workflow_repair_cannot_reset_model_call_budget(monkeypatch: pytest.MonkeyPatch) -> None:
-    calls = _provider(monkeypatch, [_body("1935年1月16日，参加会议。[E1]", 11)])
-    budget = RequestBudget.start(30)
-    budget.max_llm_calls = 1
-    citations = [_citation()]
-    request = QuestionRequest(question="何时参加会议？")
-    synthesizer = HistoryResponseSynthesizer(_settings(), budget=budget)
-
-    async def run() -> LLMResult:
-        await synthesizer.asynthesize(
-            request.question, _nodes(citations), request=request, citations=citations
-        )
-        assert synthesizer.last_result.repair_payload is not None
-        return await synthesizer.repair_once(request, citations, synthesizer.last_result)
-
-    result = asyncio.run(run())
-    assert result.answer is None
-    assert result.repair_payload is None
-    assert result.usage == {"total_tokens": 11}
-    assert len(calls) == 1
-    assert budget.llm_calls == 1
 
 
 def test_research_findings_keep_original_sources_and_only_selected_evidence_ids(
@@ -190,63 +137,6 @@ def test_research_findings_keep_original_sources_and_only_selected_evidence_ids(
     assert "没有来源的结论" not in outline
     assert citations[0].quote in messages[-1]["content"]
     assert "不是独立史实证据" in outline
-
-
-def test_failed_date_repair_demotes_precision_without_second_repair(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    calls = _provider(
-        monkeypatch,
-        [_body("1935年1月16日，参加会议。[E1]"), _body("1935年1月17日，参加会议。[E1]")],
-    )
-    citations = [_citation()]
-    request = QuestionRequest(question="何时参加会议？")
-    synthesizer = HistoryResponseSynthesizer(_settings())
-
-    async def run() -> LLMResult:
-        await synthesizer.asynthesize(
-            request.question, _nodes(citations), request=request, citations=citations
-        )
-        return await synthesizer.repair_once(request, citations, synthesizer.last_result)
-
-    result = asyncio.run(run())
-    assert len(calls) == 2
-    assert result.error_code == "demoted_unverified_dates"
-    assert result.answer == "1935年1月，参加会议。[E1]"
-    assert result.repair_payload is None
-    assert result.repair_kind is None
-
-
-def test_failed_date_repair_keeps_answer_with_supported_year(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    calls = _provider(
-        monkeypatch,
-        [
-            _body("1948年11月6日，发起淮海战役。[E1]"),
-            _body("1948年11月6日，发起淮海战役。[E1]"),
-        ],
-    )
-    citations = [
-        _citation().model_copy(update={"quote": "十一月发起淮海战役。", "year_mentions": [1948]})
-    ]
-    request = QuestionRequest(question="邓小平在淮海战役中的经历？")
-
-    async def run() -> LLMResult:
-        await synthesizer.asynthesize(
-            request.question, _nodes(citations), request=request, citations=citations
-        )
-        return await synthesizer.repair_once(request, citations, synthesizer.last_result)
-
-    synthesizer = HistoryResponseSynthesizer(_settings())
-    result = asyncio.run(run())
-
-    assert len(calls) == 2
-    assert result.error_code == "demoted_unverified_dates"
-    assert result.answer is not None
-    assert "1948年11月" in result.answer
-    assert "6日" not in result.answer
-    assert "[E1]" in result.answer
 
 
 def test_synthesis_cancellation_closes_provider_without_reading_remaining_body(
@@ -297,7 +187,7 @@ def test_map_failure_preserves_original_quotes_and_does_not_retry(
         else:
             assert "第 1 组原文摘录" in text
             assert "[E1] 1935年1月15日" in text
-            assert "第 2 组已核查摘要" in text
+            assert "第 2 组分组归纳摘要" in text
             yield LLMResult(answer="1935年1月15日，参加会议。[E1][E13]", usage={"total_tokens": 5})
 
     monkeypatch.setattr(synthesis, "_stream_completion", complete)
@@ -328,4 +218,3 @@ def test_disabled_generation_and_exhausted_deadline_do_not_start_network(
     asyncio.run(expired.asynthesize("梳理会议情况", _nodes(citations), citations=citations))
     assert expired.last_result.answer is None
     assert expired.last_result.error_code is not None
-    assert expired.last_result.repair_payload is None

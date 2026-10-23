@@ -510,3 +510,18 @@
   - 前端 `renderRestoredAnswer()` 在存在 `retrieval_mode/generator_mode` 时复用 `renderAnswer()`，恢复引用和限制；旧消息没有元数据时继续显示兼容提示。
 - 验证结果：真实浏览器完成周恩来 1956 问题后，刷新前后引用条目均为 12 条，最后一条均为 `[E12] 《周恩来年谱（1949—1976）》PDF 第 736 页`。`tests/test_context.py` 19 项通过，UI 测试通过；元数据不进入 `ConversationMessage` 的提示词序列化（`exclude=True`）。
 - 残留限制：修复前已写入的旧 assistant 消息没有 `metadata_json`，无法凭正文重建引用；只能显示“这条历史消息未保存引用元数据”。
+
+## BC-043：生产回答移除最终引用校验与修复
+
+- 记录日期：2026-10-23；状态：已实施；不是 Golden 评测。
+- 问题：最终回答校验会把模型正常输出误判为日期、引用或未引用事实问题，触发一次修复，修复仍失败时降级为证据摘录；用户要求直接输出 LLM 结果。
+- 期望表现：保留检索、证据包和无证据保护；模型成功后直接交付模型回答，不再做引用/页码/日期/未引用事实/时间线年份校验，不再修复，也不因校验失败降级。
+- 实现：
+  - `synthesis._stream_generation()` 生成后直接返回 `LLMResult`；
+  - 删除 `_check_generated_answer()`、日期降级、未引用段落 salvage、引用/日期/年份 repair payload 和 `repair_once()`；
+  - 删除 workflow 的 `RepairEvent` 与 repair step；
+  - `delivery.py` 直接采用模型回答，删除校验失败相关的 limitations；`uncited_claims` 固定为空；
+  - `validation.py` 保留为离线评测模块，生产链路不再 import。
+- 语义：`citations` 只展示模型实际写出的 `[E#]`；模型没写则为空。`llm_status` 在模型有回答时为 `used`，模型失败仍保留既有 fallback。`evidence_status` 不再由校验器判定 `supported`；完整篇目原文交付仍可标记 `supported`。
+- 验证结果：模型返回无效 `[E99]`、与证据不一致的日期、未引用段落时均原样交付；provider 截断/超时/限流仍走既有兜底；受影响测试 158 项通过，UI 测试通过；全项目 1061 项测试通过。真实流式接口重跑周恩来 1956 问题，generator_mode=llm、llm_status=used、llm_error_code=null，返回 12 条引用、约 2,712 字回答。
+- 残留风险：模型幻觉、伪造页码和错误日期不再被生产链路拦截；引用列表可能为空；离线评测中的 citation validity 不再代表线上答案一定通过。

@@ -148,7 +148,7 @@ const server = createServer(async (req, res) => {
     if (session.title === "新会话") session.title = data.question.slice(0, 30);
     addMessage(session, "user", data.question);
     res.writeHead(200, {"Content-Type": "text/event-stream", "Cache-Control": "no-cache"});
-    send(res, "status", {message: "正在生成，引用待核查…"});
+    send(res, "status", {message: "正在生成回答…"});
     send(res, "delta", {text: "## 研究结论\n\n"});
     setTimeout(() => {
       const answer = final(data.question);

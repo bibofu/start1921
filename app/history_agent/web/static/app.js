@@ -134,8 +134,8 @@ function addMessage(role, html, {scroll = true} = {}) {
 function renderAnswer(data) {
   const structured = String(data.retrieval_mode || "").startsWith("structured_");
   const mode = data.generator_mode === "llm"
-    ? `DeepSeek ${escapeHtml(data.model_name || "V4")} · 证据约束生成`
-    : structured ? "结构化研究 · 候选与原文核查" : "本地证据摘录";
+    ? `DeepSeek ${escapeHtml(data.model_name || "V4")} · 模型生成`
+    : structured ? "结构化研究 · 候选原文" : "本地证据摘录";
   const planner = data.query_planner_status === "used"
     ? ` · ${escapeHtml(data.query_planner_model || "DeepSeek")} 查询理解`
     : data.query_planner_status === "fallback" ? " · 原问题降级检索" : "";
@@ -157,10 +157,7 @@ function renderAnswer(data) {
       <p class="quote">${escapeHtml(item.quote)}</p>
     </details>`).join("");
   const limits = Array.isArray(data.limitations) && data.limitations.length ? `<p class="limits">${data.limitations.map(escapeHtml).join(" · ")}</p>` : "";
-  const removedClaims = data.llm_error_code === "removed_uncited_claims";
-  const uncited = Array.isArray(data.uncited_claims) ? data.uncited_claims : [];
-  const diagnostics = uncited.length ? `<details class="citation-diagnostics"><summary>${removedClaims ? "哪些草稿内容已移除" : "哪些语句缺少引用"}</summary><p class="meta">以下是未通过引用校验的草稿语句，不作为答案依据。</p><ul>${uncited.map(claim => `<li>${escapeHtml(claim)}</li>`).join("")}</ul></details>` : "";
-  return `<p class="meta">${mode}${planner}${research}</p><div class="markdown-body">${renderMarkdown(data.answer || "")}</div>${tasks}<div class="evidence">${evidence}</div>${limits}${diagnostics}`;
+  return `<p class="meta">${mode}${planner}${research}</p><div class="markdown-body">${renderMarkdown(data.answer || "")}</div>${tasks}<div class="evidence">${evidence}</div>${limits}`;
 }
 
 function renderRestoredAnswer(content, metadata = {}) {
@@ -501,7 +498,7 @@ async function ask(question) {
     if (run.finalData && state.activeRun === run) await streamFinalAnswer(run, run.finalData);
   } catch (error) {
     if (error.name === "AbortError") {
-      run.bubble.innerHTML = `<p class="meta">${escapeHtml(run.status || "已停止，回答未完成核查。")}</p>`;
+      run.bubble.innerHTML = `<p class="meta">${escapeHtml(run.status || "已停止输出。")}</p>`;
     } else if (state.activeRun === run) {
       cancelAnimationFrame(run.frame);
       run.frame = null;

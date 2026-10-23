@@ -105,12 +105,8 @@ def deliver_answer(
         limitations.append("当前未配置生成模型，返回证据摘录式答案。")
     elif citations and not result.answer and not raw_delivery:
         limitations.append(
-            f"生成回答未通过（{result.error_code or 'unavailable'}），已返回证据摘录。"
+            f"生成模型不可用（{result.error_code or 'unavailable'}），已返回证据摘录。"
         )
-    elif result.error_code == "removed_uncited_claims":
-        limitations.append("生成草稿中的未引用段落已移除，其余内容已通过引用核查。")
-    elif result.error_code == "demoted_unverified_dates":
-        limitations.append("部分具体日期缺少逐字对应的原文，已按证据可确认的日期精度收窄。")
     elif result.error_code == "hierarchical_partial_map_fallback":
         limitations.append("部分证据分组未生成局部摘要，最终综合时已使用该组原文。")
     if planning.status == "fallback":
@@ -125,22 +121,9 @@ def deliver_answer(
     evidence_status: Literal["supported", "partial", "no_evidence"] = (
         "no_evidence" if not used else "partial"
     )
-    if (
-        used
-        and not unresolved
-        and not degraded
-        and summary.stopped_reason == "completed"
-        and intent != "intersection"
-        and not any(task.tool in {"timeline", "intersection"} for task in tasks)
-        and (
-            raw_delivery
-            or any(
-                hit.keyword_rank is not None and hit.vector_rank is not None
-                for retrieval in retrievals
-                for hit in retrieval.hits[:5]
-            )
-        )
-    ):
+    if raw_delivery and used:
+        # A complete source excerpt is a deterministic full-text delivery, not a
+        # model claim requiring answer-level citation validation.
         evidence_status = "supported"
     return AnswerResponse(
         question=request.question,
@@ -149,7 +132,7 @@ def deliver_answer(
         generator_mode="llm" if llm_used else "extractive",
         llm_status=(
             "not_applicable"
-            if raw_delivery or not used
+            if raw_delivery or (not result.answer and not used)
             else "disabled"
             if not settings.llm_enabled
             else "used"
@@ -159,7 +142,7 @@ def deliver_answer(
         model_name=settings.llm_model if settings.llm_enabled else None,
         llm_usage=result.usage,
         llm_error_code=result.error_code,
-        uncited_claims=list(result.uncited_claims),
+        uncited_claims=[],
         query_plan=interpretation,
         research_plan=plan,
         execution_summary=summary,

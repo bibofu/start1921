@@ -54,10 +54,6 @@ class SynthesisEvent(Event):
     pass
 
 
-class RepairEvent(Event):
-    pass
-
-
 class FinishEvent(Event):
     pass
 
@@ -375,7 +371,7 @@ class HistoryResearchWorkflow(Workflow):
         return emit
 
     @step
-    async def synthesize(self, ctx: Context, ev: SynthesisEvent) -> RepairEvent | FinishEvent:
+    async def synthesize(self, ctx: Context, ev: SynthesisEvent) -> FinishEvent:
         del ev
         self.selected_ids = self.select_evidence()
         if self.stop_reason == "completed" and self.unresolved():
@@ -391,7 +387,7 @@ class HistoryResearchWorkflow(Workflow):
             return FinishEvent()
         if not self.settings.llm_enabled or self.budget.remaining <= 0:
             return FinishEvent()
-        self.progress(ctx, "正在综合任务证据并核查引用…")
+        self.progress(ctx, "正在综合任务证据并生成回答…")
         findings = [
             finding
             for task_id, result in self.results.items()
@@ -413,30 +409,6 @@ class HistoryResearchWorkflow(Workflow):
         except (TimeoutError, httpx.TimeoutException):
             self.stop_reason = "budget_exhausted"
             self.llm_result = LLMResult(answer=None, error_code="request_timeout")
-        if getattr(self.llm_result, "repair_payload", None) and self.budget.remaining > 0:
-            return RepairEvent()
-        self.record_usage("synthesis", self.llm_result.usage)
-        return FinishEvent()
-
-    @step
-    async def repair(self, ctx: Context, ev: RepairEvent) -> FinishEvent:
-        del ev
-        self.progress(ctx, "正在修复与证据不一致的引用或日期…")
-        try:
-            self.llm_result = await self.bounded(
-                self.synthesizer.repair_once(
-                    self.request,
-                    self.registry.citations(self.selected_ids),
-                    self.llm_result,
-                    event_sink=self.sink(ctx),
-                    nodes=self.registry.nodes(self.selected_ids),
-                )
-            )
-        except (TimeoutError, httpx.TimeoutException):
-            self.stop_reason = "budget_exhausted"
-            self.llm_result = LLMResult(
-                answer=None, error_code="request_timeout", usage=self.llm_result.usage
-            )
         self.record_usage("synthesis", self.llm_result.usage)
         return FinishEvent()
 

@@ -1,3 +1,9 @@
+"""Offline citation diagnostics.
+
+This module is intentionally not imported by the production synthesis path. It is
+retained for evaluation metrics and historical regression checks.
+"""
+
 from __future__ import annotations
 
 import re

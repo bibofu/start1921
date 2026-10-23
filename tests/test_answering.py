@@ -30,9 +30,7 @@ from history_agent.answering.query_understanding import QueryExecution, QueryPla
 from history_agent.answering.synthesis import (
     HistoryResponseSynthesizer,
     LLMResult,
-    _demote_unsupported_dates,
     _extractive_answer,
-    _has_ambiguous_timeline_years,
 )
 from history_agent.answering.task_executor import HistoryTaskExecutor
 from history_agent.answering.validation import (
@@ -79,7 +77,6 @@ def _synthesize_answer(
     settings: Settings,
     request: QuestionRequest,
     citations: list[Citation],
-    allow_repair: bool = False,
 ) -> LLMResult:
     async def run() -> LLMResult:
         synthesizer = HistoryResponseSynthesizer(settings)
@@ -88,10 +85,6 @@ def _synthesize_answer(
             for item in citations
         ]
         await synthesizer.asynthesize(request.question, nodes, request=request, citations=citations)
-        if allow_repair and synthesizer.last_result.repair_payload:
-            return await synthesizer.repair_once(
-                request, citations, synthesizer.last_result, nodes=nodes
-            )
         return synthesizer.last_result
 
     return asyncio.run(run())
@@ -408,7 +401,7 @@ def test_api_health_and_question_contract(monkeypatch: Any) -> None:
     assert health.status_code == 200
     assert health.json()["indexes"] == {"keyword": False, "vector": False}
     assert index.headers["cache-control"] == "no-store"
-    assert "app.js?v=multi-session-v8" in index.text
+    assert "app.js?v=multi-session-v9" in index.text
     assert javascript.headers["cache-control"] == "no-store"
     assert "/api/questions/stream" in javascript.text
     assert response.status_code == 200
@@ -499,7 +492,7 @@ def test_generation_only_receives_history_for_referential_questions(
     assert captured["json"]["temperature"] == 0
 
 
-def test_deepseek_rejects_unknown_evidence_marker(monkeypatch: Any) -> None:
+def test_deepseek_returns_unknown_evidence_marker_unchanged(monkeypatch: Any) -> None:
     def fake_post(url: str, **kwargs: Any) -> httpx.Response:
         return httpx.Response(
             200,
@@ -515,8 +508,8 @@ def test_deepseek_rejects_unknown_evidence_marker(monkeypatch: Any) -> None:
         citations=[_citation()],
     )
 
-    assert result.answer is None
-    assert result.error_code == "invalid_evidence_marker"
+    assert result.answer == "错误引用。[E99]"
+    assert result.error_code is None
 
 
 def test_validation_accepts_cited_core_fact_lines() -> None:
@@ -661,20 +654,6 @@ def test_meta_title_and_scope_notes_do_not_require_citations() -> None:
     assert validate_grounded_answer(answer, [citation]).valid is True
 
 
-def test_date_demotion_uses_structured_event_date_precision() -> None:
-    citation = _citation("周恩来出席科学规划会议。").model_copy(
-        update={"event_date": "1956", "year_mentions": [1956]}
-    )
-    answer = "1956年1月2日，周恩来出席科学规划会议。[E1]"
-
-    demoted = _demote_unsupported_dates(answer, [citation], ("1956年1月2日",))
-
-    assert demoted is not None
-    assert "1956年" in demoted
-    assert "1月2日" not in demoted
-    assert validate_grounded_answer(demoted, [citation]).valid is True
-
-
 def test_validation_still_rejects_date_absent_from_chinese_numeral_source() -> None:
     citation = _citation("一九四八年十一月六日，战役发起。").model_copy(
         update={"year_mentions": [1948]}
@@ -686,32 +665,7 @@ def test_validation_still_rejects_date_absent_from_chinese_numeral_source() -> N
     assert result.error_code == "citation_date_mismatch"
 
 
-def test_year_heading_carries_context_for_cross_year_timeline_items() -> None:
-    request = QuestionRequest(question="彭德怀在1930-1935年的主要经历")
-    citation = _citation("1935年，彭德怀担任红一方面军司令员。").model_copy(
-        update={"year_mentions": [1935]}
-    )
-    answer = "## 1935年主要经历\n\n- 彭德怀担任红一方面军司令员。[E1]"
-
-    assert validate_grounded_answer(answer, [citation]).valid is True
-    assert _has_ambiguous_timeline_years(request, answer) is False
-    assert _has_ambiguous_timeline_years(request, "- 彭德怀担任红一方面军司令员。[E1]") is True
-    assert (
-        _has_ambiguous_timeline_years(
-            request,
-            "## 1935年主要经历\n\n- 11月4日部署行动。[E1]\n- 5月上旬拒绝任职。[E1]",
-        )
-        is True
-    )
-
-
-def test_deepseek_repairs_date_that_disagrees_with_evidence(monkeypatch: Any) -> None:
-    answers = iter(
-        [
-            "1935年1月，彭德怀被任命为司令员。[E1]",
-            "1935年11月3日，彭德怀被任命为司令员。[E1]",
-        ]
-    )
+def test_deepseek_returns_date_mismatch_without_repair(monkeypatch: Any) -> None:
     requests: list[dict[str, Any]] = []
 
     def fake_post(url: str, **kwargs: Any) -> httpx.Response:
@@ -719,7 +673,7 @@ def test_deepseek_repairs_date_that_disagrees_with_evidence(monkeypatch: Any) ->
         return httpx.Response(
             200,
             request=httpx.Request("POST", url),
-            json={"choices": [{"message": {"content": next(answers)}}]},
+            json={"choices": [{"message": {"content": "1935年1月，彭德怀被任命为司令员。[E1]"}}]},
         )
 
     _install_completion_provider(monkeypatch, fake_post)
@@ -730,17 +684,14 @@ def test_deepseek_repairs_date_that_disagrees_with_evidence(monkeypatch: Any) ->
         settings=Settings(_env_file=None, llm_api_key="sk-test"),
         request=QuestionRequest(question="彭德怀在1935年的主要经历"),
         citations=[citation],
-        allow_repair=True,
     )
 
-    assert result.answer == "1935年11月3日，彭德怀被任命为司令员。[E1]"
-    assert len(requests) == 2
-    assert "日期与同段所引证据原文不一致" in requests[1]["messages"][-1]["content"]
+    assert result.answer == "1935年1月，彭德怀被任命为司令员。[E1]"
+    assert result.error_code is None
+    assert len(requests) == 1
 
 
-def test_deepseek_removes_uncited_block_without_repair_round_trip(
-    monkeypatch: Any,
-) -> None:
+def test_deepseek_keeps_uncited_block_without_validation(monkeypatch: Any) -> None:
     calls = 0
 
     def fake_post(url: str, **kwargs: Any) -> httpx.Response:
@@ -770,9 +721,8 @@ def test_deepseek_removes_uncited_block_without_repair_round_trip(
         citations=[_citation()],
     )
 
-    assert result.answer == "1956年1月，周恩来参加有关会议。[E1]"
-    assert result.error_code == "removed_uncited_claims"
-    assert result.uncited_claims == ("随后主持科学规划工作。",)
+    assert result.answer == "1956年1月，周恩来参加有关会议。[E1]\n\n随后主持科学规划工作。"
+    assert result.error_code is None
     assert calls == 1
 
 
@@ -789,7 +739,7 @@ def test_many_evidence_chunks_use_parallel_map_and_final_reduce(monkeypatch: Any
         content = str(request_payload["messages"][-1]["content"])
         calls.append((content, int(request_payload["max_tokens"])))
         markers = list(dict.fromkeys(re.findall(r"\[E\d+\]", content)))
-        if "分组证据经逐组引用校验" in content:
+        if "分组证据经分组归纳" in content:
             yield LLMResult(answer=f"最终综合结论。{''.join(markers)}", usage={"total_tokens": 1})
             return
         yield LLMResult(answer=f"本组局部结论。{''.join(markers)}", usage={"total_tokens": 1})
@@ -814,10 +764,15 @@ def test_many_evidence_chunks_use_parallel_map_and_final_reduce(monkeypatch: Any
     assert sorted(max_tokens for _, max_tokens in calls) == [1200, 1200, 1200, 5000]
 
 
-def test_deepseek_prefers_valid_salvage_over_repair_round_trip(monkeypatch: Any) -> None:
-    responses = iter(
-        [
-            {
+def test_deepseek_returns_first_answer_without_salvage(monkeypatch: Any) -> None:
+    request_bodies: list[dict[str, Any]] = []
+
+    def fake_post(url: str, **kwargs: Any) -> httpx.Response:
+        request_bodies.append(kwargs["json"])
+        return httpx.Response(
+            200,
+            request=httpx.Request("POST", url),
+            json={
                 "choices": [
                     {
                         "message": {
@@ -833,32 +788,6 @@ def test_deepseek_prefers_valid_salvage_over_repair_round_trip(monkeypatch: Any)
                     "total_tokens": 12,
                 },
             },
-            {
-                "choices": [
-                    {
-                        "message": {
-                            "content": (
-                                "1956年1月，周恩来参加有关会议。[E1]\n\n随后主持科学规划工作。[E1]"
-                            )
-                        }
-                    }
-                ],
-                "usage": {
-                    "prompt_tokens": 15,
-                    "completion_tokens": 3,
-                    "total_tokens": 18,
-                },
-            },
-        ]
-    )
-    request_bodies: list[dict[str, Any]] = []
-
-    def fake_post(url: str, **kwargs: Any) -> httpx.Response:
-        request_bodies.append(kwargs["json"])
-        return httpx.Response(
-            200,
-            request=httpx.Request("POST", url),
-            json=next(responses),
         )
 
     _install_completion_provider(monkeypatch, fake_post)
@@ -868,8 +797,8 @@ def test_deepseek_prefers_valid_salvage_over_repair_round_trip(monkeypatch: Any)
         citations=[_citation()],
     )
 
-    assert result.answer == "1956年1月，周恩来参加有关会议。[E1]"
-    assert result.error_code == "removed_uncited_claims"
+    assert result.answer == "1956年1月，周恩来参加有关会议。[E1]\n\n随后主持科学规划工作。"
+    assert result.error_code is None
     assert result.usage == {
         "prompt_tokens": 10,
         "completion_tokens": 2,

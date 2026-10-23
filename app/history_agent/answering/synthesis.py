@@ -1,7 +1,7 @@
 """One asynchronous, evidence-grounded LlamaIndex response synthesizer.
 
-The request workflow owns decisions to retry or repair. This module performs one
-bounded synthesis attempt, preserves source citations, and reports repair inputs.
+The workflow performs exactly one bounded synthesis attempt. The model answer is
+returned unchanged; citation validation and answer repair live outside production.
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ from llama_index.core.llms.mock import MockLLM
 from llama_index.core.prompts import ChatPromptTemplate
 from llama_index.core.prompts.mixin import PromptDictType
 from llama_index.core.response_synthesizers.base import BaseSynthesizer
-from llama_index.core.schema import NodeWithScore, TextNode
 
 from history_agent.answering.context import requires_conversation_context, sanitize_history_content
 from history_agent.answering.llamaindex_llm import (
@@ -31,13 +30,6 @@ from history_agent.answering.llamaindex_llm import (
 )
 from history_agent.answering.models import Citation, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
-from history_agent.answering.validation import (
-    FULL_DATE_REFERENCE,
-    citation_event_date,
-    normalize_chinese_dates,
-    remove_uncited_claim_blocks,
-    validate_grounded_answer,
-)
 from history_agent.config import Settings
 from history_agent.errors import llm_http_error_code
 
@@ -53,36 +45,17 @@ class AnswerStreamEvent:
 
 @dataclass(frozen=True)
 class LLMResult:
-    """A validated answer or a repair proposal for the owning workflow."""
+    """The model output and usage; the workflow performs no answer validation."""
 
     answer: str | None
     error_code: str | None = None
     usage: dict[str, int] | None = None
-    uncited_claims: tuple[str, ...] = ()
-    repair_payload: dict[str, object] | None = None
-    repair_kind: Literal["citation", "citation_date", "timeline_year"] | None = None
     map_failed: bool = False
 
 
 EventSink = Callable[[AnswerStreamEvent], None]
 
 SENTENCE_BOUNDARY = re.compile(r"(?<=[。！？；])")
-
-
-QUESTION_YEAR = re.compile(r"(?<!\d)(?:18|19|20)\d{2}(?!\d)")
-
-
-ANSWER_YEAR = re.compile(r"(?<!\d)(?:18|19|20)\d{2}年")
-
-
-MARKDOWN_HEADING = re.compile(r"^\s{0,3}#{1,6}\s+")
-
-
-TIMELINE_DATE = re.compile(
-    r"(?:(?P<year>(?:18|19|20)\d{2})\s*年\s*)?"
-    r"(?P<month>1[0-2]|0?[1-9])\s*月"
-    r"(?:\s*(?P<day>3[01]|[12]\d|0?[1-9])\s*日)?"
-)
 
 
 PROMPT_VERSION = "grounded-answer-v15"
@@ -94,7 +67,7 @@ LLM_EVIDENCE_BATCH_SIZE = 12
 def _citations_used_by_answer(answer: str, citations: list[Citation]) -> list[Citation]:
     """Expose only evidence the authoritative answer actually cites."""
 
-    used_ids = set(validate_grounded_answer(answer, citations).used_evidence_ids)
+    used_ids = set(re.findall(r"\[(E\d+)\]", answer))
     return [citation for citation in citations if citation.evidence_id in used_ids]
 
 
@@ -122,23 +95,6 @@ def _extractive_answer(intent: str, citations: list[Citation]) -> str:
             year_prefix = "、".join(str(year) for year in citation.year_mentions[:3]) + "年："
         bullets.append(f"- {year_prefix}{summary} [{citation.evidence_id}]")
     return lead + "\n\n" + "\n".join(bullets)
-
-
-def _salvage_llm_result(
-    answer: str,
-    citations: list[Citation],
-    uncited_claims: tuple[str, ...],
-    usage: dict[str, int] | None,
-) -> LLMResult | None:
-    salvaged = remove_uncited_claim_blocks(answer, uncited_claims)
-    if salvaged is None or not validate_grounded_answer(salvaged, citations).valid:
-        return None
-    return LLMResult(
-        answer=salvaged,
-        error_code="removed_uncited_claims",
-        usage=usage,
-        uncited_claims=uncited_claims,
-    )
 
 
 def _merge_usage(*items: dict[str, int] | None) -> dict[str, int] | None:
@@ -237,109 +193,6 @@ def _llm_request_payload(
     else:
         request_payload["temperature"] = 0
     return request_payload
-
-
-def _repair_request_payload(
-    request_payload: dict[str, object],
-    answer: str,
-    citations: list[Citation],
-    uncited_claims: tuple[str, ...],
-) -> dict[str, object]:
-    missing_claims = "\n".join(f"- {claim}" for claim in uncited_claims)
-    valid_markers = "、".join(f"[{item.evidence_id}]" for item in citations)
-    repair_instruction = (
-        "上一版回答因部分事实要点缺少引用而未通过校验。请重新输出完整回答，不要增加新事实，"
-        "根据原文修复引用覆盖：有证据支持才添加对应编号，没有证据支持的事实必须删除，"
-        "不能随意挂靠引用。每个包含日期、职务、地点、行动、会议决定或人物关系的段落、"
-        f"列表项或表格行都要使用对应的合法编号（仅限：{valid_markers}）。"
-        "单纯说明资料不足以确认某事不需要引用。缺少引用的要点如下：\n"
-        f"{missing_claims}"
-    )
-    return {
-        **request_payload,
-        "messages": [
-            *cast(list[dict[str, object]], request_payload["messages"]),
-            {"role": "assistant", "content": answer},
-            {"role": "user", "content": repair_instruction},
-        ],
-    }
-
-
-def _has_ambiguous_timeline_years(request: QuestionRequest, answer: str) -> bool:
-    """Detect month-only timeline items that lost their year in a multi-year answer."""
-
-    question_years = {int(year) for year in QUESTION_YEAR.findall(request.question)}
-    if len(question_years) < 2 or min(question_years) == max(question_years):
-        return False
-    active_year: int | None = None
-    previous_date: tuple[int, int, int] | None = None
-    for line in answer.splitlines():
-        stripped = line.strip()
-        if MARKDOWN_HEADING.match(stripped):
-            heading_year = ANSWER_YEAR.search(stripped)
-            active_year = int(heading_year.group()[:4]) if heading_year else None
-            previous_date = None
-            continue
-        if "[E" in stripped and ANSWER_YEAR.search(stripped) is None and active_year is None:
-            return True
-        if "[E" not in stripped:
-            continue
-        for match in TIMELINE_DATE.finditer(stripped):
-            year = int(match["year"]) if match["year"] else active_year
-            if year is None:
-                continue
-            active_year = year
-            current = (
-                year,
-                int(match["month"]),
-                int(match["day"]) if match["day"] else 0,
-            )
-            if previous_date is not None and current < previous_date:
-                return True
-            previous_date = current
-    return False
-
-
-def _timeline_year_repair_payload(
-    request_payload: dict[str, object], answer: str
-) -> dict[str, object]:
-    return {
-        **request_payload,
-        "messages": [
-            *cast(list[dict[str, object]], request_payload["messages"]),
-            {"role": "assistant", "content": answer},
-            {
-                "role": "user",
-                "content": (
-                    "上一版跨年回答丢失了部分时间点的四位年份，导致不同年份的月份混在一起。"
-                    "请重新输出完整回答：每个时间要点都写明四位年份，或置于明确的四位年份"
-                    "小标题下，并严格按年份先后排序。不得增加证据中没有的年份或事实，原有"
-                    "事实仍须保留对应证据编号。"
-                ),
-            },
-        ],
-    }
-
-
-def _citation_date_repair_payload(
-    request_payload: dict[str, object], answer: str, mismatches: tuple[str, ...]
-) -> dict[str, object]:
-    return {
-        **request_payload,
-        "messages": [
-            *cast(list[dict[str, object]], request_payload["messages"]),
-            {"role": "assistant", "content": answer},
-            {
-                "role": "user",
-                "content": (
-                    "上一版回答中的下列日期与同段所引证据原文不一致："
-                    + "、".join(mismatches)
-                    + "。请重新输出完整回答，日期必须逐字依据对应证据，不得根据相邻文字"
-                    "猜测或补全；无法确认的日期就删除具体月日。其他事实仍须保留对应证据编号。"
-                ),
-            },
-        ],
-    }
 
 
 def check_deepseek_connection(settings: Settings) -> dict[str, object]:
@@ -444,154 +297,6 @@ async def _stream_completion(
         )
 
 
-def _demote_unsupported_dates(
-    answer: str,
-    citations: list[Citation],
-    mismatches: tuple[str, ...],
-) -> str | None:
-    """Replace an unverifiable date with the precision its cited passages support.
-
-    A model repair gets one attempt. When it still cannot align a date, dropping
-    the whole answer for an extractive excerpt is worse than losing day precision,
-    so the surrounding claim survives at the coarsest supported precision. When no
-    cited passage supports even the year, the answer is not demoted at all.
-    """
-
-    if not mismatches:
-        return None
-    normalized_quotes = {
-        citation.evidence_id: normalize_chinese_dates(citation.quote) for citation in citations
-    }
-
-    def supported_precision(year: int, month: int) -> str | None:
-        for citation in citations:
-            structured = citation_event_date(citation)
-            if structured is not None and structured[0] == year:
-                if structured[1] == month:
-                    return f"{year}年{month}月"
-                return f"{year}年"
-            quote = normalized_quotes[citation.evidence_id]
-            if (
-                year in citation.year_mentions
-                or re.search(rf"(?<!\d){year}(?!\d)", quote) is not None
-            ):
-                if re.search(rf"(?<!\d)0?{month}\s*月", quote) is not None:
-                    return f"{year}年{month}月"
-                return f"{year}年"
-        return None
-
-    candidate = answer
-    for broken in mismatches:
-        match = FULL_DATE_REFERENCE.search(broken)
-        if match is None:
-            continue
-        replacement = supported_precision(int(match["year"]), int(match["month"]))
-        if replacement is None:
-            return None
-        if broken not in candidate:
-            normalized = normalize_chinese_dates(candidate)
-            if broken not in normalized:
-                continue
-            candidate = normalized
-        candidate = candidate.replace(broken, replacement)
-    candidate = re.sub(r"[（(]\s*[）)]", "", candidate)
-    candidate = re.sub(r"(，\s*，|，\s*。)", "，", candidate)
-    candidate = candidate.strip()
-    if candidate == answer:
-        return None
-    return candidate if validate_grounded_answer(candidate, citations).valid else None
-
-
-def _check_generated_answer(
-    request: QuestionRequest,
-    citations: list[Citation],
-    payload: dict[str, object],
-    result: LLMResult,
-    *,
-    propose_repair: bool,
-    allow_date_demotion: bool = False,
-) -> LLMResult:
-    """Clean deterministic defects, returning repair data without executing it."""
-    if not result.answer:
-        return result
-    validation = validate_grounded_answer(result.answer, citations)
-    if validation.valid:
-        if not _has_ambiguous_timeline_years(request, result.answer):
-            return result
-        return LLMResult(
-            answer=None,
-            error_code="ambiguous_timeline_years",
-            usage=result.usage,
-            repair_kind="timeline_year" if propose_repair else None,
-            repair_payload=(
-                _timeline_year_repair_payload(payload, result.answer) if propose_repair else None
-            ),
-        )
-    if validation.error_code == "citation_date_mismatch":
-        if allow_date_demotion:
-            # The single repair attempt could not align the dates. Keep the claim
-            # and drop the unsupported precision instead of discarding the answer.
-            demoted = _demote_unsupported_dates(
-                result.answer, citations, validation.date_mismatches
-            )
-            if demoted is not None:
-                return LLMResult(
-                    answer=demoted,
-                    error_code="demoted_unverified_dates",
-                    usage=result.usage,
-                )
-        return LLMResult(
-            answer=None,
-            error_code=validation.error_code,
-            usage=result.usage,
-            repair_kind="citation_date" if propose_repair else None,
-            repair_payload=(
-                _citation_date_repair_payload(payload, result.answer, validation.date_mismatches)
-                if propose_repair
-                else None
-            ),
-        )
-    if validation.error_code == "uncited_core_claim":
-        salvaged = _salvage_llm_result(
-            result.answer, citations, validation.uncited_claims, result.usage
-        )
-        if salvaged is not None:
-            if not _has_ambiguous_timeline_years(request, salvaged.answer or ""):
-                return salvaged
-            return LLMResult(
-                answer=None,
-                error_code="ambiguous_timeline_years",
-                usage=result.usage,
-                uncited_claims=validation.uncited_claims,
-                repair_kind="timeline_year" if propose_repair else None,
-                repair_payload=(
-                    _timeline_year_repair_payload(payload, salvaged.answer or "")
-                    if propose_repair
-                    else None
-                ),
-            )
-        return LLMResult(
-            answer=None,
-            error_code=validation.error_code,
-            usage=result.usage,
-            uncited_claims=validation.uncited_claims,
-            repair_kind="citation" if propose_repair else None,
-            repair_payload=(
-                _repair_request_payload(
-                    payload, result.answer, citations, validation.uncited_claims
-                )
-                if propose_repair
-                else None
-            ),
-        )
-    return LLMResult(
-        answer=None,
-        error_code=validation.error_code,
-        usage=result.usage,
-        uncited_claims=validation.uncited_claims,
-    )
-
-
 async def _generation_events(
     settings: Settings,
     request: QuestionRequest,
@@ -601,11 +306,9 @@ async def _generation_events(
     *,
     request_payload: dict[str, object] | None = None,
     initial_usage: dict[str, int] | None = None,
-    propose_repair: bool = True,
     emit_deltas: bool = True,
-    repair_kind: str | None = None,
 ) -> AsyncGenerator[AnswerStreamEvent | LLMResult, None]:
-    """Perform exactly one model call and one validation; no retry loop."""
+    """Perform exactly one model call and return its answer unchanged."""
     payload = request_payload or _llm_request_payload(
         settings=settings, request=request, citations=citations
     )
@@ -622,23 +325,6 @@ async def _generation_events(
         error_code=result.error_code,
         usage=_merge_usage(initial_usage, result.usage),
     )
-    if result.answer:
-        yield AnswerStreamEvent("status", {"message": "正在核查引用…"})
-        result = _check_generated_answer(
-            request,
-            citations,
-            payload,
-            result,
-            propose_repair=propose_repair,
-            allow_date_demotion=repair_kind is not None,
-        )
-    if repair_kind and result.answer is None:
-        result = LLMResult(
-            answer=None,
-            error_code=f"{repair_kind}_repair_{result.error_code}",
-            usage=result.usage,
-            uncited_claims=result.uncited_claims,
-        )
     yield result
 
 
@@ -688,7 +374,6 @@ async def _prepare_hierarchical_answer(
                     runtime,
                     budget,
                     request_payload=payload,
-                    propose_repair=False,
                     emit_deltas=False,
                 )
             ) as events,
@@ -709,7 +394,7 @@ async def _prepare_hierarchical_answer(
                 task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
     summaries = "\n\n".join(
-        f"第 {index + 1} 组{'原文摘录' if result.answer is None else '已核查摘要'}：\n{summary}"
+        f"第 {index + 1} 组{'原文摘录' if result.answer is None else '分组归纳摘要'}：\n{summary}"
         for index, (summary, result) in enumerate(mapped)
     )
     return HierarchicalPreparation(
@@ -718,7 +403,7 @@ async def _prepare_hierarchical_answer(
             request=request,
             citations=citations,
             evidence_override=(
-                "以下是分组证据经逐组引用校验后的摘要，失败分组保留原文摘录。"
+                "以下是分组证据经分组归纳后的摘要，失败分组保留原文摘录。"
                 "请合并重复内容，检查各分组覆盖，形成完整回答；"
                 "只能使用以下内容中出现的原始证据编号。\n\n" + summaries
             ),
@@ -732,8 +417,8 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
     """A per-request synthesizer with one async path for buffered and streamed APIs.
 
     The workflow calls ``asynthesize`` with source nodes, ``request``, ``citations``
-    and an optional synchronous ``event_sink``. ``last_result`` contains validation
-    diagnostics and a repair proposal. Only the workflow may call ``repair_once``.
+    and an optional synchronous ``event_sink``. ``last_result`` contains the model
+    answer, usage and transport error, if any; no validation or repair is performed.
     """
 
     def __init__(
@@ -793,7 +478,6 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
                 citations,
                 request_payload=response_kwargs.get("request_payload"),
                 initial_usage=response_kwargs.get("initial_usage"),
-                repair_kind=response_kwargs.get("repair_kind"),
                 map_failed=response_kwargs.get("map_failed", False),
                 findings=response_kwargs.get("findings", []),
             )
@@ -814,7 +498,6 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
         *,
         request_payload: dict[str, object] | None = None,
         initial_usage: dict[str, int] | None = None,
-        repair_kind: str | None = None,
         map_failed: bool = False,
         findings: Sequence[str] = (),
     ) -> AsyncGenerator[AnswerStreamEvent | LLMResult, None]:
@@ -837,7 +520,7 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
             request_payload = preparation.request_payload
             initial_usage = _merge_usage(initial_usage, preparation.usage)
             map_failed = map_failed or preparation.map_failed
-        if findings and repair_kind is None:
+        if findings:
             request_payload = request_payload or _llm_request_payload(
                 settings=self._settings, request=request, citations=citations
             )
@@ -875,9 +558,6 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
                 self._budget,
                 request_payload=request_payload,
                 initial_usage=initial_usage,
-                propose_repair=repair_kind is None,
-                emit_deltas=repair_kind is None,
-                repair_kind=repair_kind,
             )
         ) as events:
             async for item in events:
@@ -890,48 +570,6 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
                             else item.error_code
                         ),
                         usage=item.usage,
-                        uncited_claims=item.uncited_claims,
-                        repair_payload=item.repair_payload,
-                        repair_kind=item.repair_kind,
                         map_failed=True,
                     )
                 yield item
-
-    async def repair_once(
-        self,
-        request: QuestionRequest,
-        citations: list[Citation],
-        result: LLMResult,
-        *,
-        event_sink: EventSink | None = None,
-        nodes: list[NodeWithScore] | None = None,
-    ) -> LLMResult:
-        """Execute a workflow-approved repair once, using the same remaining budget."""
-        if result.repair_payload is None or result.repair_kind is None:
-            return result
-        source_nodes = (
-            nodes
-            if nodes is not None
-            else [
-                NodeWithScore(
-                    node=TextNode(
-                        id_=citation.evidence_id,
-                        text=citation.quote,
-                        metadata={"citation": citation.model_dump(mode="json")},
-                    )
-                )
-                for citation in citations
-            ]
-        )
-        await self.asynthesize(
-            request.question,
-            source_nodes,
-            request=request,
-            citations=citations,
-            request_payload=result.repair_payload,
-            initial_usage=result.usage,
-            repair_kind=result.repair_kind,
-            map_failed=result.map_failed,
-            event_sink=event_sink,
-        )
-        return self.last_result

@@ -178,7 +178,7 @@ def test_stream_preserves_unicode_and_final_metadata(monkeypatch: pytest.MonkeyP
     assert body.closed
 
 
-def test_stream_returns_valid_salvage_without_background_repair(
+def test_stream_returns_raw_answer_without_background_repair(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     first = ChunkStream(
@@ -187,10 +187,7 @@ def test_stream_returns_valid_salvage_without_background_repair(
             b"data: [DONE]\n\n",
         ]
     )
-    second = ChunkStream(
-        [_chunk("参加有关会议并主持工作。[E1]", finish="stop", usage=10), b"data: [DONE]\n\n"]
-    )
-    requests = _provider(monkeypatch, [first, second])
+    requests = _provider(monkeypatch, [first])
     _context(monkeypatch)
     events = _events()
     assert all(e.event != "reset" for e in events)
@@ -198,7 +195,8 @@ def test_stream_returns_valid_salvage_without_background_repair(
         "参加有关会议。[E1]\n\n随后主持工作。"
     )
     assert not any(e.event == "status" and e.data["message"] == "正在后台补全引用…" for e in events)
-    assert events[-1].data["answer"] == "参加有关会议。[E1]"
+    assert events[-1].data["answer"] == "参加有关会议。[E1]\n\n随后主持工作。"
+    assert events[-1].data["llm_error_code"] is None
     assert events[-1].data["llm_usage"] == {"total_tokens": 20}
     assert len(requests) == 1
 
@@ -206,7 +204,6 @@ def test_stream_returns_valid_salvage_without_background_repair(
 @pytest.mark.parametrize(
     "chunks,reason",
     [
-        ([_chunk("错误。[E99]", finish="stop"), b"data: [DONE]\n\n"], "invalid_evidence_marker"),
         ([_chunk("参加有关会议。[E1]", finish="stop")], "incomplete_stream"),
         (
             [_chunk("参加有关会议。[E1]", finish="length"), b"data: [DONE]\n\n"],
@@ -225,6 +222,20 @@ def test_failed_stream_is_replaced_with_evidence_excerpt(
     assert data["generator_mode"] == "extractive"
     assert "E99" not in data["answer"]
     assert any(reason in item for item in data["limitations"])
+
+
+def test_stream_returns_unknown_marker_without_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _provider(
+        monkeypatch,
+        [ChunkStream([_chunk("错误引用。[E99]", finish="stop"), b"data: [DONE]\n\n"])],
+    )
+    _context(monkeypatch)
+    data = _events()[-1].data
+    assert data["answer"] == "错误引用。[E99]"
+    assert data["llm_status"] == "used"
+    assert data["llm_error_code"] is None
 
 
 def test_stream_does_not_send_reasoning_as_answer(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -474,17 +485,18 @@ def test_cancelling_answer_closes_nested_provider(monkeypatch: pytest.MonkeyPatc
     asyncio.run(cancel())
 
 
-def test_valid_stream_salvage_does_not_retry(monkeypatch: pytest.MonkeyPatch) -> None:
-    invalid = [_chunk("参加有关会议。[E1]\n\n随后主持工作。", finish="stop"), b"data: [DONE]\n\n"]
-    requests = _provider(monkeypatch, [ChunkStream(invalid), ChunkStream(invalid)])
+def test_stream_keeps_uncited_paragraph_without_retry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    draft = [_chunk("参加有关会议。[E1]\n\n随后主持工作。", finish="stop"), b"data: [DONE]\n\n"]
+    requests = _provider(monkeypatch, [ChunkStream(draft)])
     _context(monkeypatch)
     final = _events()[-1].data
     assert len(requests) == 1
     assert final["llm_status"] == "used"
-    assert final["llm_error_code"] == "removed_uncited_claims"
-    assert final["answer"] == "参加有关会议。[E1]"
-    assert final["uncited_claims"] == ["随后主持工作。"]
-    assert any("未引用段落已移除" in item for item in final["limitations"])
+    assert final["llm_error_code"] is None
+    assert final["answer"] == "参加有关会议。[E1]\n\n随后主持工作。"
+    assert final["uncited_claims"] == []
 
 
 def test_large_evidence_set_uses_hierarchical_generation_in_stream(
@@ -555,17 +567,10 @@ def test_ceremony_overview_has_same_validation_and_diagnostics_in_both_apis(
     )
     assert synchronous == streamed
     assert len(requests) == 2
-    if missing_fact:
-        assert streamed["llm_status"] == "used"
-        assert streamed["llm_error_code"] == "removed_uncited_claims"
-        assert streamed["uncited_claims"] == ["随后主持其他会议。"]
-        assert "随后主持其他会议" not in streamed["answer"]
-        assert fact in streamed["answer"]
-    else:
-        assert streamed["llm_status"] == "used"
-        assert streamed["answer"] == draft
-        assert streamed["uncited_claims"] == []
-        assert streamed["llm_error_code"] is None
+    assert streamed["llm_status"] == "used"
+    assert streamed["answer"] == draft
+    assert streamed["uncited_claims"] == []
+    assert streamed["llm_error_code"] is None
 
 
 def test_rate_limit_becomes_final_fallback(monkeypatch: pytest.MonkeyPatch) -> None:

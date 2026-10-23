@@ -2,17 +2,17 @@
 
 ## 行为
 
-聊天页面改用 `POST /api/questions/stream`。服务端向 DeepSeek 请求真实的 `stream: true` 响应，但网页传输层**不把草稿增量和 reset 转发给浏览器**；页面只收到进度状态和最终 `done`，收到后由前端按字符流式回放一次经过引用校验的回答。未展示模型的 `reasoning_content`。原有 JSON 问答接口保持兼容，两个入口共用证据包、提示词（`grounded-answer-v8`）、引用修复请求和最终回答构造。
+聊天页面改用 `POST /api/questions/stream`。服务端向 DeepSeek 请求真实的 `stream: true` 响应，但网页传输层**不把草稿增量和 reset 转发给浏览器**；页面只收到进度状态和最终 `done`，收到后由前端按字符流式回放一次模型最终回答。未展示模型的 `reasoning_content`。原有 JSON 问答接口保持兼容，两个入口共用证据包、提示词（`grounded-answer-v8`）和最终回答构造。
 
 | 事件 | 数据 | 前端行为 |
 | --- | --- | --- |
-| `status` | `{message}` | 展示检索、生成、核查进度 |
+| `status` | `{message}` | 展示检索、生成进度 |
 | `done` | 完整 `AnswerResponse` | 开始流式回放最终回答；完成后显示引用和限制，保存会话上下文 |
 | `error` | `{message}` | 显示可读错误；用户消息标记为失败，不生成助手消息 |
 
-模型输出结束后仍执行原有引用校验：只有缺少核心事实引用时允许修复一次；非法引用、截断、断流、超时或修复失败会降级到本地摘录。最终答案只在 `done` 时渲染一次，替换等待状态。一次修复的 token 用量合并统计。结构化或无模型路径直接发送 `done`。
+模型输出结束后直接交付，不再执行引用、页码、日期或未引用事实校验，也不再发起修复。截断、断流、超时、限流或未配置模型时仍保留原有摘录/错误兜底。最终答案只在 `done` 时渲染一次，替换等待状态。结构化或无模型路径直接发送 `done`。
 
-引用校验现按 Markdown 结构识别段落、引用块、列表项和表格行；纯资料限制说明不会被当成历史事实。最终响应新增可选 `llm_error_code` 和 `uncited_claims` 字段。漏引降级时，页面可展开“哪些语句缺少引用”，查看最后一次校验未通过的草稿语句；这些语句按纯文本转义展示，不进入后续会话上下文。具体规则与复现边界见 [引用校验回归记录](CITATION_VALIDATION.md)。
+生产链路不再根据 Markdown 结构做引用覆盖校验；`uncited_claims` 保留字段但固定为空，页面不再展示缺引诊断。模型写了 `[E#]` 就展示对应引用，没写则引用列表为空。引用校验逻辑仅保留给离线评测，详见 [引用校验回归记录](CITATION_VALIDATION.md)。
 
 “停止生成”和“删除会话”使用 AbortController 取消读取；异步生成器关闭上游 HTTP 连接。检索在线程池运行，已开始的本地检索会完成，但取消后的请求不会继续进入模型生成。用户消息在开始生成时即以 `pending` 落库，停止/失败后变为 `aborted/failed`，刷新后仍可见；前端隔离请求状态，不完整草稿不会污染下一轮上下文。会话列表支持多会话切换、重命名、置顶和软删除。
 
@@ -22,7 +22,7 @@
 
 ## 验证
 
-运行 `scripts/check.ps1` 检查 Python 静态规则、类型、完整测试集；安装 Node.js 时同时检查前端语法及 `scripts/test-stream.mjs`。服务端测试使用 httpx 本地模拟传输，验证首个增量在后续内容读取前到达、Unicode、token 用量、引用修复、截断、超时、错误、取消连接清理及原 JSON 接口兼容。前端流测试覆盖 SSE 拆包、CRLF、非法 JSON 和完成后停止读取。
+运行 `scripts/check.ps1` 检查 Python 静态规则、类型、完整测试集；安装 Node.js 时同时检查前端语法及 `scripts/test-stream.mjs`。服务端测试使用 httpx 本地模拟传输，验证首个增量在后续内容读取前到达、Unicode、token 用量、直接交付、截断、超时、错误、取消连接清理及原 JSON 接口兼容。前端流测试覆盖 SSE 拆包、CRLF、非法 JSON 和完成后停止读取。
 
 浏览器集成测试使用本机无界面 Edge 和本地虚构 SSE 服务，禁止外部请求：
 
@@ -31,8 +31,8 @@ npm install --prefix data/frontend-deps --ignore-scripts --no-audit --no-fund pl
 node scripts/test-chat-ui.mjs
 ```
 
-已验证完成前显示首段、Markdown 各主要元素、危险 HTML/链接清理、桌面/390px 移动端布局、引用折叠、停止、删除、修复替换、断流、多会话切换和访客隔离。截图保存在本地 `data/reports/multisession-mobile.png`。测试不发送本地史料，也不将模拟流结果称为真实 DeepSeek 联网验收。
+已验证完成前的进度状态、最终回答回放、Markdown 各主要元素、危险 HTML/链接清理、桌面/390px 移动端布局、引用折叠、停止、删除、断流、多会话切换和访客隔离。截图保存在本地 `data/reports/multisession-mobile.png`。测试不发送本地史料，也不将模拟流结果称为真实 DeepSeek 联网验收。
 
 本次完整检查通过：Ruff、mypy、198 项 Python 测试、3 项前端流解析测试，以及上述无界面浏览器集成测试。
 
-流协议依据 [DeepSeek Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/)：仅输出 `delta.content`，记录 finish reason 和 usage，收到 `[DONE]` 且正常结束后进入引用核查。
+流协议依据 [DeepSeek Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/)：仅输出 `delta.content`，记录 finish reason 和 usage，收到 `[DONE]` 且正常结束后进入最终交付。
