@@ -454,10 +454,10 @@
   - 新增 `visitors`/`visitor_tokens`，服务端签发 HttpOnly 匿名 workspace token，DB 只存 HMAC；会话和消息统一按 `visitor_id + session_id` 校验，跨访客 404。
   - `conversation_sessions` 增加 `visitor_id/title/title_source/status/pinned/last_message_at/message_count/last_message_preview/search_text/active_run_id/version/deleted_at`；新增会话列表、新建、重命名、置顶、软删除/恢复和认领旧会话接口。
   - `conversation_messages` 增加 `status/client_request_id`；生成开始先写 user `pending`，完成/停止/失败分别更新，停止或断流不再丢失问题。
-  - 前端增加会话侧边栏、搜索、新建/切换/重命名/置顶/删除撤销、URL 路由 `/s/{id}`、移动端抽屉和多标签 BroadcastChannel。
+  - 前端增加会话侧边栏、新建/切换/重命名/置顶/删除、URL 路由 `/s/{id}`、移动端抽屉和多标签 BroadcastChannel。
   - 新增 visitor/IP/global 配额与 reserve/settle/release；生产开启 CSRF、Secure `__Host-` cookie 和 nginx 限流。
   - 移除 200 条消息物理裁剪；完整回答入库，上下文仍沿用现有消息数/字符预算。
-- 验证结果：`tests/test_context.py` 覆盖访客隔离、会话 CRUD/搜索/置顶/软删恢复、旧会话认领、配额 429、CSRF 403、流式完成和存储故障不静默；`scripts/test-chat-ui.mjs` 覆盖多会话创建/切换、侧边栏、移动端抽屉、流式回答、引用和删除。全项目 1063 项 Python 测试、Ruff、mypy、前端语法及 3 项 SSE 解析测试通过。
+- 验证结果：`tests/test_context.py` 覆盖访客隔离、会话 CRUD/置顶/软删恢复、旧会话认领、配额 429、CSRF 403、流式完成和存储故障不静默；`scripts/test-chat-ui.mjs` 覆盖多会话创建/切换、侧边栏、移动端抽屉、流式回答、引用和删除。全项目 1063 项 Python 测试、Ruff、mypy、前端语法及 3 项 SSE 解析测试通过。
 - 残留限制：不做登录，清 Cookie/换设备会丢失历史，应用内不能找回；匿名用户可通过清 Cookie 重置 visitor 配额，生产必须依赖 IP/global 限额和 nginx 限流；M1 上下文压缩尚未实施。
 
 ## BC-040：长会话历史线性增长，旧上下文只能被截断

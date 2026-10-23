@@ -65,7 +65,6 @@ COOKIE_CHECK_NAME = "start1921_cookie_check"
 MAX_MESSAGE_CHARS = 100_000
 MAX_TITLE_CHARS = 120
 MAX_PREVIEW_CHARS = 160
-MAX_SEARCH_CHARS = 4_000
 RUN_LEASE = timedelta(minutes=10)
 
 CONVERSATION_SCHEMA = """
@@ -571,13 +570,6 @@ class ConversationStore:
             "ORDER BY m.message_id DESC LIMIT 1), '') "
             "WHERE s.last_message_preview IS NULL OR s.last_message_preview = ''"
         )
-        connection.execute(
-            "UPDATE conversation_sessions s SET search_text = COALESCE(("
-            "SELECT LEFT(STRING_AGG(m.content, ' ' ORDER BY m.message_id), 4000) "
-            "FROM conversation_messages m WHERE m.session_id = s.session_id "
-            "AND m.role = 'user'), '') "
-            "WHERE s.search_text IS NULL OR s.search_text = ''"
-        )
 
     # ------------------------------------------------------------------
     # Visitors and tokens
@@ -707,21 +699,11 @@ class ConversationStore:
         *,
         limit: int = 50,
         offset: int = 0,
-        query: str = "",
     ) -> tuple[list[SessionRecord], bool]:
         limit = max(1, min(limit, 100))
         offset = max(0, offset)
         where = ["visitor_id = ?", "status = 'active'"]
         parameters: list[Any] = [visitor_id]
-        if query:
-            escaped = query.replace("%", "\\%").replace("_", "\\_")
-            like = f"%{escaped}%"
-            where.append(
-                "(COALESCE(title, '') ILIKE ? ESCAPE '\\' OR "
-                "COALESCE(last_message_preview, '') ILIKE ? ESCAPE '\\' OR "
-                "COALESCE(search_text, '') ILIKE ? ESCAPE '\\')"
-            )
-            parameters.extend([like, like, like])
         sql = (
             "SELECT * FROM conversation_sessions WHERE "
             + " AND ".join(where)
@@ -1015,7 +997,6 @@ class ConversationStore:
                 "UPDATE conversation_sessions SET title = ?, title_source = ?, "
                 "last_message_at = ?, updated_at = ?, message_count = message_count + 1, "
                 "last_message_preview = ?, "
-                "search_text = LEFT(COALESCE(search_text, '') || ? || ' ', ?), "
                 "active_run_id = ?, active_run_started_at = ?, version = version + 1 "
                 "WHERE session_id = ?",
                 (
@@ -1024,8 +1005,6 @@ class ConversationStore:
                     now,
                     now,
                     _preview(question),
-                    question,
-                    MAX_SEARCH_CHARS,
                     run_id,
                     now,
                     session_id,
@@ -1127,16 +1106,12 @@ class ConversationStore:
             connection.execute(
                 "UPDATE conversation_sessions SET title = COALESCE(NULLIF(title, ''), ?), "
                 "message_count = message_count + 2, last_message_at = ?, updated_at = ?, "
-                "last_message_preview = ?, "
-                "search_text = LEFT(COALESCE(search_text, '') || ? || ' ', ?), "
-                "version = version + 1 WHERE session_id = ?",
+                "last_message_preview = ?, version = version + 1 WHERE session_id = ?",
                 (
                     _title_from_question(question),
                     timestamp,
                     timestamp,
                     _preview(answer),
-                    question,
-                    MAX_SEARCH_CHARS,
                     session_id,
                 ),
             )

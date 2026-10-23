@@ -189,8 +189,6 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
 }
 .sidebar-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px; }
 .brand { color: var(--ink); font-family: "Noto Serif SC", SimSun, serif; font-size: 22px; font-weight: 700; text-decoration: none; letter-spacing: .03em; }
-.session-search { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: rgba(255,255,255,.6); color: var(--ink); outline: none; }
-.session-search:focus { border-color: var(--red); }
 .session-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding-right: 2px; }
 .sidebar-empty { color: var(--muted); font-size: 13px; padding: 12px 6px; }
 .session-item {

@@ -12,7 +12,6 @@ const sidebarOverlay = document.querySelector("#sidebar-overlay");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
 const newSessionButton = document.querySelector("#new-session");
 const sessionList = document.querySelector("#session-list");
-const sessionSearch = document.querySelector("#session-search");
 const loadMoreSessions = document.querySelector("#load-more-sessions");
 const currentTitle = document.querySelector("#current-title");
 const renameSessionButton = document.querySelector("#rename-session");
@@ -30,7 +29,6 @@ const state = {
   sessions: [],
   hasMore: false,
   offset: 0,
-  query: "",
   currentSessionId: null,
   currentSession: null,
   messages: [],
@@ -261,7 +259,7 @@ function sessionItemHtml(session) {
 function renderSessions() {
   if (!sessionList) return;
   if (!state.sessions.length) {
-    sessionList.innerHTML = `<p class="sidebar-empty">${state.query ? "没有匹配的会话" : "还没有会话"}</p>`;
+    sessionList.innerHTML = '<p class="sidebar-empty">还没有会话</p>';
     return;
   }
   sessionList.innerHTML = state.sessions.map(sessionItemHtml).join("");
@@ -274,7 +272,6 @@ async function loadSessions({append = false} = {}) {
   try {
     if (!append) state.offset = 0;
     const params = new URLSearchParams({limit: "50", offset: String(state.offset)});
-    if (state.query) params.set("q", state.query);
     const data = await api(`/api/sessions?${params.toString()}`);
     const items = Array.isArray(data.items) ? data.items : [];
     state.sessions = append ? [...state.sessions, ...items] : items;
@@ -656,13 +653,6 @@ function bindEvents() {
   renameSessionButton?.addEventListener("click", renameCurrentSession);
   deleteSessionButton?.addEventListener("click", () => {
     if (state.currentSessionId) deleteSession(state.currentSessionId);
-  });
-  sessionSearch?.addEventListener("input", () => {
-    clearTimeout(sessionSearch._timer);
-    sessionSearch._timer = setTimeout(async () => {
-      state.query = sessionSearch.value.trim();
-      await loadSessions();
-    }, 250);
   });
   loadMoreSessions?.addEventListener("click", () => loadSessions({append: true}));
   sessionList?.addEventListener("click", async event => {

@@ -287,14 +287,14 @@ def test_visitor_isolation_between_clients(monkeypatch: Any, work_path: Path) ->
 
 
 @pytest.mark.usefixtures("postgres_settings")
-def test_session_crud_search_pin_and_claim(monkeypatch: Any, work_path: Path) -> None:
+def test_session_crud_pin_and_claim(monkeypatch: Any, work_path: Path) -> None:
     settings = _settings(work_path)
     client = TestClient(web_module.create_app(settings))
     first_id = _create_session(client, "遵义会议")
     second_id = _create_session(client, "淮海战役")
 
-    listed = client.get("/api/sessions", params={"q": "遵义"}).json()
-    assert [item["session_id"] for item in listed["items"]] == [first_id]
+    listed = client.get("/api/sessions").json()
+    assert {item["session_id"] for item in listed["items"]} == {first_id, second_id}
 
     renamed = client.patch(
         f"/api/sessions/{first_id}",

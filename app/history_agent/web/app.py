@@ -361,7 +361,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @api.get("/api/sessions")
     def list_sessions(
         visitor: Annotated[VisitorContext, Depends(current_visitor)],
-        q: Annotated[str, Query(max_length=200)] = "",
         limit: Annotated[int, Query(ge=1, le=100)] = 50,
         offset: Annotated[int, Query(ge=0)] = 0,
     ) -> dict[str, object]:
@@ -369,7 +368,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             visitor.visitor_id,
             limit=limit,
             offset=offset,
-            query=q,
         )
         return {
             "items": [_session_payload(item) for item in items],
