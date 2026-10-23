@@ -585,7 +585,7 @@ RRF 后再按查询意图增加 0.004：
 
 证据充分性模型检查仍由 `llm_retrieval_reflection` 控制启用，只对覆盖计划、比较/原因分析等需要检查的问题调用；旧的单轮反思上限配置已删除。增补次数、工具重试和停止统一由主 Workflow 决定，不能在检查器、工具或合成器内部另开循环。
 
-网页提交问题、`top_k=12` 与 `session_id`，由服务从 PostgreSQL 会话库读取历史并按消息数和字符预算构建上下文；浏览器只持久化会话 ID。直接 API 请求可在不传 `session_id` 时提供最多 12 条历史消息。明确指代或省略式追问才会使用历史，旧 `[E#]` 被替换为历史引用标记，历史回答不能充当当前史实证据。单会话最多保留 200 条消息，单条已保存回答最多 10,000 字符。
+网页提交问题、`top_k=12` 与 `session_id`，由服务从 PostgreSQL 会话库读取历史并按消息数和字符预算构建上下文；浏览器只保存当前会话 ID。服务端为每个浏览器签发 HttpOnly 匿名 workspace cookie，会话按 `visitor_id` 隔离；跨访客访问统一返回 404。没有登录，清 Cookie/换设备会丢失历史，页面提供导出和提示。直接 API 请求可在不传 `session_id` 时提供最多 12 条历史消息；有 `session_id` 时忽略客户端历史。明确指代或省略式追问才会使用历史，旧 `[E#]` 被替换为历史引用标记，历史回答不能充当当前史实证据。会话消息不再按 200 条物理裁剪；完整回答入库，上下文仍受消息数和字符预算约束。
 
 系统提示词要求模型：
 
@@ -748,6 +748,6 @@ uv run start1921 eval answers --top-k 10
 | 共享模型适配与请求预算 | `app/history_agent/answering/llamaindex_llm.py`、`runtime.py` |
 | 引用校验与删段 | `app/history_agent/answering/validation.py` |
 | 结构化候选证据收集 | `app/history_agent/answering/structured.py` |
-| 会话持久化与上下文预算 | `app/history_agent/answering/context.py` |
+| 会话持久化、访客隔离与上下文预算 | `app/history_agent/answering/context.py` |
 | Web API | `app/history_agent/web/app.py` |
 | 前端流式与 Markdown | `app/history_agent/web/static/app.js`、`markdown.js` |

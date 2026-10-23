@@ -4,42 +4,70 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>start1921 · 近现代史研究 Agent</title>
-  <link rel="stylesheet" href="/app.css?v=stream-v2">
+  <link rel="stylesheet" href="/app.css?v=multi-session-v1">
 </head>
 <body>
-  <main class="shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">LOCAL ARCHIVE · 1921—1978</p>
-        <h1>start1921</h1>
-        <p class="subtitle">只依据本地史料回答，每条结论都能回到文献与 PDF 页码。</p>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar" aria-label="会话列表">
+      <div class="sidebar-head">
+        <a class="brand" href="/">start1921</a>
+        <button id="new-session" class="primary small" type="button">新建会话</button>
       </div>
-      <button id="clear" class="ghost" type="button">清空会话</button>
-    </header>
+      <label class="sr-only" for="session-search">搜索会话</label>
+      <input id="session-search" class="session-search" type="search" placeholder="搜索会话…" autocomplete="off">
+      <div id="session-list" class="session-list" aria-live="polite"></div>
+      <button id="load-more-sessions" class="ghost small" type="button" hidden>加载更多</button>
+      <div class="sidebar-foot">
+        <p id="visitor-label" class="meta">本浏览器工作区</p>
+        <p id="quota" class="meta"></p>
+        <details id="data-menu" class="data-menu">
+          <summary>数据</summary>
+          <div class="data-menu-body">
+            <a id="export-data" href="/api/visitor/export">导出全部会话</a>
+            <button id="toggle-archived" class="link-button" type="button">查看归档</button>
+            <button id="delete-all-data" class="danger-link" type="button">删除全部会话</button>
+            <p class="meta">会话保存在本浏览器。清除站点数据、换浏览器或换设备将看不到历史。</p>
+          </div>
+        </details>
+      </div>
+    </aside>
+    <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
 
-    <section id="messages" class="messages" aria-live="polite">
-      <article class="message assistant welcome">
-        <div class="avatar">史</div>
-        <div class="bubble">
-          <p>可以问我人物经历、人物交集或政治观点。比如：</p>
-          <div class="suggestions">
-            <button>周恩来在1956年主要有哪些经历？</button>
-            <button>毛泽东和周恩来在长征期间有哪些交集？</button>
-            <button>毛泽东关于调查研究有哪些观点？</button>
+    <main class="shell">
+      <header class="topbar">
+        <div class="topbar-main">
+          <button id="sidebar-toggle" class="icon-button" type="button" aria-label="打开会话列表">☰</button>
+          <div>
+            <p class="eyebrow">LOCAL ARCHIVE · 1921—1978</p>
+            <h1>start1921</h1>
+            <p id="current-title" class="session-title">新会话</p>
+            <p class="subtitle">只依据本地史料回答，每条结论都能回到文献与 PDF 页码。</p>
           </div>
         </div>
-      </article>
-    </section>
+        <div class="topbar-actions">
+          <button id="rename-session" class="ghost small" type="button" hidden>重命名</button>
+          <button id="delete-session" class="ghost small" type="button" hidden>删除会话</button>
+        </div>
+      </header>
 
-    <form id="composer" class="composer">
-      <label class="sr-only" for="question">输入历史研究问题</label>
-      <textarea id="question" rows="1" maxlength="500" placeholder="输入一个可由本地史料核查的问题……" required></textarea>
-      <button id="send" type="submit">发送</button>
-      <p class="notice"><span id="status-dot"></span><span id="status">正在检查本地索引…</span></p>
-    </form>
-  </main>
+      <div id="cookie-warning" class="banner" hidden>
+        浏览器禁用了 Cookie，本页无法保存会话。请允许本站 Cookie，或使用“数据 → 导出全部会话”。
+      </div>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+
+      <form id="composer" class="composer">
+        <label class="sr-only" for="question">输入历史研究问题</label>
+        <textarea id="question" rows="1" maxlength="500" placeholder="输入一个可由本地史料核查的问题……" required></textarea>
+        <button id="send" type="submit">发送</button>
+        <p class="notice"><span id="status-dot"></span><span id="status">正在检查本地索引…</span></p>
+      </form>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" hidden></div>
   <script src="/assets/marked.umd.js" defer></script>
   <script src="/assets/purify.min.js" defer></script>
-  <script src="/app.js?v=agentic-rag-v1" type="module"></script>
+  <script src="/app.js?v=multi-session-v1" type="module"></script>
 </body>
 </html>

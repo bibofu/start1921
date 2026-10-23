@@ -442,3 +442,20 @@
   - 新增测试：中文数字原文支持阿拉伯日期、错误月份仍被拒、修复失败后降级到可确认精度且不发起第二次修复。
 - 验证结果：复现问句修复前两次校验均报 `1948年11月6日`/`1949年1月10日` 不一致；修复后同一问句不再出现日期不一致，`generator_mode=llm`、`evidence_status=supported`、`stopped_reason=completed`，答案保留原草稿结构。`test_answering.py`、`test_synthesis.py`、`test_research_evidence.py`、`test_research_workflow.py`、`test_streaming.py` 共127项通过。诊断脚本与单次响应留在本地 `tmp/diag_date_mismatch.json`（不随Git分发）。
 - 残留限制：本次仍记录 `removed_uncited_claims`（首段无引用的结论被移除，见 BC-035）；中文数字归一化只覆盖“年月日”形式，未覆盖“民国纪年”和“是年/同年”等相对表述；真实模型仅跑一题一次，不是总体质量结论。
+
+## BC-039：公网只有单会话，且会话没有浏览器级隔离
+
+- 记录日期：2026-10-23；状态：已修复，本轮为多会话改造，不是 Golden 质量评测。
+- 问题：线上页面只能保存一个 `session_id`，刷新恢复依赖 localStorage；多个会话无法并存。`GET/DELETE /api/sessions/{id}` 只校验 ID 格式，拿到 URL 或日志里的 ID 即可读写；匿名用户也可无上限调用 LLM。
+- 糟糕表现：用户无法为不同研究主题建立独立会话；清空会话会新建 ID 并删除旧记录，不能撤销；旧会话只能在浏览器 localStorage 里保留一个。会话没有归属，无法做多访客隔离。
+- 期望表现：同一浏览器可管理多个会话；不同浏览器/不同访客的会话互不可见；刷新、URL 收藏、前进后退都落到正确会话；删除可恢复；匿名访问有最小配额和限流；不做账号登录。
+- 根因：会话表只有 `session_id`，没有访客归属、标题、状态、版本和列表查询；前端只持久化一个 ID；没有 visitor cookie/CSRF；消息只在最终回答后原子写入，停止/失败时问题丢失。
+- 解决方案：
+  - 新增 `visitors`/`visitor_tokens`，服务端签发 HttpOnly 匿名 workspace token，DB 只存 HMAC；会话和消息统一按 `visitor_id + session_id` 校验，跨访客 404。
+  - `conversation_sessions` 增加 `visitor_id/title/title_source/status/pinned/last_message_at/message_count/last_message_preview/search_text/active_run_id/version/deleted_at`；新增会话列表、新建、重命名、置顶、归档、软删除/恢复、认领旧会话和导出接口。
+  - `conversation_messages` 增加 `status/client_request_id`；生成开始先写 user `pending`，完成/停止/失败分别更新，停止或断流不再丢失问题。
+  - 前端增加会话侧边栏、搜索、新建/切换/重命名/置顶/归档/删除撤销、URL 路由 `/s/{id}`、移动端抽屉和多标签 BroadcastChannel。
+  - 新增 visitor/IP/global 配额与 reserve/settle/release；生产开启 CSRF、Secure `__Host-` cookie 和 nginx 限流。
+  - 移除 200 条消息物理裁剪；完整回答入库，上下文仍沿用现有消息数/字符预算。
+- 验证结果：`tests/test_context.py` 覆盖访客隔离、会话 CRUD/搜索/置顶/软删恢复、旧会话认领、配额 429、CSRF 403、流式完成和存储故障不静默；`scripts/test-chat-ui.mjs` 覆盖多会话创建/切换、侧边栏、移动端抽屉、流式回答、引用和删除。全项目 1060 项 Python 测试、Ruff、mypy、前端语法及 3 项 SSE 解析测试通过。
+- 残留限制：不做登录，清 Cookie/换设备会丢失历史，应用内只能导出，不能找回；匿名用户可通过清 Cookie 重置 visitor 配额，生产必须依赖 IP/global 限额和 nginx 限流；M1 上下文压缩尚未实施。

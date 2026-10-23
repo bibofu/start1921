@@ -41,9 +41,9 @@ sudo install -d -m 755 /opt/start1921/runtime/docs
 sudoedit /etc/start1921/start1921.env
 ```
 
-填入两个不同的随机十六进制密钥（可分别运行 `openssl rand -hex 32`），及已有
-DeepSeek API key。不要原样复制本地 `.env` 中指向 Windows 路径或 localhost 的数据库
-地址。Compose 强制使用本项目的数据库、Qdrant 和容器路径。若本地原来将主库、
+填入三个不同的随机十六进制密钥（PostgreSQL、Qdrant、visitor token pepper，可分别运行
+`openssl rand -hex 32`），及已有 DeepSeek API key。不要原样复制本地 `.env` 中指向
+Windows 路径或 localhost 的数据库地址。Compose 强制使用本项目的数据库、Qdrant 和容器路径。若本地原来将主库、
 会话库、关键词库分开，需先规划合并或调整 Compose 中三个连接地址，再分别迁移。
 配置路径如有变化，需要同时修改 `--env-file` 参数和文件内的 `START1921_ENV_FILE`。
 
@@ -122,6 +122,23 @@ curl --fail http://127.0.0.1:18021/api/ready
 
 网站页面和 API 公开访问，无需用户名和密码；nginx 显式设置 `auth_basic off`。
 应用端口保持 `127.0.0.1:18021`，由 nginx 提供 HTTPS 入口。
+
+### 匿名 workspace 与配额
+
+不做账号登录。应用首次访问时签发 `__Host-start1921_vid` HttpOnly Cookie，
+会话、消息和配额按 `visitor_id` 隔离；跨访客访问统一返回 404。生产环境必须设置：
+
+- `START1921_VISITOR_TOKEN_PEPPER`：随机十六进制密钥，用于 HMAC token 和 IP hash；
+- `HISTORY_AGENT_VISITOR_COOKIE_NAME=__Host-start1921_vid`；
+- `HISTORY_AGENT_VISITOR_COOKIE_SECURE=true`；
+- `HISTORY_AGENT_CSRF_ENABLED=true`；
+- `HISTORY_AGENT_QUOTA_ENABLED=true` 及每日问题/token 限额。
+
+Cookie 丢失、换浏览器或清站点数据会得到新的空 workspace，旧会话仍在库中但应用内
+不可见；页面提供“导出全部会话”。不存在账号找回或跨设备同步。nginx 示例已加
+HSTS/CSP；生产建议在 `http{}` 定义 `limit_req_zone`/`limit_conn_zone`，对
+`/api/visitor` 和 `/api/questions` 单独限流。应用不会信任任意代理头，Dockerfile
+只信任私有网段转发的 `X-Forwarded-For`。
 
 ## 运维与升级
 

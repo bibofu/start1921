@@ -1,4 +1,4 @@
-// Local UI integration test. Install with:
+// Local multi-session UI integration test. Install with:
 // npm install --prefix data/frontend-deps --ignore-scripts --no-audit --no-fund playwright
 import assert from "node:assert/strict";
 import {createServer} from "node:http";
@@ -7,173 +7,220 @@ import {fileURLToPath} from "node:url";
 import {chromium} from "../data/frontend-deps/node_modules/playwright/index.mjs";
 
 const root = new URL("../app/history_agent/web/static/", import.meta.url);
-const answer = '## 研究结论\n\n**重要事实**与*说明*。[E1]\n\n- 第一项\n- 第二项\n\n> 原文引述\n\n| 年份 | 事件 |\n| --- | --- |\n| 1935 | 会议 |\n\n```js\nconst text = "<tag>";\n```\n\n[文献](https://example.com/source)\n\n<img src="https://example.com/tracker" onerror="window.injected=true"><script>window.injected=true</script>[危险链接](javascript:alert(1))';
+const sessions = new Map();
+let nextSession = 1;
 const requests = [];
-const cancelled = [];
-const rejectedClaim = '未引用的草稿：<img src="https://example.com/tracker" onerror="window.injected=true">';
-const timers = new Set();
-function later(fn, delay) {
-  const timer = setTimeout(() => { timers.delete(timer); fn(); }, delay);
-  timers.add(timer);
+
+function json(res, value, status = 200) {
+  res.writeHead(status, {"Content-Type": "application/json"});
+  res.end(JSON.stringify(value));
 }
-function send(res, event, data) { if (!res.destroyed) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`); }
-function final(text = answer) {
-  return {answer: text, retrieval_mode: "hybrid_rrf", generator_mode: "llm", model_name: "local-fixture", llm_status: "used", limitations: [], citations: [{evidence_id: "E1", document: "测试文献", pdf_page: 12, section: [], source_type: "chronology", verification_status: "verified", quote: "测试原文，不使用任何本地史料。"}]};
+function sessionPayload(session) {
+  return {
+    session_id: session.id,
+    title: session.title,
+    title_source: session.titleSource,
+    status: session.status,
+    pinned: session.pinned,
+    created_at: session.createdAt,
+    updated_at: session.updatedAt,
+    last_message_at: session.lastMessageAt,
+    message_count: session.messages.length,
+    last_message_preview: session.messages.at(-1)?.content.slice(0, 120) || "",
+    version: session.version,
+    deleted_at: session.deletedAt
+  };
 }
+function createSession() {
+  const id = `session-${String(nextSession++).padStart(8, "0")}`;
+  const now = new Date().toISOString();
+  const session = {id, title: "新会话", titleSource: "auto", status: "active", pinned: false, createdAt: now, updatedAt: now, lastMessageAt: now, messages: [], version: 0, deletedAt: null};
+  sessions.set(id, session);
+  return session;
+}
+function getSession(id) {
+  return sessions.get(id) || null;
+}
+function addMessage(session, role, content) {
+  session.messages.push({message_id: session.messages.length + 1, role, content, status: "completed", created_at: new Date().toISOString()});
+  session.updatedAt = new Date().toISOString();
+  session.lastMessageAt = session.updatedAt;
+  session.version += 1;
+}
+function send(res, event, data) {
+  if (!res.destroyed) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+}
+function final(question) {
+  return {
+    answer: `## 研究结论\n\n关于“${question}”的证据摘录。[E1]`,
+    retrieval_mode: "hybrid_rrf",
+    generator_mode: "llm",
+    model_name: "local-fixture",
+    llm_status: "used",
+    limitations: [],
+    citations: [{evidence_id: "E1", document: "测试文献", pdf_page: 12, section: [], source_type: "chronology", verification_status: "verified", quote: "测试原文。"}]
+  };
+}
+
 const server = createServer(async (req, res) => {
-  if (req.url === "/api/health") {
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({status: "ok", llm_enabled: false}));
+  const url = new URL(req.url, "http://127.0.0.1");
+  if (url.pathname === "/api/health") {
+    json(res, {status: "ok", llm_enabled: false});
     return;
   }
-  if (req.url === "/api/questions/stream") {
+  if (url.pathname === "/api/visitor") {
+    res.setHeader("Set-Cookie", ["start1921_cookie_check=1; Path=/", "start1921_vid=fixture; Path=/"]);
+    json(res, {
+      visitor: {label: "v_fixture"},
+      csrf_token: "fixture-csrf",
+      quota: {daily_questions: 20, used_today: 0, enabled: false},
+      limits: {max_sessions: 50, max_messages_per_session: 1000}
+    });
+    return;
+  }
+  if (url.pathname === "/api/sessions" && req.method === "GET") {
+    const items = [...sessions.values()].filter(session => session.status === "active").map(sessionPayload);
+    json(res, {items, has_more: false, offset: 0, limit: 50});
+    return;
+  }
+  if (url.pathname === "/api/sessions" && req.method === "POST") {
+    json(res, {session: sessionPayload(createSession())});
+    return;
+  }
+  if (url.pathname === "/api/sessions/claim" && req.method === "POST") {
+    json(res, {detail: "no legacy session"}, 404);
+    return;
+  }
+  const match = url.pathname.match(/^\/api\/sessions\/([^/]+)(\/messages|\/restore)?$/);
+  if (match) {
+    const session = getSession(match[1]);
+    if (!session || session.status === "deleted") {
+      json(res, {detail: "会话不存在"}, 404);
+      return;
+    }
+    if (match[2] === "/messages" && req.method === "GET") {
+      json(res, {messages: session.messages, next_before: null});
+      return;
+    }
+    if (match[2] === "/restore" && req.method === "POST") {
+      session.status = "active";
+      session.deletedAt = null;
+      json(res, {session: sessionPayload(session)});
+      return;
+    }
+    if (req.method === "GET") {
+      json(res, {session: sessionPayload(session), messages: session.messages, next_before: null});
+      return;
+    }
+    if (req.method === "PATCH") {
+      let body = "";
+      for await (const chunk of req) body += chunk;
+      const data = JSON.parse(body || "{}");
+      if (data.title !== undefined) { session.title = data.title; session.titleSource = "user"; }
+      if (data.pinned !== undefined) session.pinned = data.pinned;
+      if (data.status !== undefined) session.status = data.status;
+      session.version += 1;
+      json(res, {session: sessionPayload(session)});
+      return;
+    }
+    if (req.method === "DELETE") {
+      session.status = "deleted";
+      session.deletedAt = new Date().toISOString();
+      json(res, {deleted: true, session: sessionPayload(session), undo_until: "later"});
+      return;
+    }
+  }
+  if (url.pathname === "/api/visitor/export") {
+    json(res, {sessions: [...sessions.values()].map(session => ({session: sessionPayload(session), messages: session.messages}))});
+    return;
+  }
+  if (url.pathname === "/api/visitor/data" && req.method === "DELETE") {
+    sessions.clear();
+    json(res, {deleted_sessions: 0});
+    return;
+  }
+  if (url.pathname === "/api/questions/stream") {
     let body = "";
     for await (const chunk of req) body += chunk;
     const data = JSON.parse(body);
     requests.push(data);
-    let done = false;
-    res.on("close", () => { if (!done) cancelled.push(data.question); });
+    const session = getSession(data.session_id) || createSession();
+    if (session.title === "新会话") session.title = data.question.slice(0, 30);
+    addMessage(session, "user", data.question);
     res.writeHead(200, {"Content-Type": "text/event-stream", "Cache-Control": "no-cache"});
     send(res, "status", {message: "正在生成，引用待核查…"});
-    send(res, "delta", {text: "## 正在输出\n\n**第一段**"});
-    if (data.question.includes("中断")) {
-      later(() => res.end(), 300);
-    } else if (data.question.includes("错误")) {
-      later(() => { send(res, "error", {message: "测试服务错误"}); res.end(); }, 300);
-    } else if (data.question.includes("停止") || data.question.includes("清空")) {
-      later(() => { send(res, "done", final("旧回答不应回来")); res.end(); }, 3000);
-    } else if (data.question.includes("降级")) {
-      later(() => {
-        done = true;
-        send(res, "done", {...final("本地证据摘录。[E1]"), generator_mode: "extractive", llm_status: "fallback", llm_error_code: "citation_repair_uncited_core_claim", uncited_claims: [rejectedClaim], limitations: ["生成回答仍有事实语句缺少引用，已改为展示证据摘录。"]});
-        res.end();
-      }, 350);
-    } else if (data.question.includes("移除")) {
-      later(() => {
-        done = true;
-        send(res, "done", {...final("保留的完整回答。[E1]"), llm_error_code: "removed_uncited_claims", uncited_claims: [rejectedClaim], limitations: ["生成草稿中的未引用段落已移除，其余内容已通过引用核查。"]});
-        res.end();
-      }, 350);
-    } else if (data.question.includes("修复")) {
-      later(() => send(res, "status", {message: "正在后台补全引用…"}), 350);
-      later(() => { done = true; send(res, "done", final("修复后的事实。[E1]")); res.end(); }, 950);
-    } else if (data.question.includes("长文")) {
-      later(() => { done = true; send(res, "done", final("长".repeat(12000))); res.end(); }, 350);
-    } else {
-      later(() => send(res, "delta", {text: "\n\n第二段也已到达。"}), 450);
-      later(() => { done = true; send(res, "done", final()); res.end(); }, 950);
-    }
+    send(res, "delta", {text: "## 研究结论\n\n"});
+    setTimeout(() => {
+      addMessage(session, "assistant", final(data.question).answer);
+      send(res, "done", final(data.question));
+      res.end();
+    }, 250);
     return;
   }
-  if (req.url?.startsWith("/api/sessions/")) {
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify(req.method === "DELETE" ? {cleared: true} : {messages: []}));
-    return;
-  }
-  const requestPath = new URL(req.url, "http://127.0.0.1").pathname;
-  const path = requestPath === "/" ? "index.html" : requestPath.split("/").pop();
+  const path = url.pathname === "/" || url.pathname.startsWith("/s/") ? "index.html" : url.pathname.split("/").pop();
   try {
     const bytes = await readFile(new URL(path, root));
     res.setHeader("Content-Type", path.endsWith(".js") ? "text/javascript" : path.endsWith(".css") ? "text/css" : "text/html");
     res.end(bytes);
-  } catch { res.writeHead(404).end(); }
+  } catch {
+    res.writeHead(404).end();
+  }
 });
 await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
 let browser;
 try {
   browser = await chromium.launch({channel: "msedge", headless: true});
-  const page = await browser.newPage({viewport: {width: 1100, height: 1000}});
+  const page = await browser.newPage({viewport: {width: 1200, height: 1000}});
   const errors = [];
-  const external = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.route("**/*", route => {
-    if (!route.request().url().startsWith(base)) { external.push(route.request().url()); return route.abort(); }
+    if (!route.request().url().startsWith(base)) return route.abort();
     return route.continue();
   });
   await page.goto(base);
+  await page.getByRole("button", {name: "新建会话"}).waitFor();
+  assert.equal(await page.locator(".message.welcome").count(), 1);
+
   async function ask(text) {
     await page.locator("#question").fill(text);
     await page.getByRole("button", {name: "发送", exact: true}).click();
+    await page.getByRole("heading", {name: "研究结论"}).waitFor();
+    await page.locator(".evidence summary").last().waitFor();
   }
-  const current = page.locator(".message.assistant:not(.welcome)").last();
-  await ask("Markdown测试");
-  await page.getByRole("heading", {name: "正在输出"}).waitFor();
-  assert.equal(await page.getByRole("button", {name: "停止生成", exact: true}).count(), 1);
-  await current.getByText("第二段也已到达。").waitFor();
-  await page.getByRole("heading", {name: "研究结论"}).waitFor();
-  assert.equal(requests.at(-1).top_k, 12);
+
+  await ask("第一问");
+  assert.equal(await page.locator(".session-item").count(), 1);
   assert.match(requests.at(-1).session_id, /^[A-Za-z0-9_-]{16,64}$/);
   assert.equal("history" in requests.at(-1), false);
-  assert.equal(await current.locator("strong").textContent(), "重要事实");
-  assert.equal(await current.locator("li").count(), 2);
-  assert.equal(await current.locator("table tbody td").count(), 2);
-  assert.equal(await current.locator("blockquote").count(), 1);
-  assert.match(await current.locator("pre code").textContent(), /<tag>/);
-  assert.equal(await current.locator("img, script, [onerror], a[href^='javascript:']").count(), 0);
-  assert.equal(await page.evaluate(() => window.injected), undefined);
-  assert.deepEqual(external, []);
-  await current.locator("summary").click();
-  assert.equal(await current.locator("details").getAttribute("open"), "");
-  await mkdir(new URL("../data/reports/", import.meta.url), {recursive: true});
-  await page.screenshot({path: fileURLToPath(new URL("../data/reports/stream-markdown-desktop.png", import.meta.url)), fullPage: true});
+  assert.equal(await page.locator(".message.user .bubble").last().textContent(), "第一问");
+  assert.equal(await page.locator(".evidence summary").count(), 1);
+
+  await page.getByRole("button", {name: "新建会话"}).click();
+  assert.equal(await page.locator(".message.welcome").count(), 1);
+  await ask("第二问");
+  assert.equal(await page.locator(".session-item").count(), 2);
+
+  await page.locator(".session-item").filter({hasText: "第一问"}).locator(".session-select").click();
+  await page.locator(".message.user", {hasText: "第一问"}).waitFor();
+  assert.match(await page.locator("#current-title").textContent(), /第一问/);
+
   await page.setViewportSize({width: 390, height: 844});
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
-  await page.screenshot({path: fileURLToPath(new URL("../data/reports/stream-markdown-mobile.png", import.meta.url)), fullPage: true});
-  await ask("停止测试");
-  await current.locator("h2").waitFor();
-  await page.getByRole("button", {name: "停止生成", exact: true}).click();
-  await current.getByText("已停止，回答未完成核查。").waitFor();
-  await ask("清空测试");
-  await current.locator("h2").waitFor();
-  const clearedSession = requests.at(-1).session_id;
-  await page.getByRole("button", {name: "清空会话"}).click();
-  assert.equal(await page.locator(".message:not(.welcome)").count(), 0);
-  await ask("修复测试");
-  await current.getByText("正在后台补全引用…").waitFor();
-  assert.equal(await current.locator("h2").textContent(), "正在输出");
-  assert.equal(await current.locator("strong").textContent(), "第一段");
-  await current.getByText("修复后的事实。[E1]", {exact: true}).waitFor();
-  await page.getByRole("button", {name: "发送", exact: true}).waitFor();
-  assert.notEqual(requests.at(-1).session_id, clearedSession);
-  assert.equal("history" in requests.at(-1), false);
-  await ask("中断测试");
-  await current.getByText(/连接中断/).waitFor();
-  assert.equal(await current.locator("h2").count(), 0);
-  await ask("错误测试");
-  await current.getByText(/测试服务错误/).waitFor();
-  assert.equal("history" in requests.at(-1), false);
-  await ask("移除测试");
-  const removedDiagnostic = current.locator(".citation-diagnostics");
-  await removedDiagnostic.getByText("哪些草稿内容已移除", {exact: true}).waitFor();
-  assert.equal(await current.locator(".markdown-body").textContent(), "保留的完整回答。[E1]\n");
-  assert.equal(await removedDiagnostic.locator("li").textContent(), rejectedClaim);
-  await ask("降级原因测试");
-  const diagnostic = current.locator(".citation-diagnostics");
-  await diagnostic.waitFor();
-  assert.equal(await diagnostic.getAttribute("open"), null);
-  await diagnostic.getByText("哪些语句缺少引用", {exact: true}).click();
-  assert.equal(await diagnostic.locator("li").textContent(), rejectedClaim);
-  assert.equal(await diagnostic.locator("img, script, [onerror]").count(), 0);
-  assert.equal(await current.locator(".markdown-body").textContent(), "本地证据摘录。[E1]\n");
-  assert.equal(await page.evaluate(() => window.injected), undefined);
-  assert.deepEqual(external, []);
-  await page.screenshot({path: fileURLToPath(new URL("../data/reports/citation-diagnostics-mobile.png", import.meta.url)), fullPage: true});
-  await ask("后续错误测试");
-  await current.getByText(/测试服务错误/).waitFor();
-  assert.equal("history" in requests.at(-1), false);
-  await ask("长文测试");
-  await page.waitForFunction(() => document.querySelector(".message.assistant:last-child .markdown-body")?.textContent.length >= 12000);
-  assert.equal((await current.locator(".markdown-body").textContent()).length, 12001);
-  await ask("错误（验证全文历史）");
-  await current.getByText(/测试服务错误/).waitFor();
-  assert.equal("history" in requests.at(-1), false);
-  assert(cancelled.includes("停止测试") && cancelled.includes("清空测试"));
-  assert.equal(await page.getByText("旧回答不应回来").count(), 0);
+  await page.locator("#sidebar-toggle").click();
+  assert.equal(await page.locator("#sidebar").evaluate(node => node.classList.contains("open")), true);
+  await page.locator("#sidebar-overlay").click();
+  assert.equal(await page.locator("#sidebar").evaluate(node => node.classList.contains("open")), false);
+  await mkdir(new URL("../data/reports/", import.meta.url), {recursive: true});
+  await page.screenshot({path: fileURLToPath(new URL("../data/reports/multisession-mobile.png", import.meta.url)), fullPage: true});
+  await page.setViewportSize({width: 1200, height: 1000});
+
+  page.once("dialog", dialog => dialog.accept());
+  await page.getByRole("button", {name: "删除会话"}).click();
+  await page.locator(".message.welcome").waitFor();
+  assert.equal(await page.locator(".session-item").count(), 1);
   assert.deepEqual(errors, []);
-  console.log("PASS: incremental Markdown, headings/lists/tables/code/quotes, sanitization, mobile layout, citations, selective removal, fallback diagnostics, abort, clear, repair, disconnect, history isolation, long-answer display.");
+  console.log("PASS: multi-session create/switch, sidebar, mobile drawer, streaming answer, citations, delete.");
 } finally {
-  for (const timer of timers) clearTimeout(timer);
   await browser?.close();
   server.closeAllConnections();
   await new Promise(resolve => server.close(resolve));

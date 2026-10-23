@@ -110,8 +110,9 @@ uv run start1921 health --json
 - 所有问答共用 LlamaIndex `HistoryResearchWorkflow` 的 Plan-and-Execute 流程：简单问题通常一个取证任务；复杂研究通过有依赖关系的检索、原文读取及分析任务完成。同步 API 与 SSE 仅交付方式不同，结构化和全文读取也是同一计划中的工具。
 - 保留中文分词、PostgreSQL BM25、Qdrant embedding 与检索、RRF、人物及时间过滤和历史研究规则。人物明确、完整年份或年份区间的时间线/两人交集可使用结构化工具；月份、地点、否定、指定来源等细约束使用混合检索。组织任职的结构化入口仍为 CLI/API。
 - 规划不可用时在同一流程内编译保守计划。研究计划总计最多 8 个任务、最多 2 次依据证据缺口的计划增补，同时执行最多 2 个就绪任务，共享请求时限和模型调用预算；预算结束后报告已有证据及缺口。组件边界与诊断字段见 [RAG 实现说明](RAG-IMPL.md)。
-- 引用核查检查证据编号、文献页码及事实句引用覆盖，不能替代逐项人工语义核验。流式草稿标记“引用待核查”，最终核查结果可替换草稿；停止生成、清空会话及 Markdown 渲染见 [流式问答说明](evals/STREAMING_CHAT.md)。
-- 浏览器保存 `session_id`，会话正文存于 PostgreSQL。服务端按消息数和字符预算构造追问上下文；历史引用失效化，只有本轮证据可支撑本轮事实。仅最终答案写入会话。
+- 引用核查检查证据编号、文献页码及事实句引用覆盖，不能替代逐项人工语义核验。流式草稿标记“引用待核查”，最终核查结果可替换草稿；停止生成、删除会话及 Markdown 渲染见 [流式问答说明](evals/STREAMING_CHAT.md)。
+- 不做账号登录：服务端为每个浏览器签发 HttpOnly 匿名 workspace cookie，所有会话、消息和配额按 `visitor_id` 隔离；跨访客访问统一返回 404。清 Cookie、换浏览器或换设备会丢失历史，页面提供“导出全部会话”和首次使用提示。
+- 会话正文存于 PostgreSQL，支持多会话列表、新建、切换、重命名、置顶、归档、软删除/恢复和搜索；消息开始生成时先落 `pending`，完成/停止/失败分别更新状态。服务端按消息数和字符预算构造追问上下文；历史引用失效化，只有本轮证据可支撑本轮事实。
 - 当前 `evidence_status` 为 `supported`、`partial`、`no_evidence`。限制与差异通过答案正文和 `limitations` 表达；尚未实现需求基线中的五类状态和独立 `conflicts` 字段。
 
 ## 常用维护入口
@@ -138,8 +139,14 @@ HTTP 接口与命令行共用业务实现：
 | `POST /api/questions` | 问答及结构化引用 |
 | `POST /api/questions/stream` | SSE 流式问答 |
 | `GET /api/health` / `GET /api/ready` | 存活与依赖就绪检查 |
-| `GET /api/sessions/{session_id}` | 恢复会话 |
-| `DELETE /api/sessions/{session_id}` | 清空会话 |
+| `GET /api/visitor` | 匿名 workspace、CSRF token 与配额 |
+| `GET /api/sessions` | 当前 workspace 的会话列表 |
+| `POST /api/sessions` | 新建会话 |
+| `GET /api/sessions/{session_id}` | 读取会话与最近消息 |
+| `PATCH /api/sessions/{session_id}` | 重命名、置顶、归档 |
+| `DELETE /api/sessions/{session_id}` | 软删除会话（30 天内可恢复） |
+| `POST /api/sessions/{session_id}/restore` | 恢复软删除会话 |
+| `POST /api/sessions/claim` | 认领旧版单会话 |
 | `GET /api/people/{person_id}/timeline` | 人物时间线 |
 | `GET /api/people/{person_id}/intersections/{other_person_id}` | 两人共同动作候选 |
 | `GET /api/people/{person_id}/relationships` | 指定时间的组织任职候选 |

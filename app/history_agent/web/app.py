@@ -1,18 +1,37 @@
 from __future__ import annotations
 
+import hmac
 import logging
 import re
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import aclosing, asynccontextmanager
+from datetime import UTC, datetime, timedelta
 from importlib.resources import files
-from typing import Annotated
+from typing import Annotated, Any, Literal
+from urllib.parse import urlsplit
 
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
 from history_agent import __version__
-from history_agent.answering.context import ConversationStore, build_prompt_context
+from history_agent.answering.context import (
+    COOKIE_CHECK_NAME,
+    ConversationMessage,
+    ConversationStore,
+    DuplicateRequest,
+    QuotaExceeded,
+    QuotaLimits,
+    SessionBusy,
+    SessionLimitExceeded,
+    SessionNotFound,
+    SessionRecord,
+    VersionConflict,
+    VisitorContext,
+    build_prompt_context,
+    hash_ip,
+)
 from history_agent.answering.models import AnswerResponse, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.answering.service import answer_question_async
@@ -43,34 +62,97 @@ from history_agent.web.readiness import (
 
 LOGGER = logging.getLogger(__name__)
 SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
+COOKIE_MAX_AGE = 365 * 24 * 60 * 60
+UNDO_DAYS = 30
+CSRF_HEADER = "X-CSRF-Token"
+
+
+class SessionCreate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=120)
+
+
+class SessionUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=120)
+    pinned: bool | None = None
+    status: Literal["active", "archived"] | None = None
+    version: int | None = Field(default=None, ge=0)
+
+
+class ClaimRequest(BaseModel):
+    legacy_session_id: str = Field(
+        min_length=16,
+        max_length=64,
+        pattern=r"^[A-Za-z0-9_-]+$",
+    )
+
+
+def _session_payload(session: SessionRecord) -> dict[str, object]:
+    return session.as_dict()
+
+
+def _message_payload(message: ConversationMessage) -> dict[str, object]:
+    return {
+        "message_id": message.message_id,
+        "role": message.role,
+        "content": message.content,
+        "status": message.status,
+        "created_at": message.created_at,
+    }
+
+
+def _next_before(messages: list[ConversationMessage], limit: int) -> int | None:
+    if len(messages) < limit or not messages:
+        return None
+    return messages[0].message_id
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip() or "unknown"
+    return request.client.host if request.client is not None else "unknown"
+
+
+def _estimate_tokens(question: str) -> int:
+    return max(1_000, min(48_000, len(question) * 3 + 2_000))
+
+
+def _usage_from_response(response: AnswerResponse) -> tuple[int, int]:
+    usage = response.llm_usage or {}
+    return int(usage.get("prompt_tokens", 0) or 0), int(usage.get("completion_tokens", 0) or 0)
+
+
+def _usage_from_event(data: dict[str, Any]) -> tuple[int, int]:
+    usage = data.get("llm_usage") or {}
+    if not isinstance(usage, dict):
+        return 0, 0
+    return int(usage.get("prompt_tokens", 0) or 0), int(usage.get("completion_tokens", 0) or 0)
+
+
+def current_visitor(request: Request) -> VisitorContext:
+    """FastAPI dependency populated by the visitor middleware."""
+
+    visitor = getattr(request.state, "visitor", None)
+    if not isinstance(visitor, VisitorContext):
+        raise HTTPException(status_code=503, detail="会话服务暂不可用")
+    return visitor
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     active_settings = settings or get_settings()
     static_dir = files("history_agent.web").joinpath("static")
-    conversations = ConversationStore(active_settings.conversation_database_target)
-
-    def with_server_context(request: QuestionRequest) -> QuestionRequest:
-        if request.session_id is None:
-            return request
-        try:
-            persisted = conversations.messages(request.session_id)
-        except Exception:
-            LOGGER.exception("conversation history could not be loaded")
-            persisted = []
-        history = build_prompt_context(
-            persisted,
-            max_messages=active_settings.context_max_messages,
-            max_chars=active_settings.context_max_chars,
-        )
-        return request.model_copy(update={"history": history})
-
-    def save_exchange(session_id: str, question: str, answer: str) -> None:
-        try:
-            conversations.append_exchange(session_id, question, answer)
-        except Exception:
-            # Context persistence is auxiliary and must never discard a completed answer.
-            LOGGER.exception("conversation exchange could not be persisted")
+    conversations = ConversationStore(
+        active_settings.conversation_database_target,
+        pepper=active_settings.visitor_token_pepper.get_secret_value(),
+    )
+    quota_limits = QuotaLimits(
+        enabled=active_settings.quota_enabled,
+        visitor_daily_questions=active_settings.visitor_daily_questions,
+        visitor_daily_tokens=active_settings.visitor_daily_tokens,
+        ip_daily_questions=active_settings.ip_daily_questions,
+        ip_daily_tokens=active_settings.ip_daily_tokens,
+        global_daily_tokens=active_settings.global_daily_tokens,
+    )
 
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
@@ -89,8 +171,124 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     api.mount("/assets", StaticFiles(directory=str(static_dir)), name="assets")
 
+    @api.middleware("http")
+    async def visitor_middleware(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        path = request.url.path
+        if path.startswith("/assets/") or path in {"/app.css", "/app.js", "/api/health"}:
+            return await call_next(request)
+        pepper = active_settings.visitor_token_pepper.get_secret_value()
+        ip_hash = hash_ip(_client_ip(request), pepper)
+        request.state.ip_hash = ip_hash
+        visitor: VisitorContext | None = None
+        new_token: str | None = None
+        try:
+            token = request.cookies.get(active_settings.visitor_cookie_name)
+            visitor = conversations.resolve_visitor(token) if token else None
+            if visitor is None:
+                visitor, new_token = conversations.create_visitor(
+                    ip_hash=ip_hash,
+                    user_agent_hash=hash_ip(request.headers.get("user-agent", ""), pepper),
+                )
+        except Exception:
+            LOGGER.exception("visitor identity could not be resolved")
+            if active_settings.environment == "production":
+                visitor = None
+            else:
+                visitor = VisitorContext(
+                    visitor_id="anonymous",
+                    label="本地临时会话",
+                    csrf_secret="",
+                    ephemeral=True,
+                )
+        request.state.visitor = visitor
+        response = await call_next(request)
+        if new_token is not None:
+            response.set_cookie(
+                key=active_settings.visitor_cookie_name,
+                value=new_token,
+                max_age=COOKIE_MAX_AGE,
+                httponly=True,
+                secure=active_settings.visitor_cookie_secure,
+                samesite="lax",
+                path="/",
+            )
+        if COOKIE_CHECK_NAME not in request.cookies:
+            response.set_cookie(
+                key=COOKIE_CHECK_NAME,
+                value="1",
+                max_age=COOKIE_MAX_AGE,
+                httponly=False,
+                secure=active_settings.visitor_cookie_secure,
+                samesite="lax",
+                path="/",
+            )
+        return response
+
+    def current_ip_hash(request: Request) -> str:
+        return str(getattr(request.state, "ip_hash", "unknown"))
+
+    def require_csrf(request: Request, visitor: VisitorContext) -> None:
+        if not active_settings.csrf_enabled:
+            return
+        origin = request.headers.get("origin")
+        if origin:
+            host = request.headers.get("host", "")
+            if urlsplit(origin).netloc != host:
+                raise HTTPException(status_code=403, detail="请求来源校验失败")
+        provided = request.headers.get(CSRF_HEADER, "")
+        if not provided or not hmac.compare_digest(provided, visitor.csrf_secret):
+            raise HTTPException(status_code=403, detail="CSRF 校验失败")
+
+    def session_or_404(visitor: VisitorContext, session_id: str) -> SessionRecord:
+        if visitor.ephemeral:
+            raise HTTPException(status_code=503, detail="会话服务暂不可用")
+        if SESSION_ID.fullmatch(session_id) is None:
+            raise HTTPException(status_code=422, detail="invalid session_id")
+        try:
+            return conversations.get_session(visitor.visitor_id, session_id)
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在") from exc
+
+    def with_session_context(
+        visitor: VisitorContext,
+        request: QuestionRequest,
+        *,
+        before_message_id: int | None = None,
+    ) -> QuestionRequest:
+        if request.session_id is None:
+            return request
+        if visitor.ephemeral:
+            raise HTTPException(status_code=503, detail="会话服务暂不可用")
+        session = session_or_404(visitor, request.session_id)
+        del session
+        try:
+            persisted = conversations.session_messages(
+                visitor.visitor_id,
+                request.session_id,
+                before=before_message_id,
+                limit=200,
+                include_unfinished=False,
+            )
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在") from exc
+        history = build_prompt_context(
+            persisted,
+            max_messages=active_settings.context_max_messages,
+            max_chars=active_settings.context_max_chars,
+        )
+        return request.model_copy(update={"history": history})
+
     @api.get("/", include_in_schema=False)
     def index() -> FileResponse:
+        return FileResponse(
+            str(static_dir.joinpath("index.html")), headers={"Cache-Control": "no-store"}
+        )
+
+    @api.get("/s/{session_id}", include_in_schema=False)
+    def session_page(session_id: str) -> FileResponse:
+        del session_id
         return FileResponse(
             str(static_dir.joinpath("index.html")), headers={"Cache-Control": "no-store"}
         )
@@ -109,6 +307,443 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             str(static_dir.joinpath("app.js")),
             media_type="application/javascript",
             headers={"Cache-Control": "no-store"},
+        )
+
+    @api.get("/api/visitor")
+    def visitor_info(
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> dict[str, object]:
+        usage = {"questions": 0, "tokens": 0}
+        if not visitor.ephemeral:
+            try:
+                usage = conversations.usage_snapshot(visitor.visitor_id)
+            except Exception:
+                LOGGER.exception("visitor quota could not be read")
+        return {
+            "visitor": {"label": visitor.label},
+            "csrf_token": visitor.csrf_secret,
+            "quota": {
+                "daily_questions": active_settings.visitor_daily_questions,
+                "used_today": usage["questions"],
+                "tokens_used_today": usage["tokens"],
+                "enabled": active_settings.quota_enabled and not visitor.ephemeral,
+            },
+            "limits": {
+                "max_sessions": active_settings.max_sessions_per_visitor,
+                "max_messages_per_session": active_settings.max_messages_per_session,
+            },
+        }
+
+    @api.get("/api/visitor/export")
+    def export_visitor(
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> JSONResponse:
+        payload = conversations.export_visitor(visitor.visitor_id)
+        return JSONResponse(
+            payload,
+            headers={
+                "Content-Disposition": 'attachment; filename="start1921-export.json"',
+                "Cache-Control": "no-store",
+            },
+        )
+
+    @api.delete("/api/visitor/data")
+    def delete_visitor_data(
+        request: Request,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> dict[str, object]:
+        require_csrf(request, visitor)
+        removed = conversations.delete_all(visitor.visitor_id)
+        return {"deleted_sessions": removed}
+
+    @api.get("/api/sessions")
+    def list_sessions(
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+        q: Annotated[str, Query(max_length=200)] = "",
+        status: Literal["active", "archived"] = "active",
+        limit: Annotated[int, Query(ge=1, le=100)] = 50,
+        offset: Annotated[int, Query(ge=0)] = 0,
+    ) -> dict[str, object]:
+        items, has_more = conversations.list_sessions(
+            visitor.visitor_id,
+            limit=limit,
+            offset=offset,
+            query=q,
+            status=status,
+        )
+        return {
+            "items": [_session_payload(item) for item in items],
+            "has_more": has_more,
+            "offset": offset,
+            "limit": limit,
+        }
+
+    @api.post("/api/sessions")
+    def create_session(
+        request: Request,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+        payload: SessionCreate | None = None,
+    ) -> dict[str, object]:
+        require_csrf(request, visitor)
+        if visitor.ephemeral:
+            raise HTTPException(status_code=503, detail="会话服务暂不可用")
+        try:
+            session_count = conversations.count_sessions(visitor.visitor_id)
+            if session_count >= active_settings.max_sessions_per_visitor:
+                raise SessionLimitExceeded("session limit")
+            session = conversations.create_session(
+                visitor.visitor_id,
+                title=payload.title if payload else None,
+            )
+        except SessionLimitExceeded as exc:
+            raise HTTPException(status_code=429, detail="会话数量已达上限") from exc
+        return {"session": _session_payload(session)}
+
+    @api.post("/api/sessions/claim")
+    def claim_session(
+        request: Request,
+        payload: ClaimRequest,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> dict[str, object]:
+        require_csrf(request, visitor)
+        try:
+            session = conversations.claim_session(visitor.visitor_id, payload.legacy_session_id)
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="旧会话不存在或已被认领") from exc
+        return {"session": _session_payload(session)}
+
+    @api.get("/api/sessions/{session_id}")
+    def get_session(
+        session_id: str,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+        limit: Annotated[int, Query(ge=1, le=200)] = 50,
+        before: Annotated[int | None, Query(ge=1)] = None,
+    ) -> dict[str, object]:
+        session = session_or_404(visitor, session_id)
+        try:
+            messages = conversations.session_messages(
+                visitor.visitor_id,
+                session_id,
+                before=before,
+                limit=limit,
+                include_unfinished=True,
+            )
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在") from exc
+        return {
+            "session": _session_payload(session),
+            "messages": [_message_payload(message) for message in messages],
+            "next_before": _next_before(messages, limit),
+        }
+
+    @api.get("/api/sessions/{session_id}/messages")
+    def get_session_messages(
+        session_id: str,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+        limit: Annotated[int, Query(ge=1, le=200)] = 50,
+        before: Annotated[int | None, Query(ge=1)] = None,
+    ) -> dict[str, object]:
+        session_or_404(visitor, session_id)
+        try:
+            messages = conversations.session_messages(
+                visitor.visitor_id,
+                session_id,
+                before=before,
+                limit=limit,
+                include_unfinished=True,
+            )
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在") from exc
+        return {
+            "messages": [_message_payload(message) for message in messages],
+            "next_before": _next_before(messages, limit),
+        }
+
+    @api.patch("/api/sessions/{session_id}")
+    def update_session(
+        session_id: str,
+        request: Request,
+        payload: SessionUpdate,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> dict[str, object]:
+        require_csrf(request, visitor)
+        session = session_or_404(visitor, session_id)
+        if payload.version is not None and payload.version != session.version:
+            raise HTTPException(status_code=409, detail="会话已被其他标签页修改")
+        try:
+            if payload.title is not None:
+                session = conversations.rename_session(
+                    visitor.visitor_id, session_id, payload.title, expected_version=payload.version
+                )
+            if payload.pinned is not None:
+                session = conversations.set_pinned(
+                    visitor.visitor_id, session_id, payload.pinned
+                )
+            if payload.status is not None:
+                session = conversations.set_archived(
+                    visitor.visitor_id, session_id, payload.status == "archived"
+                )
+        except VersionConflict as exc:
+            raise HTTPException(status_code=409, detail="会话已被其他标签页修改") from exc
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在") from exc
+        return {"session": _session_payload(session)}
+
+    @api.delete("/api/sessions/{session_id}")
+    def delete_session(
+        session_id: str,
+        request: Request,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> dict[str, object]:
+        require_csrf(request, visitor)
+        try:
+            session = conversations.soft_delete(visitor.visitor_id, session_id)
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在") from exc
+        undo_until = (datetime.now(UTC) + timedelta(days=UNDO_DAYS)).isoformat()
+        return {"deleted": True, "session": _session_payload(session), "undo_until": undo_until}
+
+    @api.post("/api/sessions/{session_id}/restore")
+    def restore_session(
+        session_id: str,
+        request: Request,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> dict[str, object]:
+        require_csrf(request, visitor)
+        try:
+            session = conversations.restore_session(visitor.visitor_id, session_id)
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="会话不存在或未删除") from exc
+        return {"session": _session_payload(session)}
+
+    @api.post("/api/questions", response_model=AnswerResponse)
+    async def question(
+        payload: QuestionRequest,
+        request: Request,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> AnswerResponse:
+        require_csrf(request, visitor)
+        reservation = None
+        start = None
+        settled = False
+        try:
+            if payload.session_id is not None and visitor.ephemeral:
+                raise HTTPException(status_code=503, detail="会话服务暂不可用")
+            if not visitor.ephemeral:
+                reservation = conversations.reserve_quota(
+                    visitor.visitor_id,
+                    current_ip_hash(request),
+                    _estimate_tokens(payload.question),
+                    quota_limits,
+                )
+            if payload.session_id is not None:
+                try:
+                    start = conversations.begin_question(
+                        visitor.visitor_id,
+                        payload.session_id,
+                        payload.question,
+                        payload.client_request_id,
+                    )
+                except SessionNotFound as exc:
+                    raise HTTPException(status_code=404, detail="会话不存在") from exc
+                except SessionBusy as exc:
+                    raise HTTPException(status_code=409, detail="当前会话正在生成") from exc
+                except DuplicateRequest as exc:
+                    raise HTTPException(status_code=409, detail="重复的请求") from exc
+            contextual_request = with_session_context(
+                visitor, payload, before_message_id=start.message_id if start else None
+            )
+            runtime = getattr(api.state, "llm_runtime", None)
+            if runtime is None:
+                response = await answer_question_async(active_settings, contextual_request)
+            else:
+                response = await answer_question_async(
+                    active_settings,
+                    contextual_request,
+                    runtime,
+                    RequestBudget.start(active_settings.request_timeout_seconds),
+                )
+            if start is not None and payload.session_id is not None:
+                conversations.complete_question(
+                    visitor.visitor_id,
+                    payload.session_id,
+                    start.message_id,
+                    response.answer,
+                    start.run_id,
+                    client_request_id=payload.client_request_id,
+                )
+            prompt_tokens, completion_tokens = _usage_from_response(response)
+            conversations.settle_quota(
+                reservation,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+            )
+            settled = True
+            return response
+        except QuotaExceeded as exc:
+            raise HTTPException(
+                status_code=429,
+                detail="今日提问额度已用完",
+                headers={"Retry-After": str(exc.retry_after), "X-Quota-Reset": exc.reset_at},
+            ) from exc
+        except RetrievalError as exc:
+            if start is not None and payload.session_id is not None:
+                conversations.abort_question(
+                    visitor.visitor_id,
+                    payload.session_id,
+                    start.message_id,
+                    start.run_id,
+                    failed=True,
+                )
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except HTTPException:
+            if start is not None and payload.session_id is not None:
+                conversations.abort_question(
+                    visitor.visitor_id,
+                    payload.session_id,
+                    start.message_id,
+                    start.run_id,
+                    failed=True,
+                )
+            raise
+        except Exception:
+            if start is not None and payload.session_id is not None:
+                conversations.abort_question(
+                    visitor.visitor_id,
+                    payload.session_id,
+                    start.message_id,
+                    start.run_id,
+                    failed=True,
+                )
+            raise
+        finally:
+            if not settled:
+                conversations.release_quota(reservation)
+
+    @api.post("/api/questions/stream")
+    async def question_stream(
+        payload: QuestionRequest,
+        request: Request,
+        visitor: Annotated[VisitorContext, Depends(current_visitor)],
+    ) -> StreamingResponse:
+        require_csrf(request, visitor)
+        reservation = None
+        start = None
+        try:
+            if payload.session_id is not None and visitor.ephemeral:
+                raise HTTPException(status_code=503, detail="会话服务暂不可用")
+            if not visitor.ephemeral:
+                reservation = conversations.reserve_quota(
+                    visitor.visitor_id,
+                    current_ip_hash(request),
+                    _estimate_tokens(payload.question),
+                    quota_limits,
+                )
+            if payload.session_id is not None:
+                try:
+                    start = conversations.begin_question(
+                        visitor.visitor_id,
+                        payload.session_id,
+                        payload.question,
+                        payload.client_request_id,
+                    )
+                except SessionNotFound as exc:
+                    raise HTTPException(status_code=404, detail="会话不存在") from exc
+                except SessionBusy as exc:
+                    raise HTTPException(status_code=409, detail="当前会话正在生成") from exc
+                except DuplicateRequest as exc:
+                    raise HTTPException(status_code=409, detail="重复的请求") from exc
+        except QuotaExceeded as exc:
+            raise HTTPException(
+                status_code=429,
+                detail="今日提问额度已用完",
+                headers={"Retry-After": str(exc.retry_after), "X-Quota-Reset": exc.reset_at},
+            ) from exc
+        except Exception:
+            conversations.release_quota(reservation)
+            raise
+
+        async def events() -> AsyncIterator[str]:
+            completed = False
+            settled = False
+            try:
+                contextual_request = with_session_context(
+                    visitor, payload, before_message_id=start.message_id if start else None
+                )
+                runtime = getattr(api.state, "llm_runtime", None)
+                answers = (
+                    stream_answer_question(active_settings, contextual_request)
+                    if runtime is None
+                    else stream_answer_question(
+                        active_settings,
+                        contextual_request,
+                        runtime,
+                        RequestBudget.start(active_settings.request_timeout_seconds),
+                    )
+                )
+                async with aclosing(answers) as stream:
+                    async for event in stream:
+                        if event.event == "done":
+                            data = event.data
+                            if start is not None and payload.session_id is not None:
+                                completed = conversations.complete_question(
+                                    visitor.visitor_id,
+                                    payload.session_id,
+                                    start.message_id,
+                                    str(data["answer"]),
+                                    start.run_id,
+                                    client_request_id=payload.client_request_id,
+                                )
+                            else:
+                                completed = True
+                            prompt_tokens, completion_tokens = _usage_from_event(data)
+                            conversations.settle_quota(
+                                reservation,
+                                prompt_tokens=prompt_tokens,
+                                completion_tokens=completion_tokens,
+                            )
+                            settled = True
+                        yield event.encode()
+            except RetrievalError:
+                if start is not None and payload.session_id is not None:
+                    conversations.abort_question(
+                        visitor.visitor_id,
+                        payload.session_id,
+                        start.message_id,
+                        start.run_id,
+                        failed=True,
+                    )
+                yield AnswerStreamEvent(
+                    "error", {"message": "本地检索暂不可用，请检查索引后重试。"}
+                ).encode()
+            except Exception:
+                LOGGER.exception("streaming answer failed")
+                if start is not None and payload.session_id is not None:
+                    conversations.abort_question(
+                        visitor.visitor_id,
+                        payload.session_id,
+                        start.message_id,
+                        start.run_id,
+                        failed=True,
+                    )
+                yield AnswerStreamEvent(
+                    "error", {"message": "问答服务暂时不可用，请重试。"}
+                ).encode()
+            finally:
+                if start is not None and payload.session_id is not None and not completed:
+                    conversations.abort_question(
+                        visitor.visitor_id,
+                        payload.session_id,
+                        start.message_id,
+                        start.run_id,
+                    )
+                if not settled:
+                    conversations.release_quota(reservation)
+
+        return StreamingResponse(
+            events(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
         )
 
     @api.get("/api/health")
@@ -162,82 +797,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         snapshot = readiness_snapshot(active_settings)
         status_code = 200 if snapshot["status"] == "ready" else 503
         return JSONResponse(snapshot, status_code=status_code)
-
-    @api.post("/api/questions", response_model=AnswerResponse)
-    async def question(request: QuestionRequest) -> AnswerResponse:
-        try:
-            contextual_request = with_server_context(request)
-            runtime = getattr(api.state, "llm_runtime", None)
-            if runtime is None:
-                response = await answer_question_async(active_settings, contextual_request)
-            else:
-                response = await answer_question_async(
-                    active_settings,
-                    contextual_request,
-                    runtime,
-                    RequestBudget.start(active_settings.request_timeout_seconds),
-                )
-            if request.session_id is not None:
-                save_exchange(request.session_id, request.question, response.answer)
-            return response
-        except RetrievalError as exc:
-            raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-    @api.post("/api/questions/stream")
-    async def question_stream(request: QuestionRequest) -> StreamingResponse:
-        async def events() -> AsyncIterator[str]:
-            try:
-                contextual_request = with_server_context(request)
-                runtime = getattr(api.state, "llm_runtime", None)
-                answers = (
-                    stream_answer_question(active_settings, contextual_request)
-                    if runtime is None
-                    else stream_answer_question(
-                        active_settings,
-                        contextual_request,
-                        runtime,
-                        RequestBudget.start(active_settings.request_timeout_seconds),
-                    )
-                )
-                async with aclosing(answers) as answers:
-                    async for event in answers:
-                        if event.event == "done" and request.session_id is not None:
-                            save_exchange(
-                                request.session_id,
-                                request.question,
-                                str(event.data["answer"]),
-                            )
-                        yield event.encode()
-            except RetrievalError:
-                yield AnswerStreamEvent(
-                    "error", {"message": "本地检索暂不可用，请检查索引后重试。"}
-                ).encode()
-            except Exception:
-                yield AnswerStreamEvent(
-                    "error", {"message": "问答服务暂时不可用，请重试。"}
-                ).encode()
-
-        return StreamingResponse(
-            events(),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
-        )
-
-    @api.get("/api/sessions/{session_id}")
-    def conversation(session_id: str) -> dict[str, object]:
-        if SESSION_ID.fullmatch(session_id) is None:
-            raise HTTPException(status_code=422, detail="invalid session_id")
-        return {
-            "session_id": session_id,
-            "messages": [item.model_dump() for item in conversations.messages(session_id)],
-        }
-
-    @api.delete("/api/sessions/{session_id}")
-    def clear_conversation(session_id: str) -> dict[str, object]:
-        if SESSION_ID.fullmatch(session_id) is None:
-            raise HTTPException(status_code=422, detail="invalid session_id")
-        conversations.clear(session_id)
-        return {"session_id": session_id, "cleared": True}
 
     @api.get("/api/people/{person_id}/timeline", response_model=PersonTimelineResponse)
     def person_timeline(

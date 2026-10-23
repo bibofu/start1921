@@ -205,15 +205,17 @@ def test_postgres_conversation_reopen_retention_clear_and_rollback(postgres_targ
         store.append_exchange("trimmed", f"问题{number:03d}", f"回答{number:03d}")
 
     reopened = ConversationStore(postgres_target)
-    messages = reopened.messages("trimmed")
-    assert len(messages) == 200
-    assert messages[0].content == "问题002"
+    messages = reopened.messages("trimmed", limit=1_000)
+    assert len(messages) == 204
+    assert messages[0].content == "问题000"
     assert messages[-1].content == "回答101"
     assert reopened.messages("retained")[1].content == "内容含100%与'引号'"
 
     with pytest.raises(INTEGRITY_ERRORS), database_connection(postgres_target) as connection:
         connection.execute(
-            "INSERT INTO conversation_sessions VALUES (?, ?, ?)", ("rollback", "now", "now")
+            "INSERT INTO conversation_sessions(session_id, created_at, updated_at) "
+            "VALUES (?, ?, ?)",
+            ("rollback", "now", "now"),
         )
         connection.executemany(
             "INSERT INTO conversation_messages (session_id, role, content, created_at) "

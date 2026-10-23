@@ -80,6 +80,18 @@ class Settings(BaseSettings):
     llm_retrieval_reflection_timeout_seconds: float = Field(default=15.0, ge=5.0, le=60.0)
     context_max_messages: int = Field(default=12, ge=4, le=50)
     context_max_chars: int = Field(default=12_000, ge=1000, le=100_000)
+    visitor_token_pepper: SecretStr = SecretStr("start1921-dev-visitor-pepper")
+    visitor_cookie_name: str = "start1921_vid"
+    visitor_cookie_secure: bool = False
+    csrf_enabled: bool = False
+    quota_enabled: bool = True
+    visitor_daily_questions: int = Field(default=20, ge=1, le=10_000)
+    visitor_daily_tokens: int = Field(default=200_000, ge=1_000, le=100_000_000)
+    ip_daily_questions: int = Field(default=60, ge=1, le=100_000)
+    ip_daily_tokens: int = Field(default=600_000, ge=1_000, le=1_000_000_000)
+    global_daily_tokens: int = Field(default=5_000_000, ge=1_000, le=10_000_000_000)
+    max_sessions_per_visitor: int = Field(default=50, ge=1, le=10_000)
+    max_messages_per_session: int = Field(default=1000, ge=0, le=100_000)
 
     @model_validator(mode="after")
     def resolve_paths_and_validate_dates(self) -> Settings:
@@ -122,6 +134,15 @@ class Settings(BaseSettings):
         if self.qdrant_api_key is not None:
             value = self.qdrant_api_key.get_secret_value().strip()
             self.qdrant_api_key = SecretStr(value) if value else None
+        if self.environment == "production":
+            if not self.visitor_cookie_secure:
+                raise ValueError("visitor_cookie_secure must be true in production")
+            if not self.visitor_cookie_name.startswith("__Host-"):
+                raise ValueError("visitor_cookie_name must use the __Host- prefix in production")
+            if not self.csrf_enabled:
+                raise ValueError("csrf_enabled must be true in production")
+            if self.visitor_token_pepper.get_secret_value() == "start1921-dev-visitor-pepper":
+                raise ValueError("Configure HISTORY_AGENT_VISITOR_TOKEN_PEPPER in production")
         return self
 
     @property
@@ -267,6 +288,17 @@ class Settings(BaseSettings):
             ),
             "context_max_messages": self.context_max_messages,
             "context_max_chars": self.context_max_chars,
+            "visitor_cookie_name": self.visitor_cookie_name,
+            "visitor_cookie_secure": self.visitor_cookie_secure,
+            "csrf_enabled": self.csrf_enabled,
+            "quota_enabled": self.quota_enabled,
+            "visitor_daily_questions": self.visitor_daily_questions,
+            "visitor_daily_tokens": self.visitor_daily_tokens,
+            "ip_daily_questions": self.ip_daily_questions,
+            "ip_daily_tokens": self.ip_daily_tokens,
+            "global_daily_tokens": self.global_daily_tokens,
+            "max_sessions_per_visitor": self.max_sessions_per_visitor,
+            "max_messages_per_session": self.max_messages_per_session,
         }
 
 

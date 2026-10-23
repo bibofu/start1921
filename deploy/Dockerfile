@@ -34,4 +34,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 USER 10001:10001
 EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "history_agent.web.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--proxy-headers", "--forwarded-allow-ips", "*"]
+CMD ["python", "-m", "uvicorn", "history_agent.web.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--proxy-headers", "--forwarded-allow-ips", "172.16.0.0/12,10.0.0.0/8,192.168.0.0/16"]

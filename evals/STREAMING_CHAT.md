@@ -10,13 +10,13 @@
 | `delta` | `{text}` | 追加临时正文，支持未结束的 Markdown 块 |
 | `reset` | `{message}` | 清除上一版草稿，准备引用修复 |
 | `done` | 完整 `AnswerResponse` | 替换草稿，显示引用和限制，保存会话上下文 |
-| `error` | `{message}` | 清除未完成草稿，显示可读错误，不写入上下文 |
+| `error` | `{message}` | 显示可读错误；用户消息标记为失败，不生成助手消息 |
 
 模型输出结束后仍执行原有引用校验：只有缺少核心事实引用时允许修复一次；非法引用、截断、断流、超时或修复失败会降级到本地摘录，最终答案替换临时文字。一次修复的 token 用量合并统计。结构化或无模型路径直接发送 `done`，无需模拟逐字输出。
 
 引用校验现按 Markdown 结构识别段落、引用块、列表项和表格行；纯资料限制说明不会被当成历史事实。最终响应新增可选 `llm_error_code` 和 `uncited_claims` 字段。漏引降级时，页面可展开“哪些语句缺少引用”，查看最后一次校验未通过的草稿语句；这些语句按纯文本转义展示，不进入后续会话上下文。具体规则与复现边界见 [引用校验回归记录](CITATION_VALIDATION.md)。
 
-“停止生成”和“清空会话”使用 AbortController 取消读取；异步生成器关闭上游 HTTP 连接。检索在线程池运行，已开始的本地检索会完成，但取消后的请求不会继续进入模型生成。前端隔离请求状态，取消、异常和不完整草稿不会污染下一轮上下文。
+“停止生成”和“删除会话”使用 AbortController 取消读取；异步生成器关闭上游 HTTP 连接。检索在线程池运行，已开始的本地检索会完成，但取消后的请求不会继续进入模型生成。用户消息在开始生成时即以 `pending` 落库，停止/失败后变为 `aborted/failed`，刷新后仍可见；前端隔离请求状态，不完整草稿不会污染下一轮上下文。会话列表支持多会话切换、重命名、置顶、归档和软删除。
 
 ## Markdown
 
@@ -33,7 +33,7 @@ npm install --prefix data/frontend-deps --ignore-scripts --no-audit --no-fund pl
 node scripts/test-chat-ui.mjs
 ```
 
-已验证完成前显示首段、Markdown 各主要元素、危险 HTML/链接清理、桌面/390px 移动端布局、引用折叠、停止、清空、修复替换、断流和会话隔离。截图保存在本地 `data/reports/stream-markdown-desktop.png` 与 `stream-markdown-mobile.png`。测试不发送本地史料，也不将模拟流结果称为真实 DeepSeek 联网验收。
+已验证完成前显示首段、Markdown 各主要元素、危险 HTML/链接清理、桌面/390px 移动端布局、引用折叠、停止、删除、修复替换、断流、多会话切换和访客隔离。截图保存在本地 `data/reports/multisession-mobile.png`。测试不发送本地史料，也不将模拟流结果称为真实 DeepSeek 联网验收。
 
 本次完整检查通过：Ruff、mypy、198 项 Python 测试、3 项前端流解析测试，以及上述无界面浏览器集成测试。
 

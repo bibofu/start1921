@@ -30,6 +30,22 @@ def _answer(question: str) -> AnswerResponse:
     )
 
 
+def _settings(work_path: Path, **overrides: Any) -> Settings:
+    values: dict[str, Any] = {"quota_enabled": False, **overrides}
+    return Settings(
+        _env_file=None,
+        project_root=work_path,
+        data_dir=work_path / "data",
+        **values,
+    )
+
+
+def _create_session(client: TestClient, title: str | None = None) -> str:
+    response = client.post("/api/sessions", json={"title": title} if title else {})
+    assert response.status_code == 200, response.text
+    return str(response.json()["session"]["session_id"])
+
+
 def test_prompt_context_is_bounded_and_old_citation_ids_are_invalidated() -> None:
     messages = [
         ConversationMessage(role="user", content="介绍遵义会议"),
@@ -77,17 +93,17 @@ def test_conversation_store_persists_and_clears_exchanges(postgres_target: str) 
     assert reopened.messages("session-12345678") == []
 
 
-def test_conversation_store_prunes_complete_turns_and_rolls_back_failed_exchange(
+def test_conversation_store_keeps_long_sessions_and_rolls_back_failed_exchange(
     postgres_target: str,
 ) -> None:
     store = ConversationStore(postgres_target)
     for number in range(102):
-        store.append_exchange("session-retained", f"问题{number}", f"回答{number}")
-    messages = store.messages("session-retained")
-    assert len(messages) == 200
-    assert messages[0].content == "问题2"
+        store.append_exchange("retained", f"问题{number:03d}", f"回答{number:03d}")
+
+    messages = store.messages("retained", limit=1_000)
+    assert len(messages) == 204
+    assert messages[0].content == "问题000"
     assert messages[-1].content == "回答101"
-    assert [item.role for item in messages] == ["user", "assistant"] * 100
 
     # A constraint failure after creating the session must roll back the entire exchange.
     with pytest.raises(INTEGRITY_ERRORS):
@@ -101,7 +117,11 @@ def test_conversation_store_prunes_complete_turns_and_rolls_back_failed_exchange
 
 def test_web_conversation_store_uses_postgres_target(monkeypatch, work_path: Path) -> None:
     targets: list[str] = []
-    monkeypatch.setattr(web_module, "ConversationStore", lambda target: targets.append(target))
+    monkeypatch.setattr(
+        web_module,
+        "ConversationStore",
+        lambda target, **kwargs: targets.append(target),
+    )
     settings = Settings(
         _env_file=None,
         project_root=work_path,
@@ -139,7 +159,7 @@ def test_health_probes_configured_database_target(monkeypatch, work_path: Path) 
 def test_web_session_uses_server_history_and_ignores_client_history(
     monkeypatch: Any, work_path: Path
 ) -> None:
-    settings = Settings(_env_file=None, project_root=work_path, data_dir=work_path / "data")
+    settings = _settings(work_path)
     received: list[QuestionRequest] = []
 
     async def fake_answer(active_settings: Settings, request: QuestionRequest) -> AnswerResponse:
@@ -149,7 +169,7 @@ def test_web_session_uses_server_history_and_ignores_client_history(
 
     monkeypatch.setattr(web_module, "answer_question_async", fake_answer)
     client = TestClient(web_module.create_app(settings))
-    session_id = "session-12345678"
+    session_id = _create_session(client)
 
     first = client.post(
         "/api/questions",
@@ -164,35 +184,35 @@ def test_web_session_uses_server_history_and_ignores_client_history(
         },
     )
 
-    assert first.status_code == 200
-    assert second.status_code == 200
+    assert first.status_code == 200, first.text
+    assert second.status_code == 200, second.text
     assert received[0].history == []
     assert [item.content for item in received[1].history] == [
         "第一个问题",
         "服务端记录的回答。[历史引用]",
     ]
-    restored = client.get(f"/api/sessions/{session_id}").json()
-    assert [item["role"] for item in restored["messages"]] == [
+    restored = client.get(f"/api/sessions/{session_id}")
+    assert restored.status_code == 200
+    assert [item["role"] for item in restored.json()["messages"]] == [
         "user",
         "assistant",
         "user",
         "assistant",
     ]
-    assert client.delete(f"/api/sessions/{session_id}").json()["cleared"] is True
-    assert client.get(f"/api/sessions/{session_id}").json()["messages"] == []
+    assert restored.json()["session"]["message_count"] == 4
 
-
-def test_sanitize_history_content_only_rewrites_evidence_markers() -> None:
-    assert sanitize_history_content("  1956年 [E12]\n普通[注1]  ") == (
-        "1956年 [历史引用]\n普通[注1]"
-    )
+    assert client.delete(f"/api/sessions/{session_id}").json()["deleted"] is True
+    assert client.get(f"/api/sessions/{session_id}").status_code == 404
+    restored = client.post(f"/api/sessions/{session_id}/restore")
+    assert restored.json()["session"]["status"] == "active"
+    assert client.get(f"/api/sessions/{session_id}").status_code == 200
 
 
 @pytest.mark.usefixtures("postgres_settings")
-def test_streaming_endpoint_persists_only_completed_answers(
+def test_streaming_endpoint_persists_completed_answers(
     monkeypatch: Any, work_path: Path
 ) -> None:
-    settings = Settings(_env_file=None, project_root=work_path, data_dir=work_path / "data")
+    settings = _settings(work_path)
 
     async def fake_stream(*args: object) -> Any:
         yield AnswerStreamEvent("delta", {"text": "回答"})
@@ -200,7 +220,7 @@ def test_streaming_endpoint_persists_only_completed_answers(
 
     monkeypatch.setattr(web_module, "stream_answer_question", fake_stream)
     client = TestClient(web_module.create_app(settings))
-    session_id = "stream-session-1234"
+    session_id = _create_session(client)
 
     response = client.post(
         "/api/questions/stream",
@@ -214,30 +234,156 @@ def test_streaming_endpoint_persists_only_completed_answers(
         "流式问题",
         "服务端记录的回答。[E1]",
     ]
+    assert [item["status"] for item in restored] == ["completed", "completed"]
 
 
 @pytest.mark.usefixtures("postgres_settings")
-def test_context_storage_failure_does_not_break_answering(
+def test_streaming_interruption_keeps_user_question_as_aborted(
     monkeypatch: Any, work_path: Path
 ) -> None:
-    settings = Settings(_env_file=None, project_root=work_path, data_dir=work_path / "data")
+    settings = _settings(work_path)
 
-    def unavailable(*args: object, **kwargs: object) -> Any:
-        raise OSError("disk unavailable")
+    async def interrupted_stream(*args: object) -> Any:
+        yield AnswerStreamEvent("delta", {"text": "半段"})
 
-    async def fake_answer(active_settings: Settings, request: QuestionRequest) -> AnswerResponse:
-        assert request.history == []
-        return _answer(request.question)
-
-    monkeypatch.setattr(ConversationStore, "messages", unavailable)
-    monkeypatch.setattr(ConversationStore, "append_exchange", unavailable)
-    monkeypatch.setattr(web_module, "answer_question_async", fake_answer)
+    monkeypatch.setattr(web_module, "stream_answer_question", interrupted_stream)
     client = TestClient(web_module.create_app(settings))
+    session_id = _create_session(client)
 
     response = client.post(
-        "/api/questions",
-        json={"question": "存储故障时仍回答", "session_id": "failure-session-123"},
+        "/api/questions/stream",
+        json={"question": "中断保留问题", "session_id": session_id},
     )
 
     assert response.status_code == 200
-    assert response.json()["answer"] == "服务端记录的回答。[E1]"
+    restored = client.get(f"/api/sessions/{session_id}").json()["messages"]
+    assert len(restored) == 1
+    assert restored[0]["role"] == "user"
+    assert restored[0]["content"] == "中断保留问题"
+    assert restored[0]["status"] == "aborted"
+
+
+@pytest.mark.usefixtures("postgres_settings")
+def test_visitor_isolation_between_clients(monkeypatch: Any, work_path: Path) -> None:
+    settings = _settings(work_path)
+
+    async def fake_answer(active_settings: Settings, request: QuestionRequest) -> AnswerResponse:
+        return _answer(request.question)
+
+    monkeypatch.setattr(web_module, "answer_question_async", fake_answer)
+    app = web_module.create_app(settings)
+    first = TestClient(app)
+    second = TestClient(app)
+    session_id = _create_session(first)
+
+    assert first.get(f"/api/sessions/{session_id}").status_code == 200
+    assert second.get(f"/api/sessions/{session_id}").status_code == 404
+    assert second.delete(f"/api/sessions/{session_id}").status_code == 404
+    assert second.patch(f"/api/sessions/{session_id}", json={"title": "越权"}).status_code == 404
+    assert second.get("/api/sessions").json()["items"] == []
+    assert first.get("/api/sessions").json()["items"][0]["session_id"] == session_id
+
+
+@pytest.mark.usefixtures("postgres_settings")
+def test_session_crud_search_pin_and_claim(monkeypatch: Any, work_path: Path) -> None:
+    settings = _settings(work_path)
+    client = TestClient(web_module.create_app(settings))
+    first_id = _create_session(client, "遵义会议")
+    second_id = _create_session(client, "淮海战役")
+
+    listed = client.get("/api/sessions", params={"q": "遵义"}).json()
+    assert [item["session_id"] for item in listed["items"]] == [first_id]
+
+    renamed = client.patch(
+        f"/api/sessions/{first_id}",
+        json={"title": "遵义会议前后", "version": 0},
+    )
+    assert renamed.status_code == 200
+    assert renamed.json()["session"]["title"] == "遵义会议前后"
+
+    pinned = client.patch(f"/api/sessions/{second_id}", json={"pinned": True})
+    assert pinned.json()["session"]["pinned"] is True
+    assert client.get("/api/sessions").json()["items"][0]["session_id"] == second_id
+
+    stored = ConversationStore(settings.conversation_database_target)
+    legacy_id = "legacy-session-1234"
+    stored.append_exchange(legacy_id, "旧问题", "旧回答")
+    claimed = client.post("/api/sessions/claim", json={"legacy_session_id": legacy_id})
+    assert claimed.status_code == 200
+    assert claimed.json()["session"]["session_id"] == legacy_id
+    assert client.get(f"/api/sessions/{legacy_id}").status_code == 200
+
+
+@pytest.mark.usefixtures("postgres_settings")
+def test_quota_is_enforced_before_generation(monkeypatch: Any, work_path: Path) -> None:
+    settings = _settings(
+        work_path,
+        quota_enabled=True,
+        visitor_daily_questions=1,
+        ip_daily_questions=10,
+        visitor_daily_tokens=1_000_000,
+        ip_daily_tokens=1_000_000,
+        global_daily_tokens=10_000_000,
+    )
+    calls: list[str] = []
+
+    async def fake_answer(active_settings: Settings, request: QuestionRequest) -> AnswerResponse:
+        calls.append(request.question)
+        return _answer(request.question)
+
+    monkeypatch.setattr(web_module, "answer_question_async", fake_answer)
+    client = TestClient(web_module.create_app(settings))
+    session_id = _create_session(client)
+
+    assert client.post(
+        "/api/questions", json={"question": "第一个问题", "session_id": session_id}
+    ).status_code == 200
+    second = client.post(
+        "/api/questions", json={"question": "第二个问题", "session_id": session_id}
+    )
+    assert second.status_code == 429
+    assert calls == ["第一个问题"]
+
+
+@pytest.mark.usefixtures("postgres_settings")
+def test_csrf_is_required_when_enabled(monkeypatch: Any, work_path: Path) -> None:
+    settings = _settings(work_path, csrf_enabled=True)
+
+    async def fake_answer(active_settings: Settings, request: QuestionRequest) -> AnswerResponse:
+        return _answer(request.question)
+
+    monkeypatch.setattr(web_module, "answer_question_async", fake_answer)
+    client = TestClient(web_module.create_app(settings))
+    visitor = client.get("/api/visitor").json()
+    missing = client.post("/api/sessions", json={})
+    assert missing.status_code == 403
+    created = client.post(
+        "/api/sessions",
+        json={},
+        headers={"X-CSRF-Token": visitor["csrf_token"]},
+    )
+    assert created.status_code == 200
+
+
+def test_sanitize_history_content_only_rewrites_evidence_markers() -> None:
+    assert sanitize_history_content("  1956年 [E12]\n普通[注1]  ") == (
+        "1956年 [历史引用]\n普通[注1]"
+    )
+
+
+@pytest.mark.usefixtures("postgres_settings")
+def test_question_storage_failure_does_not_silently_answer(
+    monkeypatch: Any, work_path: Path
+) -> None:
+    settings = _settings(work_path)
+    client = TestClient(web_module.create_app(settings), raise_server_exceptions=False)
+    session_id = _create_session(client)
+
+    def unavailable(*args: object, **kwargs: object) -> Any:
+        raise OSError("database unavailable")
+
+    monkeypatch.setattr(ConversationStore, "begin_question", unavailable)
+    response = client.post(
+        "/api/questions", json={"question": "存储故障问题", "session_id": session_id}
+    )
+    assert response.status_code == 500

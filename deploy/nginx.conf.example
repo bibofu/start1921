@@ -19,12 +19,24 @@ server {
     ssl_certificate /etc/letsencrypt/live/start1921.chat/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/start1921.chat/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
+    # No account login: the application issues an HttpOnly anonymous workspace cookie.
+    # Keep this off; do not add HTTP Basic Auth unless you intend a separate access gate.
     auth_basic off;
+    server_tokens off;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "no-referrer" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'" always;
 
     client_max_body_size 1m;
     access_log /var/log/nginx/start1921.access.log;
     error_log /var/log/nginx/start1921.error.log;
 
+    # In the http{} block, define rate/connection zones for /api/visitor and
+    # /api/questions, then apply limit_req/limit_conn here or in nested locations.
     location / {
         proxy_pass http://127.0.0.1:18021;
         proxy_http_version 1.1;
@@ -32,6 +44,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
         proxy_set_header Connection "";
         # Streaming answers use SSE.
         proxy_buffering off;

@@ -6,10 +6,15 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from history_agent.retrieval.models import SearchResponse
 
+MessageStatus = Literal["pending", "completed", "aborted", "failed"]
+
 
 class ConversationMessage(BaseModel):
+    message_id: int | None = Field(default=None, exclude=True)
     role: Literal["user", "assistant"]
-    content: str = Field(min_length=1, max_length=10_000)
+    content: str = Field(min_length=1, max_length=100_000)
+    status: MessageStatus = Field(default="completed", exclude=True)
+    created_at: str | None = Field(default=None, exclude=True)
 
 
 class QuestionRequest(BaseModel):
@@ -20,6 +25,12 @@ class QuestionRequest(BaseModel):
         default=None,
         min_length=16,
         max_length=64,
+        pattern=r"^[A-Za-z0-9_-]+$",
+    )
+    client_request_id: str | None = Field(
+        default=None,
+        min_length=8,
+        max_length=80,
         pattern=r"^[A-Za-z0-9_-]+$",
     )
 
