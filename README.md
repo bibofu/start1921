@@ -56,7 +56,7 @@ uv run start1921 llm status
 uv run start1921 llm check
 ```
 
-查询规划默认使用 `deepseek-v4-flash`，回答默认使用 `deepseek-v4-pro`，均关闭 thinking。配置字段及默认值见 [.env.example](.env.example) 和 [config.py](app/history_agent/config.py)。修改 `.env` 后需重启服务。
+查询规划默认使用 `deepseek-v4-flash`，回答默认使用 `deepseek-v4-pro`，均关闭 thinking。规划输出默认上限为 2000 tokens，已有 `.env` 的显式配置优先，不会被自动覆盖。配置字段及默认值见 [.env.example](.env.example) 和 [config.py](app/history_agent/config.py)。修改 `.env` 后需重启服务。
 
 ### 3. 首次建库或更新史料
 
@@ -107,9 +107,9 @@ uv run start1921 health --json
 
 ## 当前行为与边界
 
-- 查询规划可将人物明确、完整年份或年份区间的时间线/两人交集问题路由到结构化库。规划提示词要求月份、地点、否定、指定来源、命名历史时期等限制进入混合检索；组织任职的结构化入口目前为 CLI/API。
-- 普通问答检索由 LlamaIndex 编排，关键词和向量分支并行，使用 RRF 与领域规则排序。当前未接入交叉编码器重排模型、NetworkX 或图数据库。
-- 查询规划不可用时回退到原问题检索。复杂问题可进行一次有预算的证据覆盖反思与补检，具体条件和参数见 [RAG 实现说明](RAG-IMPL.md)。
+- 所有问答共用 LlamaIndex `HistoryResearchWorkflow` 的 Plan-and-Execute 流程：简单问题通常一个取证任务；复杂研究通过有依赖关系的检索、原文读取及分析任务完成。同步 API 与 SSE 仅交付方式不同，结构化和全文读取也是同一计划中的工具。
+- 保留中文分词、PostgreSQL BM25、Qdrant embedding 与检索、RRF、人物及时间过滤和历史研究规则。人物明确、完整年份或年份区间的时间线/两人交集可使用结构化工具；月份、地点、否定、指定来源等细约束使用混合检索。组织任职的结构化入口仍为 CLI/API。
+- 规划不可用时在同一流程内编译保守计划。研究计划总计最多 8 个任务、最多 2 次依据证据缺口的计划增补，同时执行最多 2 个就绪任务，共享请求时限和模型调用预算；预算结束后报告已有证据及缺口。组件边界与诊断字段见 [RAG 实现说明](RAG-IMPL.md)。
 - 引用核查检查证据编号、文献页码及事实句引用覆盖，不能替代逐项人工语义核验。流式草稿标记“引用待核查”，最终核查结果可替换草稿；停止生成、清空会话及 Markdown 渲染见 [流式问答说明](evals/STREAMING_CHAT.md)。
 - 浏览器保存 `session_id`，会话正文存于 PostgreSQL。服务端按消息数和字符预算构造追问上下文；历史引用失效化，只有本轮证据可支撑本轮事实。仅最终答案写入会话。
 - 当前 `evidence_status` 为 `supported`、`partial`、`no_evidence`。限制与差异通过答案正文和 `limitations` 表达；尚未实现需求基线中的五类状态和独立 `conflicts` 字段。
@@ -180,7 +180,7 @@ app/history_agent/
 ├── processing/           # 清洗、篇章与切片
 ├── retrieval/            # PostgreSQL BM25、Qdrant、融合与 LlamaIndex 适配
 ├── research/             # 人物、事件、交集、组织任职与复核
-├── answering/            # 查询规划、上下文、生成、流式与引用校验
+├── answering/            # 统一研究 Workflow、计划、工具、证据、综合与交付
 ├── evaluation/           # 分层评测、协议、复核与比较
 └── web/                  # FastAPI 与 static/ 单页会话界面
 config/                   # 文献目录、人物别名、关系词表、Qdrant 配置

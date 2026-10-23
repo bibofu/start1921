@@ -16,7 +16,7 @@ from history_agent.answering.query_understanding import (
     plan_question,
     query_execution,
 )
-from history_agent.answering.service import LLMResult, answer_question
+from history_agent.answering.service import answer_question
 from history_agent.answering.time_ranges import parse_relative_year_range
 from history_agent.config import Settings
 from history_agent.retrieval.models import SearchResponse
@@ -403,12 +403,10 @@ def test_answer_question_uses_semantic_plan_for_hybrid_retrieval(monkeypatch: An
             retrieval_mode="hybrid_rrf",
         )
 
-    monkeypatch.setattr("history_agent.answering.service.plan_question", lambda *a: planning)
-    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", search)
     monkeypatch.setattr(
-        "history_agent.answering.service._llm_answer",
-        lambda **kwargs: LLMResult(None, "no_evidence"),
+        "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning,
     )
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", search)
     original = "党的头一次全国大会讲了些什么？"
     result = answer_question(
         Settings(_env_file=None, llm_api_key=None), QuestionRequest(question=original)
@@ -478,8 +476,10 @@ def test_out_of_scope_answer_skips_retrieval(monkeypatch: Any) -> None:
     def unexpected(**kwargs: Any) -> None:
         raise AssertionError("out-of-scope question must not start retrieval")
 
-    monkeypatch.setattr("history_agent.answering.service.plan_question", lambda *a: planning)
-    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", unexpected)
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning,
+    )
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", unexpected)
     result = answer_question(
         Settings(_env_file=None, llm_api_key=None),
         QuestionRequest(question="爱因斯坦狭义相对论什么时候发表的"),
@@ -493,7 +493,10 @@ def test_out_of_scope_answer_skips_retrieval(monkeypatch: Any) -> None:
     assert "1921—1978" in result.answer
     assert result.query_plan == plan
     assert result.query_planner_status == "used"
-    assert any("范围外问题不进入检索和生成" in item for item in result.limitations)
+    assert result.execution_summary is not None
+    assert result.execution_summary.stopped_reason == "out_of_scope"
+    assert result.execution_summary.retrieval_calls == 0
+    assert result.execution_summary.plan.tasks == []
 
 
 def test_answer_question_returns_planner_clarification_without_retrieval(
@@ -509,12 +512,14 @@ def test_answer_question_returns_planner_clarification_without_retrieval(
         }
     )
     planning = QueryPlanningResult(QueryPlan.model_validate(payload), "used")
-    monkeypatch.setattr("history_agent.answering.service.plan_question", lambda *a: planning)
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning,
+    )
 
     def unexpected(**kwargs: Any) -> None:
         raise AssertionError("ambiguous query must not start retrieval")
 
-    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", unexpected)
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", unexpected)
     result = answer_question(
         Settings(_env_file=None, llm_api_key=None),
         QuestionRequest(question="他后来采取了什么政策？"),

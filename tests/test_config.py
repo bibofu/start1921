@@ -25,7 +25,7 @@ def test_settings_resolve_paths(work_path: Path) -> None:
     assert settings.llm_query_planner_model == "deepseek-v4-flash"
     assert settings.llm_query_planner_timeout_seconds == 20
     assert settings.llm_retrieval_reflection is True
-    assert settings.llm_retrieval_reflection_max_rounds == 1
+    assert settings.llm_query_planner_max_tokens == 2000
     assert settings.llm_retrieval_reflection_max_queries == 3
     assert settings.database_target == "postgresql://localhost/history"
     assert settings.conversation_database_target == settings.database_target

@@ -8,7 +8,7 @@ import httpx
 import pytest
 from history_agent.answering.models import Citation, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime
-from history_agent.answering.service import _llm_request_payload, _repair_request_payload
+from history_agent.answering.synthesis import _llm_request_payload, _repair_request_payload
 from history_agent.config import Settings
 from history_agent.evaluation.pilot import compare, generation_contexts, validate_anchors
 from history_agent.evaluation.pilot_models import (

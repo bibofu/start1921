@@ -8,15 +8,18 @@ from typing import Any
 import httpx
 import pytest
 from fastapi.testclient import TestClient
-from history_agent.answering.models import AnswerResponse, QueryPlan, QuestionRequest
-from history_agent.answering.query_understanding import QueryPlanningResult
-from history_agent.answering.service import (
-    AnswerContext,
-    HierarchicalPreparation,
-    LLMResult,
-    answer_question,
+from history_agent.answering.models import (
+    QueryEntity,
+    QueryPlan,
+    QuestionRequest,
+    ResearchTask,
+    TaskResult,
 )
-from history_agent.answering.streaming import _stream_completion, stream_answer_question
+from history_agent.answering.query_understanding import QueryPlanningResult
+from history_agent.answering.service import answer_question
+from history_agent.answering.streaming import stream_answer_question
+from history_agent.answering.synthesis import HierarchicalPreparation, LLMResult, _stream_completion
+from history_agent.answering.task_executor import HistoryTaskExecutor
 from history_agent.config import Settings
 from history_agent.errors import RetrievalError
 from history_agent.web.app import create_app
@@ -52,6 +55,7 @@ def _settings() -> Settings:
         _env_file=None,
         llm_api_key="test-only-key",
         llm_query_planning=False,
+        llm_retrieval_reflection=False,
     )
 
 
@@ -73,16 +77,61 @@ def _provider(
     return requests
 
 
-def _context(monkeypatch: pytest.MonkeyPatch) -> None:
-    context = AnswerContext(_response([_hit("one", 1, page=688)]), [_citation()], "partial", None)
+def _context(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    citations: list[Any] | None = None,
+    retrieval: Any = None,
+    tool: str = "search",
+    content: str | None = None,
+) -> list[ResearchTask]:
+    citations = citations if citations is not None else [_citation()]
+    retrieval = retrieval if retrieval is not None else _response([_hit("one", 1, page=688)])
+    received: list[ResearchTask] = []
 
-    async def retrieve(*args: object) -> AnswerContext:
-        return context
+    async def execute(
+        self: HistoryTaskExecutor, task: ResearchTask, prior: list[TaskResult]
+    ) -> TaskResult:
+        received.append(task)
+        ids = [
+            self.registry.register_citation(citation, task.task_id, f"fixture:{index}").evidence_id
+            for index, citation in enumerate(citations)
+        ]
+        return TaskResult(
+            task_id=task.task_id,
+            tool=task.tool,
+            status="completed" if ids else "empty",
+            evidence_ids=ids,
+            retrieval=retrieval if tool == "search" else None,
+            content=content,
+        )
 
-    monkeypatch.setattr(
-        "history_agent.answering.streaming.answer_structured_question", lambda *a: None
-    )
-    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", retrieve)
+    monkeypatch.setattr(HistoryTaskExecutor, "execute", execute)
+    if tool != "search":
+        plan = QueryPlan(
+            intent="timeline",
+            retrieval_route="structured",
+            normalized_question="整理结构化年谱",
+            start_year=1956,
+            end_year=1956,
+            entities=[QueryEntity(type="person", text="周恩来", canonical="周恩来")],
+            tasks=[
+                ResearchTask(
+                    task_id="timeline",
+                    tool="timeline",
+                    objective="整理年谱记录",
+                    query="整理结构化年谱",
+                    person_names=["周恩来"],
+                    start_year=1956,
+                    end_year=1956,
+                )
+            ],
+        )
+        monkeypatch.setattr(
+            "history_agent.answering.llamaindex_workflow.plan_question",
+            lambda *a: QueryPlanningResult(plan, "used"),
+        )
+    return received
 
 
 def _events(settings: Settings | None = None) -> list[Any]:
@@ -202,39 +251,18 @@ def test_stream_uses_semantic_plan_before_retrieval(monkeypatch: pytest.MonkeyPa
         search_queries=["中国共产党第一次全国代表大会 代表 决议"],
     )
     planning = QueryPlanningResult(
-        plan,
-        "used",
-        model_name="deepseek-v4-flash",
-        usage={"total_tokens": 50},
+        plan, "used", model_name="deepseek-v4-flash", usage={"total_tokens": 50}
     )
-    context = AnswerContext(
-        _response([]),
-        [],
-        "no_evidence",
-        None,
-        reflection_status="retried",
-        retrieval_rounds=2,
-        missing_aspects=("会议结果",),
-    )
-    received: list[QueryPlanningResult] = []
+    received = _context(monkeypatch, citations=[], retrieval=_response([]))
     monkeypatch.setattr(
-        "history_agent.answering.streaming.answer_structured_question", lambda *a: None
+        "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning
     )
-    monkeypatch.setattr("history_agent.answering.streaming.plan_question", lambda *a: planning)
-
-    async def retrieve(*args: Any) -> AnswerContext:
-        received.append(args[2])
-        return context
-
-    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", retrieve)
-    settings = _settings().model_copy(update={"llm_query_planning": True})
-    events = _events(settings)
-
-    assert received == [planning]
-    assert any(event.event == "status" and "规划检索" in event.data["message"] for event in events)
-    assert any(event.event == "status" and "补充检索" in event.data["message"] for event in events)
+    events = _events(_settings().model_copy(update={"llm_query_planning": True}))
+    assert received and received[0].objective == plan.normalized_question
+    assert any(event.event == "status" and "任务" in event.data["message"] for event in events)
     assert events[-1].data["query_planner_status"] == "used"
     assert events[-1].data["query_plan"]["normalized_question"] == plan.normalized_question
+    assert events[-1].data["execution_summary"]["task_results"][0]["task_id"] == received[0].task_id
 
 
 def test_stream_endpoint_sends_final_result_and_safe_error(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -251,7 +279,7 @@ def test_stream_endpoint_sends_final_result_and_safe_error(monkeypatch: pytest.M
     async def failed(*args: object) -> LLMResult:
         raise RetrievalError("internal path and secret must not leak")
 
-    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", failed)
+    monkeypatch.setattr(HistoryTaskExecutor, "execute", failed)
     response = client.post("/api/questions/stream", json={"question": "测试观点"})
     assert "event: error\n" in response.text
     assert "internal path" not in response.text
@@ -266,7 +294,7 @@ def test_disabled_planner_uses_rag_without_generic_clarification(
         queries.append(kwargs["query"])
         return _response([], intent="timeline")
 
-    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", search)
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", search)
     client = TestClient(create_app(_settings().model_copy(update={"llm_api_key": None})))
     response = client.post("/api/questions/stream", json={"question": "毛泽东有哪些经历"})
     assert queries == ["毛泽东有哪些经历"]
@@ -276,22 +304,18 @@ def test_disabled_planner_uses_rag_without_generic_clarification(
     assert "请明确人物和年份" not in response.text
 
 
-def test_stream_out_of_scope_stops_before_retrieval(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    plan = QueryPlan(
-        intent="out_of_scope",
-        normalized_question="介绍辛亥革命的情况",
+def test_stream_out_of_scope_stops_before_retrieval(monkeypatch: pytest.MonkeyPatch) -> None:
+    plan = QueryPlan(intent="out_of_scope", normalized_question="介绍辛亥革命的情况")
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.plan_question",
+        lambda *a: QueryPlanningResult(plan, "used"),
     )
-    planning = QueryPlanningResult(plan, "used")
-    monkeypatch.setattr("history_agent.answering.streaming.plan_question", lambda *a: planning)
 
-    async def unexpected(*args: object, **kwargs: object) -> AnswerContext:
+    async def unexpected(*args: object, **kwargs: object) -> TaskResult:
         raise AssertionError("out-of-scope question must not start retrieval")
 
-    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", unexpected)
+    monkeypatch.setattr(HistoryTaskExecutor, "execute", unexpected)
     events = _events(_settings().model_copy(update={"llm_query_planning": True}))
-
     assert events[-1].event == "done"
     assert events[-1].data["retrieval_mode"] == "out_of_scope"
     assert events[-1].data["evidence_status"] == "no_evidence"
@@ -302,51 +326,23 @@ def test_stream_out_of_scope_stops_before_retrieval(
 
 
 def test_structured_summary_streams_through_llm(monkeypatch: pytest.MonkeyPatch) -> None:
-    structured = AnswerResponse(
-        question="周恩来在1956年主要有哪些经历？",
-        answer="结构化记录摘录。[E1]",
-        evidence_status="partial",
-        generator_mode="extractive",
-        llm_status="not_applicable",
-        retrieval_mode="structured_timeline",
-        query_intent="timeline",
-        citations=[_citation()],
+    _context(monkeypatch, tool="timeline", content="结构化记录摘录。[E1]")
+    _provider(
+        monkeypatch,
+        [ChunkStream([_chunk("可归纳为外事和会议工作。[E1]", finish="stop"), b"data: [DONE]\n\n"])],
     )
-    body = ChunkStream([_chunk("可归纳为外事和会议工作。[E1]", finish="stop"), b"data: [DONE]\n\n"])
-    _provider(monkeypatch, [body])
-    monkeypatch.setattr(
-        "history_agent.answering.streaming.answer_structured_question",
-        lambda *args: structured,
-    )
-
     events = _events()
-
-    assert any(
-        event.event == "status" and "归纳结构化史料" in event.data["message"] for event in events
-    )
+    assert any(event.event == "status" and "综合" in event.data["message"] for event in events)
     assert events[-1].data["retrieval_mode"] == "structured_timeline"
     assert events[-1].data["llm_status"] == "used"
     assert events[-1].data["answer"] == "可归纳为外事和会议工作。[E1]"
 
 
-def test_structured_record_list_also_streams_through_llm(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    structured = AnswerResponse(
-        question="请列出1956年周恩来的时间线",
-        answer="结构化记录摘录。[E1]",
-        evidence_status="partial",
-        generator_mode="extractive",
-        llm_status="not_applicable",
-        retrieval_mode="structured_timeline",
-        query_intent="timeline",
-        citations=[_citation()],
-    )
-    body = ChunkStream([_chunk("整理后的记录。[E1]", finish="stop"), b"data: [DONE]\n\n"])
-    _provider(monkeypatch, [body])
-    monkeypatch.setattr(
-        "history_agent.answering.streaming.answer_structured_question",
-        lambda *args: structured,
+def test_structured_record_list_also_streams_through_llm(monkeypatch: pytest.MonkeyPatch) -> None:
+    _context(monkeypatch, tool="timeline", content="结构化记录摘录。[E1]")
+    _provider(
+        monkeypatch,
+        [ChunkStream([_chunk("整理后的记录。[E1]", finish="stop"), b"data: [DONE]\n\n"])],
     )
 
     async def collect() -> list[Any]:
@@ -366,47 +362,64 @@ def test_stream_structured_timeline_miss_finishes_with_filtered_hybrid(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     question = "彭德怀在1930-1935年的主要经历"
+    task = ResearchTask(
+        task_id="timeline",
+        tool="timeline",
+        objective=question,
+        query=question,
+        start_year=1930,
+        end_year=1935,
+        person_names=["彭德怀"],
+    )
     plan = QueryPlan(
         intent="timeline",
         retrieval_route="structured",
         normalized_question=question,
         start_year=1930,
         end_year=1935,
+        tasks=[task],
+        entities=[QueryEntity(type="person", text="彭德怀", canonical="彭德怀")],
     )
-    planning = QueryPlanningResult(plan, "used", model_name="deepseek-v4-flash")
-    citation = _citation().model_copy(
-        update={
-            "quote": "1935年11月3日，彭德怀被任命为红一方面军司令员。",
-            "year_mentions": [1935],
-        }
-    )
-    retrieval = _response([_hit("one", 1, page=688)]).model_copy(
-        update={
-            "query": question,
-            "query_intent": "timeline",
-            "query_people": ["彭德怀"],
-            "query_year_range": [1930, 1935],
-            "retrieval_mode": "planned_hybrid_rrf_subject_filtered",
-        }
-    )
-    context = AnswerContext(
-        retrieval,
-        [citation],
-        "partial",
-        None,
-        timeline_filter_status="applied",
-        timeline_filter_removed_count=4,
-    )
-
-    monkeypatch.setattr("history_agent.answering.streaming.plan_question", lambda *a: planning)
     monkeypatch.setattr(
-        "history_agent.answering.streaming.answer_structured_question", lambda *a: None
+        "history_agent.answering.llamaindex_workflow.plan_question",
+        lambda *a: QueryPlanningResult(plan, "used", model_name="deepseek-v4-flash"),
     )
+    citation = _citation("1935年11月3日，彭德怀被任命为红一方面军司令员。").model_copy(
+        update={"year_mentions": [1935]}
+    )
+    calls = []
 
-    async def retrieve(*args: object) -> AnswerContext:
-        return context
+    async def execute(
+        self: HistoryTaskExecutor, task: ResearchTask, prior: list[TaskResult]
+    ) -> TaskResult:
+        calls.append(task.tool)
+        if task.tool == "timeline":
+            return TaskResult(
+                task_id=task.task_id,
+                tool=task.tool,
+                status="empty",
+                limitations=["未找到年谱主体记录。"],
+            )
+        registered = self.registry.register_citation(citation, task.task_id, "fixture:timeline")
+        retrieval = _response([_hit("one", 1, page=688)]).model_copy(
+            update={
+                "query": question,
+                "query_intent": "timeline",
+                "query_people": ["彭德怀"],
+                "query_year_range": [1930, 1935],
+                "retrieval_mode": "planned_hybrid_rrf_subject_filtered",
+            }
+        )
+        return TaskResult(
+            task_id=task.task_id,
+            tool=task.tool,
+            status="completed",
+            evidence_ids=[registered.evidence_id],
+            retrieval=retrieval,
+            limitations=["核对主体后剔除 4 条候选。"],
+        )
 
-    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", retrieve)
+    monkeypatch.setattr(HistoryTaskExecutor, "execute", execute)
     _provider(
         monkeypatch,
         [
@@ -429,13 +442,23 @@ def test_stream_structured_timeline_miss_finishes_with_filtered_hybrid(
         ]
 
     done = asyncio.run(collect())[-1].data
+    assert calls == ["timeline", "search"]
     assert done["retrieval_mode"] == "planned_hybrid_rrf_subject_filtered"
     assert any("年谱主体记录" in item for item in done["limitations"])
     assert any("剔除 4 条" in item for item in done["limitations"])
+    assert done["execution_summary"]["replan_count"] == 1
 
 
 def test_cancelling_answer_closes_nested_provider(monkeypatch: pytest.MonkeyPatch) -> None:
-    body = ChunkStream([_chunk("参加有关"), _chunk("会议。[E1]", finish="stop")])
+    class WaitingStream(ChunkStream):
+        async def __aiter__(self) -> AsyncIterator[bytes]:
+            self.visited += 1
+            yield _chunk("参加有关")
+            # The workflow producer is independent of its SSE consumer. Keep a
+            # real upstream read pending so cancellation must close it promptly.
+            await asyncio.Event().wait()
+
+    body = WaitingStream([])
     _provider(monkeypatch, [body])
     _context(monkeypatch)
 
@@ -470,34 +493,27 @@ def test_large_evidence_set_uses_hierarchical_generation_in_stream(
     citations = [
         _citation().model_copy(update={"evidence_id": f"E{index}"}) for index in range(1, 14)
     ]
-    context = AnswerContext(_response([]), citations, "partial", None)
+    _context(monkeypatch, citations=citations)
 
-    async def retrieve(*args: object) -> AnswerContext:
-        return context
+    async def prepare(**kwargs: Any) -> HierarchicalPreparation:
+        return HierarchicalPreparation(
+            request_payload={"messages": []}, usage={"total_tokens": 5}, map_failed=False
+        )
 
-    monkeypatch.setattr(
-        "history_agent.answering.streaming.answer_structured_question", lambda *args: None
-    )
-    monkeypatch.setattr("history_agent.answering.streaming._aretrieve_context", retrieve)
-    monkeypatch.setattr(
-        "history_agent.answering.streaming._prepare_hierarchical_answer",
-        lambda **kwargs: HierarchicalPreparation(
-            request_payload={"messages": []},
-            usage={"total_tokens": 5},
-            map_failed=False,
-        ),
-    )
-    body = ChunkStream(
+    monkeypatch.setattr("history_agent.answering.synthesis._prepare_hierarchical_answer", prepare)
+    _provider(
+        monkeypatch,
         [
-            _chunk("分层", usage=20),
-            _chunk("综合答案。[E1][E13]", finish="stop"),
-            b"data: [DONE]\n\n",
-        ]
+            ChunkStream(
+                [
+                    _chunk("分层", usage=20),
+                    _chunk("综合答案。[E1][E13]", finish="stop"),
+                    b"data: [DONE]\n\n",
+                ]
+            )
+        ],
     )
-    _provider(monkeypatch, [body])
-
     events = _events()
-
     assert any(event.event == "status" and "分组归纳" in event.data["message"] for event in events)
     assert [event.data["text"] for event in events if event.event == "delta"] == [
         "分层",
@@ -507,7 +523,6 @@ def test_large_evidence_set_uses_hierarchical_generation_in_stream(
     assert events[-1].data["llm_usage"] == {"total_tokens": 25}
     assert [item["evidence_id"] for item in events[-1].data["citations"]] == ["E1", "E13"]
     assert events[-1].data["retrieved_evidence_count"] == 13
-    assert any("13 条证据" in item for item in events[-1].data["limitations"])
 
 
 @pytest.mark.parametrize("missing_fact", [False, True])
@@ -515,40 +530,16 @@ def test_ceremony_overview_has_same_validation_and_diagnostics_in_both_apis(
     monkeypatch: pytest.MonkeyPatch,
     missing_fact: bool,
 ) -> None:
-    # A local provider fixture for the reported question, not a recorded model answer.
     fact = "1949年10月1日，开国大典在北京天安门广场举行。"
-    draft = f"## 开国大典\n\n> {fact}\n> [E1]\n\n"
-    draft += "现有资料不足以确认所有参与人员的具体分工。"
+    draft = f"## 开国大典\n\n> {fact}\n> [E1]\n\n现有资料不足以确认所有参与人员的具体分工。"
     if missing_fact:
         draft += "\n\n随后主持其他会议。"
-    citation = _citation(fact)
-    context = AnswerContext(_response([_hit("one", 1, page=688)]), [citation], "partial", None)
-    for module in ("service", "streaming"):
-
-        async def retrieve(*args: object) -> AnswerContext:
-            return context
-
-        monkeypatch.setattr(
-            f"history_agent.answering.{module}.answer_structured_question", lambda *a: None
-        )
-        monkeypatch.setattr(f"history_agent.answering.{module}._aretrieve_context", retrieve)
-    sync_calls = []
-
-    def fake_post(url: str, **kwargs: Any) -> httpx.Response:
-        sync_calls.append(kwargs["json"])
-        return httpx.Response(
-            200,
-            request=httpx.Request("POST", url),
-            json={"choices": [{"message": {"content": draft}}], "usage": {"total_tokens": 20}},
-        )
-
-    monkeypatch.setattr(httpx, "post", fake_post)
-    expected_calls = 1
+    _context(monkeypatch, citations=[_citation(fact)])
     requests = _provider(
         monkeypatch,
         [
             ChunkStream([_chunk(draft, finish="stop", usage=20), b"data: [DONE]\n\n"])
-            for _ in range(expected_calls)
+            for _ in range(2)
         ],
     )
     question = QuestionRequest(question="介绍一下开国大典的情况")
@@ -558,8 +549,12 @@ def test_ceremony_overview_has_same_validation_and_diagnostics_in_both_apis(
         return [event async for event in stream_answer_question(_settings(), question)]
 
     streamed = asyncio.run(collect())[-1].data
+    # Different requests have distinct run IDs; all answer and execution semantics agree.
+    assert synchronous["execution_summary"].pop("run_id") != streamed["execution_summary"].pop(
+        "run_id"
+    )
     assert synchronous == streamed
-    assert len(sync_calls) == len(requests) == expected_calls
+    assert len(requests) == 2
     if missing_fact:
         assert streamed["llm_status"] == "used"
         assert streamed["llm_error_code"] == "removed_uncited_claims"

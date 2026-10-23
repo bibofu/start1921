@@ -4,8 +4,9 @@ import asyncio
 import json
 from pathlib import Path
 
-from history_agent.answering.full_text import answer_full_text_question
+from history_agent.answering.full_text import read_source_evidence
 from history_agent.answering.models import QuestionRequest
+from history_agent.answering.planning import compile_research_plan
 from history_agent.answering.service import answer_question
 from history_agent.answering.streaming import AnswerStreamEvent, stream_answer_question
 from history_agent.config import Settings
@@ -82,19 +83,16 @@ def _write_section(root: Path) -> Settings:
 def test_explicit_quoted_title_returns_complete_local_section(work_path: Path) -> None:
     settings = _write_section(work_path)
 
-    result = answer_full_text_question(
-        settings, QuestionRequest(question="毛泽东《矛盾论》的全文")
-    )
+    result = read_source_evidence(settings, question="毛泽东《矛盾论》的全文")
 
-    assert result is not None
-    assert result.retrieval_mode == "full_text_section"
-    assert result.llm_status == "not_applicable"
-    assert "矛盾论（一九三七年八月）第一页正文。\n\n第二页正文。" in result.answer
-    assert "下一篇正文" not in result.answer
-    assert result.citations[0].document == "毛泽东选集"
-    assert result.citations[0].pdf_page == 185
-    assert result.citations[0].pdf_page_end == 186
-    assert result.retrieved_evidence_count == 3
+    assert result.status == "completed"
+    assert result.content is not None
+    assert "矛盾论（一九三七年八月）第一页正文。\n\n第二页正文。" in result.content
+    assert "下一篇正文" not in result.content
+    assert result.items[0].citation.document == "毛泽东选集"
+    assert result.items[0].citation.pdf_page == 185
+    assert result.items[0].citation.pdf_page_end == 186
+    assert result.total == 3
 
 
 def test_full_text_route_bypasses_rag_and_llm(work_path: Path) -> None:
@@ -120,14 +118,16 @@ def test_streaming_full_text_route_returns_complete_answer(work_path: Path) -> N
 
     events = asyncio.run(collect())
 
-    assert [event.event for event in events] == ["status", "done"]
-    assert events[-1].data["retrieval_mode"] == "full_text_section"
-    assert "第一页正文" in events[-1].data["answer"]
+    assert events[0].event == "status"
+    assert [event.event for event in events].count("done") == 1
+    assert events[-1].event == "done"
+    assert all(event.event in {"status", "done"} for event in events)
+    assert events[-1].data["research_plan"]["tasks"][0]["tool"] == "read_source"
+    assert "第一页正文。\n\n第二页正文。" in events[-1].data["answer"]
+    assert "下一篇正文" not in events[-1].data["answer"]
 
 
 def test_ordinary_title_question_does_not_trigger_full_text_route(work_path: Path) -> None:
-    result = answer_full_text_question(
-        _settings(work_path), QuestionRequest(question="《矛盾论》如何分析主要矛盾？")
-    )
+    result = compile_research_plan("《矛盾论》如何分析主要矛盾？", None)
 
-    assert result is None
+    assert result.tasks[0].tool == "search"

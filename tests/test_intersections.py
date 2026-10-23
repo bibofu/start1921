@@ -174,9 +174,7 @@ def test_intersections_use_only_remaining_available_sources(work_path: Path) -> 
             "UPDATE document_files SET is_present = 0 WHERE document_id = 'lin_biao_chronology'"
         )
 
-    result = get_person_intersections(
-        database, person_id="zhou_enlai", other_person_id="lin_biao"
-    )
+    result = get_person_intersections(database, person_id="zhou_enlai", other_person_id="lin_biao")
     assert result.co_mention_total == 1
     assert result.total == 1
     assert result.events[0].event.event_id == "event_zhou_message"
@@ -185,9 +183,7 @@ def test_intersections_use_only_remaining_available_sources(work_path: Path) -> 
 
     with database.connect() as connection:
         connection.execute("UPDATE documents SET enabled = 0")
-    empty = get_person_intersections(
-        database, person_id="zhou_enlai", other_person_id="lin_biao"
-    )
+    empty = get_person_intersections(database, person_id="zhou_enlai", other_person_id="lin_biao")
     assert empty.co_mention_total == 0
     assert empty.total == 0
     assert empty.events == []
@@ -352,9 +348,7 @@ def test_blind_review_packet_excludes_predictions_and_finalizes(work_path: Path)
     packet_path.write_text(packet.model_dump_json(indent=2), encoding="utf-8")
     with pytest.raises(ResearchDataError, match="page-specific evidence"):
         finalize_intersection_review_packet(packet_path)
-    waived = finalize_intersection_review_packet(
-        packet_path, accept_generic_reasons=True
-    )
+    waived = finalize_intersection_review_packet(packet_path, accept_generic_reasons=True)
     assert waived["review_method"] == "reviewer_confirmed_without_case_rationales"
     assert waived["reason_quality"] == "waived"
     packet.cases[0].annotation.reason = "完整查看来源页后作出的独立判断。"
@@ -461,12 +455,10 @@ def test_adjacent_evidence_is_source_local_single_page_and_chat_complete(
         end_year=1956,
     )
     monkeypatch.setattr(
-        "history_agent.answering.service.plan_question",
+        "history_agent.answering.llamaindex_workflow.plan_question",
         lambda *args: QueryPlanningResult(plan, "used"),
     )
-    response = TestClient(create_app(settings)).post(
-        "/api/questions", json={"question": question}
-    )
+    response = TestClient(create_app(settings)).post("/api/questions", json={"question": question})
     assert response.status_code == 200
     assert response.json()["citations"][0]["quote"] == text
     assert response.json()["citations"][0]["pdf_page"] == 20

@@ -130,7 +130,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "conversation_database_backend": active_settings.conversation_database_backend,
             "keyword_database_backend": active_settings.keyword_database_backend,
             "vector_database_backend": active_settings.vector_database_backend,
-            "rag_execution_paths": ["llamaindex", "native"],
+            "rag_execution_paths": ["llamaindex"],
             "llamaindex_components": [
                 "workflow",
                 "query_bundle",
@@ -140,6 +140,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "callback_manager",
                 "output_parser",
                 "prompt_template",
+                "response_synthesizer",
             ],
             "indexes": indexes,
             "llm_enabled": active_settings.llm_enabled,
@@ -149,9 +150,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "llm_query_planning": active_settings.llm_query_planning,
             "llm_query_planner_model": active_settings.llm_query_planner_model,
             "llm_retrieval_reflection": active_settings.llm_retrieval_reflection,
-            "llm_retrieval_reflection_max_rounds": (
-                active_settings.llm_retrieval_reflection_max_rounds
-            ),
+            "answer_workflow": "plan_and_execute",
             "research_range": [
                 active_settings.research_start.year,
                 active_settings.research_end.year,

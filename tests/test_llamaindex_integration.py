@@ -1,24 +1,17 @@
 from __future__ import annotations
 
-import asyncio
 from typing import Any
 
 from history_agent.answering.llamaindex_workflow import (
-    RetrievalStartEvent,
-    run_retrieval_workflow,
+    ResearchStartEvent,
 )
-from history_agent.answering.models import QueryPlan, QuestionRequest
-from history_agent.answering.retrieval_reflection import (
-    EvidenceAssessment,
-    ReflectionResult,
-)
-from history_agent.config import Settings
+from history_agent.answering.models import QuestionRequest
 from history_agent.retrieval.llamaindex import (
     HistoryHybridRetriever,
     node_to_search_hit,
     retrieve_with_llamaindex,
 )
-from history_agent.retrieval.models import RetrievalPlan, SearchHit, SearchResponse
+from history_agent.retrieval.models import SearchHit, SearchResponse
 from llama_index.core import QueryBundle
 from llama_index.core.callbacks import CallbackManager
 from llama_index.core.retrievers import BaseRetriever
@@ -116,83 +109,10 @@ def test_retriever_uses_supplied_callback_manager() -> None:
     assert retriever.callback_manager is manager
 
 
-def test_llamaindex_workflow_runs_bounded_reflection_retry(work_path) -> None:
-    queries: list[str] = []
-
-    def search(**kwargs: Any) -> SearchResponse:
-        query = str(kwargs["query"])
-        queries.append(query)
-        suffix = len(queries)
-        return _response(
-            query,
-            [_hit(f"00000000-0000-0000-0000-00000000000{suffix}", 1, query)],
-        )
-
-    def assess(*args: Any) -> ReflectionResult:
-        return ReflectionResult(
-            "retry",
-            EvidenceAssessment(
-                sufficient=False,
-                covered_aspects=["会议期间"],
-                missing_aspects=["会议后"],
-                reason="缺少会后材料",
-            ),
-            ("周恩来 遵义会议后",),
-        )
-
-    def merge(
-        initial: SearchResponse,
-        retry: SearchResponse,
-        *,
-        query: str,
-        limit: int,
-    ) -> SearchResponse:
-        hits = [
-            hit.model_copy(update={"rank": rank})
-            for rank, hit in enumerate([*initial.hits, *retry.hits][:limit], start=1)
-        ]
-        return initial.model_copy(update={"query": query, "hits": hits})
-
-    plan = QueryPlan(
-        intent="event_overview",
-        normalized_question="周恩来在遵义会议前后做了什么",
-        search_queries=["周恩来 遵义会议"],
-        coverage="balanced_period",
-    )
-    retrieval_plan = RetrievalPlan(query_intent="event_overview", coverage="balanced_period")
-    result = asyncio.run(
-        run_retrieval_workflow(
-            settings=Settings(_env_file=None, project_root=work_path),
-            request=QuestionRequest(question="周恩来在遵义会议前后做了什么"),
-            plan=plan,
-            primary_query="周恩来 遵义会议",
-            additional_queries=["遵义会议前"],
-            retrieval_plan=retrieval_plan,
-            retrieval_limit=12,
-            search_backend=search,
-            assess_retrieval=assess,
-            merge_retrieval=merge,
-            runtime=None,
-            budget=None,
-            max_chunks=36,
-        )
-    )
-    assert queries == ["周恩来 遵义会议", "周恩来 遵义会议后"]
-    assert result.retrieval_rounds == 2
-    assert result.reflection_status == "retried"
-    assert result.missing_aspects == ("会议后",)
-    assert len(result.retrieval.hits) == 2
-
-
-def test_workflow_events_and_results_are_json_serializable() -> None:
-    event = RetrievalStartEvent(
+def test_workflow_start_event_is_json_serializable() -> None:
+    event = ResearchStartEvent(
         request=QuestionRequest(question="周恩来在遵义会议前后做了什么"),
-        plan=None,
-        primary_query="周恩来 遵义会议",
-        additional_queries=["遵义会议前", "遵义会议后"],
-        retrieval_plan=RetrievalPlan(query_intent="event_overview"),
-        retrieval_limit=12,
     )
     payload = event.model_dump_json()
-    assert "周恩来 遵义会议" in payload
+    assert "周恩来在遵义会议前后做了什么" in payload
     assert "search_backend" not in payload

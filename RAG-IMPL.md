@@ -1,18 +1,18 @@
 # RAG 实现说明
 
-本文描述仓库当前实际运行的 LlamaIndex RAG 链路，包括 PDF 抽取、清洗与分片、关键词和向量索引、查询理解、双路召回、融合与重排、证据节点、检索反思 Workflow、DeepSeek 生成、流式输出和引用校验。
+本文描述仓库当前实际运行的 LlamaIndex Plan-and-Execute RAG 链路，包括 PDF 抽取、清洗与分片、关键词和向量索引、研究计划、任务执行、双路召回、融合与重排、证据管理、答案综合、流式输出和引用校验。
 
-实现核对日期为 2026-10-20。本文说明当前代码行为；第 13 节的规模数字是注明日期的历史构建快照，不代表实时服务状态。产品目标仍以 [需求基线](REQUIREMENTS.md) 为准，本文中的实现边界不降低原有验收要求。
+实现核对日期为 2026-10-23。本文说明当前代码行为；第 13 节的规模数字是注明日期的历史构建快照，不代表实时服务状态。本轮编排重构没有重建数据或索引，也没有产生新的检索质量评测结论。产品目标仍以 [需求基线](REQUIREMENTS.md) 为准，本文中的实现边界不降低原有验收要求。
 
 ## 1. 总体架构
 
-项目先对所有问题执行统一的 LLM 查询理解，再选择三条问答路径：
+所有问答只经过一个 `HistoryResearchWorkflow`：理解与规划 → 按依赖执行任务 → 检查证据缺口 → 必要时增补计划 → 综合与引用核查 → 交付。`service.py` 和 `streaming.py` 分别适配普通响应与 SSE，共用这个执行入口；没有独立的旧编排、结构化问答主流程或流式生成循环。
 
-1. 明确的 `《篇名》+ 全文/完整原文` 请求，按本地篇目结构直接读取并拼接整篇 chunks。
-2. 查询计划判定为“明确人物 + 整年/年份区间 + 经历或交集”的问题，查询结构化研究数据库。
-3. 普通历史问题、观点问题、历史时期问题、不限定年份的两人交集，以及带月份、地点、否定或指定来源等限制的问题，进入本文描述的混合 RAG。
+简单问题通常编译成一个取证任务，例如检索某个观点、查询一位人物整年活动或读取一篇全文。复杂比较与研究问题可以形成有向无环任务图（DAG）：先分别取证，再由依赖这些证据的 `analyze` 任务比较、归纳，最后统一综合。复杂度体现在同一计划的任务和依赖中，不通过另设“简单/复杂”执行器实现。
 
-篇目全文与结构化路径不使用向量索引；结构化证据仍可由回答模型归纳。查询理解模型不可用或计划未通过校验时，除仍可独立识别的篇目全文请求外，系统保留原问题并降级到混合检索，不再运行一套前置正则来猜测结构化意图。
+允许的工具只有 `search`、`timeline`、`intersection`、`read_source` 和 `analyze`。前三类分别使用已有混合检索、人物时间线和共同动作候选查询；`read_source` 按本地篇目结构读取原文；`analyze` 只处理依赖任务已经取得的证据，不检索外网，也不自行重规划。只有明确人物、完整年份或年份区间的时间线/交集适合结构化工具；月份、地点、否定或指定来源等细约束交给混合检索。全文和结构化工具无需访问向量库，但仍受统一 Workflow 管理。
+
+模型不可用或计划校验失败时，系统在同一 Workflow 内编译保守计划：明确全文请求使用 `read_source`；能由本地人物别名和严格语法确认的整年时间线/交集使用相应结构化工具；其他问题保留原问题使用 `search`。规划失败不会启动另一套问答流程。
 
 “某年之前/以前/之后/以后”属于已经明确的开放边界，不触发“请明确人物和年份”。其中
 “1949 年之前”按研究起点至 1948 年解释；带“及”的“1949 年及以前”才包含 1949 年。
@@ -30,74 +30,93 @@ flowchart LR
     G --> H[PostgreSQL 倒排索引 / BM25]
     G --> I[FastEmbed / Qdrant]
 
-    Q[用户问题] --> P[DeepSeek JSON 查询理解]
-    P --> J[Pydantic 校验 / 原问题保留]
-    J --> O{查询计划路由}
-    O -->|明确篇目全文| N[按结构页码顺序拼接 chunks]
-    O -->|完整年份时间线或交集| S[结构化研究库]
-    O -->|其他问题与附加限制| T[LlamaIndex QueryBundle]
-    P -.失败降级.-> T
-    T --> K[自定义 BaseRetriever]
-    K --> H
-    K --> I
-    H --> U[RRF 融合]
+    Q[用户问题] --> P[理解与生成研究计划]
+    P --> J[Pydantic 校验任务与依赖]
+    P -.模型不可用.-> C0[编译保守计划]
+    C0 --> J
+    J --> O[Workflow 调度就绪任务]
+    O --> T[search / QueryBundle / BaseRetriever]
+    O --> S[timeline / intersection / PostgreSQL]
+    O --> N[read_source / 本地篇目原文]
+    O --> A0[analyze / 已有证据分析]
+    T --> H
+    T --> I
+    H --> U[RRF 与领域规则]
     I --> U
-    U --> V[TextNode / NodeWithScore]
-    V --> NP[NodePostprocessor 去重与限额]
-    NP --> RF{Workflow 证据充分性评估}
-    RF -->|不足| K
-    RF -->|充分或达到上限| W[证据包]
-    W --> X[DeepSeek 流式生成]
-    X --> Y[Markdown / 引用校验]
-    Y --> Z[最终答案或证据摘录]
+    U --> V[Node 与 NodePostprocessor]
+    V --> W[统一 EvidenceRegistry]
+    S --> W
+    N --> W
+    W --> A0
+    A0 --> R[任务结果与证据覆盖检查]
+    W --> R
+    R -->|存在可补证据缺口且预算充足| O
+    R -->|任务完成或达到预算| X[BaseSynthesizer 综合 / 完整原文交付]
+    X --> Y[引用核查 / 最多一次修复]
+    Y --> Z[最终答案、执行摘要与缺口]
 ```
 
 ### 1.1 LlamaIndex 框架职责
 
-主 RAG 路径使用 `llama-index-core` 作为基础框架，而不是只在依赖中声明它：
+`llama-index-core` 参与完整问答生命周期：
 
 - 查询计划和证据评估的结构化输出由 `PydanticOutputParser` 解析与校验；
 - 主查询和扩展查询封装为 `QueryBundle`；
 - 关键词与向量融合后端实现为 `BaseRetriever`；
 - 每个领域 `SearchHit` 转换为 `TextNode + NodeWithScore`，完整保留文献、页码、章节、年份、人物和原始排序元数据；
 - 节点去重、合法性检查和数量限制由 `BaseNodePostprocessor` 执行；
-- 首轮检索、充分性判断、定向补充检索和有界停止由 LlamaIndex `Workflow` 及类型化 Event 编排；
+- `HistoryResearchWorkflow` 以类型化 Event 和 Context 管理规划、任务依赖、并发执行、证据检查、计划增补、综合、修复及停止；
+- `HistoryResponseSynthesizer` 实现 `BaseSynthesizer`，接收统一证据 Node，管理分组摘要、最终综合和引用校验；修复建议返回 Workflow，由 Workflow 决定是否执行一次修复；
 - 查询规划、证据充分性判断、最终回答和流式回答统一通过自定义 `DeepSeekLlamaIndexLLM`；该适配器实现 LlamaIndex `LLM` 接口，接入共享 `CallbackManager`，同时保留连接池、并发准入、请求总预算、供应商 `thinking` 参数和 SSE 故障降级；
 - 最终证据回答提示词由 `ChatPromptTemplate` 构造。
 
 框架与领域层之间通过适配器隔离。关键词 BM25、FastEmbed/Qdrant、RRF、年代覆盖、人物
 硬过滤和引用校验没有替换成通用默认实现，因为这些规则是当前评测表现和史料可核验性的
-关键。普通混合检索响应公开 `rag_framework=llamaindex`；篇目全文、结构化数据库和直接检索
-等绕过 LlamaIndex 检索工作流的路径公开 `rag_framework=native`。健康检查同时列出两种执行路径
-和当前启用的 LlamaIndex 组件，避免把配置框架与单次请求的真实路径混为一谈。
+关键。所有问答响应均公开 `rag_framework=llamaindex`，包括结构化取证、全文读取及无模型摘录。
+独立的直接检索或研究 CLI/API 是底层能力接口，不构成第二套问答编排。主库、会话库、关键词索引
+继续使用 PostgreSQL，向量索引继续使用独立 Qdrant 服务；本轮不改变嵌入模型、索引和备份，
+不引入 SQLite 后端或兼容分支。
+
+健康检查以 `answer_workflow=plan_and_execute` 和 `rag_execution_paths=["llamaindex"]` 标识当前问答入口。
 
 ### 1.2 框架组件取舍
 
-本轮对 `QueryFusionRetriever`、`QdrantVectorStore` 和框架内置 Response Synthesizer 做过边界评估，
-暂不替换现有领域实现：
+统一框架生命周期不要求更换已有检索算法和存储协议：
 
 | 候选组件 | 当前结论 | 原因 |
 | --- | --- | --- |
 | `QueryFusionRetriever` | 暂不接入 | 每个查询的 BM25 与向量分支并发执行，多查询依次执行后按计划融合；人物硬过滤、年代覆盖与 RRF 已由领域实现统一处理，再套一层通用融合会重复计分并改变已有评测语义。 |
 | `QdrantVectorStore` | 暂不接管存储 | 索引使用稳定 chunk UUID、完整可回填 `SearchHit` 的 payload、服务 collection 的原子 alias 切换及专用过滤。当前保留领域适配器；框架存储适配迁移应单独评估。 |
-| Response Synthesizer | 暂不替换 | 项目需要分组摘要、事实级引用 ID、无引用段落删除、一次修复和确定性摘录降级；通用合成器不能直接保留这套失败语义。 |
+| `BaseSynthesizer` | 已由 `HistoryResponseSynthesizer` 实现 | 在框架合成接口内保留分组摘要、稳定引用 ID、无引用段落删除与摘录降级；是否修复由主 Workflow 决定。 |
 
 这里的原则不是排斥框架组件，而是只让框架接管具有统一生命周期和可观测性收益的部分。
 当前实际接入的是 `Workflow`、类型化 Event/Context、`QueryBundle`、`BaseRetriever`、证据 Node、
-NodePostprocessor、LLM/CallbackManager、Pydantic 输出解析器和提示词模板。后端存储、领域融合、
+NodePostprocessor、BaseSynthesizer、LLM/CallbackManager、Pydantic 输出解析器和提示词模板。后端存储、领域融合、
 证据约束仍通过明确的扩展接口保留。
 
-### 1.3 篇目全文路由
+### 1.3 篇目全文工具
 
-只有问题同时包含书名号篇名和“全文”“完整原文”等明确标记时才进入全文路由。系统先在
+明确包含书名号篇名和“全文”“完整原文”等标记的请求编译为 `read_source` 任务。系统先在
 `data/processed/structure/*.json` 中精确匹配篇名，再只读取对应文档的 chunk 文件，并按
 章节页码、`section_path` 和 `chunk_index` 恢复正文。若存在同名篇目，优先选择问题中明确
 提到作者的选集来源；仍无法消歧时要求用户补充作者或文献名，不用零散相似片段冒充全文。
 
-全文响应使用 `retrieval_mode=full_text_section` 和 `generator_mode=extractive`，保留篇目起止
-PDF 页码及实际拼接的 chunk 数。统一查询规划在全文路由之前执行；全文读取本身不调用混合召回或答案生成模型。正文不会受普通问答
+单任务全文响应使用 `retrieval_mode=full_text` 和 `generator_mode=extractive`，保留篇目起止
+PDF 页码。全文工具本身不调用混合召回或答案生成模型；复杂计划可以把读取结果用于后续比较与综合。单任务原文交付不会受普通问答
 的 Top-K、420 字引文和 5000-token 生成上限影响；网页只在后续对话历史里截断超长答案，
 当前轮展示的全文不截断。
+
+### 1.4 计划、预算与执行记录
+
+`ResearchPlan` 保存原始问题、语义解释、任务 DAG 和版本；`TaskResult` 保存任务状态、证据 ID、分析结论、缺口、错误及用量。初始规划通过一次模型调用同时生成理解结果和任务，提示词通常限制最多 6 个初始任务，并随显式 Token 上限收紧，为后续取证留下空间。模型输出仍必须通过总计 8 个任务的硬上限、工具白名单、年份/来源/人物约束和无环依赖校验。
+
+调度器同时执行最多 2 个就绪任务，优先取证后分析。工具不可用时，在剩余预算内最多重试一次；这是同一任务的重试，不增加第二个执行器。证据检查可以提出定向补检：结构化时间线无记录或不适用时可增加 `search`，复杂检索问题可按语义覆盖缺口追加检索。交集查询没有共同动作候选不等于两人无交集，也不会自动把宽泛共现替换为已确认交集。
+
+计划最多增补 2 次、全部版本合计最多 8 个任务。增补只追加任务和调整尚未执行的分析任务依赖，不修改用户约束或已执行任务；改为等待补检的分析任务仍保留原分支证据。分析任务已执行但报告具体证据缺口时，在任务槽位和增补预算允许的情况下追加一个 `search` 与一个依赖补检结果的新 `analyze` 任务，保留原分析记录。补检结果再次经过检查，到达上限后交付已有材料和未解决方面，不无限循环。
+
+规划、活动主体检查、证据评估、任务分析、分组摘要、最终综合和一次修复共用请求 deadline（默认 90 秒）以及最多 24 次模型调用预算；排队也计入剩余时间。调用数上限是请求内硬限额，不代表每题都会调用 24 次。没有模型时仍可交付本地证据；服务不可用与没有史料分别报告。取消请求会取消 Workflow 与后续模型调用，部分草稿不写入会话。
+
+响应的 `research_plan` 和 `execution_summary` 提供实际任务图、各任务结果、增补次数、阶段用量、检索调用数及停止原因。`query_plan` 是理解结果，旧 `retrieval_reflection_status`、`retrieval_rounds` 等展示字段仅映射实际执行摘要，不触发旧反思循环。`retrieval_rounds` 当前等于计划版本数，不等于检索任务数；完整缺口见任务结果，旧缺口展示字段最多保留 4 项。模型用量只记录供应商实际返回的数据，不能把缺失用量理解为零消耗。
 
 离线数据流的核心产物如下：
 
@@ -375,11 +394,11 @@ candidate_limit = min(500, max(100, top_k × 20))
 
 ## 7. 查询理解和过滤
 
-启用查询规划且已配置模型时，所有问法先调用 `deepseek-v4-flash` 非思考模式，要求以 JSON 输出：规范问题、意图、实体及其规范名、起止年份、覆盖方式、不可丢弃的约束、结构化/混合检索路线、是否需要澄清，以及最多 8 条短检索表达式。模型只负责理解问题，不回答历史事实；这一阶段不发送新检索的史料，明确追问可携带经过清洗和预算限制的对话历史。
+启用查询规划且已配置模型时，所有问法先调用 `deepseek-v4-flash` 非思考模式，要求以紧凑 JSON 同时输出理解结果与可执行任务。理解结果包含规范问题、意图、实体及其规范名、起止年份、覆盖方式、不可丢弃的约束、结构化/混合检索路线、是否需要澄清，以及确需别名或同义召回时的短检索表达式；任务包含工具、目的、输入和依赖。普通问题通常只需一个取证任务，复杂问题优先拆成少量取证任务及依赖它们的分析任务，不另加一次拆题调用。模型在此阶段不回答历史事实，不接收新检索的史料；明确追问可携带经过清洗和预算限制的对话历史。
 
-计划必须通过本地 Pydantic schema、年份完整性和澄清问题校验。查询规划提示词要求：仅完整年份/年份区间、人物数量符合要求的时间线或交集选择结构化路线；月份、日期、地点、否定、指定文献和命名历史时期选择混合检索。“要求引用、直接原文支持、详细说明”等回答形式不妨碍结构化路线。结构化执行器继续核对意图、人物和年份，但没有另设一套规则完整校验所有自然语言限制，因此仍需在路由评测中检验模型是否遵守这些要求。
+计划必须通过本地 Pydantic schema、年份完整性、澄清问题、任务图和工具参数校验。查询规划提示词要求：仅完整年份/年份区间、人物数量符合要求的时间线或交集选择结构化路线；月份、日期、地点、否定、指定文献和命名历史时期选择混合检索。“要求引用、直接原文支持、详细说明”等回答形式不妨碍结构化路线。编译器禁止语义解释已判定为 hybrid 时安排结构化工具，并校验人物、年份和指定来源不能被任务放宽或凭空增加。自然语言约束的理解仍依赖模型，应在路由评测中检查是否遗漏细约束。
 
-有效计划的规范问题、检索表达式、实体规范名和意图提示会追加到检索串；用户原问题始终原样放在最前面。模型未配置、关闭、超时、限流或返回非法计划时，除独立的全文路由外，系统使用原问题执行混合检索。
+每个任务输入保留原始问题与约束；未显式指定的任务 coverage 和 required_aspects 继承语义计划。任务级查询还可展开已校验的规范名称、意图提示和覆盖查询。模型未配置、关闭、超时、限流或返回非法计划时，按第 1 节规则编译保守计划并继续同一 Workflow；规划输出因 Token 上限截断时也保留已返回用量和失败诊断。
 
 ### 7.1 意图识别
 
@@ -491,15 +510,16 @@ RRF 后再按查询意图增加 0.004：
 | 请求 `QuestionRequest.top_k` | 12 | 合法范围 1—12 |
 | 关键词候选 | 48 | `max(30, 12×4)` |
 | 向量候选 | 48 | 普通查询；满足第 6.3 节条件的时间线会先取更宽池再截为 48 |
-| RRF 后最终命中 | 普通问题最多 12；复杂问题最多 36 | 已经过按页去重、意图过滤与覆盖选择 |
-| 发送给模型的证据 | 与内部最终命中相同 | 超过 12 条时使用分组摘要和最终综合 |
-| API 最终返回引用 | 不超过模型证据数 | 只保留最终答案实际使用的 `[E#]`；`retrieved_evidence_count` 记录内部候选数 |
+| 每个检索任务 RRF 后命中 | 普通覆盖最多 12；扩展覆盖最多 36 | 已经过按页去重、意图过滤与覆盖选择 |
+| 统一综合的证据 | 最多 36 条 | 按任务轮流选择并按稳定 ID 去重，避免一项任务占满上下文；单任务全文交付不限于此 |
+| 分组摘要 | 超过 12 条综合证据时启用 | 分组摘要仍关联原始 `[E#]`；某组摘要失败时保留该组原文 |
+| API 最终返回引用 | 不超过综合证据数 | 只保留最终答案实际使用的 `[E#]`；`retrieved_evidence_count` 记录送入交付阶段的证据数 |
 | 单条证据引文 | 最多 420 字符 | 从 chunk 中裁切 |
 | 生成失败时的摘录条目 | 最多 5 | 即使召回 12 条，降级回答正文也只摘要前 5 条 |
 | DeepSeek 输出上限 | 5000 tokens | 是最大生成量，不是目标长度或最短长度 |
 
 因此，“网页提交 `top_k=12`”不等于系统总是召回或展示 12 条。复杂问题可扩大内部
-证据预算；最终引用只显示答案实际采用的证据；生成彻底失败时，摘录正文固定只使用前
+证据预算，多任务研究也会合并来自不同工具的证据；最终引用只显示答案实际采用的证据；生成彻底失败时，摘录正文固定只使用前
 5 条证据。
 
 ## 10. 证据构造
@@ -512,16 +532,15 @@ RRF 后再按查询意图增加 0.004：
 - 对形如“某人在 1949 年……”的开头实体，若所有命中标题、正文和章节都没有出现该实体，则判为不支持；
 - 门槛不通过时，引用列表为空，不调用答案生成模型；前面的查询规划和证据评估可能已经调用模型。
 
-门槛通过后，最终命中按当前顺序编号为 `E1`、`E2`……，所有选中的命中都会进入模型
-证据包，包括只在向量分支出现的命中。模型回答完成并通过引用校验后，API 的 `citations`
-只返回答案正文实际出现的编号；未采用候选不在页面展示，其总数保留在
-`retrieved_evidence_count` 诊断字段中。
+门槛通过后，工具把实际返回并经过后处理的 Node 注册到请求级 `EvidenceRegistry`。证据按首次注册顺序取得稳定的 `E1`、`E2`……编号，同一来源不会因为补检、任务合并或摘要而重新编号；原文、文献页码、元数据和所属任务一起保留。混合检索、结构化记录与全文读取都使用这一注册表。综合阶段按任务分配最多 36 条证据，包括通过整体门槛后只在向量分支出现的命中；单任务全文不受此限。
+
+分析任务只能引用其依赖任务提供的证据 ID，新增无效编号会被拒绝。其结论是供最终综合核对的研究提纲，不能替代原始史料。模型回答通过引用校验后，API 的 `citations` 只返回正文实际使用的编号；`retrieved_evidence_count` 记录交付阶段可用的证据数量，完整任务取证结果可在 `execution_summary` 中查看。
 
 `evidence_status` 的计算规则是：
 
-- 非交集问题、没有检索分支降级或覆盖缺口，且前 5 条中至少一条同时被关键词和向量命中：`supported`；
-- 其他有证据情况，包括所有交集问题：`partial`；
-- 没有通过证据门槛：`no_evidence`。
+- 研究正常完成、没有未解决任务或检索降级、不是交集问题且未使用结构化候选工具时：完整原文交付，或任一检索任务前 5 条中存在双路命中，可标为 `supported`；
+- 其他有引用情况，包括结构化时间线、交集候选、预算终止或覆盖不完整：`partial`；
+- 最终没有可用引用：`no_evidence`。服务不可用另行返回错误或明确的降级信息，不视为史料不存在。
 
 这个状态表达检索支持强度，不代表史实已经人工核验。它也不是需求基线中五类回答状态的完整实现；`conflicting_sources` 等状态和独立冲突数组尚未成为当前 `AnswerResponse` 的字段。
 
@@ -562,7 +581,9 @@ RRF 后再按查询意图增加 0.004：
 | 整次请求预算 | 90 秒，涵盖规划、检索相关模型调用与生成 |
 | 网页会话上下文 | 默认最多 12 条、合计 12,000 字符，仅明确追问时进入模型提示词 |
 
-查询理解器默认使用 `deepseek-v4-flash`、关闭 thinking、JSON Output、`max_tokens=700`、超时 20 秒，使用同一份受限对话上下文。API 最终结果通过 `query_plan`、`query_planner_status`、`query_planner_model`、`query_planner_usage` 和 `query_planner_error_code` 暴露规划结果与诊断；答案生成的用量仍单独记录在 `llm_usage`。
+查询规划器默认使用 `deepseek-v4-flash`、关闭 thinking、JSON Output、`max_tokens=2000`、超时 20 秒，使用同一份受限对话上下文。2000 是代码默认值，已有 `.env` 中显式设置的 `HISTORY_AGENT_LLM_QUERY_PLANNER_MAX_TOKENS` 继续生效，不会被重构自动改写。提示词按该上限缩小初始任务数量。API 通过 `research_plan` 与 `execution_summary` 暴露真实计划和执行结果；保留 `query_plan`、`query_planner_status`、模型、用量和错误诊断字段。`llm_usage` 包括答案分组、综合与修复的已返回用量，各阶段完整汇总见 `execution_summary.usage_by_stage`。
+
+证据充分性模型检查仍由 `llm_retrieval_reflection` 控制启用，只对覆盖计划、比较/原因分析等需要检查的问题调用；旧的单轮反思上限配置已删除。增补次数、工具重试和停止统一由主 Workflow 决定，不能在检查器、工具或合成器内部另开循环。
 
 网页提交问题、`top_k=12` 与 `session_id`，由服务从 PostgreSQL 会话库读取历史并按消息数和字符预算构建上下文；浏览器只持久化会话 ID。直接 API 请求可在不传 `session_id` 时提供最多 12 条历史消息。明确指代或省略式追问才会使用历史，旧 `[E#]` 被替换为历史引用标记，历史回答不能充当当前史实证据。单会话最多保留 200 条消息，单条已保存回答最多 10,000 字符。
 
@@ -579,12 +600,14 @@ RRF 后再按查询意图增加 0.004：
 
 网页调用 `POST /api/questions/stream`，后端以 Server-Sent Events 返回：
 
-- `status`：检索、生成、核查、后台补引用等阶段状态；
+- `status`：规划、具体任务执行、计划增补、综合、核查和后台修复等阶段状态；
 - `delta`：DeepSeek 第一版回答的增量文本；
 - `done`：经过引用核查的权威最终 `AnswerResponse`；
 - `error`：检索或服务异常。
 
-当前引用修复的第二次模型输出在后台完成，不重新流式展示，也不清空第一版草稿。收到 `done` 后，前端用最终答案整体替换生成中的草稿，因此最终文本仍可能因修复、删段或降级而变短或发生变化。
+需要模型修复时，合成器关闭修复调用的 `delta` 转发，后台输出不会逐字展示，也不会发送清空第一版草稿的事件；阶段状态仍会更新。收到 `done` 后，前端用最终答案整体替换生成中的草稿，因此最终文本仍可能因修复、删段或降级而变短或发生变化。
+
+普通 `POST /api/questions` 与 SSE 订阅同一异步 Workflow 和合成实现；普通接口等待最终结果，SSE 额外转发执行进度与草稿。两者执行相同的计划校验、任务规则、证据选择、修复和交付规则。
 
 前端用 Marked 按 GFM 和换行模式解析 Markdown，再用 DOMPurify 白名单清洗。支持标题、粗体、斜体、删除线、列表、引用、代码块、链接和表格；链接只保留 `http`、`https` 和 `mailto` 协议。
 
@@ -608,12 +631,11 @@ RRF 后再按查询意图增加 0.004：
 第一版回答出现 `uncited_core_claim` 时，系统会：
 
 1. 尝试按 Markdown 源码行删除缺少引用的事实块；
-2. 对删段后的答案重新完整校验，只有再次通过才保留为安全候选；
-3. 把第一版答案和缺引用语句发回 DeepSeek，要求只修引用或删除无证据事实；
-4. 校验修复版；
-5. 如果删段版和修复版都有效，选择文本更长的版本。
+2. 重新校验删段结果；若引用有效且没有时间线年份歧义，直接采用，记录 `removed_uncited_claims`，不再调用模型补写；
+3. 若删段无法保留有效答案，返回包含原草稿和缺引用语句的修复建议；若删段结果仍有年份歧义，则提出年份修复建议；
+4. Workflow 在剩余预算内决定是否执行这一次修复，并对修复版再次校验。修复失败时不再生成新的修复建议。
 
-修复只尝试一次。无效证据编号、文献/页码不匹配、流中断、超时、鉴权失败、token 用尽等错误不会无限重试。
+第一版引用格式已通过但存在时间线年份歧义，或校验发现引用日期不一致时，也可提出相应的时间修复建议。系统不同时生成删段版和修复版后比较长度。合成器只返回建议，Workflow 在剩余请求预算内最多执行一次修复；普通响应与 SSE 遵循同一规则。无效证据编号、文献/页码不匹配、流中断、超时、鉴权失败、Token 用尽等其他错误直接返回失败诊断，不启动无限重试。
 
 ### 12.3 证据摘录降级
 
@@ -711,14 +733,21 @@ uv run start1921 eval answers --top-k 10
 | 章节结构恢复 | `app/history_agent/processing/structure.py` |
 | 分片和元数据 | `app/history_agent/processing/chunks.py` |
 | 关键词入口、分词与 PostgreSQL BM25 | `app/history_agent/retrieval/keyword.py`、`keyword_common.py`、`keyword_postgres.py` |
-| LLM 查询理解与安全降级 | `app/history_agent/answering/query_understanding.py` |
+| 一次 LLM 理解与研究规划 | `app/history_agent/answering/query_understanding.py` |
+| 计划契约、编译及约束校验 | `app/history_agent/answering/models.py`、`planning.py` |
+| 唯一问答编排与有界增补 | `app/history_agent/answering/llamaindex_workflow.py` |
+| 取证与分析工具 | `app/history_agent/answering/task_executor.py` |
+| LlamaIndex 检索及 Node 适配 | `app/history_agent/retrieval/llamaindex.py` |
 | 向量索引与召回 | `app/history_agent/retrieval/vector.py` |
 | RRF、按页去重、时间覆盖 | `app/history_agent/retrieval/hybrid.py` |
 | 篇目全文读取与拼接 | `app/history_agent/answering/full_text.py` |
-| 证据构造与同步生成 | `app/history_agent/answering/service.py` |
-| 流式生成与修复 | `app/history_agent/answering/streaming.py` |
+| 稳定证据 ID、原文与 Node 注册 | `app/history_agent/answering/evidence.py` |
+| BaseSynthesizer、分组综合与修复建议 | `app/history_agent/answering/synthesis.py` |
+| 统一答案状态、引用与执行诊断交付 | `app/history_agent/answering/delivery.py` |
+| 普通响应 / SSE 适配 | `app/history_agent/answering/service.py`、`streaming.py` |
+| 共享模型适配与请求预算 | `app/history_agent/answering/llamaindex_llm.py`、`runtime.py` |
 | 引用校验与删段 | `app/history_agent/answering/validation.py` |
-| 结构化问答路由 | `app/history_agent/answering/structured.py` |
+| 结构化候选证据收集 | `app/history_agent/answering/structured.py` |
 | 会话持久化与上下文预算 | `app/history_agent/answering/context.py` |
 | Web API | `app/history_agent/web/app.py` |
 | 前端流式与 Markdown | `app/history_agent/web/static/app.js`、`markdown.js` |

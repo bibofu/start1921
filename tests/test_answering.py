@@ -1,3 +1,5 @@
+import asyncio
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -5,34 +7,93 @@ from typing import Any
 import httpx
 import pytest
 from fastapi.testclient import TestClient
-from history_agent.answering import service as service_module
+from history_agent.answering import synthesis as synthesis_module
+from history_agent.answering.delivery import deliver_answer
+from history_agent.answering.evidence import EvidenceRegistry
+from history_agent.answering.evidence import quote_for_hit as _quote_for_hit
+from history_agent.answering.evidence import (
+    unsupported_leading_entity as _unsupported_leading_entity,
+)
 from history_agent.answering.llamaindex_llm import DeepSeekLlamaIndexLLM
 from history_agent.answering.models import (
     AnswerResponse,
     Citation,
     ConversationMessage,
+    ExecutionSummary,
+    QueryPlan,
     QuestionRequest,
+    ResearchPlan,
+    ResearchTask,
+    TaskResult,
 )
-from history_agent.answering.query_understanding import QueryExecution
-from history_agent.answering.service import (
-    AnswerContext,
+from history_agent.answering.query_understanding import QueryExecution, QueryPlanningResult
+from history_agent.answering.synthesis import (
+    HistoryResponseSynthesizer,
     LLMResult,
     _extractive_answer,
-    _finish_answer,
     _has_ambiguous_timeline_years,
-    _llm_answer,
-    _quote_for_hit,
-    _retrieval_limit,
-    _unsupported_leading_entity,
 )
+from history_agent.answering.task_executor import HistoryTaskExecutor
 from history_agent.answering.validation import (
     remove_uncited_claim_blocks,
     validate_grounded_answer,
 )
 from history_agent.config import Settings
-from history_agent.retrieval.models import RetrievalPlan, SearchHit
+from history_agent.retrieval.models import RetrievalPlan, SearchHit, SearchResponse
 from history_agent.web import app as web_module
 from llama_index.core.llms import LLM
+from llama_index.core.schema import NodeWithScore, TextNode
+
+
+def _install_completion_provider(monkeypatch: Any, complete: Any) -> None:
+    """Expose fixture completions through the real async streaming transport."""
+    original = httpx.AsyncClient
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        response = complete(str(request.url), json=payload, headers=dict(request.headers))
+        data = response.json()
+        choice = data["choices"][0]
+        wire = {
+            "choices": [
+                {
+                    "delta": {"content": choice["message"]["content"]},
+                    "finish_reason": choice.get("finish_reason", "stop"),
+                }
+            ],
+            "usage": data.get("usage"),
+        }
+        body = "data: " + json.dumps(wire, ensure_ascii=False) + "\n\ndata: [DONE]\n\n"
+        return httpx.Response(response.status_code, content=body.encode())
+
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kwargs: original(transport=httpx.MockTransport(handle), **kwargs),
+    )
+
+
+def _synthesize_answer(
+    *,
+    settings: Settings,
+    request: QuestionRequest,
+    citations: list[Citation],
+    allow_repair: bool = False,
+) -> LLMResult:
+    async def run() -> LLMResult:
+        synthesizer = HistoryResponseSynthesizer(settings)
+        nodes = [
+            NodeWithScore(node=TextNode(id_=item.evidence_id, text=item.quote))
+            for item in citations
+        ]
+        await synthesizer.asynthesize(request.question, nodes, request=request, citations=citations)
+        if allow_repair and synthesizer.last_result.repair_payload:
+            return await synthesizer.repair_once(
+                request, citations, synthesizer.last_result, nodes=nodes
+            )
+        return synthesizer.last_result
+
+    return asyncio.run(run())
 
 
 def _citation(quote: str = "【1956年1月】参加会议并讨论科学规划。") -> Citation:
@@ -70,26 +131,31 @@ def test_final_response_only_exposes_citations_used_by_answer() -> None:
     citations = [
         _citation().model_copy(update={"evidence_id": f"E{index}"}) for index in range(1, 4)
     ]
-    retrieval = service_module.SearchResponse(
-        query="习仲勋在1921—1949年党内职务的变化",
-        query_intent="timeline",
-        query_terms=["习仲"],
-        query_years=[],
-        query_year_range=[1921, 1949],
-        query_people=["习仲勋"],
-        document_filters=[],
-        include_out_of_scope=False,
-        hits=[],
+    question = "习仲勋在1921—1949年党内职务的变化"
+    interpretation = QueryPlan(normalized_question=question)
+    task = ResearchTask(task_id="search", tool="search", objective=question, query=question)
+    plan = ResearchPlan(question=question, interpretation=interpretation, tasks=[task])
+    summary = ExecutionSummary(
+        run_id="test",
+        plan=plan,
+        task_results=[
+            TaskResult(
+                task_id=task.task_id,
+                tool=task.tool,
+                status="completed",
+                evidence_ids=["E1", "E2", "E3"],
+            )
+        ],
     )
-    context = AnswerContext(retrieval, citations, "partial", None)
-
-    result = _finish_answer(
+    result = deliver_answer(
         Settings(_env_file=None, llm_api_key="sk-test"),
-        QuestionRequest(question=retrieval.query),
-        context,
+        QuestionRequest(question=question),
+        QueryPlanningResult(interpretation, "used"),
+        summary,
+        citations,
         LLMResult("1945年，习仲勋任西北中央局书记。[E2]"),
+        unresolved=[],
     )
-
     assert [citation.evidence_id for citation in result.citations] == ["E2"]
     assert result.retrieved_evidence_count == 3
 
@@ -209,21 +275,40 @@ def test_question_request_rejects_unbounded_history() -> None:
     assert request.history == []
 
 
-def test_complex_coverage_expands_internal_retrieval_budget() -> None:
-    request = QuestionRequest(question="梳理长期经历", top_k=12)
-    balanced = QueryExecution(
-        request.question,
-        ("前期", "中期", "后期"),
-        RetrievalPlan(query_intent="timeline", coverage="balanced_period"),
-    )
-    many_items = QueryExecution(
-        request.question,
-        tuple(f"项目{index}" for index in range(20)),
-        RetrievalPlan(query_intent="comparison", coverage="per_item"),
-    )
+def test_complex_coverage_expands_internal_retrieval_budget(monkeypatch: Any) -> None:
+    from test_retrieval import _response
 
-    assert _retrieval_limit(request, balanced) == 24
-    assert _retrieval_limit(request, many_items) == 36
+    request = QuestionRequest(question="梳理长期经历", top_k=12)
+    limits = []
+
+    def search(**kwargs: Any) -> SearchResponse:
+        limits.append(kwargs["top_k"])
+        return _response([])
+
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", search)
+    for coverage, queries in (
+        ("balanced_period", ("前期", "中期", "后期")),
+        ("per_item", tuple(f"项目{i}" for i in range(20))),
+    ):
+        execution = QueryExecution(
+            request.question, queries, RetrievalPlan(query_intent="timeline", coverage=coverage)
+        )
+        monkeypatch.setattr(
+            "history_agent.answering.task_executor.query_execution",
+            lambda *a, value=execution: value,
+        )
+        executor = HistoryTaskExecutor(
+            Settings(_env_file=None, llm_api_key=None), request, EvidenceRegistry()
+        )
+        task = ResearchTask(
+            task_id="search",
+            tool="search",
+            objective=request.question,
+            query=request.question,
+            coverage=coverage,
+        )
+        asyncio.run(executor.execute(task, []))
+    assert limits == [24, 36]
 
 
 def test_intersection_quote_keeps_the_complete_interaction_after_long_background() -> None:
@@ -354,9 +439,9 @@ def test_deepseek_v4_request_and_usage(monkeypatch: Any) -> None:
             },
         )
 
-    monkeypatch.setattr(httpx, "post", fake_post)
+    _install_completion_provider(monkeypatch, fake_post)
     settings = Settings(_env_file=None, llm_api_key="sk-test", llm_thinking=True)
-    result = _llm_answer(
+    result = _synthesize_answer(
         settings=settings,
         request=QuestionRequest(question="周恩来在1956年做了什么？"),
         citations=[_citation()],
@@ -397,8 +482,8 @@ def test_generation_only_receives_history_for_referential_questions(
             json={"choices": [{"message": {"content": "回答。[E1]"}}]},
         )
 
-    monkeypatch.setattr(httpx, "post", fake_post)
-    _llm_answer(
+    _install_completion_provider(monkeypatch, fake_post)
+    _synthesize_answer(
         settings=Settings(_env_file=None, llm_api_key="sk-test"),
         request=QuestionRequest(
             question=question,
@@ -421,9 +506,9 @@ def test_deepseek_rejects_unknown_evidence_marker(monkeypatch: Any) -> None:
             json={"choices": [{"message": {"content": "错误引用。[E99]"}}]},
         )
 
-    monkeypatch.setattr(httpx, "post", fake_post)
+    _install_completion_provider(monkeypatch, fake_post)
     settings = Settings(_env_file=None, llm_api_key="sk-test")
-    result = _llm_answer(
+    result = _synthesize_answer(
         settings=settings,
         request=QuestionRequest(question="周恩来在1956年做了什么？"),
         citations=[_citation()],
@@ -539,13 +624,14 @@ def test_year_heading_carries_context_for_cross_year_timeline_items() -> None:
 
     assert validate_grounded_answer(answer, [citation]).valid is True
     assert _has_ambiguous_timeline_years(request, answer) is False
-    assert _has_ambiguous_timeline_years(
-        request, "- 彭德怀担任红一方面军司令员。[E1]"
-    ) is True
-    assert _has_ambiguous_timeline_years(
-        request,
-        "## 1935年主要经历\n\n- 11月4日部署行动。[E1]\n- 5月上旬拒绝任职。[E1]",
-    ) is True
+    assert _has_ambiguous_timeline_years(request, "- 彭德怀担任红一方面军司令员。[E1]") is True
+    assert (
+        _has_ambiguous_timeline_years(
+            request,
+            "## 1935年主要经历\n\n- 11月4日部署行动。[E1]\n- 5月上旬拒绝任职。[E1]",
+        )
+        is True
+    )
 
 
 def test_deepseek_repairs_date_that_disagrees_with_evidence(monkeypatch: Any) -> None:
@@ -565,14 +651,15 @@ def test_deepseek_repairs_date_that_disagrees_with_evidence(monkeypatch: Any) ->
             json={"choices": [{"message": {"content": next(answers)}}]},
         )
 
-    monkeypatch.setattr(httpx, "post", fake_post)
+    _install_completion_provider(monkeypatch, fake_post)
     citation = _citation("11月3日，彭德怀被任命为红一方面军司令员。").model_copy(
         update={"year_mentions": [1935]}
     )
-    result = _llm_answer(
+    result = _synthesize_answer(
         settings=Settings(_env_file=None, llm_api_key="sk-test"),
         request=QuestionRequest(question="彭德怀在1935年的主要经历"),
         citations=[citation],
+        allow_repair=True,
     )
 
     assert result.answer == "1935年11月3日，彭德怀被任命为司令员。[E1]"
@@ -604,9 +691,9 @@ def test_deepseek_removes_uncited_block_without_repair_round_trip(
             },
         )
 
-    monkeypatch.setattr(httpx, "post", fake_post)
+    _install_completion_provider(monkeypatch, fake_post)
     settings = Settings(_env_file=None, llm_api_key="sk-test")
-    result = _llm_answer(
+    result = _synthesize_answer(
         settings=settings,
         request=QuestionRequest(question="周恩来在1956年做了什么？"),
         citations=[_citation()],
@@ -621,7 +708,7 @@ def test_deepseek_removes_uncited_block_without_repair_round_trip(
 def test_many_evidence_chunks_use_parallel_map_and_final_reduce(monkeypatch: Any) -> None:
     calls: list[tuple[str, int]] = []
 
-    def complete(
+    async def complete(
         settings: Settings,
         request_payload: dict[str, object],
         runtime: object = None,
@@ -632,21 +719,18 @@ def test_many_evidence_chunks_use_parallel_map_and_final_reduce(monkeypatch: Any
         calls.append((content, int(request_payload["max_tokens"])))
         markers = list(dict.fromkeys(re.findall(r"\[E\d+\]", content)))
         if "分组证据经逐组引用校验" in content:
-            return service_module.LLMResult(
-                answer=f"最终综合结论。{''.join(markers)}", usage={"total_tokens": 1}
-            )
-        return service_module.LLMResult(
-            answer=f"本组局部结论。{''.join(markers)}", usage={"total_tokens": 1}
-        )
+            yield LLMResult(answer=f"最终综合结论。{''.join(markers)}", usage={"total_tokens": 1})
+            return
+        yield LLMResult(answer=f"本组局部结论。{''.join(markers)}", usage={"total_tokens": 1})
 
-    monkeypatch.setattr(service_module, "_request_deepseek_completion", complete)
+    monkeypatch.setattr(synthesis_module, "_stream_completion", complete)
     citations = [
         _citation().model_copy(
             update={"evidence_id": f"E{index}", "quote": f"第{index}条可核验史料。"}
         )
         for index in range(1, 26)
     ]
-    result = _llm_answer(
+    result = _synthesize_answer(
         settings=Settings(_env_file=None, llm_api_key="sk-test"),
         request=QuestionRequest(question="跨阶段梳理这些材料"),
         citations=citations,
@@ -706,8 +790,8 @@ def test_deepseek_prefers_valid_salvage_over_repair_round_trip(monkeypatch: Any)
             json=next(responses),
         )
 
-    monkeypatch.setattr(httpx, "post", fake_post)
-    result = _llm_answer(
+    _install_completion_provider(monkeypatch, fake_post)
+    result = _synthesize_answer(
         settings=Settings(_env_file=None, llm_api_key="sk-test"),
         request=QuestionRequest(question="周恩来在1956年做了什么？"),
         citations=[_citation()],

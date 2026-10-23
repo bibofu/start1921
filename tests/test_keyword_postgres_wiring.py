@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi.testclient import TestClient
-from history_agent.answering.llamaindex_workflow import _search_kwargs
+from history_agent.answering.task_executor import search_kwargs as _search_kwargs
 from history_agent.config import Settings
 from history_agent.errors import RetrievalError
 from history_agent.evaluation import answers, golden

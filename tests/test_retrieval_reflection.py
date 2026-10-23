@@ -5,17 +5,17 @@ from typing import Any
 
 import httpx
 from history_agent.answering.models import QueryEntity, QueryPlan, QuestionRequest
-from history_agent.answering.query_understanding import QueryExecution, QueryPlanningResult
+from history_agent.answering.query_understanding import QueryPlanningResult
 from history_agent.answering.retrieval_reflection import (
     EvidenceAssessment,
     ReflectionResult,
     assess_retrieval,
     should_reflect,
 )
-from history_agent.answering.service import _retrieve_context
+from history_agent.answering.service import answer_question
 from history_agent.config import Settings
 from history_agent.errors import RetrievalError
-from history_agent.retrieval.models import RetrievalPlan, SearchHit, SearchResponse
+from history_agent.retrieval.models import SearchHit, SearchResponse
 
 
 def _hit(chunk_id: str, text: str, *, rank: int = 1) -> SearchHit:
@@ -154,20 +154,15 @@ def test_reflection_accepts_sufficient_first_pass(monkeypatch: Any) -> None:
     assert result.followup_queries == ()
 
 
-def test_retrieve_context_merges_one_retry_without_discarding_first_pass(
+def test_workflow_supplement_preserves_original_evidence_and_records_task_provenance(
     monkeypatch: Any,
 ) -> None:
     plan = _plan()
     planning = QueryPlanningResult(plan, "used")
-    execution = QueryExecution(
-        "详细介绍淮海战役",
-        (),
-        RetrievalPlan(query_intent="event_overview"),
-    )
     initial = _response([_hit("initial", "首轮背景材料。")])
     retry = _response(
         [
-            _hit("initial", "重复材料。"),
+            _hit("initial", "首轮背景材料。"),
             _hit("result", "补充的战役结果材料。", rank=2),
         ],
         query="淮海战役 战役结果",
@@ -176,56 +171,61 @@ def test_retrieve_context_merges_one_retry_without_discarding_first_pass(
     calls: list[str] = []
 
     monkeypatch.setattr(
-        "history_agent.answering.service.query_execution", lambda *args: execution
+        "history_agent.answering.llamaindex_workflow.plan_question", lambda *args: planning
     )
 
     def search(**kwargs: Any) -> SearchResponse:
         calls.append(kwargs["query"])
         return next(responses)
 
-    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", search)
-    monkeypatch.setattr(
-        "history_agent.answering.service.assess_retrieval",
-        lambda *args: ReflectionResult(
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", search)
+    assessments = iter([
+        ReflectionResult(
             "retry",
             EvidenceAssessment(
-                sufficient=False,
-                covered_aspects=["背景"],
-                missing_aspects=["战役结果"],
+                sufficient=False, covered_aspects=["背景"], missing_aspects=["战役结果"],
                 reason="缺少结果",
             ),
-            ("淮海战役 战役结果",),
-            {"total_tokens": 50},
+            ("淮海战役 战役结果",), {"total_tokens": 50},
         ),
+        ReflectionResult(
+            "sufficient", EvidenceAssessment(
+                sufficient=True, covered_aspects=["背景", "战役结果"], reason="已经覆盖",
+            ), usage={"total_tokens": 30},
+        ),
+    ])
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.assess_retrieval",
+        lambda *args: next(assessments),
     )
 
-    context = _retrieve_context(
+    answer = answer_question(
         Settings(_env_file=None),
         QuestionRequest(question="详细介绍淮海战役"),
-        planning,
     )
 
-    assert calls == ["详细介绍淮海战役", "淮海战役 战役结果"]
-    assert [hit.chunk_id for hit in context.retrieval.hits] == ["initial", "result"]
-    assert context.retrieval.retrieval_mode == "planned_hybrid_rrf_refined"
-    assert context.reflection_status == "retried"
-    assert context.retrieval_rounds == 2
-    assert context.missing_aspects == ("战役结果",)
-    assert context.reflection_usage == {"total_tokens": 50}
-    assert [citation.evidence_id for citation in context.citations] == ["E1", "E2"]
+    assert calls[0] == "详细介绍淮海战役"
+    assert calls[1].startswith("淮海战役 战役结果")
+    assert "详细介绍淮海战役" in calls[1]
+    summary = answer.execution_summary
+    assert summary is not None
+    assert summary.replan_count == 1
+    assert summary.retrieval_calls == 2
+    assert summary.stopped_reason == "completed"
+    assert summary.plan.tasks[1].depends_on == [summary.plan.tasks[0].task_id]
+    assert summary.task_results[0].evidence_ids == ["E1"]
+    assert summary.task_results[1].evidence_ids == ["E1", "E2"]
+    assert summary.usage_by_stage["assessment"] == {"total_tokens": 80}
+    assert [citation.evidence_id for citation in answer.citations] == ["E1", "E2"]
+    assert "首轮背景材料" in answer.citations[0].quote
 
 
-def test_failed_retry_keeps_first_pass_evidence(monkeypatch: Any) -> None:
+def test_failed_supplement_keeps_first_pass_evidence_and_marks_incomplete(monkeypatch: Any) -> None:
     planning = QueryPlanningResult(_plan(), "used")
-    execution = QueryExecution(
-        "详细介绍淮海战役",
-        (),
-        RetrievalPlan(query_intent="event_overview"),
-    )
     calls = 0
 
     monkeypatch.setattr(
-        "history_agent.answering.service.query_execution", lambda *args: execution
+        "history_agent.answering.llamaindex_workflow.plan_question", lambda *args: planning
     )
 
     def search(**kwargs: Any) -> SearchResponse:
@@ -235,9 +235,9 @@ def test_failed_retry_keeps_first_pass_evidence(monkeypatch: Any) -> None:
             return _response([_hit("initial", "首轮可用材料。")])
         raise RetrievalError("retry failed")
 
-    monkeypatch.setattr("history_agent.answering.service.search_hybrid_index", search)
+    monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", search)
     monkeypatch.setattr(
-        "history_agent.answering.service.assess_retrieval",
+        "history_agent.answering.llamaindex_workflow.assess_retrieval",
         lambda *args: ReflectionResult(
             "retry",
             EvidenceAssessment(
@@ -250,14 +250,21 @@ def test_failed_retry_keeps_first_pass_evidence(monkeypatch: Any) -> None:
         ),
     )
 
-    context = _retrieve_context(
+    answer = answer_question(
         Settings(_env_file=None),
         QuestionRequest(question="详细介绍淮海战役"),
-        planning,
     )
 
-    assert calls == 2
-    assert [hit.chunk_id for hit in context.retrieval.hits] == ["initial"]
-    assert context.reflection_status == "fallback"
-    assert context.retrieval_rounds == 1
-    assert context.reflection_error_code == "retry_retrieval_failed"
+    # The failed tool call gets one bounded transport/service retry, while the
+    # research plan still contains only one supplemental evidence task.
+    assert calls == 3
+    summary = answer.execution_summary
+    assert summary is not None
+    assert summary.stopped_reason == "insufficient_evidence"
+    assert summary.replan_count == 1
+    assert summary.retrieval_calls == 3
+    assert summary.task_results[0].evidence_ids == ["E1"]
+    assert summary.task_results[1].status == "unavailable"
+    assert summary.task_results[1].error_code == "RetrievalError"
+    assert [citation.evidence_id for citation in answer.citations] == ["E1"]
+    assert answer.evidence_status == "partial"

@@ -15,7 +15,7 @@ from llama_index.core import QueryBundle
 from llama_index.core.callbacks import CallbackManager
 from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.retrievers import BaseRetriever
-from llama_index.core.schema import NodeWithScore, TextNode
+from llama_index.core.schema import MetadataMode, NodeWithScore, TextNode
 
 from history_agent.retrieval.models import SearchHit, SearchResponse
 
@@ -34,9 +34,13 @@ def search_hit_to_node(hit: SearchHit) -> NodeWithScore:
         id_=hit.chunk_id,
         text=hit.text,
         metadata={
+            "filename": hit.filename,
+            "volume": hit.volume,
             "document_id": hit.document_id,
             "title": hit.title,
             "source_type": hit.source_type,
+            "verification_status": hit.verification_status,
+            "extraction_methods": hit.extraction_methods,
             "pdf_page_start": hit.pdf_page_start,
             "pdf_page_end": hit.pdf_page_end,
             "section_path": hit.section_path,
@@ -56,9 +60,19 @@ def node_to_search_hit(node: NodeWithScore, rank: int) -> SearchHit:
     raw = node.node.metadata.get("history_agent_hit")
     if not isinstance(raw, dict):
         raise ValueError("LlamaIndex node is missing history_agent_hit metadata")
-    return SearchHit.model_validate(raw).model_copy(
-        update={"rank": rank, "score": node.score if node.score is not None else raw["score"]}
+    # Nodes are authoritative after postprocessing. The saved payload carries
+    # retrieval-only fields, not a second copy of the authoritative text.
+    payload = dict(raw)
+    for key in SearchHit.model_fields:
+        if key in node.node.metadata and key not in {"rank", "score", "text", "chunk_id"}:
+            payload[key] = node.node.metadata[key]
+    payload.update(
+        chunk_id=node.node.node_id,
+        text=node.node.get_content(metadata_mode=MetadataMode.NONE),
+        rank=rank,
+        score=node.score if node.score is not None else raw["score"],
     )
+    return SearchHit.model_validate(payload)
 
 
 class HistoryHybridRetriever(BaseRetriever):

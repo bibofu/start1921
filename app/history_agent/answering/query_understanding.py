@@ -21,7 +21,8 @@ from history_agent.answering.llamaindex_llm import (
     chat_messages,
     response_usage,
 )
-from history_agent.answering.models import QueryEntity, QueryPlan, QuestionRequest
+from history_agent.answering.models import QueryEntity, QueryPlan, QuestionRequest, ResearchPlan
+from history_agent.answering.planning import compile_research_plan
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.answering.time_ranges import parse_relative_year_range
 from history_agent.config import Settings
@@ -30,7 +31,7 @@ from history_agent.processing.chunks import load_person_aliases
 from history_agent.retrieval.keyword import PERIOD_RANGES
 from history_agent.retrieval.models import RetrievalPlan
 
-PROMPT_VERSION = "query-understanding-v2"
+PROMPT_VERSION = "research-plan-v1"
 INTENT_HINTS = {
     "timeline": "经历 活动 时间线",
     "intersection": "交集 共同活动 人物关系",
@@ -57,6 +58,7 @@ class QueryPlanningResult:
     model_name: str | None = None
     usage: dict[str, int] | None = None
     error_code: str | None = None
+    research_plan: ResearchPlan | None = None
 
 
 @dataclass(frozen=True)
@@ -67,6 +69,10 @@ class QueryExecution:
 
 
 def _messages(settings: Settings, request: QuestionRequest) -> list[dict[str, str]]:
+    # Keep the configured token ceiling authoritative. The task ceiling reserves
+    # capacity for later evidence-driven additions instead of spending all eight
+    # graph slots before any source has been observed.
+    initial_task_limit = min(6, max(1, (settings.llm_query_planner_max_tokens - 250) // 150))
     schema = {
         "intent": (
             "general|event_overview|timeline|intersection|viewpoint|observation|comparison|"
@@ -88,9 +94,16 @@ def _messages(settings: Settings, request: QuestionRequest) -> list[dict[str, st
         "constraints": ["不能在检索时丢弃的月份、地点、否定、来源等限制"],
         "needs_clarification": False,
         "clarification_question": None,
+        "tasks": [
+            {
+                "task_id": "task_1", "tool": "search",
+                "objective": "本任务要取得的证据", "query": "简短的检索或分析输入",
+                "depends_on": [],
+            }
+        ],
     }
     system = (
-        "你是中国近现代史本地知识库的查询理解器，不回答历史问题。"
+        "你是中国近现代史本地知识库的查询理解与研究规划器，不回答历史问题。"
         "把用户的自然语言问题转换为严格JSON，禁止输出JSON之外的文字。"
         "识别简称、别名、隐含意图、时间范围、序数范围、逐年/逐项/分阶段覆盖要求和多轮指代。"
         "normalized_question必须保留用户所有明确约束，不能删除月份、地点、否定、比较对象或来源要求。"
@@ -113,6 +126,24 @@ def _messages(settings: Settings, request: QuestionRequest) -> list[dict[str, st
         "intent必须设为out_of_scope，needs_clarification设为false，search_queries留空。"
         "若问题以范围内的人物、事件或文献为主体，只是顺带提及范围外背景，则按范围内的"
         "意图正常规划，不要标记out_of_scope。"
+        "同时在tasks给出可执行计划，不再另行调用模型拆题。"
+        "普通问题只需一个取证任务；明确比较、跨阶段或前后依赖问题可拆分。"
+        f"本次输出最多{settings.llm_query_planner_max_tokens} tokens，"
+        f"初始计划最多{initial_task_limit}个任务，留出后续按证据增补的任务空间。"
+        "复杂问题优先两个取证任务加一个比较分析任务，不必把每个细节单独拆题。"
+        "tool只能是search、timeline、intersection、read_source、analyze；禁止其他工具或任意代码。"
+        "search做混合检索；timeline查一位人物的结构化时间线；intersection查两人共同动作；"
+        "read_source读取明确篇目或原文；analyze只分析其depends_on任务已有证据，不查外部知识。"
+        "只有满足structured路由条件时才使用timeline/intersection，并填person_names和起止年份。"
+        "analyze必须依赖先前取证任务，其他有依赖的任务也填写depends_on。"
+        "每个任务只输出task_id、tool、简短objective、query和depends_on以及确有需要的过滤字段；"
+        "额外字段只允许person_names、start_year、end_year、source_title、coverage、required_aspects。"
+        "document_ids不要填写，由程序按本地目录解析来源；source_title只能使用问题明说的书篇名。"
+        "不得增加无依据的人物、年份或放宽用户的月份、来源、地点、否定限制。"
+        "范围外或需要澄清时tasks留空；不要为简单问题额外添加分析、总结或检查任务。"
+        "输出紧凑JSON；省略null、空数组和默认值字段，normalized_question和tasks必须保留。"
+        "任务objective和query各用简短短语，无需重复原问题；程序自动继承原问题约束。"
+        "search_queries只在确需别名或同义召回时输出，避免重复任务query。"
         f"输出字段示意：{json.dumps(schema, ensure_ascii=False)}"
     )
     history_items = request.history if requires_conversation_context(request.question) else []
@@ -288,8 +319,13 @@ def plan_question(
     budget: RequestBudget | None = None,
 ) -> QueryPlanningResult:
     if not settings.llm_query_planning or not settings.llm_enabled:
-        return QueryPlanningResult(None, "disabled")
+        return QueryPlanningResult(
+            None, "disabled", research_plan=compile_research_plan(
+                request.question, None, settings.person_aliases_path,
+            ),
+        )
     assert settings.llm_api_key is not None
+    usage: dict[str, int] | None = None
     try:
         timeout = (
             budget.timeout(settings.llm_query_planner_timeout_seconds)
@@ -310,16 +346,22 @@ def plan_question(
             runtime=runtime,
             model=settings.llm_query_planner_model,
             timeout_seconds=timeout,
+            budget=budget,
         ).chat(
             chat_messages(request_payload),
             request_payload=request_payload,
         )
+        usage = response_usage(response)
         if response.additional_kwargs.get("finish_reason") == "length":
             return QueryPlanningResult(
                 None,
                 "fallback",
                 settings.llm_query_planner_model,
+                usage=usage,
                 error_code="max_tokens_exhausted",
+                research_plan=compile_research_plan(
+                    request.question, None, settings.person_aliases_path,
+                ),
             )
         plan = _normalize_coverage(
             _guard_plan_against_history(
@@ -328,19 +370,29 @@ def plan_question(
                 _validated_plan(response.message.content or ""),
             )
         )
+        research_plan = compile_research_plan(request.question, plan, settings.person_aliases_path)
         return QueryPlanningResult(
-            plan,
+            research_plan.interpretation,
             "used",
             settings.llm_query_planner_model,
-            response_usage(response),
+            usage,
+            research_plan=research_plan,
         )
     except httpx.HTTPError as exc:
         return QueryPlanningResult(
-            None, "fallback", settings.llm_query_planner_model, error_code=llm_http_error_code(exc)
+            None, "fallback", settings.llm_query_planner_model, usage=usage,
+            error_code=llm_http_error_code(exc),
+            research_plan=compile_research_plan(
+                request.question, None, settings.person_aliases_path,
+            ),
         )
     except (KeyError, IndexError, TypeError, ValueError, ValidationError):
         return QueryPlanningResult(
-            None, "fallback", settings.llm_query_planner_model, error_code="invalid_plan"
+            None, "fallback", settings.llm_query_planner_model, usage=usage,
+            error_code="invalid_plan",
+            research_plan=compile_research_plan(
+                request.question, None, settings.person_aliases_path,
+            ),
         )
 
 

@@ -1,4 +1,4 @@
-"""Bounded LLM reflection over first-pass retrieval coverage."""
+"""Semantic evidence assessment; the research workflow owns all retries."""
 
 from __future__ import annotations
 
@@ -61,7 +61,6 @@ def should_reflect(
 
     if (
         not settings.llm_retrieval_reflection
-        or settings.llm_retrieval_reflection_max_rounds <= 0
         or not settings.llm_enabled
         or plan is None
     ):
@@ -169,7 +168,6 @@ def assess_retrieval(
 
     if (
         not settings.llm_retrieval_reflection
-        or settings.llm_retrieval_reflection_max_rounds <= 0
         or not settings.llm_enabled
     ):
         return ReflectionResult("disabled")
@@ -187,6 +185,7 @@ def assess_retrieval(
         response = DeepSeekLlamaIndexLLM(
             settings=settings,
             runtime=runtime,
+            budget=budget,
             model=settings.llm_model,
             timeout_seconds=timeout,
         ).chat(

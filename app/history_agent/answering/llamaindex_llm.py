@@ -158,6 +158,8 @@ class DeepSeekLlamaIndexLLM(LLM):
         *,
         stream: bool,
     ) -> dict[str, object]:
+        if self._budget is not None:
+            self._budget.consume_call()
         supplied = kwargs.get("request_payload")
         if supplied is not None and not isinstance(supplied, dict):
             raise TypeError("request_payload must be a dictionary")
