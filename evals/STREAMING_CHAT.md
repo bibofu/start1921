@@ -2,13 +2,11 @@
 
 ## 行为
 
-聊天页面改用 `POST /api/questions/stream`。服务端向 DeepSeek 请求真实的 `stream: true` 响应，收到正文增量就通过 SSE 发给浏览器；前端仍解析 UTF-8 和 SSE 帧，但**只缓冲 draft，不渲染正文**，直到 `done` 才展示一次经过引用校验的最终回答。未展示模型的 `reasoning_content`。原有 JSON 问答接口保持兼容，两个入口共用证据包、提示词（`grounded-answer-v8`）、引用修复请求和最终回答构造。
+聊天页面改用 `POST /api/questions/stream`。服务端向 DeepSeek 请求真实的 `stream: true` 响应，但网页传输层**不把草稿增量和 reset 转发给浏览器**；页面只收到进度状态和最终 `done`，收到后才展示一次经过引用校验的回答。未展示模型的 `reasoning_content`。原有 JSON 问答接口保持兼容，两个入口共用证据包、提示词（`grounded-answer-v8`）、引用修复请求和最终回答构造。
 
 | 事件 | 数据 | 前端行为 |
 | --- | --- | --- |
 | `status` | `{message}` | 展示检索、生成、核查进度 |
-| `delta` | `{text}` | 仅缓冲，不渲染正文 |
-| `reset` | `{message}` | 清除缓冲区，准备引用修复 |
 | `done` | 完整 `AnswerResponse` | 首次渲染最终回答，显示引用和限制，保存会话上下文 |
 | `error` | `{message}` | 显示可读错误；用户消息标记为失败，不生成助手消息 |
 

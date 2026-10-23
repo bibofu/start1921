@@ -679,6 +679,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 )
                 async with aclosing(answers) as stream:
                     async for event in stream:
+                        # The browser renders only the validated final answer.
+                        # Keep model deltas internal to the workflow; status and
+                        # the final done event are the public SSE surface.
+                        if event.event in {"delta", "reset"}:
+                            continue
                         if event.event == "done":
                             data = event.data
                             if start is not None and payload.session_id is not None:
