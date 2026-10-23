@@ -373,7 +373,7 @@ function stopGeneration() {
 function renderDraft(run) {
   if (!run) return;
   const follow = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220;
-  run.bubble.innerHTML = `<p class="meta stream-status" role="status">${escapeHtml(run.status)}</p><div class="markdown-body">${renderMarkdown(run.text)}</div>`;
+  run.bubble.innerHTML = `<p class="meta stream-status" role="status"><span class="typing"><i></i><i></i><i></i></span>${escapeHtml(run.status)}</p>`;
   if (follow) run.pending.scrollIntoView({block: "end"});
 }
 
@@ -436,8 +436,8 @@ async function ask(question) {
         run.status = data.message;
         scheduleDraft(run);
       } else if (event === "delta") {
+        // Keep the draft off-screen until the final, validated answer arrives.
         run.text += data.text;
-        scheduleDraft(run);
       } else if (event === "reset") {
         cancelAnimationFrame(run.frame);
         run.frame = null;
