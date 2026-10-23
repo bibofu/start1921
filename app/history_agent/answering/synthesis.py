@@ -33,6 +33,7 @@ from history_agent.answering.models import Citation, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.answering.validation import (
     FULL_DATE_REFERENCE,
+    citation_event_date,
     normalize_chinese_dates,
     remove_uncited_claim_blocks,
     validate_grounded_answer,
@@ -464,6 +465,11 @@ def _demote_unsupported_dates(
 
     def supported_precision(year: int, month: int) -> str | None:
         for citation in citations:
+            structured = citation_event_date(citation)
+            if structured is not None and structured[0] == year:
+                if structured[1] == month:
+                    return f"{year}年{month}月"
+                return f"{year}年"
             quote = normalized_quotes[citation.evidence_id]
             if (
                 year in citation.year_mentions

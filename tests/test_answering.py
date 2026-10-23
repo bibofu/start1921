@@ -30,6 +30,7 @@ from history_agent.answering.query_understanding import QueryExecution, QueryPla
 from history_agent.answering.synthesis import (
     HistoryResponseSynthesizer,
     LLMResult,
+    _demote_unsupported_dates,
     _extractive_answer,
     _has_ambiguous_timeline_years,
 )
@@ -625,6 +626,53 @@ def test_validation_accepts_chinese_numeral_source_for_arabic_answer_date() -> N
     )
 
     assert result.valid is True
+
+
+def test_validation_uses_structured_event_date_when_quote_has_no_date() -> None:
+    citation = _citation("周恩来出席科学规划会议，讨论十二年规划。").model_copy(
+        update={"event_date": "1956-01-02", "year_mentions": [1956]}
+    )
+
+    correct = validate_grounded_answer(
+        "1956年1月2日，周恩来出席科学规划会议。[E1]", [citation]
+    )
+    wrong = validate_grounded_answer(
+        "1956年1月3日，周恩来出席科学规划会议。[E1]", [citation]
+    )
+
+    assert correct.valid is True
+    assert wrong.valid is False
+    assert wrong.error_code == "citation_date_mismatch"
+    assert wrong.date_mismatches == ("1956年1月3日",)
+
+
+def test_meta_title_and_scope_notes_do_not_require_citations() -> None:
+    citation = _citation("周恩来出席科学规划会议。").model_copy(
+        update={"event_date": "1956-01-02", "year_mentions": [1956]}
+    )
+    answer = (
+        "## 周恩来1956年主要经历\n\n"
+        "根据现有证据，周恩来1956年的活动主要涉及外事与经济建设。"
+        "以下按时间顺序归纳。\n\n"
+        "1956年1月2日，周恩来出席科学规划会议。[E1]\n\n"
+        "现有证据仅覆盖1956年的部分活动，无法完整还原全部经历。"
+    )
+
+    assert validate_grounded_answer(answer, [citation]).valid is True
+
+
+def test_date_demotion_uses_structured_event_date_precision() -> None:
+    citation = _citation("周恩来出席科学规划会议。").model_copy(
+        update={"event_date": "1956", "year_mentions": [1956]}
+    )
+    answer = "1956年1月2日，周恩来出席科学规划会议。[E1]"
+
+    demoted = _demote_unsupported_dates(answer, [citation], ("1956年1月2日",))
+
+    assert demoted is not None
+    assert "1956年" in demoted
+    assert "1月2日" not in demoted
+    assert validate_grounded_answer(demoted, [citation]).valid is True
 
 
 def test_validation_still_rejects_date_absent_from_chinese_numeral_source() -> None:

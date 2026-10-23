@@ -13,6 +13,23 @@ EVIDENCE_MARKER = re.compile(r"\[(E\d+)\]")
 MARKDOWN = MarkdownIt("commonmark").enable("table")
 CITATION_ONLY = re.compile(r"(?:\s*\[E\d+\][\s,，、;；。.]*)+")
 # Only nominal topic labels are exempt; a factual heading still needs a citation.
+TOPIC_TITLE = re.compile(
+    r"^[\u3400-\u4dbf\u4e00-\u9fff0-9A-Za-z（）()·\s—\-]{2,40}"
+    r"(?:主要经历|主要活动|经历|活动|时间线|概述|小结)"
+    r"(?:（[^）]{1,20}）|\([^)]{1,20}\))?$"
+)
+FACT_ACTION = re.compile(
+    r"担任|任命|出任|兼任|调任|任职|主持|参加|参与|出席|会见|访问|考察|"
+    r"领导|负责|指挥|汇报|讲话|发言|提出|指出|认为|主张|决定|通过|召开|"
+    r"成立|开展|发动|抵达|到达|前往|赴|离开|返回|逝世|撤职|免职|签署|发布|执行"
+)
+META_NOTE = re.compile(
+    r"(?:根据|基于|依据)?(?:现有|当前|本次)?(?:证据|资料|材料|史料)"
+    r"[^。！？；]{0,80}(?:仅|只)(?:能)?覆盖[^。！？；]{0,80}"
+    r"(?:部分|若干|少数|有限)(?:活动|时间|时期|月份|阶段|方面|范围|节点)|"
+    r"(?:以下|下面|本文)[\s\S]{0,30}(?:按时间|按阶段|依次|归纳|梳理|概述|总结)|"
+    r"(?:无法|不能)[\s\S]{0,30}(?:完整|全部)(?:还原|覆盖|回答)"
+)
 TOPIC_LABEL = re.compile(
     r"(?:[一二三四五六七八九十0-9]+[、.)．]\s*)?"
     r"(?:(?:共同)?(?:参加|参与|出席)(?:会议|活动)(?:情况)?|"
@@ -37,6 +54,11 @@ CHINESE_YEAR = r"[一二三四五六七八九〇零]{4}年"
 DATE_SIGNAL = re.compile(rf"(?:(?:18|19|20)\d{{2}}年|{CHINESE_YEAR}|\d{{1,2}}月\d{{1,2}}日)")
 YEAR_ONLY_HEADING = re.compile(
     rf"^(?:(?:18|19|20)\d{{2}}年|{CHINESE_YEAR})(?:主要经历|主要活动|活动|经历|时间线)?$"
+)
+EVENT_DATE_REFERENCE = re.compile(
+    r"^(?P<year>(?:18|19|20)\d{2})"
+    r"(?:-(?P<month>1[0-2]|0?[1-9])"
+    r"(?:-(?P<day>3[01]|[12]\d|0?[1-9]))?)?$"
 )
 FULL_DATE_REFERENCE = re.compile(
     r"(?<!\d)(?P<year>(?:18|19|20)\d{2})\s*年\s*"
@@ -132,7 +154,9 @@ def _claim_blocks(answer: str) -> list[_ClaimBlock]:
                         blocks[preceding_paragraph].end_line = child.map[1]
                     continue
                 is_organizational_heading = child.type == "heading" and (
-                    not DATE_SIGNAL.search(text) or YEAR_ONLY_HEADING.fullmatch(text) is not None
+                    not DATE_SIGNAL.search(text)
+                    or YEAR_ONLY_HEADING.fullmatch(text) is not None
+                    or TOPIC_TITLE.fullmatch(text) is not None
                 )
                 is_nested_list_label = container.type == "list_item" and any(
                     item.type in {"bullet_list", "ordered_list"} for item in container.children
@@ -163,7 +187,13 @@ def _claim_blocks(answer: str) -> list[_ClaimBlock]:
 def _is_core_fact_block(block: str) -> bool:
     claim = _claim_text(block)
     if not ASSERTION_TRANSITION.search(claim) and (
-        EVIDENCE_LIMIT.search(claim) or EVIDENCE_SCOPE_NOTE.search(claim)
+        EVIDENCE_LIMIT.search(claim)
+        or EVIDENCE_SCOPE_NOTE.search(claim)
+        or META_NOTE.search(claim)
+        or (
+            re.match(r"^(?:现有|当前|本次)?(?:证据|资料|材料|史料)", claim) is not None
+            and FACT_ACTION.search(claim) is None
+        )
     ):
         return False
     for clause in CLAUSE_BOUNDARY.split(claim):
@@ -189,7 +219,29 @@ def _document_matches(claimed: str | None, actual: str) -> bool:
     )
 
 
+def citation_event_date(citation: Citation) -> tuple[int, int | None, int | None] | None:
+    """Return the structured index date attached to a citation, if any."""
+
+    value = (citation.event_date or "").strip()
+    if not value:
+        return None
+    match = EVENT_DATE_REFERENCE.fullmatch(value)
+    if match is None:
+        return None
+    return (
+        int(match["year"]),
+        int(match["month"]) if match["month"] else None,
+        int(match["day"]) if match["day"] else None,
+    )
+
+
 def _citation_supports_date(citation: Citation, year: int, month: int, day: int | None) -> bool:
+    structured = citation_event_date(citation)
+    if structured is not None:
+        structured_year, structured_month, structured_day = structured
+        if structured_year != year or structured_month != month:
+            return False
+        return not (day is not None and structured_day != day)
     quote = normalize_chinese_dates(citation.quote)
     year_supported = year in citation.year_mentions or (
         re.search(rf"(?<!\d){year}(?!\d)", quote) is not None

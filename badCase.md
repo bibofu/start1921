@@ -475,3 +475,22 @@
   - 完整消息仍保留，不做物理裁剪。
 - 验证结果：新增 token 预算、摘要非证据标记、滚动摘要替换旧消息的测试；全项目 1063 项 Python 测试、Ruff、mypy、前端语法及 SSE 解析测试通过。
 - 残留限制：当前摘要为确定性抽取，不是语义摘要；没有层级摘要/长期记忆；摘要只覆盖已经完成的消息，进行中的问题不压缩；摘要质量仍需 Golden 多轮人工复核。
+
+## BC-041：结构化时间线引用日期导致整篇回答降级为证据摘录
+
+- 记录日期：2026-10-23；状态：已修复，真实流式接口复现并验证；不是 Golden 评测。
+- 问题：`周恩来在1956年主要有哪些经历？`
+- 糟糕表现：流式草稿正常输出，最终 `done` 却返回 `generator_mode=extractive`、`llm_status=fallback`、`llm_error_code=citation_date_repair_citation_date_mismatch`，12 条证据被拼成摘录。同步接口有时表现为 `removed_uncited_claims`，答案主体保留但开头/资料限制被删。
+- 期望表现：结构化时间线已有的明确日期应能支撑回答中的完整日期；一次修复仍不匹配时至少降级到年份精度，不能丢弃整篇已有引用的回答。
+- 根因：
+  - `structured.py` 构造 `Citation` 时没有带 `year_mentions`，也没有独立的结构化日期；`quote` 是年谱正文，常不含“1956年1月2日”。
+  - `validation._citation_supports_date()` 只从 `year_mentions`/`quote` 找日期，实测 E1/E2 的 `year_mentions=[]`，引用正文也不含完整日期，因此模型写完整日期即被判错。
+  - `synthesis._demote_unsupported_dates()` 同样只能从引用找年份；结构化引用没有年份元数据，降级返回 `None`，最终只能回退摘录。
+  - 另一条路径是模型写的标题、范围说明和“资料限制”被当作未引用事实，触发 `removed_uncited_claims`。
+- 解决方案：
+  - `Citation` 新增可选 `event_date`；结构化时间线/交集在构造引用时写入事件 `start.value`，并据此填充 `year_mentions`。
+  - `validation.citation_event_date()` 解析结构化日期；日期校验优先使用该元数据，仍保留 quote/中文数字日期的回退。
+  - 日期降级优先使用结构化日期精度：精确日→月→年；只有结构化日期也无法支持年份时才放弃。
+  - `validation.py` 识别章节标题、范围说明和资料限制类非事实段落，避免它们触发未引用事实修复；同时保留“现有证据只覆盖某年某人主持会议”这类真实事实的拦截。
+- 验证结果：真实流式接口重跑原问题，`generator_mode=llm`、`llm_status=used`、`llm_error_code=null`，返回 12 条引用、约 2,207 字完整回答；结构化引用 E1/E2/E3 的 `event_date` 分别为 1956-01-02、1956-02-09、1956-03-04，`year_mentions=[1956]`。新增结构化日期校验、日期降级、标题/范围说明测试；`test_answering.py` 与 `test_structured_answering.py` 117 项通过；全项目 1066 项 Python 测试、Ruff、mypy、前端语法及 SSE 解析测试通过。
+- 残留限制：`event_date` 只在结构化索引提供日期时存在；普通文献仍依赖 quote/中文数字归一化。日期是否为事件真实发生日仍取决于上游年谱抽取，不把结构化索引日期当作绝对事实。

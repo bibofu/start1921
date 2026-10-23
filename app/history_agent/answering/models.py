@@ -199,6 +199,10 @@ class Citation(BaseModel):
     verification_status: str
     extraction_methods: list[str]
     year_mentions: list[int] = Field(default_factory=list)
+    # Structured indexes can carry an exact date even when the quoted prose
+    # only contains the event description. Keep it separate from the quote so
+    # date validation does not have to infer it from document text.
+    event_date: str | None = None
 
 
 class AnswerResponse(BaseModel):

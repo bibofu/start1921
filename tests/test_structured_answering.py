@@ -470,6 +470,9 @@ def test_chat_uses_actual_proof_and_full_page_range(work_path: Path) -> None:
     assert result.items[0].citation.document_id == "lin_biao_chronology"
     assert result.items[0].citation.pdf_page_end == 31
     assert "林彪、周恩来致电毛泽东" in result.items[0].citation.quote
+    assert result.items[0].citation.event_date is not None
+    assert result.items[0].citation.event_date.startswith("1943")
+    assert result.items[0].citation.year_mentions == [1943]
 
 
 def test_intersection_before_year_routes_to_source_synthesis(

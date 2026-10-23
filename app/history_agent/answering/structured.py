@@ -24,7 +24,10 @@ def _citation(
     quote: str,
     *,
     section: list[str] | None = None,
+    event_date: str | None = None,
 ) -> Citation:
+    year_match = re.match(r"(?P<year>(?:18|19|20)\d{2})", event_date or "")
+    year_mentions = [int(year_match["year"])] if year_match is not None else []
     return Citation(
         evidence_id=f"E{number}",
         document_id=evidence.document_id,
@@ -37,6 +40,8 @@ def _citation(
         source_type=evidence.source_type,
         verification_status=evidence.verification_status,
         extraction_methods=evidence.extraction_methods,
+        year_mentions=year_mentions,
+        event_date=event_date,
     )
 
 
@@ -126,7 +131,12 @@ def collect_structured_evidence(
                 )
                 raw = proof.supporting_text
                 quote = raw[:420] + ("……" if len(raw) > 420 else "")
-                citation = _citation(evidence, len(items) + 1, quote)
+                citation = _citation(
+                    evidence,
+                    len(items) + 1,
+                    quote,
+                    event_date=item.event.start.value,
+                )
                 roles = "、".join(
                     f"{name}：{proof.roles[pid]}"
                     for name, pid in (
@@ -178,6 +188,7 @@ def collect_structured_evidence(
                     len(items) + 1,
                     quote,
                     section=[f"结构化索引日期：{event.start.value or '不明确'}"],
+                    event_date=event.start.value,
                 )
                 finding = (
                     f"记录日期 {event.start.value or '不明确'}（{event.start.certainty}）；"
