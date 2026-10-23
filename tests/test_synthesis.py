@@ -192,7 +192,9 @@ def test_research_findings_keep_original_sources_and_only_selected_evidence_ids(
     assert "不是独立史实证据" in outline
 
 
-def test_failed_repair_cannot_propose_another_repair(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_failed_date_repair_demotes_precision_without_second_repair(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     calls = _provider(
         monkeypatch,
         [_body("1935年1月16日，参加会议。[E1]"), _body("1935年1月17日，参加会议。[E1]")],
@@ -208,10 +210,43 @@ def test_failed_repair_cannot_propose_another_repair(monkeypatch: pytest.MonkeyP
         return await synthesizer.repair_once(request, citations, synthesizer.last_result)
 
     result = asyncio.run(run())
-    assert result.answer is None
-    assert result.error_code == "citation_date_repair_citation_date_mismatch"
-    assert result.repair_payload is None
     assert len(calls) == 2
+    assert result.error_code == "demoted_unverified_dates"
+    assert result.answer == "1935年1月，参加会议。[E1]"
+    assert result.repair_payload is None
+    assert result.repair_kind is None
+
+
+def test_failed_date_repair_keeps_answer_with_supported_year(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = _provider(
+        monkeypatch,
+        [
+            _body("1948年11月6日，发起淮海战役。[E1]"),
+            _body("1948年11月6日，发起淮海战役。[E1]"),
+        ],
+    )
+    citations = [
+        _citation().model_copy(update={"quote": "十一月发起淮海战役。", "year_mentions": [1948]})
+    ]
+    request = QuestionRequest(question="邓小平在淮海战役中的经历？")
+
+    async def run() -> LLMResult:
+        await synthesizer.asynthesize(
+            request.question, _nodes(citations), request=request, citations=citations
+        )
+        return await synthesizer.repair_once(request, citations, synthesizer.last_result)
+
+    synthesizer = HistoryResponseSynthesizer(_settings())
+    result = asyncio.run(run())
+
+    assert len(calls) == 2
+    assert result.error_code == "demoted_unverified_dates"
+    assert result.answer is not None
+    assert "1948年11月" in result.answer
+    assert "6日" not in result.answer
+    assert "[E1]" in result.answer
 
 
 def test_synthesis_cancellation_closes_provider_without_reading_remaining_body(

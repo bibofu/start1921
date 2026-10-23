@@ -43,6 +43,27 @@ FULL_DATE_REFERENCE = re.compile(
     r"(?P<month>1[0-2]|0?[1-9])\s*月"
     r"(?:\s*(?P<day>3[01]|[12]\d|0?[1-9])\s*日)?"
 )
+CJK_DIGITS = {
+    "〇": 0,
+    "零": 0,
+    "一": 1,
+    "二": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+}
+# Sources such as 《毛泽东选集》 write dates as 一九四八年十一月六日 while answers
+# normally use Arabic digits. Chronologies also carry the year in the section
+# heading and write 十一月六日 in the body, so the year stays optional here.
+CJK_DATE = re.compile(
+    r"(?:(?P<year>[〇零一二三四五六七八九]{4})\s*年\s*)?"
+    r"(?P<month>[一二三四五六七八九十]{1,3})\s*月"
+    r"(?:\s*(?P<day>[一二三四五六七八九十]{1,3})\s*日)?"
+)
 CORE_FACT_SIGNAL = re.compile(
     rf"(?:"
     rf"(?:18|19|20)\d{{2}}年|{CHINESE_YEAR}|\d{{1,2}}月\d{{1,2}}日|"
@@ -169,17 +190,55 @@ def _document_matches(claimed: str | None, actual: str) -> bool:
 
 
 def _citation_supports_date(citation: Citation, year: int, month: int, day: int | None) -> bool:
-    if citation.year_mentions:
-        year_supported = year in citation.year_mentions
-    else:
-        year_supported = re.search(rf"(?<!\d){year}(?!\d)", citation.quote) is not None
+    quote = normalize_chinese_dates(citation.quote)
+    year_supported = year in citation.year_mentions or (
+        re.search(rf"(?<!\d){year}(?!\d)", quote) is not None
+    )
     if not year_supported:
         return False
     month_day = re.compile(
-        rf"(?<!\d)0?{month}\s*月"
-        + (rf"\s*0?{day}\s*日" if day is not None else "")
+        rf"(?<!\d)0?{month}\s*月" + (rf"\s*0?{day}\s*日" if day is not None else "")
     )
-    return month_day.search(citation.quote) is not None
+    return month_day.search(quote) is not None
+
+
+def _cjk_number(value: str) -> int | None:
+    if "十" not in value:
+        number = 0
+        for character in value:
+            number = number * 10 + CJK_DIGITS[character]
+        return number
+    tens, _, ones = value.partition("十")
+    if (
+        len(tens) > 1
+        or len(ones) > 1
+        or (tens and tens not in CJK_DIGITS)
+        or (ones and ones not in CJK_DIGITS)
+    ):
+        return None
+    return (CJK_DIGITS[tens] if tens else 1) * 10 + (CJK_DIGITS[ones] if ones else 0)
+
+
+def normalize_chinese_dates(text: str) -> str:
+    """Rewrite 一九四八年十一月六日 as 1948年11月6日 so both forms compare equally."""
+
+    def replace(match: re.Match[str]) -> str:
+        month = _cjk_number(match["month"])
+        day = _cjk_number(match["day"]) if match["day"] else None
+        if month is None or not 1 <= month <= 12:
+            return match.group(0)
+        if day is not None and not 1 <= day <= 31:
+            return match.group(0)
+        prefix = ""
+        if match["year"]:
+            year = _cjk_number(match["year"])
+            if year is None:
+                return match.group(0)
+            prefix = f"{year}年"
+        normalized = f"{prefix}{month}月"
+        return normalized + f"{day}日" if day is not None else normalized
+
+    return CJK_DATE.sub(replace, text)
 
 
 def validate_grounded_answer(answer: str, citations: list[Citation]) -> AnswerValidationResult:
@@ -227,7 +286,7 @@ def validate_grounded_answer(answer: str, citations: list[Citation]) -> AnswerVa
             )
             if not matching_citation:
                 citation_mismatches.append(match.group(0))
-        for match in FULL_DATE_REFERENCE.finditer(block.text):
+        for match in FULL_DATE_REFERENCE.finditer(normalize_chinese_dates(block.text)):
             year, month = int(match["year"]), int(match["month"])
             day = int(match["day"]) if match["day"] else None
             if block_markers and not any(

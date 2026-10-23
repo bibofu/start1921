@@ -109,6 +109,8 @@ def deliver_answer(
         )
     elif result.error_code == "removed_uncited_claims":
         limitations.append("生成草稿中的未引用段落已移除，其余内容已通过引用核查。")
+    elif result.error_code == "demoted_unverified_dates":
+        limitations.append("部分具体日期缺少逐字对应的原文，已按证据可确认的日期精度收窄。")
     elif result.error_code == "hierarchical_partial_map_fallback":
         limitations.append("部分证据分组未生成局部摘要，最终综合时已使用该组原文。")
     if planning.status == "fallback":

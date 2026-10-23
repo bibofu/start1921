@@ -31,7 +31,12 @@ from history_agent.answering.llamaindex_llm import (
 )
 from history_agent.answering.models import Citation, QuestionRequest
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
-from history_agent.answering.validation import remove_uncited_claim_blocks, validate_grounded_answer
+from history_agent.answering.validation import (
+    FULL_DATE_REFERENCE,
+    normalize_chinese_dates,
+    remove_uncited_claim_blocks,
+    validate_grounded_answer,
+)
 from history_agent.config import Settings
 from history_agent.errors import llm_http_error_code
 
@@ -438,6 +443,59 @@ async def _stream_completion(
         )
 
 
+def _demote_unsupported_dates(
+    answer: str,
+    citations: list[Citation],
+    mismatches: tuple[str, ...],
+) -> str | None:
+    """Replace an unverifiable date with the precision its cited passages support.
+
+    A model repair gets one attempt. When it still cannot align a date, dropping
+    the whole answer for an extractive excerpt is worse than losing day precision,
+    so the surrounding claim survives at the coarsest supported precision. When no
+    cited passage supports even the year, the answer is not demoted at all.
+    """
+
+    if not mismatches:
+        return None
+    normalized_quotes = {
+        citation.evidence_id: normalize_chinese_dates(citation.quote) for citation in citations
+    }
+
+    def supported_precision(year: int, month: int) -> str | None:
+        for citation in citations:
+            quote = normalized_quotes[citation.evidence_id]
+            if (
+                year in citation.year_mentions
+                or re.search(rf"(?<!\d){year}(?!\d)", quote) is not None
+            ):
+                if re.search(rf"(?<!\d)0?{month}\s*月", quote) is not None:
+                    return f"{year}年{month}月"
+                return f"{year}年"
+        return None
+
+    candidate = answer
+    for broken in mismatches:
+        match = FULL_DATE_REFERENCE.search(broken)
+        if match is None:
+            continue
+        replacement = supported_precision(int(match["year"]), int(match["month"]))
+        if replacement is None:
+            return None
+        if broken not in candidate:
+            normalized = normalize_chinese_dates(candidate)
+            if broken not in normalized:
+                continue
+            candidate = normalized
+        candidate = candidate.replace(broken, replacement)
+    candidate = re.sub(r"[（(]\s*[）)]", "", candidate)
+    candidate = re.sub(r"(，\s*，|，\s*。)", "，", candidate)
+    candidate = candidate.strip()
+    if candidate == answer:
+        return None
+    return candidate if validate_grounded_answer(candidate, citations).valid else None
+
+
 def _check_generated_answer(
     request: QuestionRequest,
     citations: list[Citation],
@@ -445,6 +503,7 @@ def _check_generated_answer(
     result: LLMResult,
     *,
     propose_repair: bool,
+    allow_date_demotion: bool = False,
 ) -> LLMResult:
     """Clean deterministic defects, returning repair data without executing it."""
     if not result.answer:
@@ -463,6 +522,18 @@ def _check_generated_answer(
             ),
         )
     if validation.error_code == "citation_date_mismatch":
+        if allow_date_demotion:
+            # The single repair attempt could not align the dates. Keep the claim
+            # and drop the unsupported precision instead of discarding the answer.
+            demoted = _demote_unsupported_dates(
+                result.answer, citations, validation.date_mismatches
+            )
+            if demoted is not None:
+                return LLMResult(
+                    answer=demoted,
+                    error_code="demoted_unverified_dates",
+                    usage=result.usage,
+                )
         return LLMResult(
             answer=None,
             error_code=validation.error_code,
@@ -548,7 +619,12 @@ async def _generation_events(
     if result.answer:
         yield AnswerStreamEvent("status", {"message": "正在核查引用…"})
         result = _check_generated_answer(
-            request, citations, payload, result, propose_repair=propose_repair
+            request,
+            citations,
+            payload,
+            result,
+            propose_repair=propose_repair,
+            allow_date_demotion=repair_kind is not None,
         )
     if repair_kind and result.answer is None:
         result = LLMResult(

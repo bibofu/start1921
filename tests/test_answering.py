@@ -615,6 +615,29 @@ def test_validation_rejects_date_not_supported_by_cited_passage() -> None:
     assert correct.valid is True
 
 
+def test_validation_accepts_chinese_numeral_source_for_arabic_answer_date() -> None:
+    citation = _citation("战役自一九四八年十一月六日开始到一九四九年一月十日结束。").model_copy(
+        update={"year_mentions": [1948, 1949]}
+    )
+
+    result = validate_grounded_answer(
+        "淮海战役自1948年11月6日进行到1949年1月10日。[E1]", [citation]
+    )
+
+    assert result.valid is True
+
+
+def test_validation_still_rejects_date_absent_from_chinese_numeral_source() -> None:
+    citation = _citation("一九四八年十一月六日，战役发起。").model_copy(
+        update={"year_mentions": [1948]}
+    )
+
+    result = validate_grounded_answer("1948年12月6日，战役发起。[E1]", [citation])
+
+    assert result.valid is False
+    assert result.error_code == "citation_date_mismatch"
+
+
 def test_year_heading_carries_context_for_cross_year_timeline_items() -> None:
     request = QuestionRequest(question="彭德怀在1930-1935年的主要经历")
     citation = _citation("1935年，彭德怀担任红一方面军司令员。").model_copy(
