@@ -52,7 +52,7 @@ def inspect_pdf(path: Path) -> dict[str, Any]:
         "is_encrypted": is_encrypted,
     }
 
-
+# 处理文档的schema信息
 def _upsert_document(database: Database, document: CatalogDocument, timestamp: str) -> None:
     with database.connect() as connection:
         connection.execute(
@@ -214,6 +214,7 @@ def scan_corpus(
     unassigned = set(discovered_paths)
     observations: list[FileObservation] = []
 
+    # 处理pdf文档
     for document in catalog.documents:
         _upsert_document(database, document, timestamp)
         current = _current_file(database, document.document_id)

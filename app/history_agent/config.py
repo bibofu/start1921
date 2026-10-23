@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     qdrant_url: SecretStr | None = None
     qdrant_api_key: SecretStr | None = None
     qdrant_timeout_seconds: int = Field(default=30, ge=1, le=600)
-    catalog_path: Path = Path("config/corpus_catalog.json")
+    catalog_path: Path = Path("config/corpus_catalog.json")   # 文档数据
     person_aliases_path: Path = Path("config/person_aliases.json")
     relation_types_path: Path = Path("config/relation_types.json")
     log_level: str = "INFO"
