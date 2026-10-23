@@ -5,8 +5,6 @@ const messagesEl = document.querySelector("#messages");
 const form = document.querySelector("#composer");
 const input = document.querySelector("#question");
 const send = document.querySelector("#send");
-const statusText = document.querySelector("#status");
-const statusDot = document.querySelector("#status-dot");
 const sidebar = document.querySelector("#sidebar");
 const sidebarOverlay = document.querySelector("#sidebar-overlay");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
@@ -592,9 +590,7 @@ async function bootstrap() {
     if (quotaLabel && info.quota) {
       quotaLabel.textContent = `今日提问 ${info.quota.used_today}/${info.quota.daily_questions}`;
     }
-  } catch (error) {
-    statusDot.className = "bad";
-    statusText.textContent = error.message || "无法连接会话服务";
+  } catch {
     showToast("无法连接会话服务，请刷新重试");
     return;
   }
@@ -710,14 +706,3 @@ function bindEvents() {
 
 bindEvents();
 bootstrap();
-
-fetch("/api/health").then(result => result.json()).then(data => {
-  const ready = data.status === "ok";
-  statusDot.className = ready ? "ok" : "bad";
-  statusText.textContent = ready
-    ? `本地双索引已就绪 · ${data.llm_enabled ? `DeepSeek ${data.llm_model}` : "DeepSeek 密钥未配置 · 证据摘录模式"}`
-    : "索引尚未完成，请先执行构建命令";
-}).catch(() => {
-  statusDot.className = "bad";
-  statusText.textContent = "无法读取服务状态";
-});

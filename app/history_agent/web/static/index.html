@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>start1921 · 近现代史研究 Agent</title>
-  <link rel="stylesheet" href="/app.css?v=multi-session-v3">
+  <link rel="stylesheet" href="/app.css?v=multi-session-v4">
 </head>
 <body>
   <div class="app-shell">
@@ -46,9 +46,8 @@
 
       <form id="composer" class="composer">
         <label class="sr-only" for="question">输入历史研究问题</label>
-        <textarea id="question" rows="1" maxlength="500" placeholder="输入一个可由本地史料核查的问题……" required></textarea>
+        <textarea id="question" rows="1" maxlength="500" placeholder="输入历史问题，根据史料库回答" required></textarea>
         <button id="send" type="submit">发送</button>
-        <p class="notice"><span id="status-dot"></span><span id="status">正在检查本地索引…</span></p>
       </form>
     </main>
   </div>
@@ -56,6 +55,6 @@
   <div id="toast" class="toast" role="status" hidden></div>
   <script src="/assets/marked.umd.js" defer></script>
   <script src="/assets/purify.min.js" defer></script>
-  <script src="/app.js?v=multi-session-v3" type="module"></script>
+  <script src="/app.js?v=multi-session-v4" type="module"></script>
 </body>
 </html>
