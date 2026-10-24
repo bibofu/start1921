@@ -224,7 +224,7 @@ def test_failed_stream_is_replaced_with_evidence_excerpt(
     assert any(reason in item for item in data["limitations"])
 
 
-def test_stream_returns_unknown_marker_without_validation(
+def test_stream_removes_unknown_marker_at_delivery(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _provider(
@@ -233,9 +233,10 @@ def test_stream_returns_unknown_marker_without_validation(
     )
     _context(monkeypatch)
     data = _events()[-1].data
-    assert data["answer"] == "错误引用。[E99]"
+    assert data["answer"] == "错误引用。"
     assert data["llm_status"] == "used"
     assert data["llm_error_code"] is None
+    assert any("无法核实的引用标记" in item for item in data["limitations"])
 
 
 def test_stream_does_not_send_reasoning_as_answer(monkeypatch: pytest.MonkeyPatch) -> None:

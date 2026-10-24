@@ -78,6 +78,9 @@ class Settings(BaseSettings):
     llm_retrieval_reflection_max_queries: int = Field(default=3, ge=1, le=4)
     llm_retrieval_reflection_max_tokens: int = Field(default=450, ge=256, le=1000)
     llm_retrieval_reflection_timeout_seconds: float = Field(default=15.0, ge=5.0, le=60.0)
+    # Delivery-time citation checks. "s1" removes only unverifiable reference ids
+    # and contradictory page numbers; dates and uncited claims stay offline.
+    citation_check: Literal["off", "s1"] = "s1"
     context_max_messages: int = Field(default=12, ge=4, le=50)
     context_max_chars: int = Field(default=12_000, ge=1000, le=100_000)
     context_max_tokens: int = Field(default=8_000, ge=1_000, le=100_000)
@@ -287,6 +290,7 @@ class Settings(BaseSettings):
             "llm_retrieval_reflection_timeout_seconds": (
                 self.llm_retrieval_reflection_timeout_seconds
             ),
+            "citation_check": self.citation_check,
             "context_max_messages": self.context_max_messages,
             "context_max_chars": self.context_max_chars,
             "context_max_tokens": self.context_max_tokens,

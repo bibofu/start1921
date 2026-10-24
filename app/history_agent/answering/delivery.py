@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
+from history_agent.answering.citation_check import check_citations
 from history_agent.answering.models import (
     AnswerResponse,
     Citation,
@@ -19,6 +20,9 @@ from history_agent.answering.synthesis import (
 )
 from history_agent.config import Settings
 
+if TYPE_CHECKING:
+    from history_agent.answering.evidence import EvidenceRegistry
+
 
 def deliver_answer(
     settings: Settings,
@@ -29,6 +33,7 @@ def deliver_answer(
     result: LLMResult,
     *,
     unresolved: list[TaskResult],
+    registry: EvidenceRegistry | None = None,
 ) -> AnswerResponse:
     plan = summary.plan
     interpretation = plan.interpretation
@@ -91,6 +96,19 @@ def deliver_answer(
         # to Top-K. Attach its original page references if the source has no markers.
         answer += "\n\n" + " ".join(f"[{citation.evidence_id}]" for citation in citations)
         used = list(citations)
+    if llm_used:
+        # Enforce only fabricated reference syntax and contradictory page numbers.
+        # Dates and uncited claims stay offline until their false-positive rate is
+        # measured; a failure here must never replace the model's answer.
+        check = check_citations(
+            answer,
+            citations,
+            registry=registry,
+            mode=settings.citation_check,
+            run_id=summary.run_id,
+        )
+        answer = check.answer
+        limitations.extend(check.limitations())
     if summary.stopped_reason == "budget_exhausted":
         limitations.append("本次研究已达到执行预算，未完成部分不视为已核实。")
     if missing:

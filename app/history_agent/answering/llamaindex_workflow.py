@@ -446,6 +446,7 @@ class HistoryResearchWorkflow(Workflow):
             self.registry.citations(self.selected_ids),
             self.llm_result,
             unresolved=self.unresolved(),
+            registry=self.registry,
         )
         await self.snapshot(ctx)
         return StopEvent(result=response)
