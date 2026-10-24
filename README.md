@@ -12,6 +12,7 @@
 | [Linux 部署](deploy/README.md) | Docker 服务隔离、数据迁移、HTTPS 入口、健康检查与升级回滚 |
 | [Golden 评测入口](evals/golden/README.md) / [可重复评测流程](evals/golden/REPEATABLE_WORKFLOW.md) | 数据版本、人工复核状态、分层指标与实验比较 |
 | [需求基线](REQUIREMENTS.md) | 原始需求目标与验收约束，部分内容尚未实现 |
+| [后续路线图](docs/ROADMAP.md) | 评测、观测、记忆与 RAG 的顺序、交付物和决策门 |
 | [问答问题记录](badCase.md) | 已定位的问答问题、原因、修复及验证 |
 
 实现细节集中在对应专题文档，历史实验结果保留在 `evals/`。`REQUIREMENTS.md` 被评测拒答依据引用，本次保留原始字节；其中的 `TASK_PLAN.md` 是已移除的历史规划引用，旧技术选型、五类回答状态和后续版本描述不代表当前实现。当前接口以代码及服务的 `/docs`、`/openapi.json` 为准。
