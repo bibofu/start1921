@@ -82,11 +82,6 @@ class Settings(BaseSettings):
     # and contradictory page numbers; "s1_dates" additionally reports dates the
     # cited chunk does not cover, without rewriting them.
     citation_check: Literal["off", "s1", "s1_dates"] = "s1_dates"
-    # Append the chunks adjacent to each retrieved hit as extra evidence. Measured
-    # to add page-level recall, but it pushes a 12-evidence task over the grouped
-    # synthesis threshold, so it stays opt-in until fact coverage is compared.
-    neighbor_evidence: bool = False
-    neighbor_evidence_limit: int = Field(default=4, ge=0, le=12)
     context_max_messages: int = Field(default=12, ge=4, le=50)
     context_max_chars: int = Field(default=12_000, ge=1000, le=100_000)
     context_max_tokens: int = Field(default=8_000, ge=1_000, le=100_000)
@@ -297,8 +292,6 @@ class Settings(BaseSettings):
                 self.llm_retrieval_reflection_timeout_seconds
             ),
             "citation_check": self.citation_check,
-            "neighbor_evidence": self.neighbor_evidence,
-            "neighbor_evidence_limit": self.neighbor_evidence_limit,
             "context_max_messages": self.context_max_messages,
             "context_max_chars": self.context_max_chars,
             "context_max_tokens": self.context_max_tokens,

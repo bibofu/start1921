@@ -34,7 +34,6 @@ from history_agent.answering.models import (
     ResearchTask,
     TaskResult,
 )
-from history_agent.answering.neighbor_evidence import neighbour_candidates
 from history_agent.answering.query_understanding import query_execution
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.answering.structured import collect_structured_evidence
@@ -42,7 +41,6 @@ from history_agent.answering.timeline_evidence import filter_person_timeline_evi
 from history_agent.config import Settings
 from history_agent.corpus.catalog import load_catalog
 from history_agent.errors import CatalogError, RetrievalError, llm_http_error_code
-from history_agent.retrieval.chunk_store import neighbour_store
 from history_agent.retrieval.hybrid import search_hybrid_index
 from history_agent.retrieval.keyword import infer_query_intent
 from history_agent.retrieval.llamaindex import (
@@ -370,24 +368,6 @@ class HistoryTaskExecutor:
                 )
                 if citation.evidence_id not in ids:
                     ids.append(citation.evidence_id)
-            if self.settings.neighbor_evidence and self.settings.neighbor_evidence_limit > 0:
-                extras = neighbour_candidates(
-                    neighbour_store(self.settings.chunks_dir),
-                    retrieval.hits,
-                    limit=self.settings.neighbor_evidence_limit,
-                )
-                for hit in extras:
-                    citation = self.registry.register_hit(
-                        hit,
-                        task.task_id,
-                        quote_for_hit(
-                            hit,
-                            retrieval.query_terms,
-                            query_people=retrieval.query_people,
-                        ),
-                    )
-                    if citation.evidence_id not in ids:
-                        ids.append(citation.evidence_id)
         missing = list(retrieval.coverage_gaps)
         if not ids:
             missing = list(dict.fromkeys([*missing, task.objective]))
