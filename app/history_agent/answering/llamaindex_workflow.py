@@ -401,6 +401,8 @@ class HistoryResearchWorkflow(Workflow):
                     self.registry.nodes(self.selected_ids),
                     request=self.request,
                     citations=self.registry.citations(self.selected_ids),
+                    context_only=frozenset(self.selected_ids)
+                    & self.executor.context_only_evidence_ids,
                     event_sink=self.sink(ctx),
                     findings=findings,
                 )

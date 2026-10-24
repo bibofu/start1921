@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
-from collections.abc import AsyncGenerator, Callable, Sequence
+from collections.abc import AsyncGenerator, Callable, Collection, Sequence
 from contextlib import aclosing
 from dataclasses import dataclass
 from time import perf_counter
@@ -328,6 +328,14 @@ async def _generation_events(
     yield result
 
 
+def _primary_evidence_count(citations: list[Citation], context_only: Collection[str]) -> int:
+    """Adjacent-context evidence must not push a task into grouped synthesis."""
+
+    if not context_only:
+        return len(citations)
+    return sum(1 for citation in citations if citation.evidence_id not in context_only)
+
+
 @dataclass(frozen=True)
 class HierarchicalPreparation:
     request_payload: dict[str, object]
@@ -480,6 +488,7 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
                 initial_usage=response_kwargs.get("initial_usage"),
                 map_failed=response_kwargs.get("map_failed", False),
                 findings=response_kwargs.get("findings", []),
+                context_only=response_kwargs.get("context_only", ()),
             )
         ) as events:
             async for item in events:
@@ -500,6 +509,7 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
         initial_usage: dict[str, int] | None = None,
         map_failed: bool = False,
         findings: Sequence[str] = (),
+        context_only: Collection[str] = (),
     ) -> AsyncGenerator[AnswerStreamEvent | LLMResult, None]:
         if not citations:
             yield LLMResult(answer=None, error_code="no_evidence")
@@ -508,7 +518,10 @@ class HistoryResponseSynthesizer(BaseSynthesizer):
             yield LLMResult(answer=None, error_code="not_configured")
             return
         preparation: HierarchicalPreparation | None = None
-        if request_payload is None and len(citations) > LLM_EVIDENCE_BATCH_SIZE:
+        if (
+            request_payload is None
+            and _primary_evidence_count(citations, context_only) > LLM_EVIDENCE_BATCH_SIZE
+        ):
             yield AnswerStreamEvent("status", {"message": "正在分组归纳跨阶段证据…"})
             preparation = await _prepare_hierarchical_answer(
                 settings=self._settings,

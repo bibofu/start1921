@@ -131,6 +131,13 @@ class HistoryTaskExecutor:
         self.runtime = runtime
         self.budget = budget
         self.interpretation = interpretation
+        # Neighbour evidence is supporting context, not the ranked evidence the
+        # task was asked to retrieve. It must not trigger grouped synthesis.
+        self._context_only_ids: set[str] = set()
+
+    @property
+    def context_only_evidence_ids(self) -> frozenset[str]:
+        return frozenset(self._context_only_ids)
 
     async def execute(
         self,
@@ -388,6 +395,7 @@ class HistoryTaskExecutor:
                     )
                     if citation.evidence_id not in ids:
                         ids.append(citation.evidence_id)
+                        self._context_only_ids.add(citation.evidence_id)
         missing = list(retrieval.coverage_gaps)
         if not ids:
             missing = list(dict.fromkeys([*missing, task.objective]))
