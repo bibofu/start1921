@@ -1,19 +1,16 @@
-"""Delivery-time citation checks for the highest-confidence signals only.
+"""Delivery-time citation checks.
 
 The offline validator in :mod:`history_agent.answering.validation` keeps its frozen
-evaluation semantics. This module enforces the subset of checks that are precise
-enough to act on while an answer is being delivered:
+evaluation semantics. Production only enforces facts about citation existence:
 
 * a marker naming evidence that is not in this request's evidence bundle;
+* a citation whose quoted passage does not occur in the cited chunk's full text;
 * a prose page reference (``《文献》PDF 第 N 页``) that contradicts the evidence
   cited in the same line.
 
-Dates and uncited claims stay in the offline validator. They are measured in a
-later phase before any of them is allowed to change a delivered answer.
-
-Nothing here calls a model. The whole check is regular expressions over a bounded
-answer string, so the latency cost is milliseconds and a failure can never take a
-request down (fail open).
+Dates, entailment and uncited claims stay in the offline validator. Nothing here
+calls a model: the whole check is string matching over a bounded answer, so the
+cost is milliseconds and a failure can never take a request down (fail open).
 """
 
 from __future__ import annotations
@@ -46,10 +43,11 @@ EMPTY_BRACKETS = re.compile(r"[（(【]\s*[)）】]")
 DUPLICATE_PUNCTUATION = re.compile(r"([，、；。])\1+")
 SPACE_BEFORE_PUNCTUATION = re.compile(r"[ \t]+(?=[，。！？；：、）】」』\[])")
 MULTIPLE_SPACES = re.compile(r"[ \t]{2,}")
-QUOTED_PASSAGE = re.compile(r"[「“](?P<text>.{8,120}?)[」”]")
 WHITESPACE = re.compile(r"\s+")
+ELLIPSIS = re.compile(r"[…]+")
+MERGED_QUOTE = re.compile(r"\n[ \t]*…+[ \t]*\n")
 MAX_ANSWER_CHARS = 50_000
-MAX_QUOTE_SAMPLES = 5
+MIN_VERIFIABLE_QUOTE = 8
 
 
 @dataclass(frozen=True)
@@ -61,10 +59,9 @@ class CitationCheckResult:
     skipped_reason: str | None = None
     error_code: str | None = None
     removed_markers: tuple[str, ...] = ()
+    dropped_citations: tuple[str, ...] = ()
     removed_page_references: tuple[str, ...] = ()
     rewritten_page_references: tuple[str, ...] = ()
-    unverified_quotes: tuple[str, ...] = ()
-    full_text_evidence: int = 0
 
     def limitations(self) -> list[str]:
         messages: list[str] = []
@@ -72,6 +69,11 @@ class CitationCheckResult:
             messages.append(
                 f"已移除 {len(self.removed_markers)} 处无法核实的引用标记"
                 "（编号不在本轮证据包内）。"
+            )
+        if self.dropped_citations:
+            messages.append(
+                f"已移除 {len(self.dropped_citations)} 条引用："
+                "其引文片段在对应文献原文中未找到。"
             )
         if self.removed_page_references:
             messages.append(
@@ -124,41 +126,29 @@ def _tidy(answer: str) -> str:
 
 
 def _compact(text: str) -> str:
-    return WHITESPACE.sub("", text)
+    return WHITESPACE.sub("", ELLIPSIS.sub("", text))
 
 
-def _unverified_quotes(
-    answer: str,
-    citations: list[Citation],
-    registry: EvidenceRegistry | None,
-) -> tuple[tuple[str, ...], int]:
-    """Telemetry only: quoted passages that do not occur in any cited full text.
+def quote_exists(quote: str, source_text: str) -> bool:
+    """Whether every verifiable segment of ``quote`` occurs in the source text.
 
-    This never rewrites the answer. It exists so the next phase can measure how
-    often a model fabricates a verbatim quotation before that signal is enforced.
+    A quote may be truncated (leading/trailing ``……``) or merged from several
+    excerpts of the same source (``\\n……\\n``). Segments shorter than eight
+    characters cannot be checked meaningfully, so they fail open.
     """
 
-    if registry is None:
-        return (), 0
-    passages = [match.group("text") for match in QUOTED_PASSAGE.finditer(answer)]
-    if not passages:
-        return (), 0
-    haystacks: list[str] = []
-    for citation in citations:
-        try:
-            raw = registry.raw_text(citation.evidence_id)
-        except Exception:
-            continue
-        if raw:
-            haystacks.append(_compact(raw))
-    if not haystacks:
-        return (), 0
-    unverified = tuple(
-        passage
-        for passage in passages[:MAX_QUOTE_SAMPLES]
-        if not any(_compact(passage) in haystack for haystack in haystacks)
-    )
-    return unverified, len(haystacks)
+    haystack = _compact(source_text)
+    if not haystack:
+        return True
+    segments = [segment for segment in MERGED_QUOTE.split(quote) if segment.strip()]
+    verifiable = [
+        needle
+        for needle in (_compact(segment) for segment in segments)
+        if len(needle) >= MIN_VERIFIABLE_QUOTE
+    ]
+    if not verifiable:
+        return True
+    return all(needle in haystack for needle in verifiable)
 
 
 def check_citations(
@@ -171,8 +161,7 @@ def check_citations(
 ) -> CitationCheckResult:
     """Remove citation artifacts that cannot be true, and report what changed.
 
-    Only two signals are enforced; both are cheap and high precision. Everything
-    unexpected returns the original answer unchanged.
+    Everything unexpected returns the original answer unchanged.
     """
 
     if mode == "off":
@@ -199,6 +188,27 @@ def check_citations(
         )
 
 
+def _verifiable_citations(
+    citations: list[Citation], registry: EvidenceRegistry | None
+) -> tuple[dict[str, Citation], list[str]]:
+    """Drop citations whose quoted passage is absent from the source chunk."""
+
+    if registry is None:
+        return {citation.evidence_id: citation for citation in citations}, []
+    available: dict[str, Citation] = {}
+    dropped: list[str] = []
+    for citation in citations:
+        try:
+            source = registry.raw_text(citation.evidence_id)
+        except Exception:
+            source = ""
+        if source and not quote_exists(citation.quote, source):
+            dropped.append(citation.evidence_id)
+            continue
+        available[citation.evidence_id] = citation
+    return available, dropped
+
+
 def _check(
     answer: str,
     citations: list[Citation],
@@ -206,7 +216,12 @@ def _check(
     registry: EvidenceRegistry | None,
     run_id: str | None,
 ) -> CitationCheckResult:
-    available = {citation.evidence_id: citation for citation in citations}
+    available, dropped = _verifiable_citations(citations, registry)
+    dropped_ids = set(dropped)
+    if dropped_ids:
+        for evidence_id in dropped_ids:
+            answer = answer.replace(f"[{evidence_id}]", "")
+
     removed_markers: list[str] = []
     for marker in dict.fromkeys(EVIDENCE_MARKER.findall(answer)):
         if marker not in available:
@@ -242,28 +257,25 @@ def _check(
         return f"《{document}》"
 
     checked = PAGE_REFERENCE.sub(replace_page, answer)
-    changed = bool(removed_markers or removed_pages or rewritten_pages)
+    changed = bool(dropped or removed_markers or removed_pages or rewritten_pages)
     answer = _tidy(checked) if changed else checked
 
-    unverified_quotes, full_text_count = _unverified_quotes(answer, citations, registry)
     result = CitationCheckResult(
         answer=answer,
         removed_markers=tuple(removed_markers),
+        dropped_citations=tuple(dropped),
         removed_page_references=tuple(removed_pages),
         rewritten_page_references=tuple(rewritten_pages),
-        unverified_quotes=unverified_quotes,
-        full_text_evidence=full_text_count,
     )
     log_event(
         LOGGER,
         logging.INFO,
         "citation_check",
         run_id=run_id,
+        dropped_citations=list(result.dropped_citations),
         removed_markers=list(result.removed_markers),
         removed_page_references=list(result.removed_page_references),
         rewritten_page_references=list(result.rewritten_page_references),
-        unverified_quote_count=len(result.unverified_quotes),
-        full_text_evidence=result.full_text_evidence,
         changed=changed,
     )
     return result

@@ -97,9 +97,9 @@ def deliver_answer(
         answer += "\n\n" + " ".join(f"[{citation.evidence_id}]" for citation in citations)
         used = list(citations)
     if llm_used:
-        # Enforce only fabricated reference syntax and contradictory page numbers.
-        # Dates and uncited claims stay offline until their false-positive rate is
-        # measured; a failure here must never replace the model's answer.
+        # Verify that every citation the model wrote points at evidence in this
+        # request and that its quoted passage really exists in the source chunk.
+        # A failure here must never replace the model's answer.
         check = check_citations(
             answer,
             citations,
@@ -108,6 +108,12 @@ def deliver_answer(
             run_id=summary.run_id,
         )
         answer = check.answer
+        if check.dropped_citations:
+            dropped = set(check.dropped_citations)
+            citations = [
+                citation for citation in citations if citation.evidence_id not in dropped
+            ]
+            used = _citations_used_by_answer(answer, citations)
         limitations.extend(check.limitations())
     if summary.stopped_reason == "budget_exhausted":
         limitations.append("本次研究已达到执行预算，未完成部分不视为已核实。")

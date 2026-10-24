@@ -156,24 +156,58 @@ def test_check_failure_fails_open(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.error_code == "citation_check_failed"
 
 
-def test_unverified_quote_is_reported_but_not_removed() -> None:
-    answer = "他提出「调查研究是十月怀胎」。[E1]"
+def test_citation_is_kept_when_the_quote_exists() -> None:
+    registry = _FakeRegistry({"E1": "1956年1月2日，出席中央政治局会议。会后发言。"})
+
+    result = check_citations("他出席会议。[E1]", [_citation()], registry=registry)
+
+    assert result.answer == "他出席会议。[E1]"
+    assert result.dropped_citations == ()
+    assert result.limitations() == []
+
+
+def test_citation_is_dropped_when_the_quote_is_absent() -> None:
+    registry = _FakeRegistry({"E1": "这一页讲的是完全不同的内容。"})
+
+    result = check_citations("他出席会议。[E1]", [_citation()], registry=registry)
+
+    assert "[E1]" not in result.answer
+    assert result.dropped_citations == ("E1",)
+    assert any("引文片段" in note for note in result.limitations())
+
+
+def test_merged_quote_segments_must_all_exist() -> None:
+    citation = _citation(quote="出席中央政治局会议。\n……\n讨论了一九五六年的科学规划。")
+    registry = _FakeRegistry({"E1": "1956年1月2日，出席中央政治局会议。会后讨论其他事项。"})
+
+    result = check_citations("他出席会议。[E1]", [citation], registry=registry)
+
+    assert result.dropped_citations == ("E1",)
+
+
+def test_truncated_quote_with_ellipsis_still_matches() -> None:
+    citation = _citation(quote="……出席中央政治局会议。")
     registry = _FakeRegistry({"E1": "1956年1月2日，出席中央政治局会议。"})
 
-    result = check_citations(answer, [_citation()], registry=registry)
+    result = check_citations("他出席会议。[E1]", [citation], registry=registry)
 
-    assert "调查研究是十月怀胎" in result.answer
-    assert result.unverified_quotes == ("调查研究是十月怀胎",)
+    assert result.dropped_citations == ()
 
 
-def test_verified_quote_is_not_reported() -> None:
-    answer = "他提出「出席中央政治局会议」。[E1]"
-    registry = _FakeRegistry({"E1": "1956年1月2日，出席中央政治局会议并发言。"})
+def test_short_quote_fails_open() -> None:
+    citation = _citation(quote="会议。")
+    registry = _FakeRegistry({"E1": "完全无关的一段话。"})
 
-    result = check_citations(answer, [_citation()], registry=registry)
+    result = check_citations("他出席会议。[E1]", [citation], registry=registry)
 
-    assert result.unverified_quotes == ()
-    assert result.full_text_evidence == 1
+    assert result.dropped_citations == ()
+
+
+def test_quote_verification_requires_a_registry() -> None:
+    result = check_citations("他出席会议。[E1]", [_citation()])
+
+    assert result.dropped_citations == ()
+    assert "[E1]" in result.answer
 
 
 def _summary(citations: list[Citation]) -> ExecutionSummary:
@@ -197,7 +231,11 @@ def _summary(citations: list[Citation]) -> ExecutionSummary:
     )
 
 
-def _deliver(answer: str, citations: list[Citation]) -> AnswerResponse:
+def _deliver(
+    answer: str,
+    citations: list[Citation],
+    registry: Any = None,
+) -> AnswerResponse:
     return deliver_answer(
         Settings(_env_file=None, llm_api_key="sk-test"),
         QuestionRequest(question="周恩来在1956年有哪些经历"),
@@ -206,6 +244,7 @@ def _deliver(answer: str, citations: list[Citation]) -> AnswerResponse:
         citations,
         LLMResult(answer),
         unresolved=[],
+        registry=registry,
     )
 
 
@@ -234,3 +273,14 @@ def test_delivery_does_not_touch_extractive_fallback() -> None:
     response = _deliver("", citations)
 
     assert response.generator_mode == "extractive"
+
+
+def test_delivery_drops_a_citation_whose_quote_is_missing() -> None:
+    citation = _citation()
+    registry = _FakeRegistry({"E1": "这一页讲的是完全不同的内容。"})
+
+    response = _deliver("1956年1月2日，他出席会议。[E1]", [citation], registry=registry)
+
+    assert response.citations == []
+    assert "[E1]" not in response.answer
+    assert any("引文片段" in note for note in response.limitations)
