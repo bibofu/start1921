@@ -1,8 +1,7 @@
 """Offline citation diagnostics.
 
-The validator entry points here are used only by offline evaluation and
-regression checks. Production delivery imports nothing from this module except
-the pure ``normalize_chinese_dates`` helper used by ``citation_check``.
+This module is intentionally not imported by the production synthesis path. It is
+retained for evaluation metrics and historical regression checks.
 """
 
 from __future__ import annotations

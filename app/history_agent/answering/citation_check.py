@@ -8,11 +8,8 @@ enough to act on while an answer is being delivered:
 * a prose page reference (``《文献》PDF 第 N 页``) that contradicts the evidence
   cited in the same line.
 
-Dates are analysed against the cited chunk's full text, not the 420-character
-excerpt, and only reported as a review note: an offline replay of 13 real answers
-showed every date the old excerpt-based rule flagged was a citation gap or a meta
-sentence, not a false date, so rewriting dates would remove correct facts. The
-note is opt-in through ``HISTORY_AGENT_CITATION_CHECK=s1_dates``.
+Dates and uncited claims stay in the offline validator. They are measured in a
+later phase before any of them is allowed to change a delivered answer.
 
 Nothing here calls a model. The whole check is regular expressions over a bounded
 answer string, so the latency cost is milliseconds and a failure can never take a
@@ -27,7 +24,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
 from history_agent.answering.models import Citation
-from history_agent.answering.validation import normalize_chinese_dates
 from history_agent.log import log_event
 
 if TYPE_CHECKING:
@@ -35,7 +31,7 @@ if TYPE_CHECKING:
 
 LOGGER = logging.getLogger(__name__)
 
-CitationCheckMode = Literal["off", "s1", "s1_dates"]
+CitationCheckMode = Literal["off", "s1"]
 
 EVIDENCE_MARKER = re.compile(r"\[(E\d+)\]")
 # Kept separate from validation.SOURCE_PAGE_REFERENCE on purpose: the offline
@@ -54,39 +50,6 @@ QUOTED_PASSAGE = re.compile(r"[「“](?P<text>.{8,120}?)[」”]")
 WHITESPACE = re.compile(r"\s+")
 MAX_ANSWER_CHARS = 50_000
 MAX_QUOTE_SAMPLES = 5
-# Arabic dates only: CJK dates in an answer are almost always inside a verbatim
-# quotation from the source, so rewriting them would edit the historical text.
-ARABIC_FULL_DATE = re.compile(
-    r"(?<!\d)(?P<year>(?:18|19|20)\d{2})\s*年\s*"
-    r"(?P<month>0?[1-9]|1[0-2])\s*月"
-    r"(?:\s*(?P<day>3[01]|[12]\d|0?[1-9])\s*日)?"
-)
-ARABIC_MONTH_DAY = re.compile(
-    r"(?<!\d)(?P<month>0?[1-9]|1[0-2])\s*月"
-    r"(?:\s*(?P<day>3[01]|[12]\d|0?[1-9])\s*日)?"
-)
-SECTION_YEAR = re.compile(r"(?<!\d)((?:18|19|20)\d{2})(?!\d)")
-MAX_DATE_FINDINGS = 50
-
-DateVerdict = Literal[
-    "supported",
-    "partial",
-    "contradicted_month",
-    "contradicted_year",
-    "unverifiable",
-]
-
-
-@dataclass(frozen=True)
-class DateFinding:
-    """One date written by the model, judged against the full cited text."""
-
-    raw: str
-    year: int
-    month: int
-    day: int | None
-    verdict: DateVerdict
-    evidence_count: int
 
 
 @dataclass(frozen=True)
@@ -102,7 +65,6 @@ class CitationCheckResult:
     rewritten_page_references: tuple[str, ...] = ()
     unverified_quotes: tuple[str, ...] = ()
     full_text_evidence: int = 0
-    date_findings: tuple[DateFinding, ...] = ()
 
     def limitations(self) -> list[str]:
         messages: list[str] = []
@@ -118,17 +80,6 @@ class CitationCheckResult:
         if self.rewritten_page_references:
             messages.append(
                 f"已修正 {len(self.rewritten_page_references)} 处页码表述，仅保留文献名。"
-            )
-        uncertain = [
-            finding.raw
-            for finding in self.date_findings
-            if finding.verdict in {"contradicted_month", "contradicted_year"}
-        ]
-        if uncertain:
-            sample = "、".join(uncertain[:2])
-            messages.append(
-                f"有 {len(uncertain)} 处日期在所引证据的同一时期中没有对应记载"
-                f"（如 {sample}），请回到原文核对。"
             )
         return messages
 
@@ -210,136 +161,6 @@ def _unverified_quotes(
     return unverified, len(haystacks)
 
 
-def _section_year(citation: Citation) -> int | None:
-    years: set[int] = set()
-    for section in citation.section:
-        years.update(int(match.group(1)) for match in SECTION_YEAR.finditer(section))
-    return next(iter(years)) if len(years) == 1 else None
-
-
-def _evidence_dates(text: str, citation: Citation) -> list[tuple[int | None, int, int | None]]:
-    """Every date the cited chunk states, with an optional year.
-
-    Chronologies carry the year in the section heading and write only the month
-    and day in the body, so a month/day mention inherits an unambiguous section
-    or citation year rather than being treated as yearless evidence.
-    """
-
-    normalized = normalize_chinese_dates(text)
-    dates: list[tuple[int | None, int, int | None]] = []
-    covered: list[tuple[int, int]] = []
-    for match in ARABIC_FULL_DATE.finditer(normalized):
-        day = int(match["day"]) if match["day"] else None
-        dates.append((int(match["year"]), int(match["month"]), day))
-        covered.append((match.start(), match.end()))
-    fallback = _section_year(citation)
-    if fallback is None:
-        mentions = sorted(set(citation.year_mentions))
-        fallback = mentions[0] if len(mentions) == 1 else None
-    for match in ARABIC_MONTH_DAY.finditer(normalized):
-        if any(start <= match.start() < end for start, end in covered):
-            continue
-        month = int(match["month"])
-        day = int(match["day"]) if match["day"] else None
-        if fallback is None:
-            dates.append((None, month, day))
-        elif (fallback, month, day) not in dates:
-            dates.append((fallback, month, day))
-    return dates
-
-
-def _classify_date(
-    year: int,
-    month: int,
-    day: int | None,
-    evidence: list[tuple[int | None, int, int | None]],
-) -> DateVerdict:
-    """A cheaper answer may be less precise than the evidence, never more."""
-
-    if not evidence:
-        return "unverifiable"
-    same_year = [item for item in evidence if item[0] is None or item[0] == year]
-    month_match = [item for item in same_year if item[1] == month]
-    if month_match:
-        if any(day is None or item[2] == day for item in month_match):
-            return "supported"
-        # The month is right but no cited date carries this day. Treat it as
-        # unsupported precision, never as a contradiction: neighbouring pages
-        # often hold the exact day and the citation is only the closest chunk.
-        return "partial"
-    if same_year:
-        return "contradicted_month"
-    return "contradicted_year"
-
-
-_DATE_PRIORITY: tuple[DateVerdict, ...] = (
-    "supported",
-    "partial",
-    "contradicted_month",
-    "contradicted_year",
-    "unverifiable",
-)
-
-
-def _best_date_verdict(verdicts: list[DateVerdict]) -> DateVerdict:
-    if not verdicts:
-        return "unverifiable"
-    for level in _DATE_PRIORITY:
-        if level in verdicts:
-            return level
-    return verdicts[0]
-
-
-def _date_findings(
-    answer: str,
-    citations: list[Citation],
-    registry: EvidenceRegistry | None,
-) -> tuple[DateFinding, ...]:
-    """Judge each date against the full text of the evidence cited beside it."""
-
-    if registry is None:
-        return ()
-    available = {citation.evidence_id: citation for citation in citations}
-    evidence_cache: dict[str, list[tuple[int | None, int, int | None]]] = {}
-    findings: list[DateFinding] = []
-    for match in ARABIC_FULL_DATE.finditer(answer):
-        if len(findings) >= MAX_DATE_FINDINGS:
-            break
-        line = _containing_line(answer, match.start())
-        markers = [
-            item
-            for item in dict.fromkeys(EVIDENCE_MARKER.findall(line))
-            if item in available
-        ]
-        if not markers:
-            continue
-        year = int(match["year"])
-        month = int(match["month"])
-        day = int(match["day"]) if match["day"] else None
-        verdicts: list[DateVerdict] = []
-        for marker in markers:
-            if marker not in evidence_cache:
-                try:
-                    text = registry.raw_text(marker)
-                except Exception:
-                    text = ""
-                evidence_cache[marker] = (
-                    _evidence_dates(text, available[marker]) if text else []
-                )
-            verdicts.append(_classify_date(year, month, day, evidence_cache[marker]))
-        findings.append(
-            DateFinding(
-                raw=match.group(0),
-                year=year,
-                month=month,
-                day=day,
-                verdict=_best_date_verdict(verdicts),
-                evidence_count=len(markers),
-            )
-        )
-    return tuple(findings)
-
-
 def check_citations(
     answer: str,
     citations: list[Citation],
@@ -362,7 +183,7 @@ def check_citations(
         return CitationCheckResult(answer=answer, skipped_reason="answer_too_long")
 
     try:
-        return _check(answer, citations, registry=registry, mode=mode, run_id=run_id)
+        return _check(answer, citations, registry=registry, run_id=run_id)
     except Exception as exc:  # pragma: no cover - defensive, must never break delivery
         log_event(
             LOGGER,
@@ -383,7 +204,6 @@ def _check(
     citations: list[Citation],
     *,
     registry: EvidenceRegistry | None,
-    mode: CitationCheckMode,
     run_id: str | None,
 ) -> CitationCheckResult:
     available = {citation.evidence_id: citation for citation in citations}
@@ -426,9 +246,6 @@ def _check(
     answer = _tidy(checked) if changed else checked
 
     unverified_quotes, full_text_count = _unverified_quotes(answer, citations, registry)
-    date_findings = (
-        _date_findings(answer, citations, registry) if mode == "s1_dates" else ()
-    )
     result = CitationCheckResult(
         answer=answer,
         removed_markers=tuple(removed_markers),
@@ -436,23 +253,17 @@ def _check(
         rewritten_page_references=tuple(rewritten_pages),
         unverified_quotes=unverified_quotes,
         full_text_evidence=full_text_count,
-        date_findings=date_findings,
     )
     log_event(
         LOGGER,
         logging.INFO,
         "citation_check",
         run_id=run_id,
-        mode=mode,
         removed_markers=list(result.removed_markers),
         removed_page_references=list(result.removed_page_references),
         rewritten_page_references=list(result.rewritten_page_references),
         unverified_quote_count=len(result.unverified_quotes),
         full_text_evidence=result.full_text_evidence,
-        date_verdicts={
-            verdict: sum(1 for item in date_findings if item.verdict == verdict)
-            for verdict in _DATE_PRIORITY
-        },
         changed=changed,
     )
     return result

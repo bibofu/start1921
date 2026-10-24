@@ -36,7 +36,6 @@ def _citation(
     page: int = 688,
     page_end: int | None = None,
     quote: str = "1956年1月2日，出席中央政治局会议。",
-    section: list[str] | None = None,
 ) -> Citation:
     return Citation(
         evidence_id=evidence_id,
@@ -44,7 +43,7 @@ def _citation(
         document=document,
         pdf_page=page,
         pdf_page_end=page_end,
-        section=["1956年"] if section is None else section,
+        section=["1956年"],
         quote=quote,
         source_type="chronology",
         verification_status="verified",
@@ -235,116 +234,3 @@ def test_delivery_does_not_touch_extractive_fallback() -> None:
     response = _deliver("", citations)
 
     assert response.generator_mode == "extractive"
-
-
-def _dated(text: str, **overrides: Any) -> tuple[Citation, _FakeRegistry]:
-    citation = _citation(**overrides)
-    return citation, _FakeRegistry({"E1": text})
-
-
-def test_date_fully_supported_by_full_text() -> None:
-    citation, registry = _dated("1956年1月2日，出席中央政治局会议，讨论科学规划。")
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert [item.verdict for item in result.date_findings] == ["supported"]
-    assert result.limitations() == []
-
-
-def test_section_year_supplies_the_missing_year() -> None:
-    citation, registry = _dated("1月2日，出席中央政治局会议。", section=["1956年"])
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert [item.verdict for item in result.date_findings] == ["supported"]
-
-
-def test_day_beyond_the_cited_chunk_is_not_treated_as_wrong() -> None:
-    citation, registry = _dated("1956年1月，出席中央政治局会议。")
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert [item.verdict for item in result.date_findings] == ["partial"]
-    assert result.limitations() == []
-
-
-def test_month_absent_from_the_cited_year_is_reported() -> None:
-    citation, registry = _dated("1956年3月5日，出席中央政治局会议。")
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert [item.verdict for item in result.date_findings] == ["contradicted_month"]
-    assert any("请回到原文核对" in note for note in result.limitations())
-
-
-def test_year_absent_from_the_evidence_is_reported() -> None:
-    citation, registry = _dated("1957年3月5日，出席中央政治局会议。", section=[])
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert [item.verdict for item in result.date_findings] == ["contradicted_year"]
-    assert any("1956年1月2日" in note for note in result.limitations())
-
-
-def test_injected_wrong_year_is_detected() -> None:
-    citation, registry = _dated("1956年1月2日，出席中央政治局会议。")
-    correct = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-    tampered = check_citations(
-        "1959年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert correct.date_findings[0].verdict == "supported"
-    assert tampered.date_findings[0].verdict == "contradicted_year"
-
-
-def test_dates_are_not_checked_without_the_opt_in() -> None:
-    citation, registry = _dated("1957年3月5日，出席中央政治局会议。")
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。[E1]", [citation], registry=registry, mode="s1"
-    )
-
-    assert result.date_findings == ()
-
-
-def test_dates_are_not_checked_without_full_text() -> None:
-    citation = _citation()
-
-    result = check_citations("1956年1月2日，他出席会议。[E1]", [citation], mode="s1_dates")
-
-    assert result.date_findings == ()
-
-
-def test_cjk_dates_inside_quotations_are_ignored() -> None:
-    citation, registry = _dated("一九六一年三月十三日，写出调查报告。")
-
-    result = check_citations(
-        "他写道：“一九六一年三月十三日”。[E1]", [citation], registry=registry, mode="s1_dates"
-    )
-
-    assert result.date_findings == ()
-
-
-def test_date_without_a_nearby_marker_is_ignored() -> None:
-    citation, registry = _dated("1957年3月5日，出席中央政治局会议。")
-
-    result = check_citations(
-        "1956年1月2日，他出席会议。\n\n另有记录[E1]。",
-        [citation],
-        registry=registry,
-        mode="s1_dates",
-    )
-
-    assert result.date_findings == ()
