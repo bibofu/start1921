@@ -22,7 +22,7 @@ from llama_index.core.prompts import ChatPromptTemplate
 from llama_index.core.prompts.mixin import PromptDictType
 from llama_index.core.response_synthesizers.base import BaseSynthesizer
 
-from history_agent.answering.context import requires_conversation_context, sanitize_history_content
+from history_agent.answering.context import sanitize_history_content
 from history_agent.answering.llamaindex_llm import (
     DeepSeekLlamaIndexLLM,
     chat_messages,
@@ -154,9 +154,8 @@ def _llm_request_payload(
         "仅提到人物、收发报告或参加一般活动的材料不能作为职务变化。"
         "说明证据时间范围有限时不要逐年罗列证据年份，使用概括表述。"
     )
-    history_items = request.history if requires_conversation_context(request.question) else []
     history_text = "\n".join(
-        f"{item.role}: {sanitize_history_content(item.content)}" for item in history_items
+        f"{item.role}: {sanitize_history_content(item.content)}" for item in request.history
     )
     prompt = ChatPromptTemplate.from_messages(
         [

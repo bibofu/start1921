@@ -422,7 +422,9 @@ class HistoryTaskExecutor:
                 {
                     "role": "user",
                     "content": (
-                        f"任务：{task.objective}\n要求：{task.required_aspects}\n证据：\n{evidence}"
+                        f"本轮完整问题：{self.request.question}\n"
+                        f"任务：{task.objective}\n任务输入：{task.query}\n"
+                        f"要求：{task.required_aspects}\n证据：\n{evidence}"
                     ),
                 },
             ],

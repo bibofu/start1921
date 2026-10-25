@@ -95,6 +95,9 @@ class QueryPlan(BaseModel):
     ] = "general"
     retrieval_route: Literal["structured", "hybrid"] = "hybrid"
     normalized_question: str = Field(min_length=2, max_length=500)
+    context_message_indices: list[Annotated[int, Field(ge=1)]] = Field(
+        default_factory=list, max_length=50,
+    )
     search_queries: list[ShortQueryText] = Field(default_factory=list, max_length=8)
     entities: list[QueryEntity] = Field(default_factory=list, max_length=12)
     start_year: int | None = Field(default=None, ge=1800, le=2100)

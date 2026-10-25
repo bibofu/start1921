@@ -11,6 +11,7 @@ import httpx
 from llama_index.core.workflow import Context, Event, StartEvent, StopEvent, Workflow, step
 from workflows.handler import WorkflowHandler
 
+from history_agent.answering.context import build_prompt_context
 from history_agent.answering.delivery import deliver_answer
 from history_agent.answering.evidence import EvidenceRegistry
 from history_agent.answering.models import (
@@ -22,7 +23,12 @@ from history_agent.answering.models import (
     TaskResult,
 )
 from history_agent.answering.planning import compile_research_plan, extend_research_plan
-from history_agent.answering.query_understanding import QueryPlanningResult, plan_question
+from history_agent.answering.query_understanding import (
+    QueryPlanningResult,
+    fallback_planning_result,
+    plan_question,
+    resolved_request,
+)
 from history_agent.answering.retrieval_reflection import assess_retrieval
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.answering.synthesis import HistoryResponseSynthesizer, LLMResult
@@ -89,6 +95,7 @@ class HistoryResearchWorkflow(Workflow):
         self.llm_result = LLMResult(answer=None)
         self.selected_ids: list[str] = []
         self.request: QuestionRequest
+        self.execution_request: QuestionRequest
         self.plan: ResearchPlan
         self.planning: QueryPlanningResult
         self.executor: HistoryTaskExecutor
@@ -115,7 +122,12 @@ class HistoryResearchWorkflow(Workflow):
 
     @step
     async def make_plan(self, ctx: Context, ev: ResearchStartEvent) -> DispatchEvent | FinishEvent:
-        self.request = ev.request
+        self.request = ev.request.model_copy(update={"history": build_prompt_context(
+            ev.request.history,
+            max_messages=self.settings.context_max_messages,
+            max_chars=self.settings.context_max_chars,
+            max_tokens=self.settings.context_max_tokens,
+        )})
         self.progress(ctx, "正在理解问题并安排研究任务…")
         try:
             self.planning = await self.bounded(
@@ -128,7 +140,9 @@ class HistoryResearchWorkflow(Workflow):
                 )
             )
         except (TimeoutError, httpx.TimeoutException):
-            self.planning = QueryPlanningResult(None, "fallback", error_code="request_timeout")
+            self.planning = fallback_planning_result(
+                self.settings, self.request, error_code="request_timeout",
+            )
             self.stop_reason = "budget_exhausted"
         self.record_usage("planning", self.planning.usage)
         self.plan = self.planning.research_plan or compile_research_plan(
@@ -136,9 +150,10 @@ class HistoryResearchWorkflow(Workflow):
             self.planning.plan,
             self.settings.person_aliases_path,
         )
+        self.execution_request = resolved_request(self.request, self.plan.interpretation)
         self.executor = HistoryTaskExecutor(
             self.settings,
-            self.request,
+            self.execution_request,
             self.registry,
             self._llm_runtime,
             self.budget,
@@ -295,7 +310,9 @@ class HistoryResearchWorkflow(Workflow):
                         asyncio.to_thread(
                             assess_retrieval,
                             self.settings,
-                            self.request.model_copy(update={"question": task.query[:500]}),
+                            self.execution_request.model_copy(
+                                update={"question": task.query[:500]},
+                            ),
                             interpretation,
                             result.retrieval,
                             self._llm_runtime,
@@ -397,9 +414,9 @@ class HistoryResearchWorkflow(Workflow):
         try:
             await self.bounded(
                 self.synthesizer.asynthesize(
-                    self.request.question,
+                    self.execution_request.question,
                     self.registry.nodes(self.selected_ids),
-                    request=self.request,
+                    request=self.execution_request,
                     citations=self.registry.citations(self.selected_ids),
                     event_sink=self.sink(ctx),
                     findings=findings,

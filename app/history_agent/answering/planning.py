@@ -122,14 +122,18 @@ def _inherit_constraints(
         updates["required_aspects"] = interpretation.constraints
     if task.start_year is None and interpretation.start_year is not None:
         updates.update(start_year=interpretation.start_year, end_year=interpretation.end_year)
-    source = _constrained_source(question)
+    scope = (
+        interpretation.normalized_question if interpretation.context_message_indices else question
+    )
+    source = _constrained_source(question) or _constrained_source(scope)
     if source is not None and task.source_title is None and task.tool != "analyze":
         updates["source_title"] = source
-    # Every task remains anchored to the original question, including constraints
-    # not representable as numeric year/document filters (month, place, negation).
+    # Execute one complete scope, not a mixture of an unresolved follow-up and
+    # its resolution. Keep the original wording on ResearchPlan for auditing.
     query = task.query
-    if question not in query:
-        query = f"{query}\n原始问题及约束：{question}"
+    if scope not in query:
+        suffix = f"\n问题及约束：{scope}"
+        query = query[: 1000 - len(suffix)] + suffix
     updates["query"] = query
     return ResearchTask.model_validate({**task.model_dump(), **updates})
 
@@ -147,7 +151,8 @@ def compile_research_plan(
     raw_tasks = semantic.tasks
     semantic = semantic.model_copy(update={"tasks": []})
     terminal = semantic.intent == "out_of_scope" or semantic.needs_clarification
-    tasks = [] if terminal else raw_tasks or [_default_task(question, semantic)]
+    scope = semantic.normalized_question if semantic.context_message_indices else question
+    tasks = [] if terminal else raw_tasks or [_default_task(scope, semantic)]
     tasks = [_inherit_constraints(task, question, semantic) for task in tasks]
     return validate_research_plan(
         ResearchPlan(question=question, interpretation=semantic, tasks=tasks)
@@ -166,11 +171,12 @@ def validate_research_plan(
         for entity in semantic.entities if entity.type == "person"
         for name in (entity.text, entity.canonical)
     }
-    named_titles = {_compact(title) for title in _source_titles(plan.question)}
-    required_source = _constrained_source(plan.question)
+    scope = semantic.normalized_question if semantic.context_message_indices else plan.question
+    named_titles = {_compact(title) for title in _source_titles(plan.question + scope)}
+    required_source = _constrained_source(plan.question) or _constrained_source(scope)
     for task in plan.tasks:
-        if plan.question not in task.query:
-            raise ValueError("Task queries must preserve the original question and constraints")
+        if scope not in task.query:
+            raise ValueError("Task queries must preserve the resolved question and constraints")
         if semantic.start_year is not None and semantic.end_year is not None:
             if (
                 task.start_year is None or task.end_year is None

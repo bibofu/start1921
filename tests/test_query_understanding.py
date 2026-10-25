@@ -89,6 +89,7 @@ def test_standalone_event_isolated_from_history_and_unsafe_plan_fields(
     payload = {
         "intent": "event_overview",
         "normalized_question": "介绍林彪1930年至1949年的淮海战役经历",
+        "context_message_indices": [],
         "search_queries": ["林彪 淮海战役 1930年至1949年"],
         "entities": [
             {"type": "event", "text": "淮海战役", "canonical": "淮海战役"},
@@ -121,8 +122,8 @@ def test_standalone_event_isolated_from_history_and_unsafe_plan_fields(
     result = plan_question(Settings(_env_file=None, llm_api_key="sk-test"), request)
 
     user_prompt = captured["json"]["messages"][-1]["content"]
-    assert "conversation_history" not in user_prompt
-    assert "林彪在1930-1949年" not in user_prompt
+    assert "conversation_history" in user_prompt
+    assert "林彪在1930-1949年" in user_prompt
     assert result.plan is not None
     assert result.plan.normalized_question == "详细介绍淮海战役"
     assert result.plan.start_year is None
@@ -139,6 +140,7 @@ def test_referential_question_keeps_history_for_resolution(monkeypatch: Any) -> 
     payload.update(
         {
             "normalized_question": "淮海战役的历史意义",
+            "context_message_indices": [3],
             "search_queries": ["淮海战役 历史意义"],
             "entities": [
                 {"type": "event", "text": "淮海战役", "canonical": "淮海战役"},

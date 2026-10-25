@@ -227,7 +227,9 @@ def test_analysis_reads_original_evidence_beyond_display_excerpt(
     )
 
     result = asyncio.run(
-        HistoryTaskExecutor(settings, QuestionRequest(question=task.query), registry).execute(
+        HistoryTaskExecutor(
+            settings, QuestionRequest(question="只依据会议记录比较两次会议的会后安排"), registry,
+        ).execute(
             task,
             {
                 "dependency": TaskResult(
@@ -243,6 +245,8 @@ def test_analysis_reads_original_evidence_beyond_display_excerpt(
     assert result.status == "completed"
     assert "文末补充决定涉及会后的执行安排。" in received[0]
     assert "PDF第12—13页" in received[0]
+    assert "本轮完整问题：只依据会议记录比较两次会议的会后安排" in received[0]
+    assert task.query in received[0]
     assert result.findings == ["文末另有补充决定。 [E1]"]
 
 

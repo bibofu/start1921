@@ -24,42 +24,6 @@ from history_agent.db_backend import (
 
 EVIDENCE_MARKER = re.compile(r"\[E[1-9]\d*\]")
 WHITESPACE = re.compile(r"[ \t]+")
-CONTEXTUAL_PRONOUN = re.compile(
-    r"(?:^|[，,。！？?!；;\s])(?:他|她|他们|她们|它|其)"
-    r"(?:的|在|于|后来|当时|又|还|曾|是否|如何|为何|为什么|做|说|提出|经历|观点)"
-)
-ELLIPTICAL_FOLLOW_UP = re.compile(
-    r"(?:呢|继续|接着说|再详细(?:一点|一些)?|展开(?:说说|介绍)?|还有吗|然后呢)"
-    r"[？?。！!\s]*$"
-)
-CONTEXT_REFERENCE_PHRASES = (
-    "刚才",
-    "前面",
-    "上述",
-    "上一轮",
-    "上一个",
-    "前者",
-    "后者",
-    "这位",
-    "那位",
-    "这个人",
-    "那个人",
-    "这场",
-    "那场",
-    "该战役",
-    "这次",
-    "那次",
-    "这件事",
-    "那件事",
-    "两人",
-    "双方",
-    "同一时期",
-    "同期",
-    "那年",
-    "当年",
-    "这一年",
-    "同年",
-)
 SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
 CJK_CHAR = re.compile(r"[\u3400-\u9fff\uf900-\ufaff]")
 COOKIE_CHECK_NAME = "start1921_cookie_check"
@@ -267,17 +231,6 @@ def sanitize_history_content(content: str) -> str:
     return "\n".join(WHITESPACE.sub(" ", line).strip() for line in content.splitlines()).strip()
 
 
-def requires_conversation_context(question: str) -> bool:
-    """Return whether the current question explicitly depends on an earlier turn."""
-
-    compact = question.strip()
-    return (
-        any(marker in compact for marker in CONTEXT_REFERENCE_PHRASES)
-        or CONTEXTUAL_PRONOUN.search(compact) is not None
-        or ELLIPTICAL_FOLLOW_UP.search(compact) is not None
-    )
-
-
 def _truncate(text: str, limit: int) -> str:
     if len(text) <= limit:
         return text
@@ -311,7 +264,7 @@ def build_prompt_context(
     max_tokens: int = 0,
     summary: str | None = None,
 ) -> list[ConversationMessage]:
-    """Keep recent complete turns plus an optional rolling summary within budget."""
+    """Budget recent exchanges before older summaries, preserving their user anchor."""
 
     if (not messages and not summary) or max_messages <= 0 or max_chars <= 0:
         return []
@@ -326,41 +279,89 @@ def build_prompt_context(
         for item in messages
         if item.content.strip() and item.status not in {"aborted", "failed"}
     ]
-    selected: list[ConversationMessage] = []
+    turns: list[list[ConversationMessage]] = []
+    for item in sanitized:
+        if item.role == "user" or not turns:
+            turns.append([item])
+        else:
+            turns[-1].append(item)
+
+    used_messages = 0
     used_chars = 0
     used_tokens = 0
-    summary_message: ConversationMessage | None = None
-    if summary:
-        summary_text = (
-            "会话摘要（仅用于承接和解析指代，不是史实证据；旧引用编号已失效）：\n"
-            + sanitize_history_content(summary)
-        )
-        summary_content = _truncate_to_budget(summary_text, max_chars, max_tokens)
-        if summary_content:
-            summary_message = ConversationMessage(
-                role="assistant",
-                content=summary_content,
-            )
-            used_chars += len(summary_content)
-            used_tokens += estimate_tokens(summary_content)
-    for item in reversed(sanitized):
-        remaining_chars = max_chars - used_chars
-        remaining_tokens = max_tokens - used_tokens if max_tokens > 0 else 0
-        if remaining_chars <= 0 or (max_tokens > 0 and remaining_tokens <= 0):
-            break
-        if len(selected) >= max_messages:
-            break
-        content = _truncate_to_budget(item.content, remaining_chars, remaining_tokens)
-        if not content:
-            break
-        selected.append(item.model_copy(update={"content": content}))
-        used_chars += len(content)
-        used_tokens += estimate_tokens(content)
-    selected.reverse()
 
-    omitted = sanitized[: len(sanitized) - len(selected)]
+    def allocate(items: list[ConversationMessage]) -> list[ConversationMessage]:
+        nonlocal used_messages, used_chars, used_tokens
+        allocated: list[ConversationMessage] = []
+        for item in items:
+            remaining_chars = max_chars - used_chars
+            remaining_tokens = max_tokens - used_tokens if max_tokens > 0 else 0
+            if (
+                used_messages >= max_messages
+                or remaining_chars <= 0
+                or (max_tokens > 0 and remaining_tokens <= 0)
+            ):
+                break
+            content = _truncate_to_budget(item.content, remaining_chars, remaining_tokens)
+            if not content:
+                break
+            allocated.append(item.model_copy(update={"content": content}))
+            used_messages += 1
+            used_chars += len(content)
+            used_tokens += estimate_tokens(content)
+        return allocated
+
+    # Keep the latest question first. A small reserved summary share also keeps
+    # the original subject available when recent turns only use pronouns.
+    latest_turn = turns.pop() if turns else []
+    selected = allocate(latest_turn[:1])
+    summary_messages: list[ConversationMessage] = []
+    summary_prefix = "会话摘要（仅用于承接，不是史实证据）：\n"
+    if latest_turn and max_messages < 3:
+        # With fewer than three slots, prefer the recent question/answer pair.
+        selected += allocate(latest_turn[1:])
+    if summary:
+        share = 4 if latest_turn and max_messages >= 3 else 1
+        summary_chars = (max_chars - used_chars) // share
+        summary_tokens = (max_tokens - used_tokens) // share if max_tokens > 0 else 0
+        summary_content = (
+            _truncate_to_budget(
+                summary_prefix + sanitize_history_content(summary),
+                summary_chars,
+                summary_tokens,
+            )
+            if summary_chars > 0 and (max_tokens <= 0 or summary_tokens > 0)
+            else ""
+        )
+        summary_messages = allocate(
+            [
+                ConversationMessage(
+                    role="assistant",
+                    content=summary_content,
+                )
+            ]
+        ) if summary_content.startswith(summary_prefix) else []
+    if max_messages >= 3:
+        selected += allocate(latest_turn[1:])
+
+    while turns:
+        turn = turns[-1]
+        if len(turn) > max_messages - used_messages:
+            break
+        additions = allocate(turn)
+        if not additions:
+            break
+        turns.pop()
+        selected = additions + selected
+        if len(additions) < len(turn) or any(
+            kept.content != original.content
+            for kept, original in zip(additions, turn, strict=True)
+        ):
+            break
+
+    omitted = [item for turn in turns for item in turn]
     old_questions = [item.content for item in omitted if item.role == "user"][-6:]
-    if old_questions and selected and summary_message is None:
+    if old_questions and selected and not summary_messages and used_messages < max_messages:
         topic_lines = [f"- {_truncate(question, 160)}" for question in old_questions]
         topic_index = (
             "更早对话的用户问题索引（仅用于解析指代，不是史实证据）：\n"
@@ -369,20 +370,10 @@ def build_prompt_context(
         available_chars = max_chars - used_chars
         available_tokens = max_tokens - used_tokens if max_tokens > 0 else 0
         if available_chars >= 80 and (max_tokens <= 0 or available_tokens > 0):
-            selected.insert(
-                0,
-                ConversationMessage(
-                    role="assistant",
-                    content=_truncate_to_budget(
-                        topic_index, available_chars, available_tokens
-                    ),
-                ),
-            )
-            if len(selected) > max_messages:
-                selected.pop(1)
-    if summary_message is not None:
-        selected.insert(0, summary_message)
-    return selected
+            selected = allocate(
+                [ConversationMessage(role="assistant", content=topic_index)]
+            ) + selected
+    return summary_messages + selected
 
 
 @dataclass(frozen=True)

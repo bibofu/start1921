@@ -66,8 +66,8 @@ def test_prompt_context_is_bounded_and_old_citation_ids_are_invalidated() -> Non
     context = build_prompt_context(messages, max_messages=4, max_chars=2_000)
 
     assert len(context) == 4
-    assert context[0].content.startswith("更早对话的用户问题索引")
-    assert "介绍遵义会议" in context[0].content
+    assert [item.role for item in context] == ["user", "assistant", "user", "assistant"]
+    assert context[0].content == "再介绍四渡赤水"
     assert context[-1].content == "最近的回答。[历史引用]"
     assert all("[E" not in item.content for item in context)
 
@@ -75,7 +75,7 @@ def test_prompt_context_is_bounded_and_old_citation_ids_are_invalidated() -> Non
 def test_prompt_context_enforces_character_budget_on_long_messages() -> None:
     context = build_prompt_context(
         [
-            ConversationMessage(role="user", content="前情" * 1000),
+            ConversationMessage(role="user", content="请介绍一个研究主题及其形成过程"),
             ConversationMessage(role="assistant", content="回答" * 1000),
         ],
         max_messages=12,
@@ -83,7 +83,143 @@ def test_prompt_context_enforces_character_budget_on_long_messages() -> None:
     )
 
     assert sum(len(item.content) for item in context) <= 600
+    assert [item.role for item in context] == ["user", "assistant"]
+    assert context[0].content == "请介绍一个研究主题及其形成过程"
     assert context[-1].content.endswith("[内容已截断]")
+
+
+def test_prompt_context_summary_cannot_displace_latest_exchange() -> None:
+    context = build_prompt_context(
+        [
+            ConversationMessage(role="user", content="这个机构何时成立？"),
+            ConversationMessage(role="assistant", content="最近回答中的机构名称。[E2]"),
+        ],
+        summary="更早的研究主题。" * 500,
+        max_messages=4,
+        max_chars=200,
+        max_tokens=120,
+    )
+
+    assert [item.role for item in context[-2:]] == ["user", "assistant"]
+    assert context[-2].content == "这个机构何时成立？"
+    assert context[-1].content == "最近回答中的机构名称。[历史引用]"
+    assert context[0].content.startswith("会话摘要")
+    assert len(context) <= 4
+    assert sum(len(item.content) for item in context) <= 200
+    assert sum(estimate_tokens(item.content) for item in context) <= 120
+
+
+@pytest.mark.parametrize("max_chars,max_tokens", [(800, 0), (100_000, 400)])
+def test_prompt_context_reserves_summary_beside_long_latest_answer(
+    max_chars: int, max_tokens: int,
+) -> None:
+    question = "那他之后呢？"
+    context = build_prompt_context(
+        [
+            ConversationMessage(role="user", content=question),
+            ConversationMessage(role="assistant", content="他还有其他活动。[E2]" * 2_000),
+        ],
+        summary="已讨论主体：周恩来。[E1]；其他旧线索。" * 100,
+        max_messages=3,
+        max_chars=max_chars,
+        max_tokens=max_tokens,
+    )
+
+    assert [item.role for item in context] == ["assistant", "user", "assistant"]
+    assert context[1].content == question
+    assert context[2].content.startswith("他还有其他活动。[历史引用]")
+    assert "不是史实证据" in context[0].content
+    assert "周恩来" in context[0].content
+    assert all("[E" not in item.content for item in context)
+    assert len(context[0].content) <= (max_chars - len(question)) // 4
+    assert sum(len(item.content) for item in context) <= max_chars
+    if max_tokens:
+        assert estimate_tokens(context[0].content) <= (
+            max_tokens - estimate_tokens(question)
+        ) // 4
+        assert sum(estimate_tokens(item.content) for item in context) <= max_tokens
+
+
+def test_prompt_context_two_slots_prioritize_latest_exchange_over_summary() -> None:
+    context = build_prompt_context(
+        [
+            ConversationMessage(role="user", content="那他之后呢？"),
+            ConversationMessage(role="assistant", content="最新回答。" * 1_000),
+        ],
+        summary="已讨论主体：周恩来。",
+        max_messages=2,
+        max_chars=600,
+    )
+
+    assert [item.role for item in context] == ["user", "assistant"]
+    assert context[0].content == "那他之后呢？"
+    assert context[1].content.startswith("最新回答。")
+
+
+def test_prompt_context_counts_summary_within_message_limit() -> None:
+    messages = [
+        ConversationMessage(role=role, content=f"第{turn}轮{role}")
+        for turn in range(4)
+        for role in ("user", "assistant")
+    ]
+
+    context = build_prompt_context(
+        messages, summary="以前的研究摘要", max_messages=4, max_chars=2_000
+    )
+
+    assert len(context) <= 4
+    assert context[0].content.startswith("会话摘要")
+    assert [item.content for item in context[-2:]] == ["第3轮user", "第3轮assistant"]
+    # Historical exchanges must not become an orphan assistant answer.
+    assert [item.role for item in context[1:]] == ["user", "assistant"]
+
+
+def test_prompt_context_single_slot_keeps_latest_user_question() -> None:
+    context = build_prompt_context(
+        [
+            ConversationMessage(role="user", content="较早主题"),
+            ConversationMessage(role="assistant", content="较早回答"),
+            ConversationMessage(role="user", content="当前研究对象是谁？"),
+            ConversationMessage(role="assistant", content="当前回答"),
+        ],
+        summary="旧摘要",
+        max_messages=1,
+        max_chars=200,
+    )
+
+    assert [(item.role, item.content) for item in context] == [
+        ("user", "当前研究对象是谁？")
+    ]
+
+
+def test_prompt_context_truncates_long_user_without_replacing_it_with_answer() -> None:
+    context = build_prompt_context(
+        [
+            ConversationMessage(role="user", content="最近研究问题" * 100),
+            ConversationMessage(role="assistant", content="最近回答" * 100),
+        ],
+        max_messages=2,
+        max_chars=100,
+        max_tokens=80,
+    )
+
+    assert context[0].role == "user"
+    assert context[0].content.startswith("最近研究问题")
+    assert len(context) <= 2
+    assert sum(len(item.content) for item in context) <= 100
+    assert sum(estimate_tokens(item.content) for item in context) <= 80
+
+
+def test_prompt_context_supports_bounded_summary_without_recent_messages() -> None:
+    context = build_prompt_context(
+        [], summary="旧摘要[E9]" * 100, max_messages=1, max_chars=200, max_tokens=100
+    )
+
+    assert len(context) == 1
+    assert context[0].content.startswith("会话摘要")
+    assert "[E9]" not in context[0].content
+    assert len(context[0].content) <= 200
+    assert estimate_tokens(context[0].content) <= 100
 
 
 def test_conversation_store_persists_and_clears_exchanges(postgres_target: str) -> None:
@@ -442,7 +578,7 @@ def test_question_storage_failure_does_not_silently_answer(
 
 def test_build_prompt_context_respects_token_budget() -> None:
     messages = [
-        ConversationMessage(role="user", content="前情" * 2_000),
+        ConversationMessage(role="user", content="这个政策的提出背景是什么？"),
         ConversationMessage(role="assistant", content="回答" * 2_000),
     ]
     context = build_prompt_context(
@@ -452,6 +588,8 @@ def test_build_prompt_context_respects_token_budget() -> None:
         max_tokens=120,
     )
     assert context
+    assert [item.role for item in context] == ["user", "assistant"]
+    assert context[0].content == "这个政策的提出背景是什么？"
     assert sum(estimate_tokens(item.content) for item in context) <= 120
 
 

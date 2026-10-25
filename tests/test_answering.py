@@ -455,13 +455,12 @@ def test_deepseek_v4_request_and_usage(monkeypatch: Any) -> None:
 
 
 @pytest.mark.parametrize(
-    ("question", "expects_history"),
-    [("详细介绍淮海战役", False), ("这场战役的意义呢？", True)],
+    "question",
+    ["详细介绍淮海战役", "那它具体在哪里？", "再给三个例子。"],
 )
-def test_generation_only_receives_history_for_referential_questions(
+def test_generation_preserves_planner_selected_history_without_lexical_gates(
     monkeypatch: Any,
     question: str,
-    expects_history: bool,
 ) -> None:
     captured: dict[str, Any] = {}
 
@@ -485,7 +484,7 @@ def test_generation_only_receives_history_for_referential_questions(
 
     messages = captured["json"]["messages"]
     has_history = any("<conversation_history>" in item["content"] for item in messages)
-    assert has_history is expects_history
+    assert has_history
     assert captured["json"]["temperature"] == 0
 
 
