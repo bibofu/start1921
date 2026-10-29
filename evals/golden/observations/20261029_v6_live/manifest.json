@@ -40,5 +40,6 @@
     "report": "data/reports/eval_development20_v6_live_20261029/report.json",
     "summary": "data/reports/eval_development20_v6_live_20261029/report.summary.json",
     "review_workbench": "data/reports/eval_development20_v6_live_20261029/reviews/index.html"
-  }
+  },
+  "note": "Historical v6 observation. The referenced v6 annotation/protocol files were cleaned on 2026-10-29; this manifest is retained for audit only."
 }

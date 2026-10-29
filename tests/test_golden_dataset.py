@@ -6,7 +6,7 @@ from pathlib import Path
 from history_agent.evaluation.pilot_models import PilotDataset
 
 ROOT = Path(__file__).resolve().parents[1]
-DATASET = ROOT / "evals/golden/golden_v2_selected20.json"
+DATASET = ROOT / "evals/golden/golden_dataset.json"
 DELETED = {
     "holdout_exact_decision",
     "pilot_semantic_deng_1962_agriculture",

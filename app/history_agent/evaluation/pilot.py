@@ -60,7 +60,7 @@ from history_agent.processing.chunks import effective_pages
 from history_agent.retrieval.hybrid import search_hybrid_index
 
 VERSION = "reviewable-pilot-v5"
-DEFAULT_DATASET = "evals/golden/pilot_annotations.json"
+DEFAULT_DATASET = "evals/golden/golden_dataset.json"
 DEFAULT_K = (1, 3, 5, 10, 20)
 
 

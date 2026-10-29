@@ -1,6 +1,6 @@
-# 当前评测集索引（selected20，2026-10-29）
+# 当前评测集索引（20 题，2026-10-29）
 
-按用户 2026-10-29 裁定，从 29 题中删除 9 题、改写 2 题后，当前工作集为 **20 题**。`development_annotations_v6.json`、`holdout_annotations_v1.json`、`DATASET_V1.md` 和 `CASE_INVENTORY_V1.md` 保留为历史版本。
+按用户 2026-10-29 裁定，从 29 题中删除 9 题、改写 2 题后，当前工作集为 **20 题**。旧 v3–v6 标注、协议、29 题集、旧复核队列和旧观测已清理；本文件是当前唯一数据集索引。
 
 ## 总量
 
@@ -10,10 +10,9 @@
 | 保留集 | 5 | 5 / 0 | 16 | 16 | 0 |
 | **合计** | **20** | **18 / 2** | **88** | **93** | **5 / 20** |
 
-- 当前数据集：[golden_v2_selected20.json](golden_v2_selected20.json)
-- 逐题原文与状态：[CASE_INVENTORY_V2.md](CASE_INVENTORY_V2.md)
-- 历史 29 题索引：[DATASET_V1.md](DATASET_V1.md)
-- 历史 29 题逐题清单：[CASE_INVENTORY_V1.md](CASE_INVENTORY_V1.md)
+- 当前数据集：[golden_dataset.json](golden_dataset.json)
+- 逐题原文与状态：[CASE_INVENTORY.md](CASE_INVENTORY.md)
+- 采集/复核/评分流程：[REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md)
 
 ## 本次删除与改写
 
@@ -67,7 +66,7 @@
 
 ## 本次本地运行
 
-详见 [selected20 本地基线](observations/20261029_selected20_local/README.md)（完整 capture/report 留在本地忽略目录 `data/reports/selected20_local_20261029/`）：
+详见 [Golden 20 题本地基线](observations/20261029_golden20_local/README.md)（完整 capture/report 留在本地忽略目录 `data/reports/golden20_local_20261029/`）：
 
 | 指标 | 结果 |
 |---|---:|

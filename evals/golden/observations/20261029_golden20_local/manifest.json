@@ -1,12 +1,12 @@
 {
-  "run_name": "selected20_local_20261029",
-  "created_at": "2026-10-29T08:14:44.687001+00:00",
-  "capture_sha256": "e354c8ebbbb4233b3fe2e3199a68d43b353d88a4ac7ecb39e3b387f3dd5db2e6",
-  "dataset_sha256": "d727f9cc27123c07ed7fb1f0c0d7f11ef33ae7d75f10895f843323d64bfd098c",
+  "run_name": "golden20_local_20261029",
+  "created_at": "2026-10-29T08:34:45.987050+00:00",
+  "capture_sha256": "493763fbcf2112339747c8d87a35a197ea83974f9cad70a48ca80add800fb95e",
+  "dataset_sha256": "31eebe905a0d937d5a9662bf482c2d655ac93ea3942835caa53a394601d53071",
   "corpus_sha256": "a9225af6a1996d1721f34963cea1bdfcd5409a4a2edef73f8fbfed347dee430d",
-  "source_sha256": "4b06f0e1abec5da07a686238beaa8428e244d036f4c15339a966878f016df89f",
+  "source_sha256": "7584b632df12a039057bfafd4a3e4823d9da0ea6fb45f6037cefead25c492f3e",
   "git": {
-    "commit": "7a04d6586a33a9a69712af720d55446f1757f555",
+    "commit": "0b8a8d74a527cb4d81cf47aad36fa27f86f760cf",
     "branch": "main",
     "dirty": true
   },
@@ -32,9 +32,9 @@
     "embedding_model": null
   },
   "degraded_cases": {},
-  "dataset": "evals/golden/golden_v2_selected20.json",
+  "dataset": "evals/golden/golden_dataset.json",
   "local_artifacts": {
-    "capture": "data/reports/selected20_local_20261029/capture.json",
-    "report": "data/reports/selected20_local_20261029/report.json"
+    "capture": "data/reports/golden20_local_20261029/capture.json",
+    "report": "data/reports/golden20_local_20261029/report.json"
   }
 }

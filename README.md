@@ -156,11 +156,11 @@ HTTP 接口与命令行共用业务实现：
 
 ## 评测与开发检查
 
-Golden 目标为 30 个高质量用例，目前 v6 有 20 道开发题，题目定义 8 题人工批准、12 题待审；另 10 道独立验收题仍隔离。候选相关等级和真实答案未随题目定义一起获批。v6 只重绑了两道拒答题引用的 `REQUIREMENTS.md` 当前字节哈希，已恢复全量采集；[2026-10-29 v6 本地基线](evals/golden/observations/20261029_v6_local/README.md) 为 20 题/21 输入、无模型调用，正式口径只有 8 道已批准题的证据 Recall 可评。最新 [13 题回答复核](evals/golden/observations/20261011_calibrated/README.md) 仍是旧采集的重审，不代表 v6 真实模型运行或正式 Golden 成绩。
+当前评测集为 **20 题**（15 开发 + 5 保留，18 可答 + 2 拒答）：88 个必要事实、93 个证据组；题目定义 5 题人工批准、15 题待审；8 道开发题有 Agent 候选标签和固定池。正式 Recall 只覆盖 5 道已批准题，正式 Precision/MRR/nDCG/Fact/Cit 仍为 0 题。总索引、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，逐题原文与状态见 [CASE_INVENTORY.md](evals/golden/CASE_INVENTORY.md)，当前本地基线见 [selected20 本地基线](evals/golden/observations/20261029_golden20_local/README.md)。
 
-2026-10-29 已完成一次 v6 真实模型运行（55 次 HTTP、178,551 Token、无请求失败），答案尚未人工复核，见 [v6 真实基线](evals/golden/observations/20261029_v6_live/README.md)。按 2026-10-29 裁定删除 9 题、改写 2 题后，当前工作集为 **20 题**（15 开发 + 5 保留）；总索引、指标可计算性和缺口见 [DATASET_V2.md](evals/golden/DATASET_V2.md)，逐题原文与状态见 [CASE_INVENTORY_V2.md](evals/golden/CASE_INVENTORY_V2.md)。历史 29 题版本保留在 [DATASET_V1.md](evals/golden/DATASET_V1.md)。仍待完成：15 题题目定义复核、10 道可答题的候选相关性标注、20 题答案复核。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [v6 迁移记录](evals/golden/MIGRATION_V6.md) 与 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。版本化标注、裁定、候选池和观测快照保留用于审计，不按重复文件删除。
+2026-10-29 的 [v6 真实模型观察](evals/golden/observations/20261029_v6_live/README.md) 仅作历史对照：其 v6 标注/协议文件已清理，答案未人工复核，不代表当前 20 题的正式成绩。仍待完成：15 题题目定义复核、10 道可答题的候选相关性标注、20 题答案复核。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。
 
-历史页级评测可通过 `eval retrieval`、`eval answers`、`eval comprehensive`、`eval golden` 运行，适用维度、分母和限制见各自报告。真实模型调用需显式启用相应参数。
+历史页级评测可通过 `eval retrieval`、`eval answers`、`eval comprehensive` 运行；旧 v1 `eval golden` 命令已随 v1 数据清理移除。真实模型调用需显式启用相应参数。
 
 ```powershell
 & .\scripts\check.ps1

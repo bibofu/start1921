@@ -1,6 +1,6 @@
-# 20 题逐题原文与状态清单（selected20，2026-10-29）
+# 20 题逐题原文与状态清单（golden_dataset，2026-10-29）
 
-本清单直接从 `golden_v2_selected20.json` 生成。它是按用户 2026-10-29 裁定删除 9 题、改写 2 题后的当前工作集；`development_annotations_v6.json`、`holdout_annotations_v1.json` 和 `CASE_INVENTORY_V1.md` 保留为历史版本。
+本清单直接从 `golden_dataset.json` 生成。它是按用户 2026-10-29 裁定删除 9 题、改写 2 题后的当前唯一工作集；旧 v3–v6 标注、协议、29 题集及其清单已清理。
 
 ## 总量
 
@@ -79,7 +79,7 @@
 
 ### 1. `dev_exact_deng_1954`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`deng_central_appointments_1952_1954`
 - 人工复核：`pending`
 - 候选标签：9 条（{'agent_review': 9}）；固定池：9 个成员（basis=agent_review）
@@ -123,7 +123,7 @@
 
 ### 2. `dev_exact_zhou_1954`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`zhou_work_1954_1956`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T16:57:42+08:00`
 - 复核备注：用户认可全年职务变化范围与跨年履历脚注结合当年条目的证据；3A收窄为年初仍任政务院总理，9月任国务院总理由3D独立评分。总理到月、政协主席到12月25日的现有精度保留；1956年副主席仅为防错边界。
@@ -198,7 +198,7 @@
 
 ### 3. `dev_exact_zunyi_election`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`zunyi_lushan_comparison_component`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -230,7 +230,7 @@
 
 ### 4. `pilot_exact_deng_1952_appointment`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`deng_central_appointments_1952_1954`
 - 人工复核：`pending`
 - 候选标签：19 条（{'agent_review': 19}）；固定池：9 个成员（basis=agent_review）
@@ -261,7 +261,7 @@
 
 ### 5. `holdout_exact_date`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`exact_fact`；可答性：`answerable`；主题组：`holdout_deng_moscow_study_1926`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -301,7 +301,7 @@
 
 ### 6. `dev_semantic_contradiction`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`mao_contradiction`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可三项最低事实、篇目硬约束、版本适用性与主要矛盾/主要方面防错边界；明确允许《矛盾论》中其他准确例证替代侵略战争例。
@@ -354,7 +354,7 @@
 
 ### 7. `dev_semantic_first_congress`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`party_foundation_1921`
 - 人工复核：`pending`
 - 候选标签：13 条（{'agent_review': 13}）；固定池：13 个成员（basis=agent_review）
@@ -421,7 +421,7 @@
 
 ### 8. `dev_semantic_investigation`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`mao_investigation`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可四项最低观点、本地版本适用性和其他可靠来源可支持；亲身调查不等于每个点本人包办，反本本主义不等于反理论。
@@ -480,7 +480,7 @@
 
 ### 9. `holdout_semantic_observation`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`holdout_snow_red_army_schools`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -542,7 +542,7 @@
 
 ### 10. `dev_multi_mao_hunan`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`multi_evidence`；可答性：`answerable`；主题组：`mao_hunan_1921_1926`
 - 人工复核：`pending`
 - 复核备注：Agent原文与原图预核，不是人工批准；最低事实集、年份权重及地理边界待人工确认。
@@ -687,7 +687,7 @@
 
 ### 11. `dev_multi_meetings`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`multi_evidence`；可答性：`answerable`；主题组：`zunyi_lushan_comparison_component`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -816,7 +816,7 @@
 
 ### 12. `dev_multi_zhou_periods`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`multi_evidence`；可答性：`answerable`；主题组：`zhou_work_1954_1956`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可六项代表活动加综合、非排他主题归纳及年月精度；5E收紧为知识分子中的绝大部分，不能推及全体。
@@ -896,7 +896,7 @@
 
 ### 13. `holdout_multi_period`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`multi_evidence`；可答性：`answerable`；主题组：`holdout_deng_1938_tasks`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -943,7 +943,7 @@
 
 ### 14. `dev_intersection_mao_zhou_1949`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`mao_zhou_meetings_1949`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -989,7 +989,7 @@
 
 ### 15. `holdout_intersection_negative`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`holdout_liu_deng_129_roles`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -1027,7 +1027,7 @@
 
 ### 16. `holdout_intersection_positive`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`liu_deng_joint_campaigns`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -1084,7 +1084,7 @@
 
 ### 17. `dev_constraint_history_isolation`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`constraints_routing`；可答性：`answerable`；主题组：`huaihai_history_isolation`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -1194,7 +1194,7 @@
 
 ### 18. `dev_constraint_month_place`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`constraints_routing`；可答性：`answerable`；主题组：`mao_zhou_cppcc_1949`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可四项最低覆盖、迁驻+后续复电作为地点组合证据、27/29日OR替代及月份/地点边界。
@@ -1259,7 +1259,7 @@
 
 ### 19. `dev_refusal_einstein`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`refusal_boundary`；可答性：`unanswerable`；主题组：`einstein_false_premise`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无
@@ -1300,7 +1300,7 @@
 
 ### 20. `pilot_refusal_out_of_scope_2024`
 
-- 文件：`golden_v2_selected20.json`
+- 文件：`golden_dataset.json`
 - 分层：`development`；类别：`refusal_boundary`；可答性：`unanswerable`；主题组：`out_of_scope_2024`
 - 人工复核：`pending`
 - 候选标签：0；固定池：无

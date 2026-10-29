@@ -226,7 +226,7 @@ mypy `disallow_untyped_defs`、Ruff（E/F/I/UP/B/SIM）、Pydantic 数据契约�
 
 需求基线：普通检索 P95 ≤ 2s，完整问答 P95 ≤ 15s。
 
-13 题实测（[metrics_report.md](../evals/golden/observations/20261011_calibrated/metrics_report.md)）：
+13 题实测（（历史记录已清理））：
 
 | 路径 | 均值 | 中位 | 最大 |
 | --- | ---: | ---: | ---: |
@@ -306,16 +306,16 @@ mypy `disallow_untyped_defs`、Ruff（E/F/I/UP/B/SIM）、Pydantic 数据契约�
 
 | 指标 | 现状 | 企业级门槛 | 出处 |
 | --- | --- | --- | --- |
-| 整题通过率 | 3/13（23%） | ≥80%（开发集） | [13 题复核](../evals/golden/observations/20261011_calibrated/README.md) |
+| 整题通过率 | 3/13（23%） | ≥80%（开发集） | （历史记录已清理） |
 | 必要事实完整覆盖 | 20/43（46.5%） | ≥85% | 同上 |
 | 指定来源约束 | 0/2 | 100%（硬约束） | 同上 |
 | 范围/缺口说明 | 5/10 | ≥90% | 同上 |
 | 必要证据 Recall@20 | 71.8% | ≥90% | 同上 |
 | Precision@5 | 70.0% | ≥85% | 同上 |
 | nDCG@5 | 0.7315 | ≥0.85 | 同上 |
-| 完整问答墙钟（中位/最大） | 15.1s / 31.6s | P95 ≤ 15s | [metrics_report](../evals/golden/observations/20261011_calibrated/metrics_report.md) |
+| 完整问答墙钟（中位/最大） | 15.1s / 31.6s | P95 ≤ 15s | （历史记录已清理） |
 | 单题 token | 约 8,900 | 需按成本模型设定 | 同上（115,393 / 13） |
-| Golden 用例 | 20/30，8 批准 | 30/30 批准 + 冻结 | [Golden 说明](../evals/golden/README.md) |
+| Golden 用例 | 20 题，5 批准 | 20/20 批准 + 冻结 | [Golden 说明](../evals/golden/README.md) |
 | CI 门禁 | 无 | 每次 PR 全量 | 仓库结构 |
 | 指标/追踪/告警 | 仅日志 | Metrics + Trace + Alert + SLO | 代码检索 |
 | DB 连接池 | 无 | 必备 | `db_backend.py` |
@@ -405,8 +405,8 @@ mypy `disallow_untyped_defs`、Ruff（E/F/I/UP/B/SIM）、Pydantic 数据契约�
 | 结论 | 证据位置 |
 | --- | --- |
 | 生产不校验引用与事实 | [badCase.md](../badCase.md) BC-043；[RAG-IMPL.md](../RAG-IMPL.md) 第 12 节 |
-| 13 题通过率与事实覆盖 | [20261011_calibrated/README.md](../evals/golden/observations/20261011_calibrated/README.md) |
-| 检索指标与延迟 | [metrics_report.md](../evals/golden/observations/20261011_calibrated/metrics_report.md) 第 25–56、178–199 行 |
+| 13 题通过率与事实覆盖 | （历史记录已清理） |
+| 检索指标与延迟 | （历史记录已清理） 第 25–56、178–199 行 |
 | Golden 进度与哈希阻塞 | [evals/golden/README.md](../evals/golden/README.md) 第 3、11、17 行 |
 | 无重排、无邻居扩展、页内分片限制 | [RAG-IMPL.md](../RAG-IMPL.md) 第 15 节 |
 | 索引规模与全量重建 | [RAG-IMPL.md](../RAG-IMPL.md) 第 13 节；第 14 节末段 |

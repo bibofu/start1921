@@ -27,7 +27,7 @@
       "sha256": "0a77e74eb2cd3dc5ce5a5a528c8dc7a3193fdb692272c334d7f20661e854750f"
     },
     {
-      "path": "evals/golden/ranking_pools_v2.json",
+      "path": "evals/golden/ranking_pools.json",
       "sha256": "96e3c46cdffc2797b211c4e336c72b8af3df2df7eca4ba1efa62e9f391ac64bc"
     }
   ],

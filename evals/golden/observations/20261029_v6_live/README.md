@@ -6,7 +6,7 @@
 
 | 项目 | 值 |
 |---|---|
-| 题集 | `evals/golden/development_annotations_v6.json` |
+| 题集 | v6 开发集（历史观察；标注/协议文件已清理） |
 | 题集指纹 | `513b684429d8ba5bf069f9c0d4b3c94415224f2529e160992c2dacea05dfebee` |
 | 协议文件 SHA-256 | `8aa9b7e9d09a985fb18799da78db57a79030460fb06405250bc26c4ee2f31e9a` |
 | 采集指纹 | `756b808c66bad84e621bd3da6ba2016a9bbd3049a27b6ee065430bf4d231b843` |
@@ -36,7 +36,7 @@
 
 ## 检索指标
 
-真实运行使用的组件探针是原问题，因此组件检索指标与 [v6 本地基线](../20261029_v6_local/README.md) 相同：
+真实运行使用的组件探针是原问题；组件检索指标与已清理的 v6 本地基线相同。以下数字仅作历史对照：
 
 | 口径 | K | 必要证据 Recall | Precision | MRR | 固定池 nDCG |
 |---|---:|---:|---:|---:|---:|
@@ -71,28 +71,30 @@ data/reports/eval_development20_v6_live_20261029/reviews/index.html
 
 打开后按题查看交付答案、引用、必要事实和过程轨迹。复核导出后用 `pilot import-reviews` 导入新目录，再用 `pilot score --reviews-dir` 重算答案维度；未完成判断保持 `unknown`。
 
-## 复现
+## 复现（历史命令，v6 文件已清理）
+
+> 以下命令是历史记录，对应 v6 标注/协议已不在仓库，不能直接复现；当前 20 题流程见 [REPEATABLE_WORKFLOW.md](../../REPEATABLE_WORKFLOW.md)。
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
-  --dataset evals/golden/development_annotations_v6.json `
-  --protocols evals/golden/development_protocols_v6.json `
+  --dataset <cleaned v6 annotations> `
+  --protocols <cleaned v6 protocols> `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
   --with-llm `
   --run-name development20_v6_live_20261029 `
   --output data/reports/eval_development20_v6_live_20261029/capture.json
 
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot prepare-reviews `
-  --dataset evals/golden/development_annotations_v6.json `
-  --protocols evals/golden/development_protocols_v6.json `
+  --dataset <cleaned v6 annotations> `
+  --protocols <cleaned v6 protocols> `
   --capture data/reports/eval_development20_v6_live_20261029/capture.json `
   --output-dir data/reports/eval_development20_v6_live_20261029/reviews
 
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot score `
-  --dataset evals/golden/development_annotations_v6.json `
-  --protocols evals/golden/development_protocols_v6.json `
+  --dataset <cleaned v6 annotations> `
+  --protocols <cleaned v6 protocols> `
   --capture data/reports/eval_development20_v6_live_20261029/capture.json `
-  --ranking-pools evals/golden/ranking_pools_v2.json `
+  --ranking-pools <v6-era ranking pools> `
   --k-values 1 3 5 10 20 `
   --output data/reports/eval_development20_v6_live_20261029/report.json
 ```

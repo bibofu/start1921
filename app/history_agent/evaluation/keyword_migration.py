@@ -20,9 +20,9 @@ from history_agent.evaluation.pilot_protocols import load_inputs
 from history_agent.retrieval import keyword
 from history_agent.retrieval.models import RetrievalPlan
 
-PROTOCOL = Path("evals/keyword_migration/protocol_v1.json")
-DATASET = Path("evals/golden/development_annotations_v6.json")
-CASE_PROTOCOLS = Path("evals/golden/development_protocols_v6.json")
+PROTOCOL = Path("evals/keyword_migration/protocol_v2.json")
+DATASET = Path("evals/golden/golden_dataset.json")
+CASE_PROTOCOLS: Path | None = None
 SYNTHETIC = Path("evals/keyword_migration/synthetic_v1.json")
 VOLATILE_FIELDS = {"elapsed_ms", "retrieval_ms", "answer_ms", "latency_ms"}
 
@@ -274,7 +274,10 @@ def compare_e2e(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
 def score_e2e_availability(capture: dict[str, Any], *, root: Path) -> dict[str, Any]:
     """Report trace evidence recall; unreviewed candidate/answer quality stays unavailable."""
     contract = load_contract(root)
-    inputs = load_inputs(root / DATASET, root / CASE_PROTOCOLS)
+    inputs = load_inputs(
+        root / DATASET,
+        root / CASE_PROTOCOLS if CASE_PROTOCOLS is not None else None,
+    )
     if capture["dataset_sha256"] != inputs.dataset_sha256:
         raise ValueError("Capture dataset differs from frozen annotations.")
     definitions = {case.id: case.model_dump(mode="json") for case in inputs.dataset.cases}

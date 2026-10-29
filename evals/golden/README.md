@@ -1,211 +1,47 @@
-# Unified RAG Golden Benchmark
-
-2026-10-29 v6 更新：两道拒答题原先绑定的 `REQUIREMENTS.md` 字节哈希已过期，导致整包 `pilot collect` 被 `validate_anchors` 阻止。v6 在确认三条规则原文仍存在后，只重绑 `dev_refusal_einstein`、`dev_refusal_source_year` 的项目依据哈希，未改题目、事实、证据、候选标签或8题人工批准状态。当前标注为 [development_annotations_v6.json](development_annotations_v6.json) 及配套 [development_protocols_v6.json](development_protocols_v6.json)，复核队列见 [review_queue_v6.json](review_queue_v6.json)，待审12题的逐题清单见 [PENDING_REVIEW_V6.md](PENDING_REVIEW_V6.md)，迁移说明见 [MIGRATION_V6.md](MIGRATION_V6.md)。v5/v4/v3 保留为历史冻结资产。
-
-2026-10-11人工复核更新：前两批的题干、原文、必要事实与回答边界已获用户明确批准，当前为 **8/20开发题批准、12题待审**。v5 标注使用 [development_annotations_v5.json](development_annotations_v5.json) 及配套 [development_protocols_v5.json](development_protocols_v5.json)，本批逐字段裁定及用户原话见 [human_adjudications_v5.json](human_adjudications_v5.json)，下一批见 [review_queue_v5.json](review_queue_v5.json)。第二批将周恩来知识分子报告事实限定为“知识分子中的绝大部分”，允许《矛盾论》其他准确篇内例证替代侵略战争例。第一批4题及其裁定原样继承，85项事实、90个题级证据组、20题/21输入不变。候选等级、排序池及真实答案不在本批批准范围，不能把旧成绩升级为正式Golden成绩；v3/v4和历史观察保持原样。
-
-《矛盾论》的篇目限制不等于独占本地合订版本。替代例证的答案及实际引用须逐项核验；固定锚点Recall只反映已标注证据，不穷尽全部合格例证，也不能用来否定另有本文证据支持的正确答案。新增候选和锚点仍需单独标注。
-
-最新13题真实回答的新口径复核见 [2026-10-11复核对照](observations/20261011_calibrated/README.md)：仍为3/13通过、20/43事实完整覆盖，引用、来源与范围说明的部分判断已更新。这是同一答案重审，没有新增模型运行或修改Agent。原始运行见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
-
-当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 运行器已接入 v6 的20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。2026-10-29 已用 v6 完成一次20题本地组件采集，见 [v6本地基线](observations/20261029_v6_local/README.md)；同日完成一次真实模型运行（55次HTTP、178,551 Token、0失败），答案尚未复核，见 [v6真实基线](observations/20261029_v6_live/README.md)。
-
-按用户 2026-10-29 裁定删除 9 题、改写 2 题后，当前工作集为 **20 题**（15 开发 + 5 保留）：[golden_v2_selected20.json](golden_v2_selected20.json)，逐题原文与状态见 [CASE_INVENTORY_V2.md](CASE_INVENTORY_V2.md)，总索引见 [DATASET_V2.md](DATASET_V2.md)。v6/holdout v1 的 29 题版本保留为历史资产：[DATASET_V1.md](DATASET_V1.md)、[CASE_INVENTORY_V1.md](CASE_INVENTORY_V1.md)、[HOLDOUT_V1_AUDIT.md](HOLDOUT_V1_AUDIT.md)。
-
-v3/v4/v5 的全量新采集仍会因两道拒答题绑定的旧 `REQUIREMENTS.md` 哈希而被拒；这些版本保留为历史冻结资产，旧capture仍按其绑定版本离线复核和评分。2026-10-29 发布的 v6 已完成依据重绑并通过 `validate_anchors`，新采集应使用 v6。`scripts/prepare_development_review.py` 只处理历史v3，仍受旧依据校验约束，不用于 v6 复核。
-
-## v2设计与当前开发集
-
-答案复核已提供离线工作台：`pilot prepare-reviews` 同时生成 `index.html`、版本化校准说明与复核导出包；填写后用 `pilot import-reviews` 校验导入新目录。开放题最低覆盖、正文与引用分离、额外断言及边界示例见 [答案复核口径](ANSWER_REVIEW_CALIBRATION.md)。旧答案不会自动沿用判断或提分，必要事实分母和人工批准状态不变。
-
-截至2026-10-05，30题设计中的**20道开发题已完成原文、必要事实与边界预标注（17可答、3拒答）**，当时人工批准为0；当前人工进展见上述v5记录。标注包、逐阶段判据和分批人工复核入口见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。**尚未完成30题正式Golden。** 10道保留题仍隔离。
-
-2026-10-11执行更新：`development_annotations_v3.json` 可通过 `pilot collect --protocols evals/golden/development_protocols_v3.json` 显式接入新评测入口。协议保留20个独立题、21个执行输入：淮海题按带历史和无历史两臂运行，湖南活动题保留六年覆盖与14事实的独立分母。原文件的 `annotation_only` 和协议制作期状态不回写，原定义、哈希、标签及人工pending保持冻结；不能降schema或丢弃历史绕过检查。新接入默认仅做本地检索，未新增真实模型答案，新增7题的候选相关性及排名池仍待标注。
-
-`development_v2.json` 的13题历史执行入口及其标签完整保留；2026-10-05从该13题应用已记录的旬别局部裁定后冻结本轮快照，完成13题真实模型流程及新的逐事实评审，见 [历史运行报告与复现命令](observations/20261005/README.md)。该报告仍是13题观察，不能重命名为20题成绩。
-
-设计及分母见 [DESIGN_V2.md](DESIGN_V2.md)。当前支持分阶段证据组Recall、Precision、MRR与固定候选池nDCG，以及绑定具体答案的显式逐事实/维度评审汇总。未知项不按0处理，跨配置比较核对标注、有效分母和池指纹；控制臂计入执行成本，不扩充独立题分母。默认采集无LLM；此前用户授权的13题真实模型观察不代表20题均已运行真实问答，也不代表整题Golden标注获批。
-
-**以下各节描述旧v1的12题数据集、`evaluation.golden`与 `eval golden` 命令；v1和v2试点的数据、指标及报告不能混用。**
-
-## Why
-
-旧评测分别回答了“目标文献是否出现”“最终回答是否带引用”“结构化记录是否仍可查询”等问题，但同一个 case 没有贯穿 RAG 各层。因而一次 chunking 或 embedding 变更后，即使最终回答分数不变，也很难判断是 retrieval 没有改善，还是改善被 context noise 或 generation 抵消。
-
-Unified Golden Benchmark 使用一份经过复核的 page-level Golden Dataset，并按 case 声明的维度运行分层 evaluator：
-
-```text
-one Golden Dataset
-    ├── routing evaluator
-    ├── retrieval / ranking evaluator
-    ├── candidate-context evaluator
-    ├── generation / refusal evaluator
-    └── citation evaluator
-```
-
-旧的 retrieval、answers、structured、intersection、semantic calibration 和 comprehensive eval 全部保留。Golden v1 是增量能力，不替代历史基线。
-
-## Architecture
-
-`golden_questions.json` 保存稳定标注；`history_agent.evaluation.golden` 提供严格 Pydantic schema、page mapping、纯指标函数、分层 runner 和结果聚合；生产 `answer_question` 只用于 routing、generation、citation 和 refusal 层，retrieval/ranking/context 层直接调用混合检索入口。
-
-retrieval component 故意使用 case 原问题，不调用 LLM query planner。这样 chunk、embedding、BM25、fusion 和 Top-K 的对比不会被一次非确定性 query rewrite 混入。生产链路的 query understanding 和 routing 变化由 routing/E2E 层单独体现。
-
-当前 context evaluator 的对象是混合检索返回的最终 Top-K candidate context。生产回答结果还记录实际使用的 citation bundle 数量，但当前 API 没有暴露完整内部 prompt，因此报告不会把 candidate context 冒充为 LLM prompt context。
-
-## Golden annotation rules
-
-- Gold identity 只能使用 `document_id + pdf_page`，禁止写入 `chunk_id`。
-- `required_evidence` 是回答必须找到的关键页；`relevant_evidence` 是用于 precision/nDCG 的分级相关页集合。
-- 只有人工确认相关页集合足够完整时，才可设置 `relevance_complete=true`。否则 Precision@K、nDCG 和“irrelevant context ratio”必须为 `null`。
-- required page 若同时写入 `relevant_evidence`，必须标为 `relevance=2`；辅助相关页使用 `relevance=1`。
-- `gold_facts` 是生成正确性的核心标签。`required` 与 `optional` 分开统计；`reference_answer` 只作阅读参考，不作为唯一答案。
-- `deterministic_patterns` 是可审计的第一层匹配。启用 `--semantic-judge` 后，未命中的 fact 才交给语义 judge；结果保留 `covered=true|false|null`、`evaluable`、`judge` 和 `reason`。judge 未运行或失败时是不可评，不是未覆盖。
-- `forbidden_claims` 明确记录共现升级、时间升级为因果、弱证据升级为强结论等不可接受陈述。确定性命中与语义引文 judge 是两个独立信号。
-- `answerability=unanswerable` 的 case 不得声明 gold evidence 或 gold facts，重点评估拒答和无关引用。
-- 每个 case 通过 `eval_dimensions` 选择参与的指标，不支持的维度不进入聚合分母。
-- `metadata.reviewed` 不能在未人工核对时标为 true。迁移旧题必须保留 `legacy_case_id`。
-
-Golden v1 包含 12 条从现有人工页码和必要事实标签迁移的示例，覆盖 timeline、intersection、event、viewpoint、organization、conflict、multi-hop、adversarial 和 refusal。v1 没有把旧标签臆测成完整 relevance set，因此所有 case 的 `relevance_complete` 都是 false。
-
-## Page-level mapping
-
-检索仍返回 chunk，evaluator 将一个 chunk 的 `pdf_page_start..pdf_page_end` 视为闭区间：只要 gold page 落在该区间内就算匹配。Recall 使用命中 gold page 的集合，因此一个 gold page 最多计数一次，一个跨页 chunk 可以同时召回多个 gold page。
-
-Ranking 的稳定 evidence unit 定义为 `(document_id, page_start, page_end, normalized_text_sha256)`。相同 unit 只允许第一次获得 gain，并一次消费它覆盖的全部 gold pages；完全重复的跨页 chunk 因而不能再消费另一个 page。若一个跨页 unit 同时覆盖多个 graded gold pages，page-level 标签无法唯一确定这个“单个结果”的理想 gain，当前 nDCG 明确标为不可评，而不输出看似精确的数字。
-
-Citation range 同样按闭区间与 gold page 求交。quote 会在范围内每个可用页面检查；若在非起始页命中则通过，若未命中且范围内有页面文本缺失则返回不可评。
-
-当前 chunker 实际按物理页切分，`pdf_page_start == pdf_page_end`。闭区间实现保留了未来跨页 chunk 的兼容性。页级标注无法区分同一页内相关与无关段落，这是有意接受的 v1 粒度限制；未来可在不改变主键语义的情况下增加 text span。
-
-## Metrics
-
-### Implemented
-
-Retrieval / ranking：
-
-- HitRate@5、HitRate@10：Top-K 是否命中至少一个已标注相关页；
-- Annotated Recall@5、Annotated Recall@10：命中的唯一已标注相关页数 / 已标注相关页数；兼容字段 `recall_at_k` 指向同一数值，不代表完整相关集；
-- Required Evidence Recall@5、@10：命中的唯一 required evidence page 数 / required evidence page 数；
-- Precision@5、Precision@10：相关 chunk 数 / K，仅对完整 relevance annotation 计算；
-- MRR：第一个已标注相关页的倒数排名；
-- nDCG@5、nDCG@10：使用 relevance 1/2，仅对完整 relevance annotation 计算；
-- 每个 required evidence 的首次排名。
-
-Context：
-
-- known relevant ratio lower bound：即使标注不完整也可观察的相关比例下界；
-- relevant evidence ratio / irrelevant context ratio：只对完整 relevance annotation 计算；
-- start-page concentration ratio：相同文档起始页在 candidate context 中重复出现的比例；旧名 `duplicate_start_page_ratio` 作为兼容别名保留；
-- redundancy ratio：稳定 page range 与规范化文本指纹均相同的 evidence unit 重复比例，同页不同文本不算重复。
-
-Generation / refusal：
-
-- Required Fact Recall、Optional Fact Recall；
-- 每个 fact 的 deterministic/semantic/not-evaluated 判定与理由；
-- Answer Correctness（基于当前可用的事实、forbidden、refusal 和语义信号）；
-- Forbidden Claim Violation Rate；
-- 语义 judge 检出的 unsupported claims；
-- Refusal Accuracy 与 False Answer Rate。
-
-Citation：
-
-- citation presence 及其与 answerability 的一致性；
-- citation page validity；
-- citation quote-to-page consistency；
-- deterministic claim-to-citation coverage；
-- citation precision/recall（page gold；precision 仍要求完整 relevance）；
-- semantic citation support（仅在显式启用 judge 时）。
-
-Routing / operational：
-
-- 多允许路由的 route accuracy 与 mismatch case IDs；
-- retrieval、answer、total latency；
-- answer、planner、reflection、fact judge 和 citation judge 的 Token 用量；
-- Git commit/dirty state、prompt/chunker/index/embedding/RRF/Top-K/LLM 等自动可得的 run metadata。
-
-所有 case metric 都带统一的 `metric_status.{name}={value,evaluable,reason}`。aggregate 只读取明确 `evaluable=true` 的数值，并继续输出 `{value,evaluable_cases}`，同时增加 `total_cases`、`unevaluable_cases` 和两类 case IDs。没有 forbidden labels、judge 未运行/失败、required fact 未评估等情况不会作为 0 分进入分母；若 required fact 有任一项不可评，Answer Correctness 也是不可评。
-
-Fact Recall 的 aggregate 使用 fact-level micro denominator，不再平均各 case recall。稳定单元 ID 为 `case_id:fact_id`；报告同时保存 `evaluable_unit_ids`、`unevaluable_unit_ids`、实际 unit 数和 `aggregation=micro_over_fact_units`。因此同一个 case ID 在两个 run 中并不保证 Fact Recall 可比。Answer Correctness 仍以 case ID 为评估单元。
-
-### Reserved / future work
-
-- 完整 LLM prompt context 的独立 precision、token utilization 和跨证据 redundancy；
-- text-span relevance；
-- 开放式答案中全部 factual claims 的可靠分母，因此当前不声称实现严格的 claim-level Unsupported Claim Rate；
-- 人工标注完备的 graded relevance case；在这些标注完成前，v1 的 Precision@n/nDCG 为 `null` 是正确结果；
-- 独立供应商或人工复核的 semantic judge 校准扩充。
-
-## How to run
-
-通过现有 CLI：
-
-```powershell
-.\.venv\Scripts\start1921.exe eval golden --dimension retrieval
-.\.venv\Scripts\start1921.exe eval golden --dimension all --limit 3 --run-name baseline
-.\.venv\Scripts\start1921.exe eval golden --dimension generation --case-id golden_event_zunyi_001
-.\.venv\Scripts\start1921.exe eval golden --dimension retrieval --category event --json
-```
-
-也可按模块运行：
-
-```powershell
-.\.venv\Scripts\python.exe -m history_agent.evaluation.golden `
-  --dataset evals/golden/golden_questions.json `
-  --dimension retrieval
-```
-
-默认 generation 使用无外部调用的 extractive fallback。需要真实生成与语义判定时显式使用：
-
-```powershell
-.\.venv\Scripts\start1921.exe eval golden --dimension all `
-  --with-llm --semantic-judge --run-name production-v14
-```
-
-详细结果写入 `data/reports/golden_benchmark_<run_id>.json`，并更新 `golden_benchmark_latest.json`。
-
-chunk、keyword index 和 vector index 的构建报告均写入 manifest，记录实际 chunking 参数、chunk artifact SHA、index artifact SHA、embedding/index 版本、build run ID 和 Git commit。Golden 会把 manifest 的 index artifact SHA 与实际查询路径重新核对；旧索引缺少 manifest 或 artifact identity 时相应字段保持 `null` 并产生 warning，不再从当前函数默认值反推历史实验配置。
-
-run metadata 记录 `actual_retrieval_branches`、`degraded_retrieval_branches`、`index_manifest_consistent` 和 `attribution_safe`。只有实际参与检索的分支用于归因判断：双分支必须具有完整 manifest、索引 artifact 可验证，并使用相同 chunk artifact/chunking；单分支降级时只要求实际分支满足这些条件，未参与的 vector 配置不会被冒充成本次 embedding 配置。
-
-## How to compare experiments
-
-每次实验使用稳定数据集并给出名称，例如：
-
-```powershell
-# baseline 索引
-.\.venv\Scripts\start1921.exe eval golden --dimension all --run-name chunk650_bge
-
-# 修改 chunking 并重建索引后
-.\.venv\Scripts\start1921.exe eval golden --dimension all --run-name chunk800_bge
-
-# 只有 dataset SHA、case IDs 和 requested dimension 一致才计算 delta
-.\.venv\Scripts\start1921.exe eval golden-compare `
-  data/reports/baseline.json data/reports/chunk800.json
-
-# 机器可读输出；每项同时展示两边 denominator 和 evaluable case IDs
-.\.venv\Scripts\start1921.exe eval golden-compare `
-  data/reports/baseline.json data/reports/chunk800.json --json
-```
-
-compare 分三层给出结论：
-
-- `compatible`：结果 schema、dataset SHA、实际 case IDs 和 requested dimension 是否一致；不一致时 CLI 返回非零退出码；
-- `metrics.*.comparable`：对应 metric definition、page/relevance mapping、实际 judge basis、semantic judge 版本/供应商/模型及评估单元是否一致；某个 semantic 指标不可比不会阻止 deterministic retrieval 指标；
-- `attribution_safe`：两边实际索引 manifest 是否足以支持配置归因。该项为 false 时仍可比较同口径原始指标，CLI 返回零，但会显著警告不得把 delta 归因于 chunking、embedding 或 index 变化。
-
-chunk size、embedding/retrieval 配置、generation model、prompt 和 Top-K 是允许变化的实验变量，会显示在 `metadata_differences`，不会自动阻止无关指标。evaluator/metric definition 不同会阻止相应指标；Fact Recall 还要求两边 `case_id:fact_id` 分母完全相同。旧报告缺少 evaluator 或 unit metadata 时可以读取，但相关 metric 明确标为 `comparable=false` 并给出 `non_comparable_reasons`。
-
-不要只比较 Answer Correctness。应对齐同一 dataset SHA 和 case IDs，再逐层比较：
-
-```text
-Recall@10                 +6%
-nDCG@10                   +4%   # 仅完整 relevance case
-RelevantContextRatio      -8%   # 仅完整 relevance case
-RequiredFactRecall        +1%
-AnswerCorrectness          0%
-```
-
-这种结果表示 retrieval 找到了更多、更靠前的 gold evidence，但 context noise 同时增加，提升没有充分传导到 generation。结果文件保留 per-case required evidence rank、fact 判定和路由 mismatch，可继续定位是哪一类 case 抵消了收益。
-
-对比时还应确认 `run_metadata` 中 Git、index version、embedding、chunking、RRF、Top-K、prompt 和 LLM 等变量；无法从配置可靠取得的字段保持 `null`，不得手工伪造。
+# Golden Dataset（selected20，2026-10-29）
+
+当前评测集是 **20 题**：15 道开发题 + 5 道保留题，18 可答 + 2 拒答，88 个必要事实、93 个证据组。它是按用户 2026-10-29 裁定从原 29 题中删除 9 题、改写 2 题后的唯一工作集；旧的 v3–v6 标注、协议、29 题集、旧复核队列和旧观测已清理。
+
+## 入口
+
+| 文件 | 内容 |
+|---|---|
+| [golden_dataset.json](golden_dataset.json) | 20 题数据集（PilotCase schema） |
+| [DATASET.md](DATASET.md) | 总量、题型覆盖、指标可计算性、缺口 |
+| [CASE_INVENTORY.md](CASE_INVENTORY.md) | 逐题原文、锚点、事实、拒答依据、状态 |
+| [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
+| [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
+| [ranking_pools.json](ranking_pools.json) | 8 道有候选标签题的固定池 |
+| [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
+| [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
+
+## 当前状态
+
+| 项目 | 数值 |
+|---|---:|
+| 开发题 / 保留题 | 15 / 5 |
+| 可答 / 拒答 | 18 / 2 |
+| 必要事实 / 证据组 | 88 / 93 |
+| 有候选标签的题 | 8（95 条 Agent 判断） |
+| 有固定池的题 | 8 |
+| 题目定义已批准 / 待审 | 5 / 15 |
+
+- 正式 Recall@K 只覆盖 5 道已批准开发题；正式 Precision/MRR/nDCG/Fact/Cit 仍为 0 题。
+- 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 只覆盖 8 道有候选标签的开发题，K≤5 稳定。
+- 保留题全部待审，且保留集目前没有约束题和拒答题。
+- 逐题状态和每一条原文见 [CASE_INVENTORY.md](CASE_INVENTORY.md)。
+
+## 重要边界
+
+- `approved` 只批准题目定义、来源、必要事实和回答边界，不批准候选标签、排序池或历史答案。
+- 未标注候选是 unknown，不是 0 分；不可评指标保持 N/A。
+- 固定池 nDCG 只在该池内成立，不是全语料理想排序。
+- 当前 `golden_dataset.json` 是单轮 PilotCase schema，不含 v6 的多臂执行协议；`dev_constraint_history_isolation` 在本数据集中只作为单轮问题存在。
+- Qdrant 服务没有独立可验证的 artifact manifest，`attribution_safe=false`；embedding/切分/rerank 的单变量归因仍需补 manifest。
+
+## 历史
+
+2026-10-29 清理后只保留：
+
+- 当前 20 题数据集及其索引、逐题清单、固定池、当前本地基线；
+- 一次历史真实模型观察 [20261029_v6_live](observations/20261029_v6_live/README.md)，用于对照；其原始 v6 标注/协议文件已不在仓库。

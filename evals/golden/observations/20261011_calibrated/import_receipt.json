@@ -1,7 +1,0 @@
-{
-  "schema_version": 1,
-  "bundle_sha256": "6b40dbd88885708f5e879bda065130ce1f27460ef3a85177e813227cda923d72",
-  "capture_sha256": "b84e8dcf48e149e043dba4e3abd195c342176967d567f7f6601d423810cab3f5",
-  "calibration_sha256": "1582f3b5b5f46d1f65db5d55da3a332c40dd6937ea72cfe7baa1d522fdf76cd7",
-  "note": "Imported explicit reviews only; no Golden case approval is granted."
-}

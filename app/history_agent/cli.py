@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import platform
 import sys
-from pathlib import Path
 from typing import Annotated, Literal
 
 import typer
@@ -15,13 +14,12 @@ from history_agent.corpus.catalog import load_catalog
 from history_agent.corpus.exporter import export_diff, export_manifest, load_latest_diff
 from history_agent.corpus.scanner import scan_corpus
 from history_agent.db import Database
-from history_agent.errors import HistoryAgentError, ResearchDataError
+from history_agent.errors import ResearchDataError
 from history_agent.evaluation.answers import evaluate_answers
 from history_agent.evaluation.comprehensive import (
     audit_comprehensive_question_set,
     evaluate_structured_questions,
 )
-from history_agent.evaluation.golden import compare_golden_runs, run_golden_benchmark
 from history_agent.evaluation.intersections import (
     build_intersection_review_packet,
     evaluate_intersections,
@@ -1361,161 +1359,6 @@ def eval_retrieval(
         typer.echo(f"Recall@{top_k}: {recall:.2%}")
         typer.echo(f"MRR: {mrr:.4f}")
         typer.echo(str(settings.reports_dir / "retrieval_eval_latest.json"))
-
-
-@eval_app.command("golden")
-def eval_golden(
-    dataset: Annotated[
-        str,
-        typer.Option("--dataset", help="Golden dataset path relative to project root."),
-    ] = "evals/golden/golden_questions.json",
-    dimension: Annotated[
-        Literal[
-            "all",
-            "routing",
-            "retrieval",
-            "ranking",
-            "context",
-            "generation",
-            "citation",
-        ],
-        typer.Option("--dimension", help="Evaluate one layer or all annotated layers."),
-    ] = "all",
-    case_id: Annotated[
-        list[str] | None,
-        typer.Option("--case-id", help="Run one or more case IDs."),
-    ] = None,
-    category: Annotated[
-        list[str] | None,
-        typer.Option("--category", help="Run one or more Golden categories."),
-    ] = None,
-    limit: Annotated[int | None, typer.Option("--limit", min=1)] = None,
-    top_k: Annotated[int, typer.Option("--top-k", min=10, max=100)] = 10,
-    run_name: Annotated[
-        str | None,
-        typer.Option("--run-name", help="Experiment label stored in run metadata."),
-    ] = None,
-    with_llm: bool = typer.Option(
-        False,
-        "--with-llm",
-        help="Use the configured generation model for generation/citation dimensions.",
-    ),
-    semantic_judge: bool = typer.Option(
-        False,
-        "--semantic-judge",
-        help="Use the configured LLM for semantic fact and citation judgments.",
-    ),
-    json_output: bool = typer.Option(False, "--json", help="Emit the full JSON result."),
-) -> None:
-    """Run the layered Unified RAG Golden Benchmark."""
-
-    settings = get_settings()
-    settings.ensure_runtime_dirs()
-    try:
-        payload = run_golden_benchmark(
-            settings=settings,
-            dataset_path=settings.project_root / dataset,
-            dimension=dimension,
-            case_ids=set(case_id or []),
-            categories=set(category or []),
-            limit=limit,
-            top_k=top_k,
-            run_name=run_name,
-            with_llm=with_llm,
-            semantic_judge=semantic_judge,
-        )
-    except (OSError, ValueError, HistoryAgentError) as exc:
-        error = {
-            "error": type(exc).__name__,
-            "message": str(exc),
-            "hint": (
-                "Build current chunks and indexes with `start1921 process chunks`, "
-                "`start1921 index build-keyword`, and "
-                "`start1921 index build-vector`, then retry."
-            ),
-        }
-        if json_output:
-            typer.echo(json.dumps(error, ensure_ascii=False))
-        else:
-            typer.echo(f"golden benchmark failed: {error['message']}", err=True)
-            typer.echo(f"hint: {error['hint']}", err=True)
-        raise typer.Exit(code=2) from None
-    if json_output:
-        typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
-        return
-    aggregate = payload["aggregate"]
-    assert isinstance(aggregate, dict)
-    typer.echo(f"golden benchmark run: {payload['run_id']}")
-    typer.echo(f"cases: {aggregate['case_count']}; dimension: {dimension}")
-    retrieval = aggregate["retrieval"]
-    if isinstance(retrieval, dict) and retrieval.get("hit_rate_at_10"):
-        metric = retrieval["hit_rate_at_10"]
-        if isinstance(metric, dict) and metric["value"] is not None:
-            typer.echo(
-                f"HitRate@10: {float(metric['value']):.2%} "
-                f"({metric['evaluable_cases']} evaluable cases)"
-            )
-    typer.echo(str(settings.reports_dir / "golden_benchmark_latest.json"))
-
-
-@eval_app.command("golden-compare")
-def eval_golden_compare(
-    run_a: str = typer.Argument(..., help="First Golden report JSON path."),
-    run_b: str = typer.Argument(..., help="Second Golden report JSON path."),
-    json_output: bool = typer.Option(False, "--json", help="Emit comparison JSON."),
-) -> None:
-    """Compare two compatible Golden runs and expose denominator changes."""
-
-    settings = get_settings()
-    path_a = Path(run_a)
-    path_b = Path(run_b)
-    if not path_a.is_absolute():
-        path_a = settings.project_root / path_a
-    if not path_b.is_absolute():
-        path_b = settings.project_root / path_b
-    try:
-        payload = compare_golden_runs(path_a, path_b)
-    except (OSError, ValueError, TypeError) as exc:
-        error = {"error": type(exc).__name__, "message": str(exc)}
-        if json_output:
-            typer.echo(json.dumps(error, ensure_ascii=False))
-        else:
-            typer.echo(f"golden comparison failed: {exc}", err=True)
-        raise typer.Exit(code=2) from None
-    if json_output:
-        typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
-    else:
-        typer.echo(f"compatible: {payload['compatible']}")
-        typer.echo(f"attribution safe: {payload['attribution_safe']}")
-        if payload["compatible"] and not payload["attribution_safe"]:
-            typer.echo(
-                "warning: comparison possible but attribution unsafe; "
-                "do not attribute deltas to chunking, embeddings, or index changes"
-            )
-        for message in payload["errors"]:
-            typer.echo(f"error: {message}")
-        for message in payload["warnings"]:
-            typer.echo(f"warning: {message}")
-        for name, difference in payload["metadata_differences"].items():
-            typer.echo(
-                f"metadata {name}: {difference['run_a']!r} -> {difference['run_b']!r}"
-            )
-        for name, metric in payload["metrics"].items():
-            if metric["delta"] is not None:
-                typer.echo(
-                    f"{name}: {metric['run_a']} -> {metric['run_b']} "
-                    f"(delta {metric['delta']:+.6f}, "
-                    f"n={metric['evaluable_cases_a']}/{metric['evaluable_cases_b']})"
-                )
-            else:
-                typer.echo(
-                    f"{name}: {metric['run_a']} -> {metric['run_b']}; "
-                    "metric not comparable "
-                    f"(n={metric['evaluable_cases_a']}/{metric['evaluable_cases_b']}; "
-                    f"reasons={'; '.join(metric['non_comparable_reasons'])})"
-                )
-    if not payload["compatible"]:
-        raise typer.Exit(code=2)
 
 
 @eval_app.command("answers")

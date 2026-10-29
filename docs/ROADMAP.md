@@ -283,9 +283,9 @@ Langfuse 的定位与边界：
 
 | ID | 任务 | 交付物 | 验收标准 | 估时 |
 | --- | --- | --- | --- | ---: |
-| 1.1 | 12 题待审批准 | 逐字段裁定记录，更新 `human_adjudications` | 20/20 开发题批准 | 2—3 天 |
-| 1.2 | 10 道验收题 | 题目、证据、必要事实、边界、拒答规则 | 30/30 成稿并批准，独立存放 | 3—4 天 |
-| 1.3 | 候选相关性 + 固定排序池 | 每题 relevance 0/1/2、`relevance_complete`、ranking pool | 全部可答题（约 17 题）在 K=5/10/20 都有可评分母 | 3—5 天 |
+| 1.1 | 15 题待审批准 | 逐字段裁定记录写入 `human_review` | 20/20 题批准 | 2—3 天 |
+| 1.2 | 保留集补题 | 约束题、拒答题；题目、证据、必要事实、边界 | 保留集覆盖六类题型 | 3—4 天 |
+| 1.3 | 候选相关性 + 固定排序池 | 每题 relevance 0/1/2、`relevance_complete`、ranking pool | 18 道可答题在 K=5/10/20 都有可评分母（当前 8 题） | 3—5 天 |
 | 1.4 | 评审吞吐 | LLM 预填（引用原文、候选事实、疑似遗漏）+ 人工确认；记录每题复核时长 | 单题复核 ≤ 10 分钟；自动标签不得直接当 Golden | 1—2 天 |
 | 1.5 | 评测 CI | mini-golden：3—5 篇固定文献、≤2k chunks 的小索引、10 题 retrieval smoke | PR 上 Recall@10/MRR 回归 >1pp 阻止合并 | 1—2 天 |
 | 1.6 | 发布门禁 | `eval compare` + 阈值写入 CI/发布脚本；绑定 git SHA、镜像 digest、索引 generation、模型版本 | 每次发布有评测记录，可回滚定位 | 1 天 |
@@ -647,17 +647,16 @@ BC-043 的问题不是“不该校验”，而是“校验失败就降级摘录�
 命令示例（以实际 CLI 帮助为准）：
 
 ```powershell
-# 基线采集（示例路径，按新版本标注/协议替换）
+# 基线采集（当前 20 题工作集）
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
-  --dataset evals/golden/development_annotations_v6.json `
-  --protocols evals/golden/development_protocols_v6.json `
+  --dataset evals/golden/golden_dataset.json `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
   --with-llm `
   --run-name baseline_20261029 `
   --output data/reports/eval_baseline_20261029/capture.json
 ```
 
-> 2026-10-29：v6 已重绑两道拒答题的 `REQUIREMENTS.md` 哈希，`validate_anchors` 通过；新采集使用 v6，不要手工修改旧哈希或跳过门禁。v6 的无模型本地基线见 [observations/20261029_v6_local](../evals/golden/observations/20261029_v6_local/README.md)。
+> 2026-10-29：当前工作集是 `golden_dataset.json`（20 题，15 开发 + 5 保留），旧 v3–v6 标注/协议已清理；采集不再需要 `--protocols`。当前本地基线见 [observations/20261029_golden20_local](../evals/golden/observations/20261029_golden20_local/README.md)。
 
 ---
 

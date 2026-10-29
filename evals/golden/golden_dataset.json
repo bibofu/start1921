@@ -1975,7 +1975,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "84",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p95.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "836a007fbce71bf34e2e7db28bdd273bf10c828bb434ce34d67af61dc185d911"
               }
             }
@@ -1997,7 +1997,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "86",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p97.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "aab8249c238319c12a03137dade00e6a6662bc53e95a1b1152a724f6f04ebd37"
               }
             }
@@ -2019,7 +2019,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "93",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p104.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "e2fda51c4bf2e34692f0c60be8278069b539792ceeb4a23c9bd8b58131fcd1c7"
               }
             }
@@ -2041,7 +2041,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "99",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p110.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "907997f379d40513c744c8e5294d7b88edc6045f46deac0f34de4da84b4b8069"
               }
             }
@@ -2063,7 +2063,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "110",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p121.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "892705c1d893061923d47a4d7d4e7e4486c36f8a90a450859da40798df0d17a7"
               }
             }
@@ -2085,7 +2085,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "115",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p126.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "de348b2331e955cc473401c7cd570e7b644fb4be7f547e32afa7c82229865252"
               }
             }
@@ -2107,7 +2107,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "127",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p138.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "57eaebdf59c90a2e42bc76f34c1120c695e112ba5e79f33be13abd0655d4c202"
               }
             }
@@ -2129,7 +2129,7 @@
                 "text_source": "data/processed/ocr/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "128",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p139.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "a38a108c5874163214bcc010fe71035a7bf2f42d41c92e5cfad70af4c04192eb"
               }
             }
@@ -2151,7 +2151,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "129",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p140.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "e1199823573a96cf10af0f83bf66d28785732d116584afc8821d86464f5a09fe"
               }
             }
@@ -2173,7 +2173,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "129",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p140.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "e1199823573a96cf10af0f83bf66d28785732d116584afc8821d86464f5a09fe"
               }
             }
@@ -2195,7 +2195,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "130",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p141.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "d7773fa2ea9951a03d05945aaddf795263fe9be25c2eb923403bb2312c5f000c"
               }
             }
@@ -2217,7 +2217,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "132",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p143.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "0149f8db2095c585f81aa86ac7afec7cb65bf7f0d1da01a0293368687c718353"
               }
             }
@@ -2239,7 +2239,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "172",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p183.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "760c9a16ed55e21e995f580b4951b801b9b97060222cff5e3776f05a7d5b67bb"
               }
             }
@@ -2261,7 +2261,7 @@
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_1.jsonl",
                 "method": "Agent read the complete rendered PDF page and checked the dated entry against page text; not human review.",
                 "printed_page": "172",
-                "rendered_image": "data/reports/development_completion_20261005/hunan_scratch/mao1_p183.png",
+                "rendered_image": "已清理（历史审计原图路径）",
                 "rendered_image_sha256": "760c9a16ed55e21e995f580b4951b801b9b97060222cff5e3776f05a7d5b67bb"
               }
             }

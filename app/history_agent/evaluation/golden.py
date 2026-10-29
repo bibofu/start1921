@@ -9,7 +9,6 @@ not) propagate.
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import math
@@ -29,7 +28,7 @@ from history_agent import __version__
 from history_agent.answering.models import AnswerResponse, QuestionRequest
 from history_agent.answering.service import PROMPT_VERSION, answer_question
 from history_agent.answering.validation import validate_grounded_answer
-from history_agent.config import Settings, get_settings
+from history_agent.config import Settings
 from history_agent.evaluation.answers import _load_effective_page_texts, quote_matches_page
 from history_agent.evaluation.semantic import (
     FACT_COVERAGE_JUDGE_VERSION,
@@ -2026,36 +2025,3 @@ def compare_golden_runs(run_a_path: Path, run_b_path: Path) -> dict[str, Any]:
         "metrics": metrics,
         "token_usage": token_usage,
     }
-
-
-def _module_main() -> None:
-    parser = argparse.ArgumentParser(description="Run the Unified RAG Golden Benchmark.")
-    parser.add_argument("--dataset", default="evals/golden/golden_questions.json")
-    parser.add_argument("--dimension", choices=("all", *ALL_DIMENSIONS), default="all")
-    parser.add_argument("--case-id", action="append", dest="case_ids")
-    parser.add_argument("--category", action="append", dest="categories")
-    parser.add_argument("--limit", type=int)
-    parser.add_argument("--top-k", type=int, default=10)
-    parser.add_argument("--run-name")
-    parser.add_argument("--with-llm", action="store_true")
-    parser.add_argument("--semantic-judge", action="store_true")
-    args = parser.parse_args()
-    settings = get_settings()
-    payload = run_golden_benchmark(
-        settings=settings,
-        dataset_path=settings.project_root / args.dataset,
-        dimension=args.dimension,
-        case_ids=set(args.case_ids or []),
-        categories=set(args.categories or []),
-        limit=args.limit,
-        top_k=args.top_k,
-        run_name=args.run_name,
-        with_llm=args.with_llm,
-        semantic_judge=args.semantic_judge,
-    )
-    print(json.dumps(payload["aggregate"], ensure_ascii=False, indent=2))
-    print(settings.reports_dir / "golden_benchmark_latest.json")
-
-
-if __name__ == "__main__":
-    _module_main()

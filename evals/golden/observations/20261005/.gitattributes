@@ -1,2 +1,0 @@
-# Preserve artifact byte hashes across Windows checkouts.
-*.json text eol=lf
