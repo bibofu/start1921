@@ -19,7 +19,7 @@
 
 ## 1.1 候选池与 LLM 预标
 
-当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；候选标签为 95 条 `agent_review` + 88 条 `llm_judge` + 10 条人工抽检。未抽检的 LLM 标签只是暂定，不能当人工批准。
+当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；候选标签为 95 条 `agent_review` + 78 条 `llm_judge` + 20 条人工抽检。未抽检的 LLM 标签只是暂定，不能当人工批准。
 
 复现/扩展命令：
 

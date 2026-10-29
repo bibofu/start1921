@@ -621,10 +621,10 @@
         {
           "unit_id": "2932a38955063ee8e55c386dd63766bcc38776daf05a414dd41822ba54373554",
           "relevance": 2,
-          "reason": "明确写出遵义会议增选毛泽东为中央政治局常委。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "明确写出遵义会议增选毛泽东为中央政治局常委。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "zunyi_election"
           ]
@@ -2704,10 +2704,10 @@
         {
           "unit_id": "e59099ad64b2ae7f42488c44cb4d0a4a1ab9c171516f9858941a11e65533498b",
           "relevance": 2,
-          "reason": "明确记载1926年12月20日毛泽东出席湖南全省第一次农、工代表大会欢迎会并作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题，直接支持y1926_workers_peasants_welcome_speech。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1926年12月20日毛泽东出席湖南全省第一次农、工代表大会欢迎会并作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题，直接支持y1926_workers_peasants_welcome_speech。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "y1926_workers_peasants_welcome_speech"
           ]
@@ -3249,10 +3249,10 @@
         {
           "unit_id": "08c1a462783b5a44a7f714a95fdb3e7756e546f99f134b2682d9dfeea33babbb",
           "relevance": 2,
-          "reason": "明确提到1959年7月2日至8月1日政治局扩大会议和8月2日至16日八届八中全会，以及通过《关于以彭德怀同志为首的反党集团的错误的决议》，支持全会日期和决议。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "明确提到1959年7月2日至8月1日政治局扩大会议和8月2日至16日八届八中全会，以及通过《关于以彭德怀同志为首的反党集团的错误的决议》，支持全会日期和决议。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "lushan_plenum_date",
             "lushan_plenum_decisions"
@@ -3270,10 +3270,10 @@
         {
           "unit_id": "c8eedefdfd503ad6a68dbb3c59fb4726161089942dd0763066ba985c2f1cf361",
           "relevance": 2,
-          "reason": "明确记载庐山会议前期讨论十八个问题总结教训，彭德怀7月14日写信肯定成绩提出左倾倾向，7月16日印发讨论，7月23日毛泽东发言指责右倾，会议转为批判，支持多个必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载庐山会议前期讨论十八个问题总结教训，彭德怀7月14日写信肯定成绩提出左倾倾向，7月16日印发讨论，7月23日毛泽东发言指责右倾，会议转为批判，支持多个必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "lushan_initial",
             "lushan_letter_content",
@@ -3284,14 +3284,12 @@
         },
         {
           "unit_id": "a1b0ac083019c55d6792cd98cc310df4058251010e28cb92a226c8ac18fbeba6",
-          "relevance": 2,
-          "reason": "提到1959年庐山会议彭德怀写信、讲人民公社办早了、得不偿失等，支持彭德怀信的内容。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
-          "supported_groups": [
-            "lushan_letter_content"
-          ]
+          "relevance": 1,
+          "reason": "提到1959年庐山会议彭德怀写信、讲人民公社办早了、得不偿失等，支持彭德怀信的内容；人工改判为1：非会议内容",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
+          "supported_groups": []
         },
         {
           "unit_id": "aa95f9e238b88284e6eebdfbcfbf482a27ab66f4c4bb7afdb18e29252af056e5",
@@ -3327,10 +3325,10 @@
         {
           "unit_id": "6cd11fa8404529bfe388522b7260977cce3171061330774232833f998682ed4a",
           "relevance": 2,
-          "reason": "记载庐山会议召开日期和毛泽东提出十八个问题，支持庐山会议构成与初衷。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "记载庐山会议召开日期和毛泽东提出十八个问题，支持庐山会议构成与初衷。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "lushan_initial"
           ]
@@ -4481,14 +4479,12 @@
         },
         {
           "unit_id": "a95eec2af5f9794aeeb546fd1975b0a1a50b9c6f5383557658d3cad225ba362e",
-          "relevance": 2,
-          "reason": "原文明确记载1945年8月刘伯承、邓小平致电报告上党战役部署，直接支持上党战役证据组。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
-          "basis": "llm_judge",
-          "supported_groups": [
-            "shangdang_1945"
-          ]
+          "relevance": 1,
+          "reason": "原文明确记载1945年8月刘伯承、邓小平致电报告上党战役部署，直接支持上党战役证据组；人工改判为1：未明确说明共同指挥战役",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
+          "supported_groups": []
         },
         {
           "unit_id": "30496aced1c9ae412e45fb7a14ea902cf3f2ee2e6db91b8319ceebc5eeca67a1",
@@ -4933,10 +4929,10 @@
         {
           "unit_id": "760e375add447fb95fbc74e114be311f392667bc7fed01497643b5f040a2d75e",
           "relevance": 2,
-          "reason": "直接支持多个必要事实：战场范围、参战力量、总前委、历时和战果、战略影响、第一阶段。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "直接支持多个必要事实：战场范围、参战力量、总前委、历时和战果、战略影响、第一阶段。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "battle_geography",
             "battle_forces_start",
@@ -4980,10 +4976,10 @@
         {
           "unit_id": "9123a12fbba67cc4cf4d963ac17833f649746ec4ff32edaffa12cde8e903e2d4",
           "relevance": 2,
-          "reason": "直接支持作战方针：1948年10月11日毛泽东提出第一阶段歼灭黄百韬兵团。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "直接支持作战方针：1948年10月11日毛泽东提出第一阶段歼灭黄百韬兵团。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "battle_planning"
           ]
@@ -4991,10 +4987,10 @@
         {
           "unit_id": "e0f794418ae4e01b85fa257b4af7658d5d24b287c1eb37162598f4e7851b0d61",
           "relevance": 2,
-          "reason": "直接支持粟裕提出淮海战役建议及军委接受：1948年9月军委电文称举行淮海战役甚为必要。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "直接支持粟裕提出淮海战役建议及军委接受：1948年9月军委电文称举行淮海战役甚为必要。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:31:04+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "battle_planning"
           ]
