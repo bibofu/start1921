@@ -20,6 +20,10 @@ def _isolate_service_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in ("DATABASE_URL", "CONVERSATION_DATABASE_URL", "KEYWORD_DATABASE_URL"):
         monkeypatch.setenv(f"HISTORY_AGENT_{name}", target)
     monkeypatch.setenv("HISTORY_AGENT_QDRANT_URL", "http://127.0.0.1:1")
+    # Never let a developer's real API key turn an offline test into a networked
+    # one. Tests that need a key set it explicitly in their own body.
+    for name in ("DEEPSEEK_API_KEY", "HISTORY_AGENT_LLM_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
 
 
 def pytest_configure(config: pytest.Config) -> None:

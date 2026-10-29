@@ -1,0 +1,28 @@
+name: eval-gate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  eval-release-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync --group dev
+      - name: Golden v6 release and evaluator tests
+        run: |
+          uv run pytest -q \
+            tests/test_pilot_v6_release.py \
+            tests/test_pilot_protocols.py \
+            tests/test_pilot_metrics.py \
+            tests/test_pilot_scoring_v2.py \
+            tests/test_golden_evaluation.py
+      - name: Lint
+        run: uv run ruff check app tests --no-cache
+      - name: Type check
+        run: uv run mypy --cache-dir .mypy_cache

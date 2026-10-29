@@ -1,14 +1,16 @@
 # Unified RAG Golden Benchmark
 
-2026-10-11人工复核更新：前两批的题干、原文、必要事实与回答边界已获用户明确批准，当前为 **8/20开发题批准、12题待审**。当前标注使用 [development_annotations_v5.json](development_annotations_v5.json) 及配套 [development_protocols_v5.json](development_protocols_v5.json)，本批逐字段裁定及用户原话见 [human_adjudications_v5.json](human_adjudications_v5.json)，下一批见 [review_queue_v5.json](review_queue_v5.json)。第二批将周恩来知识分子报告事实限定为“知识分子中的绝大部分”，允许《矛盾论》其他准确篇内例证替代侵略战争例。第一批4题及其裁定原样继承，85项事实、90个题级证据组、20题/21输入不变。候选等级、排序池及真实答案不在本批批准范围，不能把旧成绩升级为正式Golden成绩；v3/v4和历史观察保持原样。
+2026-10-29 v6 更新：两道拒答题原先绑定的 `REQUIREMENTS.md` 字节哈希已过期，导致整包 `pilot collect` 被 `validate_anchors` 阻止。v6 在确认三条规则原文仍存在后，只重绑 `dev_refusal_einstein`、`dev_refusal_source_year` 的项目依据哈希，未改题目、事实、证据、候选标签或8题人工批准状态。当前标注为 [development_annotations_v6.json](development_annotations_v6.json) 及配套 [development_protocols_v6.json](development_protocols_v6.json)，复核队列见 [review_queue_v6.json](review_queue_v6.json)，待审12题的逐题清单见 [PENDING_REVIEW_V6.md](PENDING_REVIEW_V6.md)，迁移说明见 [MIGRATION_V6.md](MIGRATION_V6.md)。v5/v4/v3 保留为历史冻结资产。
+
+2026-10-11人工复核更新：前两批的题干、原文、必要事实与回答边界已获用户明确批准，当前为 **8/20开发题批准、12题待审**。v5 标注使用 [development_annotations_v5.json](development_annotations_v5.json) 及配套 [development_protocols_v5.json](development_protocols_v5.json)，本批逐字段裁定及用户原话见 [human_adjudications_v5.json](human_adjudications_v5.json)，下一批见 [review_queue_v5.json](review_queue_v5.json)。第二批将周恩来知识分子报告事实限定为“知识分子中的绝大部分”，允许《矛盾论》其他准确篇内例证替代侵略战争例。第一批4题及其裁定原样继承，85项事实、90个题级证据组、20题/21输入不变。候选等级、排序池及真实答案不在本批批准范围，不能把旧成绩升级为正式Golden成绩；v3/v4和历史观察保持原样。
 
 《矛盾论》的篇目限制不等于独占本地合订版本。替代例证的答案及实际引用须逐项核验；固定锚点Recall只反映已标注证据，不穷尽全部合格例证，也不能用来否定另有本文证据支持的正确答案。新增候选和锚点仍需单独标注。
 
 最新13题真实回答的新口径复核见 [2026-10-11复核对照](observations/20261011_calibrated/README.md)：仍为3/13通过、20/43事实完整覆盖，引用、来源与范围说明的部分判断已更新。这是同一答案重审，没有新增模型运行或修改Agent。原始运行见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
-当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 已接入20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。
+当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 运行器已接入 v6 的20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。2026-10-29 已用 v6 完成一次20题本地组件采集，见 [v6本地基线](observations/20261029_v6_local/README.md)。
 
-当前代码可加载v3/v4/v5配套协议，但全量新采集的锚点校验会因两道拒答题绑定的 `REQUIREMENTS.md` 哈希已过期而拒绝执行；该失配在2026-10-20本轮文档清理前已存在，本轮保留需求文件与冻结JSON原件。旧capture仍可按其绑定版本离线复核和评分；恢复新采集需要复核变化后的项目依据并发布新标注版本，不能改写冻结标签或旧运行身份。`scripts/prepare_development_review.py` 只处理历史v3，同样受此依据校验约束。
+v3/v4/v5 的全量新采集仍会因两道拒答题绑定的旧 `REQUIREMENTS.md` 哈希而被拒；这些版本保留为历史冻结资产，旧capture仍按其绑定版本离线复核和评分。2026-10-29 发布的 v6 已完成依据重绑并通过 `validate_anchors`，新采集应使用 v6。`scripts/prepare_development_review.py` 只处理历史v3，仍受旧依据校验约束，不用于 v6 复核。
 
 ## v2设计与当前开发集
 

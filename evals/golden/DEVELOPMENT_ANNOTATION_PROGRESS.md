@@ -1,5 +1,7 @@
 # 20题开发标注与分批复核准备（2026-10-05）
 
+2026-10-29 v6 更新：两道拒答题原先绑定的 `REQUIREMENTS.md` 字节哈希过期，已确认三条规则原文仍存在后完成重绑；v6 标注与协议通过 `validate_anchors`，并完成一次20题本地采集。题目、事实、证据、196条候选标签和8题人工批准状态均未改变。当前入口为 [development_annotations_v6.json](development_annotations_v6.json)、[development_protocols_v6.json](development_protocols_v6.json) 和 [review_queue_v6.json](review_queue_v6.json)；迁移与结果见 [MIGRATION_V6.md](MIGRATION_V6.md) 和 [v6本地基线](observations/20261029_v6_local/README.md)。
+
 2026-10-11第二批人工复核已完成：周恩来1954—1956经历、毛泽东1949年3月北平活动、调查研究观点和《矛盾论》4题获用户批准，累计 **8/20题批准、12题待审**。当前入口为 [development_annotations_v5.json](development_annotations_v5.json) 和 [development_protocols_v5.json](development_protocols_v5.json)；[第二批裁定记录](human_adjudications_v5.json) 绑定v4原件、v5结果、用户原话和逐字段变化，[复核队列](review_queue_v5.json) 转入第三批5题。
 
 第二批修订：知识分子报告的事实和参考答案明确“知识分子中的绝大部分”；《矛盾论》条件变化事实允许其他准确篇内例证替代侵略战争例，硬约束为篇目本身，不独占本地合订版本。用户认可北平复电的迁驻/后续条目组合证据、27/29日替代关系、调查研究的最低观点及本地版本适用性。三组《矛盾论》固定锚点仍衡量已标注证据覆盖，不能用未命中固定例证否定有据替代答案；新候选、锚点及实际答案引用仍须另审。

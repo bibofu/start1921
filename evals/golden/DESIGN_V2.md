@@ -1,6 +1,6 @@
 # Golden v2 设计与开发集进度
 
-当前开发标注为 [development_annotations_v5.json](development_annotations_v5.json)，配套 [development_protocols_v5.json](development_protocols_v5.json)：**20道开发题，17道可答、3道拒答，85个必要事实、90个证据组**；截至2026-10-11，题目定义已批准8题、12题待审，候选等级与历史答案没有因此获批。分批复核进度见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)。
+当前开发标注为 [development_annotations_v6.json](development_annotations_v6.json)，配套 [development_protocols_v6.json](development_protocols_v6.json)：**20道开发题，17道可答、3道拒答，85个必要事实、90个证据组**；截至2026-10-11，题目定义已批准8题、12题待审，候选等级与历史答案没有因此获批。2026-10-29 的 v6 只重绑两道拒答题引用的 `REQUIREMENTS.md` 哈希，恢复全量采集；不改变本题集定义。分批复核进度见 [DEVELOPMENT_ANNOTATION_PROGRESS.md](DEVELOPMENT_ANNOTATION_PROGRESS.md)，迁移说明见 [MIGRATION_V6.md](MIGRATION_V6.md)。
 
 `reviewable-pilot-v5` 已支持20题协议及21个执行输入；v3的20题本地检索采集已完成，13题真实模型观察与新口径复核也已单独保留，入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md) 和 [当前总览](README.md)。当前新采集仍需先处理冻结拒答依据与现有 `REQUIREMENTS.md` 哈希不一致的问题；协议可加载不等于原文锚点校验通过。10道保留题仍隔离，尚未完成30题正式Golden。
 

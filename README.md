@@ -156,9 +156,9 @@ HTTP 接口与命令行共用业务实现：
 
 ## 评测与开发检查
 
-Golden 目标为 30 个高质量用例，目前 v5 有 20 道开发题，题目定义 8 题人工批准、12 题待审；另 10 道独立验收题仍隔离。候选相关等级和真实答案未随题目定义一起获批。最新 [13 题回答复核](evals/golden/observations/20261011_calibrated/README.md) 是对同一历史采集的重审，不代表新模型运行或正式 Golden 成绩。
+Golden 目标为 30 个高质量用例，目前 v6 有 20 道开发题，题目定义 8 题人工批准、12 题待审；另 10 道独立验收题仍隔离。候选相关等级和真实答案未随题目定义一起获批。v6 只重绑了两道拒答题引用的 `REQUIREMENTS.md` 当前字节哈希，已恢复全量采集；[2026-10-29 v6 本地基线](evals/golden/observations/20261029_v6_local/README.md) 为 20 题/21 输入、无模型调用，正式口径只有 8 道已批准题的证据 Recall 可评。最新 [13 题回答复核](evals/golden/observations/20261011_calibrated/README.md) 仍是旧采集的重审，不代表 v6 真实模型运行或正式 Golden 成绩。
 
-本轮清理前，拒答题绑定的 `REQUIREMENTS.md` 哈希已与现文件不一致，当前全量新采集会被锚点校验阻止；需单独复核并发布新标注版本。旧采集仍可按绑定版本离线评分，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。版本化标注、裁定、候选池和观测快照保留用于审计，不按重复文件删除。
+仍待完成：12 题题目定义复核、5 道新可答题的候选相关性标注、10 道保留题的事实/证据标注，以及 v6 的真实模型基线。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [v6 迁移记录](evals/golden/MIGRATION_V6.md) 与 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。版本化标注、裁定、候选池和观测快照保留用于审计，不按重复文件删除。
 
 历史页级评测可通过 `eval retrieval`、`eval answers`、`eval comprehensive`、`eval golden` 运行，适用维度、分母和限制见各自报告。真实模型调用需显式启用相应参数。
 

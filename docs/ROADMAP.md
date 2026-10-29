@@ -649,15 +649,15 @@ BC-043 的问题不是“不该校验”，而是“校验失败就降级摘录�
 ```powershell
 # 基线采集（示例路径，按新版本标注/协议替换）
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
-  --dataset evals/golden/development_annotations_v5.json `
-  --protocols evals/golden/development_protocols_v5.json `
+  --dataset evals/golden/development_annotations_v6.json `
+  --protocols evals/golden/development_protocols_v6.json `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
   --with-llm `
-  --run-name baseline_20261024 `
-  --output data/reports/eval_baseline_20261024/capture.json
+  --run-name baseline_20261029 `
+  --output data/reports/eval_baseline_20261029/capture.json
 ```
 
-> 注意：在 0.1 完成前，`validate_anchors` 会因 `REQUIREMENTS.md` 哈希失配拒绝采集；不要手工改旧哈希或跳过门禁。
+> 2026-10-29：v6 已重绑两道拒答题的 `REQUIREMENTS.md` 哈希，`validate_anchors` 通过；新采集使用 v6，不要手工修改旧哈希或跳过门禁。v6 的无模型本地基线见 [observations/20261029_v6_local](../evals/golden/observations/20261029_v6_local/README.md)。
 
 ---
 

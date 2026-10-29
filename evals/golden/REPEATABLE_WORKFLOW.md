@@ -1,10 +1,10 @@
 # 开发集可重复评测流程
 
-2026-10-11人工复核更新：当前题目定义版本为 `development_annotations_v5.json`，必须配套显式指定 `development_protocols_v5.json`；前两批8题已批准、其余12题待审，详见 [第二批裁定记录](human_adjudications_v5.json)，其中继承了第一批v4裁定。当前入口支持加载这对文件，无需修改Agent。下面的v3命令与`stable/`路径保留为已有采集的复现示例；任何新采集应使用新输出目录，并在全部采集/复核/评分步骤使用同一版本的标注和协议。不得将旧capture或答案评审改哈希绑定到v5，也不因题目批准而自动批准候选或答案。定义变化题的特定校准提示会回落通用指导，应按v5协议人工边界复核，尤其保留知识分子的“绝大部分”限定和《矛盾论》准确篇内例证替代规则。该题的固定锚点Recall只衡量已标注证据，不是全部合格例证的穷尽召回。
+2026-10-29 v6 更新：当前题目定义版本为 `development_annotations_v6.json`，必须配套显式指定 `development_protocols_v6.json`；前两批8题已批准、其余12题待审，详见 [第二批裁定记录](human_adjudications_v5.json)，其中继承了第一批v4裁定。v6 只重绑两道拒答题引用的 `REQUIREMENTS.md` 当前字节哈希，已通过 `validate_anchors` 并完成一次20题本地组件采集；详见 [v6迁移记录](MIGRATION_V6.md) 和 [v6本地基线](observations/20261029_v6_local/README.md)。任何新采集应使用新输出目录，并在全部采集/复核/评分步骤使用同一版本的标注和协议。不得将旧capture或答案评审改哈希绑定到 v6，也不因题目批准而自动批准候选或答案。
 
-当前新采集有一项已确认的前置缺口：v3/v4/v5的 `dev_refusal_einstein`、`dev_refusal_source_year` 仍绑定旧版 `REQUIREMENTS.md` 字节哈希，现有文件已变化。该失配在2026-10-20本轮文档清理前已存在，本轮保留需求文件与冻结JSON原件。`collect` 的 `validate_anchors` 会因此报 `project refusal basis changed`；旧capture的离线复核、评分不重新校验当前项目文档。下列采集命令说明历史流程，恢复新采集须先复核项目依据并发布配套新标注版本，不得直接修改旧哈希或跳过门禁。
+v3/v4/v5 仍绑定旧版 `REQUIREMENTS.md` 字节哈希，全量新采集会报 `project refusal basis changed`；这些版本只作为历史冻结资产保留，旧capture仍可按其绑定版本离线复核和评分。下面的 v3 命令与 `stable/` 路径是历史复现示例，不是当前入口。
 
-本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v5`），仅涉及评测工具。2026-10-11起，20题 `development_annotations_v3.json` 可与显式指定的 `development_protocols_v3.json` 一起运行；旧13题 schema v1 入口继续兼容。20题按21个输入采集：淮海题的带历史主臂和无历史控制臂分开执行，仍只占1个独立题。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
+本流程使用 `history_agent.evaluation.pilot`（`reviewable-pilot-v5` 运行器），仅涉及评测工具。v6 的20题按21个输入采集：淮海题的带历史主臂和无历史控制臂分开执行，仍只占1个独立题。所有默认标签和已有答案评审仍为 Agent 暂定判断，正式 Golden 成绩需独立满足人工批准门槛。
 
 原 schema v2 标注包及其 `execution_status=annotation_only`、协议中的制作期状态保持原样，作为2026-10-05冻结资产。新评测入口校验整包、协议、逐题定义和输入绑定后执行；不会改低 schema、忽略历史或回写人工批准。当前新增接入不包含20题真实模型回答或新增7题的候选相关性标注。
 
@@ -15,11 +15,11 @@
 ```powershell
 # 示例：新的本地检索采集，不调用模型。已有输出或 partial 输出会拒绝覆盖。
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
-  --dataset evals/golden/development_annotations_v3.json `
-  --protocols evals/golden/development_protocols_v3.json `
+  --dataset evals/golden/development_annotations_v6.json `
+  --protocols evals/golden/development_protocols_v6.json `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
-  --run-name development20_local_stable_20261011 `
-  --output data/reports/eval_development20_20261011/stable/capture.json
+  --run-name development20_v6_local_20261029 `
+  --output data/reports/eval_development20_v6_20261029/capture.json
 ```
 
 需要真实问答时显式加 `--with-llm`，会发送问题、史料与中间答案并产生服务用量。上述命令不带该参数，执行本地组件检索及无模型的摘录回答路径；已记录的检索阶段可以评分，但模型 Planner、生成上下文和真实模型成本保持 N/A，摘录答案仍须独立复核。不会为了补全报告自动调用模型。此前13题的外发范围不代表新增7题已经做过真实模型评测。
@@ -36,10 +36,10 @@
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot prepare-reviews `
-  --dataset evals/golden/development_annotations_v3.json `
-  --capture data/reports/eval_development20_20261011/stable/capture.json `
-  --protocols evals/golden/development_protocols_v3.json `
-  --output-dir data/reports/eval_development20_20261011/stable/reviews
+  --dataset evals/golden/development_annotations_v6.json `
+  --capture data/reports/eval_development20_v6_20261029/capture.json `
+  --protocols evals/golden/development_protocols_v6.json `
+  --output-dir data/reports/eval_development20_v6_20261029/reviews
 ```
 
 生成以下文件。复核目录必须不存在，以免覆盖正在进行的审查。
@@ -70,11 +70,11 @@
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot import-reviews `
-  --dataset evals/golden/development_annotations_v3.json `
-  --capture data/reports/eval_development20_20261011/stable/capture.json `
-  --protocols evals/golden/development_protocols_v3.json `
-  --bundle data/reports/eval_development20_20261011/stable/review-bundle.json `
-  --output-dir data/reports/eval_development20_20261011/stable/reviewed
+  --dataset evals/golden/development_annotations_v6.json `
+  --capture data/reports/eval_development20_v6_20261029/capture.json `
+  --protocols evals/golden/development_protocols_v6.json `
+  --bundle data/reports/eval_development20_v6_20261029/review-bundle.json `
+  --output-dir data/reports/eval_development20_v6_20261029/reviewed
 ```
 
 导入端从命令行指定的原件重建模板，不读取导出包自带的路径。主输入、控制臂、事实、观察快照、分母和全部版本绑定通过检查后，才写入新目录并保存导入凭据；允许只完成部分判断，其余待审项仍须保留。不会覆盖原复核包或修改整题人工批准。之后评分将 `--reviews-dir` 指向新 `reviewed` 目录；未开始复核时可直接使用下面的初始 `reviews` 示例。
@@ -83,13 +83,13 @@
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot score `
-  --dataset evals/golden/development_annotations_v3.json `
-  --capture data/reports/eval_development20_20261011/stable/capture.json `
+  --dataset evals/golden/development_annotations_v6.json `
+  --capture data/reports/eval_development20_v6_20261029/capture.json `
   --ranking-pools evals/golden/ranking_pools_v2.json `
-  --reviews-dir data/reports/eval_development20_20261011/stable/reviews `
-  --protocols evals/golden/development_protocols_v3.json `
+  --reviews-dir data/reports/eval_development20_v6_20261029/reviews `
+  --protocols evals/golden/development_protocols_v6.json `
   --k-values 1 3 5 10 20 `
-  --output data/reports/eval_development20_20261011/stable/report.json
+  --output data/reports/eval_development20_v6_20261029/report.json
 ```
 
 每次自动输出三份文件：
@@ -135,6 +135,12 @@
 上述 `stable/` 目录已实际完成本地采集、复核包生成、评分和同报告比较。20个主输入、1个控制输入均完成，采集前后及评分时源码指纹一致，索引身份校验通过，无检索降级。组件最终阶段关键证据 Recall@20 为60.88%（17道可答题宏平均），Precision@5 为70.00%（12道已有候选标注题）；未标候选不计作不相关。没有外部模型请求，答案及专项检查仍待复核，不能据此报告20题真实问答通过率。
 
 评测相关测试共407项通过；最终控制臂复核包定位和源码变化检查另经14项定向回归通过，Ruff与8个相关源码文件的mypy检查通过。旧13题离线重算的检索与答案四组聚合结果与原报告完全一致。此轮只接入评测流程，未改Agent、冻结标注或人工批准状态。
+
+## 2026-10-29 v6 接入验证
+
+v6 只重绑两道拒答题的 `REQUIREMENTS.md` 哈希，`load_inputs` 与 `validate_anchors` 均通过；20个主输入、1个控制输入完成本地采集，采集前后源码指纹一致，无检索降级。组件最终阶段关键证据 Recall@20 为60.88%（17道可答题宏平均），正式口径 Recall@20 为60.9%（8道已批准题），Precision@5 为70.00%（12道已有候选标注题），MRR@5 0.9167、固定池 nDCG@5 0.7315；K=10/20 的 Precision/nDCG 仍因候选标注不足保持 N/A。没有外部模型请求。完整报告见 [v6本地基线](observations/20261029_v6_local/README.md)。
+
+本次采集的 `index_attribution.attribution_safe=false`，原因是 Qdrant 服务集合没有独立可验证的 artifact manifest；关键词侧 manifest 已校验。即使组件排序与 v3 采集逐阶段相同，也不能据此单独归因 embedding/切分改动。
 
 ## 已有 13 题的离线复现（兼容入口）
 

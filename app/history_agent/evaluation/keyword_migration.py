@@ -21,8 +21,8 @@ from history_agent.retrieval import keyword
 from history_agent.retrieval.models import RetrievalPlan
 
 PROTOCOL = Path("evals/keyword_migration/protocol_v1.json")
-DATASET = Path("evals/golden/development_annotations_v5.json")
-CASE_PROTOCOLS = Path("evals/golden/development_protocols_v5.json")
+DATASET = Path("evals/golden/development_annotations_v6.json")
+CASE_PROTOCOLS = Path("evals/golden/development_protocols_v6.json")
 SYNTHETIC = Path("evals/keyword_migration/synthetic_v1.json")
 VOLATILE_FIELDS = {"elapsed_ms", "retrieval_ms", "answer_ms", "latency_ms"}
 
