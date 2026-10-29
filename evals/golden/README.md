@@ -8,7 +8,9 @@
 
 最新13题真实回答的新口径复核见 [2026-10-11复核对照](observations/20261011_calibrated/README.md)：仍为3/13通过、20/43事实完整覆盖，引用、来源与范围说明的部分判断已更新。这是同一答案重审，没有新增模型运行或修改Agent。原始运行见 [2026-10-05评测报告](observations/20261005/README.md)。六题历史结果见 [LIVE_EVALUATION.md](LIVE_EVALUATION.md)，此前本地Top-K对照见 [PILOT_BASELINE.md](PILOT_BASELINE.md)，用户已确认的发送范围见 [OUTBOUND_REVIEW.md](OUTBOUND_REVIEW.md)。
 
-当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 运行器已接入 v6 的20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。2026-10-29 已用 v6 完成一次20题本地组件采集，见 [v6本地基线](observations/20261029_v6_local/README.md)；同日完成一次真实模型运行（55次HTTP、178,551 Token、0失败），答案尚未复核，见 [v6真实基线](observations/20261029_v6_live/README.md)。保留题首批9题已预标注，见 [保留题审计](HOLDOUT_V1_AUDIT.md) 和 [holdout_annotations_v1.json](holdout_annotations_v1.json)；当前 20 开发 + 9 保留 = 29 题的总索引见 [DATASET_V1.md](DATASET_V1.md)。
+当前可重复执行入口见 [评测与比较流程](REPEATABLE_WORKFLOW.md)：`reviewable-pilot-v5` 运行器已接入 v6 的20道开发题及其执行协议，为每次采集生成主输入、控制臂和专门协议的独立复核包，离线汇总检索、查询理解、实际上下文、答案和成本；比较器核对跨运行的协议输入、实际索引、embedding 与切分身份。该流程不改变 Agent，也不自动批准 Golden 标签。2026-10-29 已用 v6 完成一次20题本地组件采集，见 [v6本地基线](observations/20261029_v6_local/README.md)；同日完成一次真实模型运行（55次HTTP、178,551 Token、0失败），答案尚未复核，见 [v6真实基线](observations/20261029_v6_live/README.md)。
+
+按用户 2026-10-29 裁定删除 9 题、改写 2 题后，当前工作集为 **20 题**（15 开发 + 5 保留）：[golden_v2_selected20.json](golden_v2_selected20.json)，逐题原文与状态见 [CASE_INVENTORY_V2.md](CASE_INVENTORY_V2.md)，总索引见 [DATASET_V2.md](DATASET_V2.md)。v6/holdout v1 的 29 题版本保留为历史资产：[DATASET_V1.md](DATASET_V1.md)、[CASE_INVENTORY_V1.md](CASE_INVENTORY_V1.md)、[HOLDOUT_V1_AUDIT.md](HOLDOUT_V1_AUDIT.md)。
 
 v3/v4/v5 的全量新采集仍会因两道拒答题绑定的旧 `REQUIREMENTS.md` 哈希而被拒；这些版本保留为历史冻结资产，旧capture仍按其绑定版本离线复核和评分。2026-10-29 发布的 v6 已完成依据重绑并通过 `validate_anchors`，新采集应使用 v6。`scripts/prepare_development_review.py` 只处理历史v3，仍受旧依据校验约束，不用于 v6 复核。
 

@@ -1,4 +1,6 @@
-# 29 题逐题原文与状态清单（v1，2026-10-29）
+# 29 题逐题原文与状态清单（v1，历史版本）
+
+> 本文件是 29 题历史版本。用户 2026-10-29 裁定删除 9 题、改写 2 题后，当前工作集是 [golden_v2_selected20.json](golden_v2_selected20.json)，逐题清单见 [CASE_INVENTORY_V2.md](CASE_INVENTORY_V2.md)。
 
 本清单直接从 `development_annotations_v6.json` 和 `holdout_annotations_v1.json` 生成，供人工逐题检查。它不是批准记录；所有 `pending` 题仍需人工确认。
 
