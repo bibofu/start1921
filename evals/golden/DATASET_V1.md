@@ -12,6 +12,7 @@
 
 - 开发集：[development_annotations_v6.json](development_annotations_v6.json) + [development_protocols_v6.json](development_protocols_v6.json)
 - 保留集：[holdout_annotations_v1.json](holdout_annotations_v1.json)
+- 逐题原文与状态清单：[CASE_INVENTORY_V1.md](CASE_INVENTORY_V1.md)
 - 保留题审计与裁定：[HOLDOUT_V1_AUDIT.md](HOLDOUT_V1_AUDIT.md)
 - 开发集待审清单：[PENDING_REVIEW_V6.md](PENDING_REVIEW_V6.md)
 - v6 迁移记录：[MIGRATION_V6.md](MIGRATION_V6.md)
