@@ -8,8 +8,8 @@
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
   --dataset evals/golden/golden_dataset.json `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
-  --run-name golden20_local_20261029 `
-  --output data/reports/golden20_local_20261029/capture.json
+  --run-name golden20_r2_20261029 `
+  --output data/reports/golden20_r2_20261029/capture.json
 ```
 
 - 组件检索用原问题，不经过 LLM 规划。
@@ -19,7 +19,7 @@
 
 ## 1.1 候选池与 LLM 预标
 
-当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；候选标签为 95 条 `agent_review` + 68 条 `llm_judge` + 30 条人工处理。未抽检的 LLM 标签只是暂定，不能当人工批准。
+当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；候选标签为 95 条 `agent_review` + 72 条 `llm_judge` + 25 条人工处理。未抽检的 LLM 标签只是暂定，不能当人工批准。
 
 复现/扩展命令：
 
@@ -34,8 +34,8 @@
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot prepare-reviews `
   --dataset evals/golden/golden_dataset.json `
-  --capture data/reports/golden20_local_20261029/capture.json `
-  --output-dir data/reports/golden20_local_20261029/reviews
+  --capture data/reports/golden20_r2_20261029/capture.json `
+  --output-dir data/reports/golden20_r2_20261029/reviews
 ```
 
 生成 `index.html`、答案/过程复核模板、校准包和导出包。所有判断初始为 `unknown`，不会自动打分或批准。
@@ -45,9 +45,9 @@
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot import-reviews `
   --dataset evals/golden/golden_dataset.json `
-  --capture data/reports/golden20_local_20261029/capture.json `
-  --bundle data/reports/golden20_local_20261029/review-bundle.json `
-  --output-dir data/reports/golden20_local_20261029/reviewed
+  --capture data/reports/golden20_r2_20261029/capture.json `
+  --bundle data/reports/golden20_r2_20261029/review-bundle.json `
+  --output-dir data/reports/golden20_r2_20261029/reviewed
 ```
 
 ## 4. 评分
@@ -55,16 +55,16 @@
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot score `
   --dataset evals/golden/golden_dataset.json `
-  --capture data/reports/golden20_local_20261029/capture.json `
+  --capture data/reports/golden20_r2_20261029/capture.json `
   --ranking-pools evals/golden/ranking_pools.json `
-  --reviews-dir data/reports/golden20_local_20261029/reviewed `
+  --reviews-dir data/reports/golden20_r2_20261029/reviewed `
   --k-values 1 3 5 10 20 `
-  --output data/reports/golden20_local_20261029/report.json
+  --output data/reports/golden20_r2_20261029/report.json
 ```
 
 - 暂定分数允许 Agent 标签；正式分数只接受人工批准题目和人工标签/答案。
 - 未标注候选是 unknown，不是 0 分；不可评指标保持 N/A。
-- 当前只有 8 道题有候选标签/固定池，Precision/MRR/nDCG 只在 K≤5 稳定。
+- 18 道可答题都有候选标签/固定池，但 K=10/20 受池大小限制，Precision/nDCG 只在 K≤5 稳定。
 
 ## 5. 比较
 

@@ -1,6 +1,6 @@
 # 20 题逐题原文与状态清单（golden_dataset，2026-10-29）
 
-本清单直接从 `golden_dataset.json` 生成。它是按用户 2026-10-29 裁定删除 9 题、改写 2 题后的当前唯一工作集；旧 v3–v6 标注、协议、29 题集及其清单已清理。
+本清单直接从 `golden_dataset.json` 生成。它是按用户 2026-10-29 裁定删除 9 题并两次改写交集题后的当前唯一工作集；旧 v3–v6 标注、协议、29 题集及其清单已清理。
 
 ## 总量
 
@@ -8,10 +8,10 @@
 |---|---:|
 | 开发题 / 保留题 | 15 / 5 |
 | 可答 / 拒答 | 18 / 2 |
-| 必要事实 / 证据组 | 88 / 93 |
-| 有候选标签的题 | 18（193 条候选判断） |
+| 必要事实 / 证据组 | 91 / 97 |
+| 有候选标签的题 | 18（192 条候选判断） |
 | 有固定池的题 | 18 |
-| 题目定义已批准 / 待审 | 5 / 15 |
+| 题目定义已批准 / 待审 | 18 / 2 |
 
 ## 本次删除与改写
 
@@ -29,8 +29,8 @@
 
 改写 2 题：
 
-- `dev_intersection_mao_zhou_1949`：改为“毛泽东与周恩来在1949年有哪些有共同出席的会议？”；删除共同致电、共同出发两条非会议事实。
-- `holdout_intersection_positive`：改为“刘伯承和邓小平有哪些共同指挥的战役？”；改为邯长、上党、陇海、定陶四个战役。
+- `dev_intersection_mao_zhou_1949`：2026-10-29 按用户裁定扩为 7 次会议（新增 7月1日、7月9日、9月8日、12月1日）；参考答案明确不声称穷尽。
+- `holdout_intersection_positive`：2026-10-29 按用户裁定收窄为 1948.11–1949.12 的淮海、渡江、进军西南三项。
 
 ## 状态口径
 
@@ -39,14 +39,14 @@
 - `R`：必要证据组 Recall@K，仅对可答题有分母。
 - `P/MRR/nDCG`：只有存在候选标签和固定池时暂定可评；当前 18 道可答题、K≤5 稳定。
 - `Fact/Cit`：旧 13 题真实答案只有 Agent 评审；其余题没有可评真实答案。
-- 正式：需要人工批准题目和人工候选/答案标签；当前正式 P/MRR/nDCG/Fact/Cit 均为 0 题；68 条 llm_judge 待人工抽检，30 条已人工抽检。
+- 正式：需要人工批准题目和人工候选/答案标签；当前正式 P/MRR/nDCG/Fact/Cit 均不足；72 条 llm_judge 待人工抽检，25 条已人工抽检。
 - `Agent校验` 记录的是预标注时的程序/图像核对，不是人工批准；`human_approval=False` 表示该锚点尚未获人工批准。
 
 ## 建议检查顺序
 
-1. 先看 5 道 `approved` 开发题，确认题目定义、来源、事实和边界没有被后续版本悄悄改动。
-2. 再看 10 道 `pending` 开发题，重点核对剩余窄事实、跨年覆盖、淮海历史隔离和项目范围拒答。
-3. 最后看 5 道保留题；全部 `pending`，其中 2 道是本次改写的交集题，3 道是保留的精确/语义/多证据题。
+1. 先看 14 道已批准的开发题，确认题目定义、来源、事实和边界没有被后续版本悄悄改动。
+2. 再看 1 道待审开发题，重点核对剩余窄事实、跨年覆盖、淮海历史隔离和项目范围拒答。
+3. 最后看 5 道保留题；其中 1 道待审，其余已批准。
 4. 所有标为 `OCR` 的锚点都需要对照 PDF 原页图像；`文本层` 锚点也建议抽查原页。
 5. 2 道拒答题没有正向 R/P 分母，重点看拒答边界、范围说明和是否编造。
 
@@ -54,26 +54,26 @@
 
 | # | 题 | 类别 | 分层 | 可答性 | 事实/组 | 候选标签/池 | 题目状态 | 当前可评 |
 |---:|---|---|---|---|---:|---:|---|---|
-| 1 | `dev_exact_deng_1954` | exact_fact | development | answerable | 2 / 2 | 9 / 9 | pending | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
+| 1 | `dev_exact_deng_1954` | exact_fact | development | answerable | 2 / 2 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 2 | `dev_exact_zhou_1954` | exact_fact | development | answerable | 6 / 6 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
-| 3 | `dev_exact_zunyi_election` | exact_fact | development | answerable | 1 / 1 | 11 / 11 | pending | R, P/MRR/nDCG(小池) |
-| 4 | `pilot_exact_deng_1952_appointment` | exact_fact | development | answerable | 1 / 1 | 19 / 9 | pending | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
-| 5 | `holdout_exact_date` | exact_fact | holdout | answerable | 2 / 2 | 6 / 6 | pending | R, P/MRR/nDCG(小池) |
+| 3 | `dev_exact_zunyi_election` | exact_fact | development | answerable | 1 / 1 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
+| 4 | `pilot_exact_deng_1952_appointment` | exact_fact | development | answerable | 1 / 1 | 19 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
+| 5 | `holdout_exact_date` | exact_fact | holdout | answerable | 2 / 2 | 6 / 6 | approved | R, P/MRR/nDCG(小池) |
 | 6 | `dev_semantic_contradiction` | semantic_retrieval | development | answerable | 3 / 3 | 12 / 12 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
-| 7 | `dev_semantic_first_congress` | semantic_retrieval | development | answerable | 5 / 5 | 13 / 13 | pending | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
+| 7 | `dev_semantic_first_congress` | semantic_retrieval | development | answerable | 5 / 5 | 13 / 13 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 8 | `dev_semantic_investigation` | semantic_retrieval | development | answerable | 4 / 4 | 14 / 14 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
-| 9 | `holdout_semantic_observation` | semantic_retrieval | holdout | answerable | 5 / 5 | 11 / 11 | pending | R, P/MRR/nDCG(小池) |
-| 10 | `dev_multi_mao_hunan` | multi_evidence | development | answerable | 14 / 14 | 11 / 11 | pending | R, P/MRR/nDCG(小池) |
-| 11 | `dev_multi_meetings` | multi_evidence | development | answerable | 12 / 15 | 11 / 11 | pending | R, P/MRR/nDCG(小池) |
+| 9 | `holdout_semantic_observation` | semantic_retrieval | holdout | answerable | 5 / 5 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
+| 10 | `dev_multi_mao_hunan` | multi_evidence | development | answerable | 14 / 14 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
+| 11 | `dev_multi_meetings` | multi_evidence | development | answerable | 12 / 15 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
 | 12 | `dev_multi_zhou_periods` | multi_evidence | development | answerable | 7 / 7 | 10 / 10 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
-| 13 | `holdout_multi_period` | multi_evidence | holdout | answerable | 3 / 3 | 9 / 9 | pending | R, P/MRR/nDCG(小池) |
-| 14 | `dev_intersection_mao_zhou_1949` | intersection_hard_negative | development | answerable | 3 / 3 | 9 / 9 | pending | R, P/MRR/nDCG(小池) |
-| 15 | `holdout_intersection_negative` | intersection_hard_negative | holdout | answerable | 2 / 2 | 11 / 11 | pending | R, P/MRR/nDCG(小池) |
-| 16 | `holdout_intersection_positive` | intersection_hard_negative | holdout | answerable | 4 / 4 | 11 / 11 | pending | R, P/MRR/nDCG(小池) |
-| 17 | `dev_constraint_history_isolation` | constraints_routing | development | answerable | 10 / 12 | 8 / 8 | pending | R, P/MRR/nDCG(小池) |
+| 13 | `holdout_multi_period` | multi_evidence | holdout | answerable | 3 / 3 | 9 / 9 | approved | R, P/MRR/nDCG(小池) |
+| 14 | `dev_intersection_mao_zhou_1949` | intersection_hard_negative | development | answerable | 7 / 7 | 9 / 9 | pending | R, P/MRR/nDCG(小池) |
+| 15 | `holdout_intersection_negative` | intersection_hard_negative | holdout | answerable | 2 / 2 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
+| 16 | `holdout_intersection_positive` | intersection_hard_negative | holdout | answerable | 3 / 4 | 10 / 10 | pending | R, P/MRR/nDCG(小池) |
+| 17 | `dev_constraint_history_isolation` | constraints_routing | development | answerable | 10 / 12 | 8 / 8 | approved | R, P/MRR/nDCG(小池) |
 | 18 | `dev_constraint_month_place` | constraints_routing | development | answerable | 4 / 4 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
-| 19 | `dev_refusal_einstein` | refusal_boundary | development | unanswerable | 0 / 0 | 0 / — | pending | Ref/Scope(无复核答案) |
-| 20 | `pilot_refusal_out_of_scope_2024` | refusal_boundary | development | unanswerable | 0 / 0 | 0 / — | pending | Ref/Scope(旧Agent) |
+| 19 | `dev_refusal_einstein` | refusal_boundary | development | unanswerable | 0 / 0 | 0 / — | approved | Ref/Scope(无复核答案) |
+| 20 | `pilot_refusal_out_of_scope_2024` | refusal_boundary | development | unanswerable | 0 / 0 | 0 / — | approved | Ref/Scope(旧Agent) |
 
 ## 精确事实/日期/职务
 
@@ -81,7 +81,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`deng_central_appointments_1952_1954`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：9 条（{'agent_review': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：1954年9月，邓小平在国务院和国防委员会分别担任什么职务？
 - 参考答案：1954年9月，邓小平在国务院任副总理，在中华人民共和国国防委员会任副主席。两者属于不同机构，不能混成国防部长或国防委员会主席。
@@ -200,7 +201,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`zunyi_lushan_comparison_component`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：11 条（{'llm_judge': 9, 'human_review': 2}）；固定池：11 个成员（basis=agent_review）
 - 问题：遵义会议选举毛泽东担任什么党内职务？
 - 参考答案：遵义会议选举毛泽东为中央政治局常委。依据《中国共产党历史》第一卷 PDF 第483页。
@@ -232,7 +234,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`deng_central_appointments_1952_1954`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：19 条（{'agent_review': 19}）；固定池：9 个成员（basis=agent_review）
 - 问题：1952年8月7日，邓小平被任命为什么职务？
 - 参考答案：邓小平被任命为政务院副总理。依据《邓小平年谱（1904—1974）》中卷 PDF 第420页。
@@ -263,7 +266,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`exact_fact`；可答性：`answerable`；主题组：`holdout_deng_moscow_study_1926`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：6 条（{'human_review': 1, 'llm_judge': 5}）；固定池：6 个成员（basis=agent_review）
 - 问题：《邓小平年谱》记载邓小平1926年在哪些学校学习？
 - 参考答案：先入莫斯科东方劳动者共产主义大学，不久转入莫斯科中山大学（《邓小平年谱》上卷 PDF 第33页）。
@@ -356,7 +360,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`party_foundation_1921`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：13 条（{'agent_review': 13}）；固定池：13 个成员（basis=agent_review）
 - 问题：党的头一次全国大会讲了些什么、形成了哪些决定？
 - 参考答案：这里的'头一次全国大会'指1921年中国共产党第一次全国代表大会。会议听取各地党、团组织情况，讨论党纲和实际工作计划。主要决定包括：通过党的纲领，确定党名及纲领目标；规定统一组织和严格纪律；把集中领导工人运动、组织工会和教育工人作为工作重点；通过当前实际工作决议，提出维护无产阶级利益的独立政策；暂设中央局，选举陈独秀为书记，张国焘负责组织、李达负责宣传。依据《中国共产党历史》第一卷PDF120—122页。
@@ -482,7 +487,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`holdout_snow_red_army_schools`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：11 条（{'llm_judge': 9, 'human_review': 2}）；固定池：11 个成员（basis=agent_review）
 - 问题：斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？
 - 参考答案：斯诺记红军大学有四个分部、八百名学员，第一分部约二百名营团师级干部，受四个月高级军政训练；第二、三分部六个月，第四分部训练工兵、骑兵、炮兵；课程分政治和军事两类；文娱时间有球类、读书和俱乐部学习。
@@ -544,8 +550,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`multi_evidence`；可答性：`answerable`；主题组：`mao_hunan_1921_1926`
-- 人工复核：`pending`
-- 复核备注：Agent原文与原图预核，不是人工批准；最低事实集、年份权重及地理边界待人工确认。
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：11 条（{'llm_judge': 7, 'human_review': 4}）；固定池：11 个成员（basis=agent_review）
 - 问题：逐年梳理毛泽东1921—1926年在湖南的活动。
 - 参考答案：以下按年份列出已核实的主要活动，属于可复核的最低覆盖清单，不代表这六年全部活动。
@@ -689,7 +695,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`multi_evidence`；可答性：`answerable`；主题组：`zunyi_lushan_comparison_component`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：11 条（{'human_review': 8, 'llm_judge': 3}）；固定池：11 个成员（basis=agent_review）
 - 问题：比较遵义会议和1959年庐山会议各自讨论的核心问题、会议进程和后续影响。
 - 参考答案：遵义会议是1935年1月15—17日召开的中央政治局扩大会议，集中纠正军事指挥和战略战术错误，处理迫切的军事与组织问题。多数与会者反对博古的总结报告，赞同毛泽东等人的意见；会议指定张闻天起草决议，委托常委审查，然后发支部讨论。组织上选举毛泽东为中央政治局常委、取消原三人团，仍由朱德、周恩来指挥军事，周恩来负党内对指挥军事下最后决心的责任。该书评价会议在危急关头挽救了党、红军和中国革命（《中国共产党历史》第一卷 PDF 481—484页）。1959年庐山会议包括中央政治局扩大会议和八届八中全会，初意是继续纠正大跃进以来的左倾错误。彭德怀的信在肯定成绩的同时提出工作问题和总结教训，其信于7月16日印发讨论，并引出对信件性质的争论，会议延长。7月23日毛泽东讲话后，会议主题转向反右；8月2—16日八届八中全会接续召开，形成反右倾及将彭德怀等认定为反党集团的决议（第二卷 PDF 526、529—530、533—535页；反党集团是当时会议的错误认定，不能作为对彭德怀等人的事实背书）。会后继续批判彭德怀等人，并在全党开展反右倾斗争；这打断了纠左进程，使大跃进和人民公社化中已暴露的左倾错误重新发展，又破坏党内民主，使个人崇拜、个人专断倾向进一步发展，打击了向党反映实际情况、提出批评意见的同志（第二卷 PDF 538、540页）。前者纠正军事领导错误并产生挽救危局的作用，后者从纠左转为反右，给经济工作与党内民主造成严重后果；比较时须把两个会议各自的议题、进程和影响分别挂靠证据。
@@ -898,7 +905,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`multi_evidence`；可答性：`answerable`；主题组：`holdout_deng_1938_tasks`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：9 条（{'llm_judge': 8, 'human_review': 1}）；固定池：9 个成员（basis=agent_review）
 - 问题：邓小平在1938年承担了哪些主要工作任务？
 - 参考答案：1938年1月任一二九师政治委员；3月就开辟冀西根据地提出建立军分区；10月就冀南反“扫荡”准备提出建议。
@@ -946,39 +954,71 @@
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`mao_zhou_meetings_1949`
 - 人工复核：`pending`
-- 候选标签：9 条（{'human_review': 2, 'llm_judge': 7}）；固定池：9 个成员（basis=agent_review）
+- 复核备注：2026-10-29 按用户裁定重写，待再次复核。
+- 候选标签：9 条（{'llm_judge': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：毛泽东与周恩来在1949年有哪些有共同出席的会议？
-- 参考答案：可据原文列出以下代表性会议，清单不穷尽全年：①6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚（毛3 PDF521）；②9月25日晚，毛泽东召集国旗、国徽、国歌、纪年、国都问题协商座谈会，周恩来出席（毛3 PDF585）；③10月24日，毛泽东接见绥远军区负责人和傅作义，周恩来参加（毛4 PDF32）。共同出席必须逐条得到直接支持，不能把邻条、引文背景或只出现两人姓名的片段算作共同出席会议。
+- 参考答案：可据原文列出以下七项，清单以年谱明确记载为限、不声称穷尽1949年全年：①6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚（毛3 PDF521）；②7月1日，同朱德、周恩来等出席纪念中国共产党成立二十八周年大会（毛3 PDF531）；③7月9日，同朱德、周恩来出席全国铁路职工临时代表会议等在中南海怀仁堂的集会（毛3 PDF536）；④9月8日，毛泽东会见和宴请程潜，朱德、刘少奇、周恩来等参加（毛3 PDF572）；⑤9月25日晚，毛泽东召集国旗、国徽、国歌、纪年、国都问题协商座谈会，周恩来出席（毛3 PDF585）；⑥10月24日，毛泽东接见绥远军区负责人和傅作义，周恩来参加（毛4 PDF32）；⑦12月1日，毛泽东同张澜等十二位民主人士座谈，磋商访苏签订中苏条约事宜，朱德、周恩来、林伯渠参加（毛4 PDF58）。共同出席必须逐条得到直接支持，不能把邻条、引文背景或只出现两人姓名的片段算作共同出席会议。
 
 **必要事实**
 
 - `joint_meeting_0607`（必要）：1949年6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚，谈中外局势等问题。
   - 证据组：`joint_meeting_0607`
+- `joint_meeting_0701`（必要）：1949年7月1日，毛泽东同朱德、周恩来等出席中共中央华北局、北平市委在先农坛运动场召开的纪念中国共产党成立二十八周年大会。
+  - 证据组：`joint_meeting_0701`
+- `joint_meeting_0709`（必要）：1949年7月9日，毛泽东同朱德、周恩来出席全国铁路职工临时代表会议暨全国机务会议全体代表和铁道部、铁道兵团、平津铁路管理局部分工作人员在中南海怀仁堂的集会。
+  - 证据组：`joint_meeting_0709`
+- `joint_meeting_0908`（必要）：1949年9月8日，毛泽东在中南海会见和宴请程潜，朱德、刘少奇、周恩来等参加会见和宴会。
+  - 证据组：`joint_meeting_0908`
 - `joint_consultation_0925`（必要）：1949年9月25日晚，毛泽东在中南海召集关于国旗、国徽、国歌、纪年、国都问题的协商座谈会，周恩来明确列为出席者。
   - 证据组：`joint_consultation_0925`
 - `joint_meeting_1024`（必要）：1949年10月24日，毛泽东在中南海菊香书屋接见绥远军区负责人和傅作义，谈起义部队的团结改造及与非党人士长期合作，周恩来参加。
   - 证据组：`joint_meeting_1024`
+- `joint_meeting_1201`（必要）：1949年12月1日，毛泽东同张澜、李济深、郭沫若、黄炎培、沈钧儒等十二位民主人士座谈，磋商毛泽东访问苏联时签订中苏条约事宜，朱德、周恩来、林伯渠参加。
+  - 证据组：`joint_meeting_1201`
 
 **证据组与原文**
 
-- `joint_meeting_0607`：1949年6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚，谈中外局势等问题。
+- `joint_meeting_0607`：1949年6月7日会见陈嘉庚，周恩来参加
   - `mao_zedong_chronology_volume_3` PDF 第 521 页（SHA `f0c76c272810d80a1ea93070b4393d276933bc07a63bb54ae815590b803a4468`；文本层）
     - 原文：6月7日和刘少奇、周恩来在香山双清别墅会见陈嘉庚，就中外局势等问题进行交谈。
-    - Agent校验：status=source_text_and_pdf_image_verified; reviewer=Codex source review; human approval pending; verified_at=2026-10-05T14:30:38.722457+08:00
-- `joint_consultation_0925`：1949年9月25日晚，毛泽东在中南海召集关于国旗、国徽、国歌、纪年、国都问题的协商座谈会，周恩来明确列为出席者。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `joint_meeting_0701`：1949年7月1日纪念中国共产党成立二十八周年大会，周恩来出席
+  - `mao_zedong_chronology_volume_3` PDF 第 531 页（SHA `f0c76c272810d80a1ea93070b4393d276933bc07a63bb54ae815590b803a4468`；文本层）
+    - 原文：7月1日和朱德、周恩来等出席中共中央华北局、北平市委在先农坛运动场召开的纪念中国共产党成立二十八周年大会。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `joint_meeting_0709`：1949年7月9日全国铁路职工临时代表会议等集会，周恩来出席
+  - `mao_zedong_chronology_volume_3` PDF 第 536 页（SHA `f0c76c272810d80a1ea93070b4393d276933bc07a63bb54ae815590b803a4468`；文本层）
+    - 原文：和朱德、周恩来出席全国铁路职工临时代表会议暨全国机务会议全体代表和铁道部、铁道兵团、平津铁路管理局部分工作人员在中南海怀仁堂的集会。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `joint_meeting_0908`：1949年9月8日会见和宴请程潜，周恩来参加
+  - `mao_zedong_chronology_volume_3` PDF 第 572 页（SHA `f0c76c272810d80a1ea93070b4393d276933bc07a63bb54ae815590b803a4468`；文本层）
+    - 原文：八日，毛泽东在中南海会见和宴请程潜，朱德、刘少奇、周恩来等参加会见和宴会。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `joint_consultation_0925`：1949年9月25日晚国旗国徽国歌纪年国都协商座谈会，周恩来出席
   - `mao_zedong_chronology_volume_3` PDF 第 585 页（SHA `f0c76c272810d80a1ea93070b4393d276933bc07a63bb54ae815590b803a4468`；文本层）
     - 原文：9月25日出席中国人民政协全体会议。会议继续听取各党派、团体代表发言。会上，毛泽东接受北平市妇女和儿童代表献花。同日晚上，在中南海召集关千国旗、国徽、国歌、纪年、国都问题协商座谈会。出席座谈会的有周恩来、郭沫若、沈雁冰、黄炎培、陈嘉庚、张奚若、马叙伦、田汉、徐悲鸿、李立三、洪深、艾青、马寅初、梁思成、马思聪、吕骥、贺绿汀等。
-    - Agent校验：status=source_text_and_pdf_image_verified; reviewer=Codex source review; human approval pending; verified_at=2026-10-05T14:30:38.722457+08:00
-- `joint_meeting_1024`：1949年10月24日，毛泽东在中南海菊香书屋接见绥远军区负责人和傅作义，谈起义部队的团结改造及与非党人士长期合作，周恩来参加。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `joint_meeting_1024`：1949年10月24日接见绥远军区负责人和傅作义，周恩来参加
   - `mao_zedong_chronology_volume_4` PDF 第 32 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
     - 原文：10月24日在中南海菊香书屋接见绥远军区负责人高克林、姚桔、裴周玉(1)和傅作义，谈对绥远起义部队的团结改造以及同非党人士长期合作问题。周恩来、薄一波、聂荣臻参加。
-    - Agent校验：status=source_text_and_pdf_image_verified; reviewer=Codex source review; human approval pending; verified_at=2026-10-05T14:30:38.722457+08:00
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `joint_meeting_1201`：1949年12月1日同十二位民主人士座谈，周恩来参加
+  - `mao_zedong_chronology_volume_4` PDF 第 58 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：12月1日同张澜、李济深、郭沫若、黄炎培、沈钧儒等十二位民主人士座谈，磋商毛泽东访问苏联时签订中苏条约事宜，朱德、周恩来、林伯渠参加。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
 
 **禁止结论**
 
-- 仅据毛3 PDF476的代表名单和谈判基础说明，断言毛泽东是1949年4月1日国共和谈中共代表团成员，并和周恩来共同出席该日谈判。（原因：该片段仅列周恩来等为代表，并说以毛泽东1月14日声明作为基础；名单和背景引用不能证明毛本人参与4月1日谈判。这里禁止的是缺乏直接证据的推断，不是对所有其他史料预先判负；若出现新直接证据，应重新审核该具体命题。）
-- 仅据毛3 PDF521，或跨用6月7日的参与名单，断言周恩来参加了1949年6月8日毛泽东会见傅作义。（原因：该页的周恩来参与出现在6月7日会见陈嘉庚条，6月8日另一条没有这一共同参与证据；不得跨日期拼接。未提及不能证明周恩来没有参加；若出现其他直接支持6月8日共同会见的证据，须待核后判断，不能自动视为负例。）
-- 上述三项就是毛泽东与周恩来1949年共同出席的全部会议。（原因：本题只冻结三个代表性会议，未穷尽全年；额外有直接原文支持的共同出席/共同会见会议不因未标注而视为不存在。）
+- 仅据毛3 PDF476 的代表名单和谈判基础说明，断言毛泽东是1949年4月1日国共和谈中共代表团成员，并和周恩来共同出席该日谈判。（原因：代表名单不能证明毛泽东本人出席了该日谈判，属于邻近条目串用。）
+- 仅据毛3 PDF521，或跨用6月7日的参与名单，断言周恩来参加了1949年6月8日毛泽东会见傅作义。（原因：6月8日条目没有列周恩来，6月7日的名单不能移植到次日。）
+- 以上七项就是毛泽东与周恩来1949年共同出席的全部会议。（原因：年谱另有政治局会议等共同出席记录；本题只冻结七项可逐条核验的会议，不声称穷尽。）
 
 **复核提示**
 
@@ -986,12 +1026,14 @@
 - 开放题最低覆盖为三个可核验的共同会见/座谈会，不是全年会议清单；额外有效会议允许补充，不以未标注直接判负。
 - 6月7日/6月8日及3月26日代表团说明仍是困难负例线索，不是历史否定；其他新直接证据须待核。
 - 尚未生成真实候选池或候选相关性标签；Precision/MRR/nDCG 待下一步标注。
+- 2026-10-29 用户复核认为原答案不完整；按用户选择的改法重写事实、证据组和参考答案，待再次送审。
 
 ### 15. `holdout_intersection_negative`
 
 - 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`holdout_liu_deng_129_roles`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：11 条（{'human_review': 2, 'llm_judge': 9}）；固定池：11 个成员（basis=agent_review）
 - 问题：刘伯承和邓小平是否都担任过八路军第一二九师师长？
 - 参考答案：不是。刘伯承任一二九师师长，邓小平任一二九师政治委员。
@@ -1030,48 +1072,49 @@
 - 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`liu_deng_joint_campaigns`
 - 人工复核：`pending`
-- 候选标签：11 条（{'human_review': 3, 'llm_judge': 8}）；固定池：11 个成员（basis=agent_review）
-- 问题：刘伯承和邓小平有哪些共同指挥的战役？
-- 参考答案：可据原文列出以下代表性战役，清单不穷尽：①1939年12月邯（郸）长（治）战役；②1945年9月上党战役；③1946年8月陇海战役；④1946年9月定陶战役。只纳入原文明确写“共同指挥”或“和刘伯承指挥……发起/开始”并点名战役的条目。
+- 复核备注：2026-10-29 按用户裁定重写，待再次复核。
+- 候选标签：10 条（{'llm_judge': 10}）；固定池：10 个成员（basis=agent_review）
+- 问题：1948年11月至1949年12月，刘伯承和邓小平共同指挥了哪些战略决战和战略进军？
+- 参考答案：在1948年11月至1949年12月这一窗口内，可据原文列出：①淮海战役：总前委由刘伯承、陈毅、邓小平、粟裕、谭震林组成，刘伯承、陈毅、邓小平为常委，邓小平任书记（邓年谱中卷 PDF131）；②渡江战役（京沪杭战役）：1949年2月9日邓小平主持总前委扩大会议讨论渡江作战，并与刘伯承等联名致电中央军委；4月第二、第三野战军及地方部队百万余人强渡长江（PDF155、173）；③进军西南：1949年8月刘伯承、邓小平联名致信林彪等，安排二野进军西南的粮草保障（PDF189）。窗口外的邯长、上党、陇海、定陶等不属本题；本题只评估窗口内三项，不声称是两人全部共同指挥的战役。
 
 **必要事实**
 
-- `handan_changzhi_1939`（必要）：1939年12月8日，刘伯承、邓小平共同指挥发起邯（郸）长（治）战役。
-  - 证据组：`handan_changzhi_1939`
-- `shangdang_1945`（必要）：1945年9月10日，刘伯承、邓小平指挥太行、太岳、冀南军区部队发起上党战役。
-  - 证据组：`shangdang_1945`
-- `longhai_1946`（必要）：1946年8月10日夜，刘伯承、邓小平指挥晋冀鲁豫野战军主力发起陇海战役。
-  - 证据组：`longhai_1946`
-- `dingtao_1946`（必要）：1946年9月，刘伯承、邓小平指挥晋冀鲁豫野战军主力对整编三师发起进攻，定陶战役开始。
-  - 证据组：`dingtao_1946`
+- `huaihai_command`（必要）：1948年11月6日至1949年1月10日，淮海战役由刘伯承、陈毅、邓小平、粟裕、谭震林组成的总前委统筹，刘伯承、陈毅、邓小平为常委，邓小平任书记。
+  - 证据组：`huaihai_1948`
+- `yangtze_1949`（必要）：1949年2月9日，邓小平主持总前委扩大会议讨论渡江作战，并与刘伯承等联名致电中央军委报告；4月，第二、第三野战军及地方部队百万余人强渡长江。
+  - 证据组：`yangtze_planning_1949` + `yangtze_crossing_1949`
+- `southwest_1949`（必要）：1949年8月，刘伯承、邓小平联名致信林彪等，请华中地区保障第二野战军进军西南的粮草供应。
+  - 证据组：`southwest_1949`
 
 **证据组与原文**
 
-- `handan_changzhi_1939`：1939年12月共同指挥邯（郸）长（治）战役
-  - `deng_xiaoping_chronology_1904_1974_upper` PDF 第 274 页（SHA `8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12`；OCR）
-    - 原文：12月8日和刘伯承共同指挥发起邯（郸）长（治）战役
+- `huaihai_1948`：淮海战役总前委组成与邓小平任书记
+  - `deng_xiaoping_chronology_1904_1974_middle` PDF 第 131 页（SHA `da2ffdcf984368e69d22ca43c02839d0afb573b94ea563d27d0df29e5b9937be`；OCR）
+    - 原文：为统筹战役作战和地方支前事宜，中共中央军委决定由刘伯承、陈毅、邓小平、粟裕、谭震林组成总前敌委员会，由刘伯承、陈毅、邓小平为常委，临机处置一切。邓小平为总前委书记。
     - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
     - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
-- `shangdang_1945`：1945年9月共同指挥上党战役
-  - `deng_xiaoping_chronology_1904_1974_upper` PDF 第 574 页（SHA `8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12`；OCR）
-    - 原文：9月10日和刘伯承指挥太行、太岳、冀南军区部队共三万一千人发起上党战役
+- `yangtze_planning_1949`：总前委讨论渡江作战，邓小平与刘伯承等联名报告
+  - `deng_xiaoping_chronology_1904_1974_middle` PDF 第 155 页（SHA `da2ffdcf984368e69d22ca43c02839d0afb573b94ea563d27d0df29e5b9937be`；OCR）
+    - 原文：2月9日在徐州主持召开总前委扩大会议，具体讨论关于渡江作战的八个问题。同日，和刘伯承、陈毅、粟裕、谭震林致电中共中央军委，报告会议讨论情况
     - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
     - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
-- `longhai_1946`：1946年8月共同指挥陇海战役
-  - `deng_xiaoping_chronology_1904_1974_upper` PDF 第 631 页（SHA `8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12`；OCR）
-    - 原文：8月10日夜，和刘伯承指挥晋冀鲁豫野战军主力发起陇海战役
+- `yangtze_crossing_1949`：第二、第三野战军百万余人强渡长江
+  - `deng_xiaoping_chronology_1904_1974_middle` PDF 第 173 页（SHA `da2ffdcf984368e69d22ca43c02839d0afb573b94ea563d27d0df29e5b9937be`；OCR）
+    - 原文：从夜晚起至二十一日，第二、第三野战军及地方部队共百万余人在东起江阴、西至九江东北湖口间五百余公里的战线上，分中、东、西三路强渡长江天堑，彻底摧毁国民党军构筑的长江防线。
     - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
     - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
-- `dingtao_1946`：1946年9月共同指挥定陶战役
-  - `deng_xiaoping_chronology_1904_1974_upper` PDF 第 636 页（SHA `8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12`；OCR）
-    - 原文：夜二十三时三十分，和刘伯承指挥晋冀鲁豫野战军主力对整编三师发起进攻。定陶战役开始
+- `southwest_1949`：刘伯承、邓小平联名安排二野进军西南保障
+  - `deng_xiaoping_chronology_1904_1974_middle` PDF 第 189 页（SHA `da2ffdcf984368e69d22ca43c02839d0afb573b94ea563d27d0df29e5b9937be`；OCR）
+    - 原文：8月10日和刘伯承、张际春、李达致信林彪、邓子恢、萧克、赵尔陆（1〕：“二野此次奉命进军西南路经华中地区，关于粮食、柴草供应方面，请格外予以帮助
     - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
     - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
 
 **禁止结论**
 
-- 刘伯承和邓小平共同指挥的战役只有百团大战。（原因：至少还有邯长、上党、陇海、定陶等直接原文支持的共同指挥战役；本题为最低覆盖。）
-- 刘伯承单独指挥上党战役，邓小平未参与。（原因：原文明确写“和刘伯承指挥太行、太岳、冀南军区部队……发起上党战役”，直接支持共同指挥。）
+- 刘伯承和邓小平在1948年11月至1949年12月只共同指挥了淮海战役。（原因：渡江战役和进军西南同样有原文支持，漏项即为错误。）
+- 渡江战役由第三野战军单独指挥，刘伯承、邓小平未参加总前委。（原因：总前委由刘伯承、陈毅、邓小平、粟裕、谭震林组成，邓小平任书记。）
+- 进军西南由贺龙单独指挥，第二野战军未参加。（原因：原文记载二野奉命进军西南，刘伯承、邓小平联名安排保障。）
+- 淮海战役总前委书记是粟裕或陈毅。（原因：原文明确邓小平为总前委书记。）
 
 **复核提示**
 
@@ -1079,6 +1122,7 @@
 - 联名电报但未写指挥、仅共同署名或同页出现，不纳入本条最低覆盖。
 - 这是代表性最低覆盖，不声称穷尽1949年前所有共同指挥战役；额外有效战役允许补充。
 - OCR页，需人工核对原页图像。
+- 2026-10-29 用户复核认为原答案不完整；按用户选择的改法重写事实、证据组和参考答案，待再次送审。
 
 ## 约束/路由/多轮
 
@@ -1086,7 +1130,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`constraints_routing`；可答性：`answerable`；主题组：`huaihai_history_isolation`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：8 条（{'llm_judge': 3, 'human_review': 5}）；固定池：8 个成员（basis=agent_review）
 - 问题：详细介绍淮海战役。
 - 参考答案：淮海战役以徐州为中心，战场东起海州、西至商丘、北起临城（今薛城）、南达淮河。参战解放军以华东、中原两支野战军及相关军区部队为主，共约60万人。粟裕提出举行战役的建议，中央军委接受建议，于10月11日明确第一阶段集中歼灭黄百韬兵团的方针。为统筹作战与地方支前，中央军委决定组成刘伯承、陈毅、邓小平、粟裕、谭震林五人总前委，邓小平任书记（《中国共产党历史》第一卷 PDF 963—965页）。第一阶段为11月6—22日，华东野战军在碾庄圩歼灭黄百韬兵团约10万人；第二阶段为11月23日至12月15日，中原野战军及华东野战军一部在双堆集歼灭黄维兵团约12万人；第三阶段为12月16日至1949年1月10日，1949年1月6日华东野战军发起对杜聿明部总攻，至10日歼灭邱清泉、李弥两个兵团约20万人，俘杜聿明，战役胜利结束（第965页）。全役历时66天，歼灭国民党军55.5万人，使长江以北华东、中原地区基本解放，使南京、上海直接受到解放军威胁，为渡江作战创造有利条件（第966页）。人民群众的支前对胜利具有重要作用，陈毅用人民群众用小车推出来的胜利概括其作用；该页三大战役的累计支前数字不能单算成淮海战役的统计（第969页）。这些是战役概述的最低覆盖，允许继续补充有可靠引用的内容。
@@ -1261,7 +1306,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`refusal_boundary`；可答性：`unanswerable`；主题组：`einstein_false_premise`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：0；固定池：无
 - 问题：爱因斯坦在1925年担任了什么党内职务？
 - 参考答案：当前本地文献没有可核实的证据支持爱因斯坦在1925年担任某项党内职务，因此我不能据此给出职务。题目也没有说明所指党派；如要继续查证，需要明确党派并提供相应史料。资料不足不等于已证明他在历史上从未参加任何党派或担任任何职务。
@@ -1302,7 +1348,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`refusal_boundary`；可答性：`unanswerable`；主题组：`out_of_scope_2024`
-- 人工复核：`pending`
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
+- 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
 - 候选标签：0；固定池：无
 - 问题：习近平在2024年考察了哪些地方？
 - 参考答案：这个问题超出本项目1921—1978年的研究范围，当前资料库不能据此列出2024年的考察行程。

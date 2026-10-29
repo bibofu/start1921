@@ -28,7 +28,7 @@ from history_agent.log import log_event
 LOGGER = logging.getLogger(__name__)
 DATASET = Path("evals/golden/golden_dataset.json")
 POOLS = Path("evals/golden/ranking_pools.json")
-DEFAULT_CAPTURE = Path("data/reports/golden20_local_20261029/capture.json")
+DEFAULT_CAPTURE = Path("data/reports/golden20_r2_20261029/capture.json")
 TARGET_CASES = [
     "dev_exact_zunyi_election",
     "dev_multi_meetings",
@@ -173,6 +173,8 @@ def main() -> None:
     parser.add_argument("--dataset", type=Path, default=DATASET)
     parser.add_argument("--pools", type=Path, default=POOLS)
     parser.add_argument("--capture", type=Path, default=DEFAULT_CAPTURE)
+    parser.add_argument("--case", action="append", dest="cases", default=None)
+    parser.add_argument("--replace-pools", action="store_true")
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args()
 
@@ -185,10 +187,13 @@ def main() -> None:
     by_id = {case["id"]: case for case in dataset["cases"]}
     capture_by_id = {case["case_id"]: case for case in capture["cases"]}
     hashes = {item["document_id"]: item["sha256"] for item in capture["corpus"]["documents"]}
+    if args.replace_pools:
+        selected = set(args.cases or TARGET_CASES)
+        pools["pools"] = [pool for pool in pools["pools"] if pool["case_id"] not in selected]
     existing_pool_cases = {pool["case_id"] for pool in pools["pools"]}
 
     failures = 0
-    for case_id in TARGET_CASES:
+    for case_id in args.cases or TARGET_CASES:
         case = by_id[case_id]
         if case.get("judgments"):
             print(f"skip {case_id}: already has candidate judgments")

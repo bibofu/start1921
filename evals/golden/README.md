@@ -1,6 +1,6 @@
 # Golden Dataset（selected20，2026-10-29）
 
-当前评测集是 **20 题**：15 道开发题 + 5 道保留题，18 可答 + 2 拒答，88 个必要事实、93 个证据组。它是按用户 2026-10-29 裁定从原 29 题中删除 9 题、改写 2 题后的唯一工作集；旧的 v3–v6 标注、协议、29 题集、旧复核队列和旧观测已清理。
+当前评测集是 **20 题**：15 道开发题 + 5 道保留题，18 可答 + 2 拒答，91 个必要事实、97 个证据组。它是按用户 2026-10-29 裁定从原 29 题中删除 9 题并两次改写交集题后的唯一工作集；旧的 v3–v6 标注、协议、29 题集、旧复核队列和旧观测已清理。
 
 ## 入口
 
@@ -14,7 +14,7 @@
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
 | [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
 | [LLM_LABEL_REVIEW.md](LLM_LABEL_REVIEW.md) | 全部候选标签及抽检状态 |
-| [LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md) | 仅 68 条待人工抽检的 LLM 标签 |
+| [LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md) | 仅 72 条待人工抽检的 LLM 标签 |
 | [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
 | [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
 
@@ -24,16 +24,16 @@
 |---|---:|
 | 开发题 / 保留题 | 15 / 5 |
 | 可答 / 拒答 | 18 / 2 |
-| 必要事实 / 证据组 | 88 / 93 |
-| 有候选标签的题 | 18（95 条 Agent + 68 条 LLM + 30 条人工，合计 193） |
+| 必要事实 / 证据组 | 91 / 97 |
+| 有候选标签的题 | 18（95 条 Agent + 72 条 LLM + 25 条人工，合计 192） |
 | 有固定池的题 | 18 |
-| 题目定义已批准 / 待审 | 5 / 15 |
+| 题目定义已批准 / 待审 | 18 / 2 |
 
-- 正式 Recall@K 只覆盖 5 道已批准开发题；正式 Precision/MRR/nDCG/Fact/Cit 仍为 0 题。
+- 正式 Recall@K 覆盖 16 道已批准可答题；正式 Precision@5 只有 1 题、MRR@5 只有 5 题，nDCG/Fact/Cit 仍为 0 题。
 - 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 也覆盖 18 道，K≤5 稳定。
-- 68 条 `llm_judge` 标签仍待人工抽检，30 条已人工处理（28 通过、2 改判）；人工抽检不改变题目定义的 pending 状态。
+- 72 条 `llm_judge` 标签仍待人工抽检，25 条已人工处理（23 通过、2 改判）；人工抽检不改变题目定义的 pending 状态。
 - 15 道待批准题的复核材料（问题、必要事实、锚点原文、禁止说法、拒绝依据、池内覆盖）见 [DEFINITION_REVIEW.md](DEFINITION_REVIEW.md)。
-- 保留题全部待审，且保留集目前没有约束题和拒答题。
+- 保留题 4/5 已批准，仅 `holdout_intersection_positive` 待审；保留集目前没有约束题和拒答题。
 - 逐题状态和每一条原文见 [CASE_INVENTORY.md](CASE_INVENTORY.md)。
 
 ## 重要边界
