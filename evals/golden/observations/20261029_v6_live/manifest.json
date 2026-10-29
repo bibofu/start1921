@@ -1,0 +1,44 @@
+{
+  "run_name": "development20_v6_live_20261029",
+  "created_at": "2026-10-29T07:25:33.010637+00:00",
+  "dataset": "evals/golden/development_annotations_v6.json",
+  "protocols": "evals/golden/development_protocols_v6.json",
+  "dataset_sha256": "513b684429d8ba5bf069f9c0d4b3c94415224f2529e160992c2dacea05dfebee",
+  "protocol_file_sha256": "8aa9b7e9d09a985fb18799da78db57a79030460fb06405250bc26c4ee2f31e9a",
+  "capture_sha256": "756b808c66bad84e621bd3da6ba2016a9bbd3049a27b6ee065430bf4d231b843",
+  "corpus_sha256": "a9225af6a1996d1721f34963cea1bdfcd5409a4a2edef73f8fbfed347dee430d",
+  "source_sha256": "33efedce2bd57c76c764ccaf8e241259bce6ca37b3a20f129a7bbefc485e86f4",
+  "github_commit_at_capture": {
+    "commit": "aa135a4c24a3f5cae486a73b67f20732c898de30",
+    "branch": "main",
+    "dirty": false
+  },
+  "config": {
+    "candidate_k": 30,
+    "top_k": 20,
+    "answer_top_k": 10,
+    "component_query": "raw_question",
+    "with_llm": true,
+    "llm_model": "deepseek-v4-pro",
+    "query_planner_model": "deepseek-v4-flash",
+    "prompt_version": "grounded-answer-v15",
+    "e2e_candidate_policy": "production default; independent from component budget"
+  },
+  "index_attribution": {
+    "index_manifest_consistent": false,
+    "attribution_safe": false,
+    "attribution_unsafe_reasons": [
+      "actual vector branch has no index manifest"
+    ],
+    "chunk_artifact_sha256": null,
+    "chunking": null,
+    "embedding_model": null
+  },
+  "degraded_cases": {},
+  "local_artifacts": {
+    "capture": "data/reports/eval_development20_v6_live_20261029/capture.json",
+    "report": "data/reports/eval_development20_v6_live_20261029/report.json",
+    "summary": "data/reports/eval_development20_v6_live_20261029/report.summary.json",
+    "review_workbench": "data/reports/eval_development20_v6_live_20261029/reviews/index.html"
+  }
+}

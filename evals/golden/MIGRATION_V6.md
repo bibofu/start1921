@@ -58,7 +58,7 @@ v6 只做了一件事：把两道拒答题的项目依据哈希重绑到当前 `
 2. **5 道新可答题没有候选相关性标签**：`dev_exact_zunyi_election`、`dev_multi_meetings`、`dev_constraint_history_isolation`、`dev_multi_mao_hunan`、`dev_intersection_mao_zhou_1949`。
 3. **固定池仍是 Top-5 并集**：K=10/20 的 Precision/nDCG 和 reranker 实验仍不可评。
 4. **10 道保留题只有题干**，没有事实、证据或可执行标注。
-5. **v6 没有真实模型基线**；下一次带 `--with-llm` 的运行需要单独确认外发范围和成本。
+5. **v6 已有一次真实模型运行，但答案未复核**：见 [v6 真实基线](observations/20261029_v6_live/README.md)（55 次 HTTP、178,551 Token、无请求失败）。引用支持、必要事实、来源/时间约束、拒答和范围说明仍是 N/A；下一次带 `--with-llm` 的运行仍需单独确认外发范围和成本。
 6. **索引归因**：若要支持 embedding/切分/rerank 的单变量归因，需要给 Qdrant 服务补充可验证的 artifact manifest 绑定。
 
 ## 不要做
