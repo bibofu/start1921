@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "version": "golden-v2.2-selected-20-20261029",
-  "description": "按用户2026-10-29裁定，从v6开发集与holdout v1中删除9题，并两次改写交集题后的20题工作集：15开发+5保留，18可答+2拒答；18题定义已人工批准，2道交集题仍待审。不替代历史版本。",
-  "annotation_status": "human_review_partial_18_of_20_approved",
+  "version": "golden-v2.3-selected-20-20261029",
+  "description": "按用户2026-10-29裁定，从v6开发集与holdout v1中删除9题，并两次改写交集题后的20题工作集：15开发+5保留，18可答+2拒答；20题定义均已人工批准。不替代历史版本。",
+  "annotation_status": "human_review_complete_20_of_20_approved",
   "evidence_group_semantics": {
     "facts_to_groups": "AND：一条事实列出的所有 evidence_group_ids 都必须命中。",
     "group_alternatives": "OR：同一 evidence group 内任一 alternative 命中即可，一个组只计一次。",
@@ -3958,11 +3958,16 @@
       "split": "development",
       "topic_group": "mao_zhou_meetings_1949",
       "human_review": {
-        "status": "pending",
-        "reviewed_by": null,
-        "reviewed_at": null,
-        "notes": "2026-10-29 按用户裁定重写，待再次复核。",
-        "confirmations": {}
+        "status": "approved",
+        "reviewed_by": "user_in_current_chat",
+        "reviewed_at": "2026-10-29T19:48:24+08:00",
+        "notes": "用户 2026-10-29 批准扩为七次会议后的题目定义。",
+        "confirmations": {
+          "question": true,
+          "evidence": true,
+          "facts": true,
+          "refusal": true
+        }
       },
       "evidence_groups": [
         {
@@ -4473,11 +4478,16 @@
       "split": "holdout",
       "topic_group": "liu_deng_joint_campaigns",
       "human_review": {
-        "status": "pending",
-        "reviewed_by": null,
-        "reviewed_at": null,
-        "notes": "2026-10-29 按用户裁定重写，待再次复核。",
-        "confirmations": {}
+        "status": "approved",
+        "reviewed_by": "user_in_current_chat",
+        "reviewed_at": "2026-10-29T19:48:24+08:00",
+        "notes": "用户 2026-10-29 批准收窄到1948.11–1949.12三项后的题目定义。",
+        "confirmations": {
+          "question": true,
+          "evidence": true,
+          "facts": true,
+          "refusal": true
+        }
       },
       "evidence_groups": [
         {

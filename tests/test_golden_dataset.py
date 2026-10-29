@@ -34,10 +34,8 @@ def test_golden20_has_expected_counts_and_no_deleted_cases() -> None:
     assert sum(len(case.facts) for case in dataset.cases) == 91
     assert sum(len(case.evidence_groups) for case in dataset.cases) == 97
     assert sum(len(case.judgments) for case in dataset.cases) == 192
-    assert sum(case.human_review.status == "approved" for case in dataset.cases) == 18
-    assert {
-        case.id for case in dataset.cases if case.human_review.status != "approved"
-    } == {"dev_intersection_mao_zhou_1949", "holdout_intersection_positive"}
+    assert sum(case.human_review.status == "approved" for case in dataset.cases) == 20
+    assert all(case.human_review.status == "approved" for case in dataset.cases)
     assert not {case.id for case in dataset.cases} & DELETED
 
 

@@ -11,7 +11,7 @@
 | 必要事实 / 证据组 | 91 / 97 |
 | 有候选标签的题 | 18（192 条候选判断） |
 | 有固定池的题 | 18 |
-| 题目定义已批准 / 待审 | 18 / 2 |
+| 题目定义已批准 / 待审 | 20 / 0 |
 
 ## 本次删除与改写
 
@@ -44,9 +44,9 @@
 
 ## 建议检查顺序
 
-1. 先看 14 道已批准的开发题，确认题目定义、来源、事实和边界没有被后续版本悄悄改动。
-2. 再看 1 道待审开发题，重点核对剩余窄事实、跨年覆盖、淮海历史隔离和项目范围拒答。
-3. 最后看 5 道保留题；其中 1 道待审，其余已批准。
+1. 先看 15 道已批准的开发题，确认题目定义、来源、事实和边界没有被后续版本悄悄改动。
+2. 开发题定义已全部批准，可直接核对事实、锚点和固定池覆盖。
+3. 最后看 5 道保留题；定义均已批准，重点看保留集缺约束题和拒答题的覆盖风险。
 4. 所有标为 `OCR` 的锚点都需要对照 PDF 原页图像；`文本层` 锚点也建议抽查原页。
 5. 2 道拒答题没有正向 R/P 分母，重点看拒答边界、范围说明和是否编造。
 
@@ -67,9 +67,9 @@
 | 11 | `dev_multi_meetings` | multi_evidence | development | answerable | 12 / 15 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
 | 12 | `dev_multi_zhou_periods` | multi_evidence | development | answerable | 7 / 7 | 10 / 10 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 13 | `holdout_multi_period` | multi_evidence | holdout | answerable | 3 / 3 | 9 / 9 | approved | R, P/MRR/nDCG(小池) |
-| 14 | `dev_intersection_mao_zhou_1949` | intersection_hard_negative | development | answerable | 7 / 7 | 9 / 9 | pending | R, P/MRR/nDCG(小池) |
+| 14 | `dev_intersection_mao_zhou_1949` | intersection_hard_negative | development | answerable | 7 / 7 | 9 / 9 | approved | R, P/MRR/nDCG(小池) |
 | 15 | `holdout_intersection_negative` | intersection_hard_negative | holdout | answerable | 2 / 2 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
-| 16 | `holdout_intersection_positive` | intersection_hard_negative | holdout | answerable | 3 / 4 | 10 / 10 | pending | R, P/MRR/nDCG(小池) |
+| 16 | `holdout_intersection_positive` | intersection_hard_negative | holdout | answerable | 3 / 4 | 10 / 10 | approved | R, P/MRR/nDCG(小池) |
 | 17 | `dev_constraint_history_isolation` | constraints_routing | development | answerable | 10 / 12 | 8 / 8 | approved | R, P/MRR/nDCG(小池) |
 | 18 | `dev_constraint_month_place` | constraints_routing | development | answerable | 4 / 4 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 19 | `dev_refusal_einstein` | refusal_boundary | development | unanswerable | 0 / 0 | 0 / — | approved | Ref/Scope(无复核答案) |
@@ -953,8 +953,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`mao_zhou_meetings_1949`
-- 人工复核：`pending`
-- 复核备注：2026-10-29 按用户裁定重写，待再次复核。
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:48:24+08:00`
+- 复核备注：用户 2026-10-29 批准扩为七次会议后的题目定义。
 - 候选标签：9 条（{'llm_judge': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：毛泽东与周恩来在1949年有哪些有共同出席的会议？
 - 参考答案：可据原文列出以下七项，清单以年谱明确记载为限、不声称穷尽1949年全年：①6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚（毛3 PDF521）；②7月1日，同朱德、周恩来等出席纪念中国共产党成立二十八周年大会（毛3 PDF531）；③7月9日，同朱德、周恩来出席全国铁路职工临时代表会议等在中南海怀仁堂的集会（毛3 PDF536）；④9月8日，毛泽东会见和宴请程潜，朱德、刘少奇、周恩来等参加（毛3 PDF572）；⑤9月25日晚，毛泽东召集国旗、国徽、国歌、纪年、国都问题协商座谈会，周恩来出席（毛3 PDF585）；⑥10月24日，毛泽东接见绥远军区负责人和傅作义，周恩来参加（毛4 PDF32）；⑦12月1日，毛泽东同张澜等十二位民主人士座谈，磋商访苏签订中苏条约事宜，朱德、周恩来、林伯渠参加（毛4 PDF58）。共同出席必须逐条得到直接支持，不能把邻条、引文背景或只出现两人姓名的片段算作共同出席会议。
@@ -1071,8 +1071,8 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`liu_deng_joint_campaigns`
-- 人工复核：`pending`
-- 复核备注：2026-10-29 按用户裁定重写，待再次复核。
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:48:24+08:00`
+- 复核备注：用户 2026-10-29 批准收窄到1948.11–1949.12三项后的题目定义。
 - 候选标签：10 条（{'llm_judge': 10}）；固定池：10 个成员（basis=agent_review）
 - 问题：1948年11月至1949年12月，刘伯承和邓小平共同指挥了哪些战略决战和战略进军？
 - 参考答案：在1948年11月至1949年12月这一窗口内，可据原文列出：①淮海战役：总前委由刘伯承、陈毅、邓小平、粟裕、谭震林组成，刘伯承、陈毅、邓小平为常委，邓小平任书记（邓年谱中卷 PDF131）；②渡江战役（京沪杭战役）：1949年2月9日邓小平主持总前委扩大会议讨论渡江作战，并与刘伯承等联名致电中央军委；4月第二、第三野战军及地方部队百万余人强渡长江（PDF155、173）；③进军西南：1949年8月刘伯承、邓小平联名致信林彪等，安排二野进军西南的粮草保障（PDF189）。窗口外的邯长、上党、陇海、定陶等不属本题；本题只评估窗口内三项，不声称是两人全部共同指挥的战役。
