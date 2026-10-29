@@ -4187,22 +4187,20 @@
       "judgments": [
         {
           "unit_id": "1f7649d7411888877fee1e68850c113d78d954ff9d9ca32c3b13efdcb479e45b",
-          "relevance": 2,
-          "reason": "明确记载1949年6月7日陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
-          "supported_groups": [
-            "joint_meeting_0607"
-          ]
+          "relevance": 1,
+          "reason": "明确记载1949年6月7日陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。；人工改判为1：只是聊天，不算共同出席的会议。",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
+          "supported_groups": []
         },
         {
           "unit_id": "647408cdddf35b5e3efa1825921663f95071b896ca5f669946c01956cda98999",
           "relevance": 2,
-          "reason": "明确记载1949年7月1日毛泽东、朱德、周恩来等出席北平各界庆祝“七一”大会，直接支持joint_meeting_0701。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1949年7月1日毛泽东、朱德、周恩来等出席北平各界庆祝“七一”大会，直接支持joint_meeting_0701。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "joint_meeting_0701"
           ]
@@ -4210,19 +4208,19 @@
         {
           "unit_id": "d44e2b000ce79d70d97851ba887830727c61fe542170b945d374799f51c06a0c",
           "relevance": 0,
-          "reason": "内容涉及1949年9月政协会议和开国大典，但未提及毛泽东与周恩来共同出席的具体会议，且无必要事实中的日期和事件。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及1949年9月政协会议和开国大典，但未提及毛泽东与周恩来共同出席的具体会议，且无必要事实中的日期和事件。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "e69a4184e5ff5e979c038c2e26539a5c38ce40f33ddc3352d9d2c3e3ad836781",
           "relevance": 2,
-          "reason": "明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "joint_consultation_0925"
           ]
@@ -4230,46 +4228,46 @@
         {
           "unit_id": "0b36040e82d3b65deee85cd6de7b104fe277b97853d7b57cd3043d8fb0ac2a09",
           "relevance": 0,
-          "reason": "内容为1950年1月事件，时间不符，且未涉及1949年共同会议。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1950年1月事件，时间不符，且未涉及1949年共同会议。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "32e39677191f6d55c8d1cb6debddec5f462a083afcaadde20bfb0c65e29c8ac1",
           "relevance": 0,
-          "reason": "内容为1949年1-2月事件，未涉及必要事实中的共同会议。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1949年1-2月事件，未涉及必要事实中的共同会议。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "e24b37c977bc79066856db65481489a9de8c44ac59fbfbb2f4fffaf1ae58ac39",
           "relevance": 0,
-          "reason": "内容为1949年9月18-22日事件，未涉及必要事实中的共同会议。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1949年9月18-22日事件，未涉及必要事实中的共同会议。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "9481413cf99d180990140f9684b238473a8cf721ce566f8e61edd7375b2691ba",
-          "relevance": 0,
-          "reason": "内容为1949年11月25日政治局会议，未涉及必要事实中的共同会议。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "relevance": 2,
+          "reason": "内容为1949年11月25日政治局会议，未涉及必要事实中的共同会议。；人工改判为2：原文明确记载周恩来出席11月25日政治局会议，但该会议不在冻结的七项必要事实内。",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "ea66074c16f9988c1e11ffda5b7fa9c19c25b4638d9019cd8564f4e4421a5a8a",
           "relevance": 0,
-          "reason": "内容为注释和参考文献，涉及1954-1955年事件，与问题无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:05.371504+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为注释和参考文献，涉及1954-1955年事件，与问题无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T20:14:25+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
