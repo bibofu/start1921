@@ -132,7 +132,7 @@ class PilotCase(StrictModel):
     question: str
     category: str
     answerability: Literal["answerable", "unanswerable"]
-    split: Literal["development"]
+    split: Literal["development", "holdout"]
     topic_group: str
     human_review: HumanReview
     evidence_groups: list[EvidenceGroup] = Field(default_factory=list)
