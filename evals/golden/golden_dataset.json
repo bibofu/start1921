@@ -2117,10 +2117,10 @@
         {
           "unit_id": "64f0e7bbbaca4a1b16e5fdac4d2103b7f65f3df0a0107fad01e25d69cdcfc02f",
           "relevance": 0,
-          "reason": "仅书名，无内容",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "仅书名，无内容（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2135,10 +2135,10 @@
         {
           "unit_id": "ee4a90c27ef73eb00a058e1c29fb18d3fceb4db6dc32122f685517b83d983423",
           "relevance": 0,
-          "reason": "关于朱德，与红军学校无关",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "关于朱德，与红军学校无关（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -3237,10 +3237,10 @@
         {
           "unit_id": "16777fac3338798e874746d0ecd833328b5a31520aa1d9fd6950f5207abee819",
           "relevance": 2,
-          "reason": "明确提到1935年1月遵义会议纠正王明路线错误，支持遵义会议时间；提到1959年庐山会议彭德怀写信、讲人民公社办早了等，支持彭德怀信的内容。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "明确提到1935年1月遵义会议纠正王明路线错误，支持遵义会议时间；提到1959年庐山会议彭德怀写信、讲人民公社办早了等，支持彭德怀信的内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "zunyi_date",
             "lushan_letter_content"
@@ -3305,10 +3305,10 @@
         {
           "unit_id": "83897cc0d070f98128177f73a8c97bee50082a078ce0f5df8516c156b3636c01",
           "relevance": 2,
-          "reason": "明确说明庐山会议原意是进一步纠正大跃进以来左的错误，支持庐山会议初衷。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "明确说明庐山会议原意是进一步纠正大跃进以来左的错误，支持庐山会议初衷。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "lushan_initial"
           ]
@@ -4040,10 +4040,10 @@
         {
           "unit_id": "1f7649d7411888877fee1e68850c113d78d954ff9d9ca32c3b13efdcb479e45b",
           "relevance": 2,
-          "reason": "明确记载1949年6月7日周恩来陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1949年6月7日周恩来陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "joint_meeting_0607"
           ]
@@ -4069,10 +4069,10 @@
         {
           "unit_id": "e69a4184e5ff5e979c038c2e26539a5c38ce40f33ddc3352d9d2c3e3ad836781",
           "relevance": 2,
-          "reason": "明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "joint_consultation_0925"
           ]
@@ -4213,10 +4213,10 @@
         {
           "unit_id": "8987487314ca9bd17862ca4b7e2088430a6fd9ec98f6a9bf0ec36f48ca273e6d",
           "relevance": 2,
-          "reason": "明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "liu_commander"
           ]
@@ -4251,10 +4251,10 @@
         {
           "unit_id": "3f5f47f8e4ad97d37e59a506930f32e15dcbe362d98b4aa6a293dd157f4e618a",
           "relevance": 2,
-          "reason": "明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "liu_commander"
           ]
@@ -4462,10 +4462,10 @@
         {
           "unit_id": "48f29e5d0bddaa7360dc415b8a4bce169b8a100ddd7a265d0008e43f432d5932",
           "relevance": 2,
-          "reason": "原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关行动，如致电指示、报告战役经验，直接支持上党战役证据组。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
-          "basis": "llm_judge",
+          "reason": "原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关行动，如致电指示、报告战役经验，直接支持上党战役证据组。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "shangdang_1945"
           ]
@@ -4529,10 +4529,10 @@
         {
           "unit_id": "7aa921b3e125bb121e7914ce5b48c60932f2aae367b094d05f98eec34c95a10b",
           "relevance": 2,
-          "reason": "原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关战斗，如命令部队、突袭马法五部，直接支持上党战役证据组。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
-          "basis": "llm_judge",
+          "reason": "原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关战斗，如命令部队、突袭马法五部，直接支持上党战役证据组。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:03:42+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "shangdang_1945"
           ]

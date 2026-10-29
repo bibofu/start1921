@@ -1,6 +1,6 @@
-# 98 条 LLM 候选标签抽检清单
+# LLM 候选标签抽检清单（10 条已人工通过）
 
-本清单列出 10 道题的 `llm_judge` 候选标签（0/1/2），供人工抽检。LLM 标签不是人工批准，不能直接作为正式 Golden 标签。
+本清单列出 10 道题的候选标签（0/1/2）。其中 10 条已由用户人工抽检通过，改为 `human_review`；其余 `llm_judge` 仍待抽检。LLM 标签不是人工批准，不能直接作为正式 Golden 标签。
 
 抽检重点：
 
@@ -8,29 +8,20 @@
 2. 池内没有任何锚点页的题（说明召回本身可能缺失，不是标签问题）；
 3. 0/1/2 的边界例子；每案建议至少抽 2 条，优先抽 rel=2 和 rel=0。
 
-高风险题（自动标记，需优先看）：
-
-- `holdout_semantic_observation`：池内 0 个锚点页、0 个 rel=2；这是召回缺失，不是标签问题。
-- `holdout_multi_period`：池内只有 1 个锚点页，另外两组必要事实未进池。
-- `dev_intersection_mao_zhou_1949`：池内 0 个锚点页，2 个非锚点页 rel=2。
-- `holdout_intersection_negative`：池内 0 个锚点页，2 个非锚点页 rel=2。
-- `holdout_intersection_positive`：池内 0 个锚点页，3 个非锚点页 rel=2。
-- `dev_multi_meetings`：5 个非锚点页 rel=2，需确认是否过度标注。
-
 ## 总览
 
-| 题 | 标签数 | rel=2 | rel=1 | rel=0 | 非锚点页 rel=2 | 池内锚点页数 |
-|---|---:|---:|---:|---:|---:|---:|
-| `dev_exact_zunyi_election` | 11 | 2 | 3 | 6 | 1 | 1 |
-| `holdout_exact_date` | 6 | 1 | 1 | 4 | 0 | 1 |
-| `holdout_semantic_observation` | 11 | 0 | 2 | 9 | 0 | 0 |
-| `dev_multi_mao_hunan` | 11 | 3 | 3 | 5 | 1 | 2 |
-| `dev_multi_meetings` | 11 | 7 | 4 | 0 | 5 | 2 |
-| `holdout_multi_period` | 9 | 1 | 0 | 8 | 0 | 1 |
-| `dev_intersection_mao_zhou_1949` | 9 | 2 | 0 | 7 | 2 | 0 |
-| `holdout_intersection_negative` | 11 | 2 | 8 | 1 | 2 | 0 |
-| `holdout_intersection_positive` | 11 | 3 | 3 | 5 | 3 | 0 |
-| `dev_constraint_history_isolation` | 8 | 4 | 2 | 2 | 3 | 1 |
+| 题 | 标签数 | 已人工 | rel=2 | rel=1 | rel=0 | 非锚点页 rel=2 | 池内锚点页数 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `dev_exact_zunyi_election` | 11 | 0 | 2 | 3 | 6 | 1 | 1 |
+| `holdout_exact_date` | 6 | 0 | 1 | 1 | 4 | 0 | 1 |
+| `holdout_semantic_observation` | 11 | 2 | 0 | 2 | 9 | 0 | 0 |
+| `dev_multi_mao_hunan` | 11 | 0 | 3 | 3 | 5 | 1 | 2 |
+| `dev_multi_meetings` | 11 | 2 | 7 | 4 | 0 | 5 | 2 |
+| `holdout_multi_period` | 9 | 0 | 1 | 0 | 8 | 0 | 1 |
+| `dev_intersection_mao_zhou_1949` | 9 | 2 | 2 | 0 | 7 | 2 | 0 |
+| `holdout_intersection_negative` | 11 | 2 | 2 | 8 | 1 | 2 | 0 |
+| `holdout_intersection_positive` | 11 | 2 | 3 | 3 | 5 | 3 | 0 |
+| `dev_constraint_history_isolation` | 8 | 0 | 4 | 2 | 2 | 3 | 1 |
 
 ## `dev_exact_zunyi_election`
 
@@ -38,19 +29,19 @@
 - 必要事实：
   - `elected_standing_member`：遵义会议选举毛泽东为中央政治局常委。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `f84ee4c70b` | mao_selected_works_combined PDF 2527 | 1 | — | 提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务，仅背景相关。 |  |
-| `a4d40f1a74` | cpc_history_volume_1 PDF 483 | 2 | zunyi_election | 明确写出遵义会议选举毛泽东为中央政治局常委。 |  |
-| `d84a62939d` | mao_zedong_chronology_volume_2 PDF 486 | 0 | — | 内容为1943年整风讲话，与遵义会议选举无关。 |  |
-| `d5e4aa5a2b` | mao_selected_works_combined PDF 2376 | 0 | — | 内容涉及苏联政治和四清运动，与遵义会议无关。 |  |
-| `2932a38955` | deng_xiaoping_chronology_1904_1974_upper PDF 123 | 2 | zunyi_election | 明确写出遵义会议增选毛泽东为中央政治局常委。 | **非锚点页 rel=2，重点抽检** |
-| `02b7b7dafc` | mao_selected_works_combined PDF 62 | 0 | — | 内容为井冈山时期特委选举，与遵义会议无关。 |  |
-| `f75f5ffcc9` | mao_selected_works_combined PDF 2623 | 1 | — | 提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务。 |  |
-| `aa0e7b86ca` | zhou_enlai_chronology_1949_1976 PDF 1068 | 0 | — | 仅评价遵义会议意义，未提及选举职务。 |  |
-| `b41e283c43` | mao_selected_works_combined PDF 2623 | 1 | — | 提到王稼祥在遵义会议后被增选为政治局委员，但未提及毛泽东职务。 |  |
-| `d0c43c829e` | mao_selected_works_combined PDF 1708 | 0 | — | 内容为秋收起义后处分及王明路线背景，与遵义会议选举无关。 |  |
-| `5c40d3509a` | mao_selected_works_combined PDF 1683 | 0 | — | 内容为1954年宪法及国家主席选举，与遵义会议无关。 |  |
+| `f84ee4c70b` | mao_selected_works_combined PDF 2527 | 1 | — | 提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务，仅背景相关。 | LLM 待抽检  |
+| `a4d40f1a74` | cpc_history_volume_1 PDF 483 | 2 | zunyi_election | 明确写出遵义会议选举毛泽东为中央政治局常委。 | LLM 待抽检  |
+| `d84a62939d` | mao_zedong_chronology_volume_2 PDF 486 | 0 | — | 内容为1943年整风讲话，与遵义会议选举无关。 | LLM 待抽检  |
+| `d5e4aa5a2b` | mao_selected_works_combined PDF 2376 | 0 | — | 内容涉及苏联政治和四清运动，与遵义会议无关。 | LLM 待抽检  |
+| `2932a38955` | deng_xiaoping_chronology_1904_1974_upper PDF 123 | 2 | zunyi_election | 明确写出遵义会议增选毛泽东为中央政治局常委。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `02b7b7dafc` | mao_selected_works_combined PDF 62 | 0 | — | 内容为井冈山时期特委选举，与遵义会议无关。 | LLM 待抽检  |
+| `f75f5ffcc9` | mao_selected_works_combined PDF 2623 | 1 | — | 提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务。 | LLM 待抽检  |
+| `aa0e7b86ca` | zhou_enlai_chronology_1949_1976 PDF 1068 | 0 | — | 仅评价遵义会议意义，未提及选举职务。 | LLM 待抽检  |
+| `b41e283c43` | mao_selected_works_combined PDF 2623 | 1 | — | 提到王稼祥在遵义会议后被增选为政治局委员，但未提及毛泽东职务。 | LLM 待抽检  |
+| `d0c43c829e` | mao_selected_works_combined PDF 1708 | 0 | — | 内容为秋收起义后处分及王明路线背景，与遵义会议选举无关。 | LLM 待抽检  |
+| `5c40d3509a` | mao_selected_works_combined PDF 1683 | 0 | — | 内容为1954年宪法及国家主席选举，与遵义会议无关。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -73,14 +64,14 @@
   - `oriental_university`：邓小平1926年1月到达莫斯科后，先入莫斯科东方劳动者共产主义大学学习。
   - `sun_yat_sen_university`：不久转入莫斯科中山大学。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `e8fbd60295` | deng_xiaoping_chronology_1904_1974_upper PDF 33 | 2 | oriental_university, sun_yat_sen_university | 原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。 |  |
-| `ae55014d8a` | deng_xiaoping_chronology_1904_1974_upper PDF 23 | 0 | — | 内容为1922年旅欧少年共产党成立及求学未成，与1926年在莫斯科的学校无关。 |  |
-| `373dd98397` | deng_xiaoping_chronology_1904_1974_upper PDF 36 | 1 | — | 提及莫斯科中山大学和东方劳动者共产主义大学，但未明确说明邓小平先后入学，仅涉及1926年5月后的活动，不足以直接支持必要事实。 |  |
-| `19f4f87094` | deng_xiaoping_chronology_1904_1974_upper PDF 20 | 0 | — | 内容为1921年留法勤工俭学活动，与1926年在莫斯科的学校无关。 |  |
-| `8906ad82c6` | deng_xiaoping_chronology_1904_1974_upper PDF 32 | 0 | — | 内容为1926年1月离开巴黎赴苏联的经过，未提及到达莫斯科后入读的学校。 |  |
-| `4034515a63` | deng_xiaoping_chronology_1904_1974_upper PDF 25 | 0 | — | 内容为1923年加入旅欧共青团及编辑刊物，与1926年在莫斯科的学校无关。 |  |
+| `e8fbd60295` | deng_xiaoping_chronology_1904_1974_upper PDF 33 | 2 | oriental_university, sun_yat_sen_university | 原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。 | LLM 待抽检  |
+| `ae55014d8a` | deng_xiaoping_chronology_1904_1974_upper PDF 23 | 0 | — | 内容为1922年旅欧少年共产党成立及求学未成，与1926年在莫斯科的学校无关。 | LLM 待抽检  |
+| `373dd98397` | deng_xiaoping_chronology_1904_1974_upper PDF 36 | 1 | — | 提及莫斯科中山大学和东方劳动者共产主义大学，但未明确说明邓小平先后入学，仅涉及1926年5月后的活动，不足以直接支持必要事实。 | LLM 待抽检  |
+| `19f4f87094` | deng_xiaoping_chronology_1904_1974_upper PDF 20 | 0 | — | 内容为1921年留法勤工俭学活动，与1926年在莫斯科的学校无关。 | LLM 待抽检  |
+| `8906ad82c6` | deng_xiaoping_chronology_1904_1974_upper PDF 32 | 0 | — | 内容为1926年1月离开巴黎赴苏联的经过，未提及到达莫斯科后入读的学校。 | LLM 待抽检  |
+| `4034515a63` | deng_xiaoping_chronology_1904_1974_upper PDF 25 | 0 | — | 内容为1923年加入旅欧共青团及编辑刊物，与1926年在莫斯科的学校无关。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -101,19 +92,19 @@
   - `curriculum`：课程分为政治课程和军事课程；政治课程包括政治知识、中国革命问题、政治经济学、党的建设等，军事课程包括抗日战争的战略问题、运动战、游击战术等。
   - `recreation`：文娱时间学员打篮球、网球、乒乓球，读书报或在俱乐部学习。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `a7f87c3700` | red_star_over_china PDF 52 | 0 | — | 仅目录，无具体描述 |  |
-| `64f0e7bbba` | red_star_over_china PDF 1 | 0 | — | 仅书名，无内容 |  |
-| `acfc0bb601` | red_star_over_china PDF 3 | 0 | — | 仅书名和译者，无内容 |  |
-| `ee4a90c27e` | red_star_over_china PDF 365 | 0 | — | 关于朱德，与红军学校无关 |  |
-| `47e97f2006` | red_star_over_china PDF 308 | 1 | — | 描述列宁室和军事训练，但未直接支持任何必要事实 |  |
-| `7fd0129792` | red_star_over_china PDF 38 | 0 | — | 出版说明，无相关内容 |  |
-| `89b2e351a6` | red_star_over_china PDF 41 | 0 | — | 出版背景，无相关内容 |  |
-| `12b3732f91` | red_star_over_china PDF 39 | 0 | — | 斯诺生平，无相关内容 |  |
-| `571e7e2d0d` | red_star_over_china PDF 265 | 1 | — | 提到红军大学等学校，但未给出具体规模和训练安排 |  |
-| `c44c60f964` | red_star_over_china PDF 37 | 0 | — | 出版说明，无相关内容 |  |
-| `2b85dd969e` | red_star_over_china PDF 53 | 0 | — | 仅目录，无具体描述 |  |
+| `a7f87c3700` | red_star_over_china PDF 52 | 0 | — | 仅目录，无具体描述 | LLM 待抽检  |
+| `64f0e7bbba` | red_star_over_china PDF 1 | 0 | — | 仅书名，无内容（人工抽检通过） | 人工通过  |
+| `acfc0bb601` | red_star_over_china PDF 3 | 0 | — | 仅书名和译者，无内容 | LLM 待抽检  |
+| `ee4a90c27e` | red_star_over_china PDF 365 | 0 | — | 关于朱德，与红军学校无关（人工抽检通过） | 人工通过  |
+| `47e97f2006` | red_star_over_china PDF 308 | 1 | — | 描述列宁室和军事训练，但未直接支持任何必要事实 | LLM 待抽检  |
+| `7fd0129792` | red_star_over_china PDF 38 | 0 | — | 出版说明，无相关内容 | LLM 待抽检  |
+| `89b2e351a6` | red_star_over_china PDF 41 | 0 | — | 出版背景，无相关内容 | LLM 待抽检  |
+| `12b3732f91` | red_star_over_china PDF 39 | 0 | — | 斯诺生平，无相关内容 | LLM 待抽检  |
+| `571e7e2d0d` | red_star_over_china PDF 265 | 1 | — | 提到红军大学等学校，但未给出具体规模和训练安排 | LLM 待抽检  |
+| `c44c60f964` | red_star_over_china PDF 37 | 0 | — | 出版说明，无相关内容 | LLM 待抽检  |
+| `2b85dd969e` | red_star_over_china PDF 53 | 0 | — | 仅目录，无具体描述 | LLM 待抽检  |
 
 原文摘录：
 
@@ -148,19 +139,19 @@
   - `y1926_hunan_peasant_congress`：1926年12月17日由汉口到长沙，参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案。
   - `y1926_workers_peasants_welcome_speech`：1926年12月20日出席湖南全省第一次工人、农民代表大会联合欢迎大会，作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `a2654187b7` | cpc_history_volume_1 PDF 246 | 1 | — | 涉及1926年湖南工农运动背景，但未直接支持任何必要事实，仅提供背景。 |  |
-| `e59099ad64` | cpc_history_volume_1 PDF 247 | 2 | y1926_workers_peasants_welcome_speech | 明确记载1926年12月20日毛泽东出席湖南全省第一次农、工代表大会欢迎会并作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题，直接支持y1926_workers_peasants_welcome_speech。 | **非锚点页 rel=2，重点抽检** |
-| `07189eaae4` | mao_zedong_chronology_volume_1 PDF 184 | 1 | — | 涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。 |  |
-| `fc93ef0f94` | mao_zedong_chronology_volume_1 PDF 161 | 0 | — | 内容涉及国民党二大决议案修改，与问题中毛泽东在湖南的活动无关。 |  |
-| `3253e3ec73` | mao_zedong_chronology_volume_1 PDF 183 | 2 | y1926_hunan_peasant_congress, y1926_workers_peasants_welcome_speech | 明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。 |  |
-| `a722b83e50` | mao_zedong_chronology_volume_1 PDF 211 | 0 | — | 内容涉及1927年6月马日事变后的活动，与问题时间范围不符。 |  |
-| `b4308a73ff` | mao_zedong_chronology_volume_1 PDF 145 | 0 | — | 内容涉及1925年9月毛泽东离开湖南赴广州，与问题中1921-1926年在湖南的活动无关。 |  |
-| `a020df2627` | mao_zedong_chronology_volume_1 PDF 104 | 2 | y1922_xiang_committee | 明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。 |  |
-| `0b7a35d0df` | mao_zedong_chronology_volume_1 PDF 98 | 0 | — | 内容涉及1921年10月湖南支部活动，但未直接支持任何必要事实，且部分信息与必要事实不符。 |  |
-| `60c21f68ff` | mao_zedong_chronology_volume_1 PDF 182 | 1 | — | 涉及1926年12月湖南农民代表大会电请毛泽东指导，但未直接支持任何必要事实。 |  |
-| `ad013bb4cf` | mao_zedong_chronology_volume_1 PDF 163 | 0 | — | 内容涉及1926年1月国民党二大及中央宣传部代理部长任命，与问题中毛泽东在湖南的活动无关。 |  |
+| `a2654187b7` | cpc_history_volume_1 PDF 246 | 1 | — | 涉及1926年湖南工农运动背景，但未直接支持任何必要事实，仅提供背景。 | LLM 待抽检  |
+| `e59099ad64` | cpc_history_volume_1 PDF 247 | 2 | y1926_workers_peasants_welcome_speech | 明确记载1926年12月20日毛泽东出席湖南全省第一次农、工代表大会欢迎会并作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题，直接支持y1926_workers_peasants_welcome_speech。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `07189eaae4` | mao_zedong_chronology_volume_1 PDF 184 | 1 | — | 涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。 | LLM 待抽检  |
+| `fc93ef0f94` | mao_zedong_chronology_volume_1 PDF 161 | 0 | — | 内容涉及国民党二大决议案修改，与问题中毛泽东在湖南的活动无关。 | LLM 待抽检  |
+| `3253e3ec73` | mao_zedong_chronology_volume_1 PDF 183 | 2 | y1926_hunan_peasant_congress, y1926_workers_peasants_welcome_speech | 明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。 | LLM 待抽检  |
+| `a722b83e50` | mao_zedong_chronology_volume_1 PDF 211 | 0 | — | 内容涉及1927年6月马日事变后的活动，与问题时间范围不符。 | LLM 待抽检  |
+| `b4308a73ff` | mao_zedong_chronology_volume_1 PDF 145 | 0 | — | 内容涉及1925年9月毛泽东离开湖南赴广州，与问题中1921-1926年在湖南的活动无关。 | LLM 待抽检  |
+| `a020df2627` | mao_zedong_chronology_volume_1 PDF 104 | 2 | y1922_xiang_committee | 明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。 | LLM 待抽检  |
+| `0b7a35d0df` | mao_zedong_chronology_volume_1 PDF 98 | 0 | — | 内容涉及1921年10月湖南支部活动，但未直接支持任何必要事实，且部分信息与必要事实不符。 | LLM 待抽检  |
+| `60c21f68ff` | mao_zedong_chronology_volume_1 PDF 182 | 1 | — | 涉及1926年12月湖南农民代表大会电请毛泽东指导，但未直接支持任何必要事实。 | LLM 待抽检  |
+| `ad013bb4cf` | mao_zedong_chronology_volume_1 PDF 163 | 0 | — | 内容涉及1926年1月国民党二大及中央宣传部代理部长任命，与问题中毛泽东在湖南的活动无关。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -193,19 +184,19 @@
   - `lushan_economic_effect`：反右倾打断纠左进程，使大跃进和人民公社化中已暴露的左倾错误重新发展。
   - `lushan_democratic_effect`：反右倾破坏党内民主，发展个人崇拜、个人专断倾向，打击提出批评意见的同志。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `16777fac33` | mao_selected_works_combined PDF 2675 | 2 | zunyi_date, lushan_letter_content | 明确提到1935年1月遵义会议纠正王明路线错误，支持遵义会议时间；提到1959年庐山会议彭德怀写信、讲人民公社办早了等，支持彭德怀信的内容。 | **非锚点页 rel=2，重点抽检** |
-| `08c1a46278` | mao_selected_works_combined PDF 1617 | 2 | lushan_plenum_date, lushan_plenum_decisions | 明确提到1959年7月2日至8月1日政治局扩大会议和8月2日至16日八届八中全会，以及通过《关于以彭德怀同志为首的反党集团的错误的决议》，支持全会日期和决议。 | **非锚点页 rel=2，重点抽检** |
-| `147ae167f5` | mao_selected_works_combined PDF 1705 | 1 | — | 提到1959年庐山会议与彭德怀的斗争是两个司令部的斗争，但未提供具体日期、内容或决议，仅部分相关。 |  |
-| `c8eedefdfd` | zhou_enlai_chronology_1949_1976 PDF 855 | 2 | lushan_initial, lushan_letter_content, lushan_letter_discussion, lushan_turn_date, lushan_turn | 明确记载庐山会议前期讨论十八个问题总结教训，彭德怀7月14日写信肯定成绩提出左倾倾向，7月16日印发讨论，7月23日毛泽东发言指责右倾，会议转为批判，支持多个必要事实。 | **非锚点页 rel=2，重点抽检** |
-| `a1b0ac0830` | mao_selected_works_combined PDF 1705 | 2 | lushan_letter_content | 提到1959年庐山会议彭德怀写信、讲人民公社办早了、得不偿失等，支持彭德怀信的内容。 | **非锚点页 rel=2，重点抽检** |
-| `aa95f9e238` | mao_zedong_chronology_volume_7 PDF 120 | 1 | — | 提到庐山会议议定记录修正草案的讨论，但信息不完整，未直接支持任何必要事实。 |  |
-| `83897cc0d0` | cpc_history_volume_2 PDF 526 | 2 | lushan_initial | 明确说明庐山会议原意是进一步纠正大跃进以来左的错误，支持庐山会议初衷。 |  |
-| `7c69df789f` | cpc_history_volume_2 PDF 529 | 2 | lushan_letter_content | 详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。 |  |
-| `6cd11fa840` | mao_zedong_chronology_volume_7 PDF 88 | 2 | lushan_initial | 记载庐山会议召开日期和毛泽东提出十八个问题，支持庐山会议构成与初衷。 | **非锚点页 rel=2，重点抽检** |
-| `42afeccc96` | zhou_enlai_chronology_1949_1976 PDF 859 | 1 | — | 涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。 |  |
-| `6dc18d3e08` | cpc_history_volume_2 PDF 531 | 1 | — | 描述黄克诚、周小舟对彭德怀信的看法，但未直接支持任何必要事实。 |  |
+| `16777fac33` | mao_selected_works_combined PDF 2675 | 2 | zunyi_date, lushan_letter_content | 明确提到1935年1月遵义会议纠正王明路线错误，支持遵义会议时间；提到1959年庐山会议彭德怀写信、讲人民公社办早了等，支持彭德怀信的内容。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `08c1a46278` | mao_selected_works_combined PDF 1617 | 2 | lushan_plenum_date, lushan_plenum_decisions | 明确提到1959年7月2日至8月1日政治局扩大会议和8月2日至16日八届八中全会，以及通过《关于以彭德怀同志为首的反党集团的错误的决议》，支持全会日期和决议。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `147ae167f5` | mao_selected_works_combined PDF 1705 | 1 | — | 提到1959年庐山会议与彭德怀的斗争是两个司令部的斗争，但未提供具体日期、内容或决议，仅部分相关。 | LLM 待抽检  |
+| `c8eedefdfd` | zhou_enlai_chronology_1949_1976 PDF 855 | 2 | lushan_initial, lushan_letter_content, lushan_letter_discussion, lushan_turn_date, lushan_turn | 明确记载庐山会议前期讨论十八个问题总结教训，彭德怀7月14日写信肯定成绩提出左倾倾向，7月16日印发讨论，7月23日毛泽东发言指责右倾，会议转为批判，支持多个必要事实。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `a1b0ac0830` | mao_selected_works_combined PDF 1705 | 2 | lushan_letter_content | 提到1959年庐山会议彭德怀写信、讲人民公社办早了、得不偿失等，支持彭德怀信的内容。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `aa95f9e238` | mao_zedong_chronology_volume_7 PDF 120 | 1 | — | 提到庐山会议议定记录修正草案的讨论，但信息不完整，未直接支持任何必要事实。 | LLM 待抽检  |
+| `83897cc0d0` | cpc_history_volume_2 PDF 526 | 2 | lushan_initial | 明确说明庐山会议原意是进一步纠正大跃进以来左的错误，支持庐山会议初衷。（人工抽检通过） | 人工通过  |
+| `7c69df789f` | cpc_history_volume_2 PDF 529 | 2 | lushan_letter_content | 详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。 | LLM 待抽检  |
+| `6cd11fa840` | mao_zedong_chronology_volume_7 PDF 88 | 2 | lushan_initial | 记载庐山会议召开日期和毛泽东提出十八个问题，支持庐山会议构成与初衷。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `42afeccc96` | zhou_enlai_chronology_1949_1976 PDF 859 | 1 | — | 涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。 | LLM 待抽检  |
+| `6dc18d3e08` | cpc_history_volume_2 PDF 531 | 1 | — | 描述黄克诚、周小舟对彭德怀信的看法，但未直接支持任何必要事实。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -229,17 +220,17 @@
   - `west_base`：1938年3月，邓小平就开辟冀西根据地同张贻祥谈话，提出准备在冀西建立军分区。
   - `jinan_counter`：1938年10月15日，邓小平致电徐向前、宋任穷等，对冀南反“扫荡”准备工作提出建议。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `bd2c980abe` | deng_xiaoping_chronology_1904_1974_upper PDF 237 | 0 | — | 内容涉及1938年9月后的行程和六届六中全会，未提及任何必要事实中的具体任务。 |  |
-| `a7256fd6f0` | deng_xiaoping_chronology_1904_1974_upper PDF 174 | 2 | d129_commissar | 明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。 |  |
-| `9567843f97` | deng_xiaoping_chronology_1904_1974_upper PDF 243 | 0 | — | 内容为1938年12月收阅电报，涉及区划调整，与必要事实无关。 |  |
-| `c435c64e05` | deng_xiaoping_chronology_1904_1974_upper PDF 223 | 0 | — | 内容为1938年6月活动，未涉及必要事实中的具体任务。 |  |
-| `8080eccd6b` | deng_xiaoping_chronology_1904_1974_upper PDF 181 | 0 | — | 内容为1938年2月活动，未涉及必要事实中的具体任务。 |  |
-| `6f3db4a1a4` | deng_xiaoping_chronology_1904_1974_upper PDF 229 | 0 | — | 内容为1938年7月活动，未涉及必要事实中的具体任务。 |  |
-| `23d28ba8aa` | deng_xiaoping_chronology_1904_1974_upper PDF 215 | 0 | — | 内容为1938年5月活动，未涉及必要事实中的具体任务。 |  |
-| `b50b90ecdd` | deng_xiaoping_chronology_1904_1974_upper PDF 188 | 0 | — | 内容为1938年2月活动，未涉及必要事实中的具体任务。 |  |
-| `c608b7a9b5` | deng_xiaoping_chronology_1904_1974_upper PDF 198 | 0 | — | 内容为1938年3月活动，但未提及开辟冀西根据地或与张贻祥谈话，不直接支持west_base。 |  |
+| `bd2c980abe` | deng_xiaoping_chronology_1904_1974_upper PDF 237 | 0 | — | 内容涉及1938年9月后的行程和六届六中全会，未提及任何必要事实中的具体任务。 | LLM 待抽检  |
+| `a7256fd6f0` | deng_xiaoping_chronology_1904_1974_upper PDF 174 | 2 | d129_commissar | 明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。 | LLM 待抽检  |
+| `9567843f97` | deng_xiaoping_chronology_1904_1974_upper PDF 243 | 0 | — | 内容为1938年12月收阅电报，涉及区划调整，与必要事实无关。 | LLM 待抽检  |
+| `c435c64e05` | deng_xiaoping_chronology_1904_1974_upper PDF 223 | 0 | — | 内容为1938年6月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
+| `8080eccd6b` | deng_xiaoping_chronology_1904_1974_upper PDF 181 | 0 | — | 内容为1938年2月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
+| `6f3db4a1a4` | deng_xiaoping_chronology_1904_1974_upper PDF 229 | 0 | — | 内容为1938年7月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
+| `23d28ba8aa` | deng_xiaoping_chronology_1904_1974_upper PDF 215 | 0 | — | 内容为1938年5月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
+| `b50b90ecdd` | deng_xiaoping_chronology_1904_1974_upper PDF 188 | 0 | — | 内容为1938年2月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
+| `c608b7a9b5` | deng_xiaoping_chronology_1904_1974_upper PDF 198 | 0 | — | 内容为1938年3月活动，但未提及开辟冀西根据地或与张贻祥谈话，不直接支持west_base。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -261,17 +252,17 @@
   - `joint_consultation_0925`：1949年9月25日晚，毛泽东在中南海召集关于国旗、国徽、国歌、纪年、国都问题的协商座谈会，周恩来明确列为出席者。
   - `joint_meeting_1024`：1949年10月24日，毛泽东在中南海菊香书屋接见绥远军区负责人和傅作义，谈起义部队的团结改造及与非党人士长期合作，周恩来参加。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `1f7649d741` | zhou_enlai_chronology_1949_1976 PDF 428 | 2 | joint_meeting_0607 | 明确记载1949年6月7日周恩来陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。 | **非锚点页 rel=2，重点抽检** |
-| `647408cddd` | zhou_enlai_chronology_1949_1976 PDF 429 | 0 | — | 内容涉及1949年6月下旬至7月初，无毛泽东与周恩来共同出席的会议记录。 |  |
-| `d44e2b000c` | deng_xiaoping_chronology_1904_1974_middle PDF 199 | 0 | — | 内容为邓小平年谱，涉及政协会议和开国大典，但未提及毛泽东与周恩来共同出席的具体会议。 |  |
-| `e69a4184e5` | zhou_enlai_chronology_1949_1976 PDF 435 | 2 | joint_consultation_0925 | 明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。 | **非锚点页 rel=2，重点抽检** |
-| `0b36040e82` | zhou_enlai_chronology_1949_1976 PDF 445 | 0 | — | 内容为1950年1月，时间不符。 |  |
-| `32e3967719` | zhou_enlai_chronology_1949_1976 PDF 418 | 0 | — | 内容为1949年1月31日，时间不符。 |  |
-| `e24b37c977` | zhou_enlai_chronology_1949_1976 PDF 434 | 0 | — | 内容为1949年9月18日至22日，未提及毛泽东与周恩来共同出席的会议。 |  |
-| `9481413cf9` | mao_zedong_chronology_volume_4 PDF 54 | 0 | — | 内容为1949年11月25日，时间不符。 |  |
-| `ea66074c16` | cpc_history_volume_2 PDF 380 | 0 | — | 内容为注释和参考文献，无具体会议记录。 |  |
+| `1f7649d741` | zhou_enlai_chronology_1949_1976 PDF 428 | 2 | joint_meeting_0607 | 明确记载1949年6月7日周恩来陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `647408cddd` | zhou_enlai_chronology_1949_1976 PDF 429 | 0 | — | 内容涉及1949年6月下旬至7月初，无毛泽东与周恩来共同出席的会议记录。 | LLM 待抽检  |
+| `d44e2b000c` | deng_xiaoping_chronology_1904_1974_middle PDF 199 | 0 | — | 内容为邓小平年谱，涉及政协会议和开国大典，但未提及毛泽东与周恩来共同出席的具体会议。 | LLM 待抽检  |
+| `e69a4184e5` | zhou_enlai_chronology_1949_1976 PDF 435 | 2 | joint_consultation_0925 | 明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `0b36040e82` | zhou_enlai_chronology_1949_1976 PDF 445 | 0 | — | 内容为1950年1月，时间不符。 | LLM 待抽检  |
+| `32e3967719` | zhou_enlai_chronology_1949_1976 PDF 418 | 0 | — | 内容为1949年1月31日，时间不符。 | LLM 待抽检  |
+| `e24b37c977` | zhou_enlai_chronology_1949_1976 PDF 434 | 0 | — | 内容为1949年9月18日至22日，未提及毛泽东与周恩来共同出席的会议。 | LLM 待抽检  |
+| `9481413cf9` | mao_zedong_chronology_volume_4 PDF 54 | 0 | — | 内容为1949年11月25日，时间不符。 | LLM 待抽检  |
+| `ea66074c16` | cpc_history_volume_2 PDF 380 | 0 | — | 内容为注释和参考文献，无具体会议记录。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -292,19 +283,19 @@
   - `liu_commander`：1937年9月一二九师改编时，刘伯承任师长。
   - `deng_commissar`：1938年1月，邓小平接替张浩任一二九师政治委员。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `8987487314` | mao_selected_works_combined PDF 2734 | 2 | liu_commander | 明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。 | **非锚点页 rel=2，重点抽检** |
-| `1399c64077` | deng_xiaoping_chronology_1904_1974_upper PDF 180 | 1 | — | 涉及一二九师和邓小平，但未明确提及邓小平任政治委员，仅部分背景。 |  |
-| `a17207bedc` | deng_xiaoping_chronology_1904_1974_upper PDF 484 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `dd2779ed9b` | deng_xiaoping_chronology_1904_1974_upper PDF 212 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `3f5f47f8e4` | mao_selected_works_combined PDF 1746 | 2 | liu_commander | 明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。 | **非锚点页 rel=2，重点抽检** |
-| `0a30e3f3be` | deng_xiaoping_chronology_1904_1974_upper PDF 190 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `af6552f684` | deng_xiaoping_chronology_1904_1974_upper PDF 213 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `3bfb3e1eb2` | deng_xiaoping_chronology_1904_1974_upper PDF 208 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `3a2ceb584d` | deng_xiaoping_chronology_1904_1974_upper PDF 363 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `a148b5224b` | deng_xiaoping_chronology_1904_1974_upper PDF 494 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 |  |
-| `acff31c9c8` | deng_xiaoping_chronology_1904_1974_lower PDF 612 | 0 | — | 内容为1967年关于邓小平的谈话，与一二九师职务无关。 |  |
+| `8987487314` | mao_selected_works_combined PDF 2734 | 2 | liu_commander | 明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `1399c64077` | deng_xiaoping_chronology_1904_1974_upper PDF 180 | 1 | — | 涉及一二九师和邓小平，但未明确提及邓小平任政治委员，仅部分背景。 | LLM 待抽检  |
+| `a17207bedc` | deng_xiaoping_chronology_1904_1974_upper PDF 484 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `dd2779ed9b` | deng_xiaoping_chronology_1904_1974_upper PDF 212 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `3f5f47f8e4` | mao_selected_works_combined PDF 1746 | 2 | liu_commander | 明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `0a30e3f3be` | deng_xiaoping_chronology_1904_1974_upper PDF 190 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `af6552f684` | deng_xiaoping_chronology_1904_1974_upper PDF 213 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `3bfb3e1eb2` | deng_xiaoping_chronology_1904_1974_upper PDF 208 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `3a2ceb584d` | deng_xiaoping_chronology_1904_1974_upper PDF 363 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `a148b5224b` | deng_xiaoping_chronology_1904_1974_upper PDF 494 | 1 | — | 涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。 | LLM 待抽检  |
+| `acff31c9c8` | deng_xiaoping_chronology_1904_1974_lower PDF 612 | 0 | — | 内容为1967年关于邓小平的谈话，与一二九师职务无关。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -329,19 +320,19 @@
   - `longhai_1946`：1946年8月10日夜，刘伯承、邓小平指挥晋冀鲁豫野战军主力发起陇海战役。
   - `dingtao_1946`：1946年9月，刘伯承、邓小平指挥晋冀鲁豫野战军主力对整编三师发起进攻，定陶战役开始。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `48f29e5d0b` | deng_xiaoping_chronology_1904_1974_upper PDF 585 | 2 | shangdang_1945 | 原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关行动，如致电指示、报告战役经验，直接支持上党战役证据组。 | **非锚点页 rel=2，重点抽检** |
-| `b0d3840ec1` | deng_xiaoping_chronology_1904_1974_upper PDF 591 | 1 | — | 原文涉及刘伯承、邓小平在1945年11月的共同活动，但未提及任何必要战役，仅提供背景。 |  |
-| `a95eec2af5` | deng_xiaoping_chronology_1904_1974_upper PDF 572 | 2 | shangdang_1945 | 原文明确记载1945年8月刘伯承、邓小平致电报告上党战役部署，直接支持上党战役证据组。 | **非锚点页 rel=2，重点抽检** |
-| `30496aced1` | deng_xiaoping_chronology_1904_1974_middle PDF 8 | 1 | — | 原文涉及1947年1月刘伯承、邓小平分别指挥豫皖边战役，但未提及任何必要战役，仅部分相关。 |  |
-| `25d184d06e` | deng_xiaoping_chronology_1904_1974_upper PDF 588 | 1 | — | 原文涉及1945年11月平汉战役结束及高树勋起义，未提及必要战役。 |  |
-| `6b09aaf208` | deng_xiaoping_chronology_1904_1974_middle PDF 75 | 0 | — | 原文涉及1948年2月大别山游击战部署，与必要战役无关。 |  |
-| `6129d1799e` | deng_xiaoping_chronology_1904_1974_middle PDF 14 | 0 | — | 原文涉及1947年2-3月休整及指示，未提及必要战役。 |  |
-| `7aa921b3e1` | deng_xiaoping_chronology_1904_1974_upper PDF 587 | 2 | shangdang_1945 | 原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关战斗，如命令部队、突袭马法五部，直接支持上党战役证据组。 | **非锚点页 rel=2，重点抽检** |
-| `6b4c088915` | deng_xiaoping_chronology_1904_1974_middle PDF 99 | 0 | — | 原文涉及1948年6月襄樊作战部署，与必要战役无关。 |  |
-| `e01e4e8f25` | deng_xiaoping_chronology_1904_1974_middle PDF 26 | 0 | — | 原文涉及1947年6-7月鲁西南战役，与必要战役无关。 |  |
-| `ff20fa65ac` | deng_xiaoping_chronology_1904_1974_upper PDF 259 | 0 | — | 原文涉及1939年3月刘伯承、邓小平活动，但未提及任何必要战役。 |  |
+| `48f29e5d0b` | deng_xiaoping_chronology_1904_1974_upper PDF 585 | 2 | shangdang_1945 | 原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关行动，如致电指示、报告战役经验，直接支持上党战役证据组。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `b0d3840ec1` | deng_xiaoping_chronology_1904_1974_upper PDF 591 | 1 | — | 原文涉及刘伯承、邓小平在1945年11月的共同活动，但未提及任何必要战役，仅提供背景。 | LLM 待抽检  |
+| `a95eec2af5` | deng_xiaoping_chronology_1904_1974_upper PDF 572 | 2 | shangdang_1945 | 原文明确记载1945年8月刘伯承、邓小平致电报告上党战役部署，直接支持上党战役证据组。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `30496aced1` | deng_xiaoping_chronology_1904_1974_middle PDF 8 | 1 | — | 原文涉及1947年1月刘伯承、邓小平分别指挥豫皖边战役，但未提及任何必要战役，仅部分相关。 | LLM 待抽检  |
+| `25d184d06e` | deng_xiaoping_chronology_1904_1974_upper PDF 588 | 1 | — | 原文涉及1945年11月平汉战役结束及高树勋起义，未提及必要战役。 | LLM 待抽检  |
+| `6b09aaf208` | deng_xiaoping_chronology_1904_1974_middle PDF 75 | 0 | — | 原文涉及1948年2月大别山游击战部署，与必要战役无关。 | LLM 待抽检  |
+| `6129d1799e` | deng_xiaoping_chronology_1904_1974_middle PDF 14 | 0 | — | 原文涉及1947年2-3月休整及指示，未提及必要战役。 | LLM 待抽检  |
+| `7aa921b3e1` | deng_xiaoping_chronology_1904_1974_upper PDF 587 | 2 | shangdang_1945 | 原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关战斗，如命令部队、突袭马法五部，直接支持上党战役证据组。（人工抽检通过） | 人工通过 **非锚点页 rel=2，重点抽检** |
+| `6b4c088915` | deng_xiaoping_chronology_1904_1974_middle PDF 99 | 0 | — | 原文涉及1948年6月襄樊作战部署，与必要战役无关。 | LLM 待抽检  |
+| `e01e4e8f25` | deng_xiaoping_chronology_1904_1974_middle PDF 26 | 0 | — | 原文涉及1947年6-7月鲁西南战役，与必要战役无关。 | LLM 待抽检  |
+| `ff20fa65ac` | deng_xiaoping_chronology_1904_1974_upper PDF 259 | 0 | — | 原文涉及1939年3月刘伯承、邓小平活动，但未提及任何必要战役。 | LLM 待抽检  |
 
 原文摘录：
 
@@ -372,16 +363,16 @@
   - `battle_impact`：胜利使长江以北华东、中原地区基本解放，使南京、上海直接受到威胁，为渡江作战创造条件。
   - `battle_civilian_support`：人民群众的支前对淮海战役胜利具有重要作用，陈毅用小车推出来的胜利概括这种支持。
 
-| 候选 | 文献/页 | rel | groups | LLM 理由 | 抽检提示 |
+| 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `3fb3143019` | deng_xiaoping_chronology_1904_1974_lower PDF 658 | 0 | — | 内容为1973年邓小平视察武钢，仅提及淮海战役时间长度作比喻，无战役细节。 |  |
-| `760e375add` | mao_selected_works_combined PDF 787 | 2 | battle_geography, battle_forces_start, battle_forces_end, battle_command, battle_result, battle_impact, battle_stage_one | 直接支持多个必要事实：战场范围、参战力量、总前委、历时和战果、战略影响、第一阶段。 | **非锚点页 rel=2，重点抽检** |
-| `689a591944` | mao_selected_works_combined PDF 787 | 0 | — | 为注释内容，涉及淮海战役结果设想，但无直接支持必要事实的具体信息。 |  |
-| `8714cf4e70` | mao_selected_works_combined PDF 797 | 1 | — | 提及淮海战役中起义和投诚事件，与战役相关但未直接支持任何必要事实。 |  |
-| `fa9669315e` | cpc_history_volume_1 PDF 965 | 2 | battle_stage_three_time, battle_stage_three_result | 直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。 |  |
-| `9123a12fbb` | mao_selected_works_combined PDF 786 | 2 | battle_planning | 直接支持作战方针：1948年10月11日毛泽东提出第一阶段歼灭黄百韬兵团。 | **非锚点页 rel=2，重点抽检** |
-| `e0f794418a` | mao_zedong_chronology_volume_3 PDF 354 | 2 | battle_planning | 直接支持粟裕提出淮海战役建议及军委接受：1948年9月军委电文称举行淮海战役甚为必要。 | **非锚点页 rel=2，重点抽检** |
-| `f080419eab` | mao_zedong_chronology_volume_3 PDF 355 | 1 | — | 涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。 |  |
+| `3fb3143019` | deng_xiaoping_chronology_1904_1974_lower PDF 658 | 0 | — | 内容为1973年邓小平视察武钢，仅提及淮海战役时间长度作比喻，无战役细节。 | LLM 待抽检  |
+| `760e375add` | mao_selected_works_combined PDF 787 | 2 | battle_geography, battle_forces_start, battle_forces_end, battle_command, battle_result, battle_impact, battle_stage_one | 直接支持多个必要事实：战场范围、参战力量、总前委、历时和战果、战略影响、第一阶段。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `689a591944` | mao_selected_works_combined PDF 787 | 0 | — | 为注释内容，涉及淮海战役结果设想，但无直接支持必要事实的具体信息。 | LLM 待抽检  |
+| `8714cf4e70` | mao_selected_works_combined PDF 797 | 1 | — | 提及淮海战役中起义和投诚事件，与战役相关但未直接支持任何必要事实。 | LLM 待抽检  |
+| `fa9669315e` | cpc_history_volume_1 PDF 965 | 2 | battle_stage_three_time, battle_stage_three_result | 直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。 | LLM 待抽检  |
+| `9123a12fbb` | mao_selected_works_combined PDF 786 | 2 | battle_planning | 直接支持作战方针：1948年10月11日毛泽东提出第一阶段歼灭黄百韬兵团。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `e0f794418a` | mao_zedong_chronology_volume_3 PDF 354 | 2 | battle_planning | 直接支持粟裕提出淮海战役建议及军委接受：1948年9月军委电文称举行淮海战役甚为必要。 | LLM 待抽检 **非锚点页 rel=2，重点抽检** |
+| `f080419eab` | mao_zedong_chronology_volume_3 PDF 355 | 1 | — | 涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。 | LLM 待抽检  |
 
 原文摘录：
 
