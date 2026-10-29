@@ -2,6 +2,8 @@
 
 本清单列出 10 道题的候选标签（0/1/2）。其中 10 条已由用户人工抽检通过，改为 `human_review`；其余 `llm_judge` 仍待抽检。LLM 标签不是人工批准，不能直接作为正式 Golden 标签。
 
+只包含 88 条待抽检标签的独立清单见 [LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md)。
+
 抽检重点：
 
 1. 标为 2 但候选不在任何冻结锚点页上的条目；

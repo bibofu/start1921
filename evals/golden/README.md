@@ -12,7 +12,8 @@
 | [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
 | [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
-| [LLM_LABEL_REVIEW.md](LLM_LABEL_REVIEW.md) | 88 条 LLM + 10 条人工抽检的候选标签清单 |
+| [LLM_LABEL_REVIEW.md](LLM_LABEL_REVIEW.md) | 全部候选标签及抽检状态 |
+| [LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md) | 仅 88 条待人工抽检的 LLM 标签 |
 | [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
 | [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
 
