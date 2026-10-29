@@ -60,7 +60,7 @@ class PilotJudgment(StrictModel):
     reason: str = Field(min_length=2)
     reviewer: str = Field(min_length=1)
     reviewed_at: str = Field(min_length=1)
-    basis: Literal["agent_review", "human_review"]
+    basis: Literal["agent_review", "human_review", "llm_judge"]
     supported_groups: list[str] = Field(default_factory=list)
 
 

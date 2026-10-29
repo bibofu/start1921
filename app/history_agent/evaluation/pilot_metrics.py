@@ -81,7 +81,11 @@ def _judgments(
         unit_id = judgment.get("unit_id")
         if not isinstance(unit_id, str) or not unit_id:
             continue
-        allowed = {"human_review"} if label_mode == "approved" else {"human_review", "agent_review"}
+        allowed = (
+            {"human_review"}
+            if label_mode == "approved"
+            else {"human_review", "agent_review", "llm_judge"}
+        )
         relevance = judgment.get("relevance")
         if judgment.get("basis") not in allowed:
             invalid[unit_id] = "judgment_basis_not_allowed"

@@ -579,7 +579,111 @@
         "仅评价会议直接选举职务，不要求回答会后2月、3月的组织调整。",
         "与既有遵义三阶段题、遵义/庐山比较题属于同一开发主题组，不能当作独立主题或迁入保留集。"
       ],
-      "judgments": [],
+      "judgments": [
+        {
+          "unit_id": "f84ee4c70b388304a02ea0b929b21dacfbe873a3f62fab36592c5063ce1c9d2c",
+          "relevance": 1,
+          "reason": "提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务，仅背景相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a4d40f1a749eef243146b1c1f674c5873bc1f764ee40b2b3a2a289fd0df2891b",
+          "relevance": 2,
+          "reason": "明确写出遵义会议选举毛泽东为中央政治局常委。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "zunyi_election"
+          ]
+        },
+        {
+          "unit_id": "d84a62939db0ead1c6905d13edde9f69c7491f1e8914d7a6a6846680353155d7",
+          "relevance": 0,
+          "reason": "内容为1943年整风讲话，与遵义会议选举无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "d5e4aa5a2baac4a7e3079a7fb4d2628cded05f19ae14b8b2914b3825166f77f3",
+          "relevance": 0,
+          "reason": "内容涉及苏联政治和四清运动，与遵义会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "2932a38955063ee8e55c386dd63766bcc38776daf05a414dd41822ba54373554",
+          "relevance": 2,
+          "reason": "明确写出遵义会议增选毛泽东为中央政治局常委。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "zunyi_election"
+          ]
+        },
+        {
+          "unit_id": "02b7b7dafcbae14bbc8f6835e4c9234a33fdfc6ef21ced1efaf1347a5876e998",
+          "relevance": 0,
+          "reason": "内容为井冈山时期特委选举，与遵义会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "f75f5ffcc948419ba8d444b89200431a6878e5fe32a85525f1c547773cae5770",
+          "relevance": 1,
+          "reason": "提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "aa0e7b86cadbeb7ca144c480b89ef45e0912b7d534c45242c3dc10b2362d37e5",
+          "relevance": 0,
+          "reason": "仅评价遵义会议意义，未提及选举职务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "b41e283c43618dcd3bb82809c914b393677989cb7f40a3f5bc6d1d62904ca46d",
+          "relevance": 1,
+          "reason": "提到王稼祥在遵义会议后被增选为政治局委员，但未提及毛泽东职务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "d0c43c829ed121cc76552c41f0f764f81bc603e299472600404f848ef25fb7e9",
+          "relevance": 0,
+          "reason": "内容为秋收起义后处分及王明路线背景，与遵义会议选举无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "5c40d3509a82b05212fa101e43d5c2c797101986bf972d2f4e8c1fdd98db92ca",
+          "relevance": 0,
+          "reason": "内容为1954年宪法及国家主席选举，与遵义会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ],
       "refusal_basis": null,
       "not_applicable_metrics": {
         "precision_at_k": "本批未采集或逐条判定候选；unknown，不按0计。待第2步候选盲审。",
@@ -912,7 +1016,65 @@
         "OCR页PDF33（页内印刷页26）明确写“1月中旬到达莫斯科。先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学”。",
         "需人工核对原页图像；本条为确定性事实题，不建议使用LLM judge。"
       ],
-      "judgments": []
+      "judgments": [
+        {
+          "unit_id": "e8fbd60295ea7c184e2958e6df7a5d209e5fab402d9ada473f870720f59d5424",
+          "relevance": 2,
+          "reason": "原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "oriental_university",
+            "sun_yat_sen_university"
+          ]
+        },
+        {
+          "unit_id": "ae55014d8a592aef0e7d83e0b89ea00aef092152f38c58181040388869d6d36a",
+          "relevance": 0,
+          "reason": "内容为1922年旅欧少年共产党成立及求学未成，与1926年在莫斯科的学校无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "373dd983979ee5c4a6896a11edae3f916c7f129d17f4f9a0acdd1f88797f910a",
+          "relevance": 1,
+          "reason": "提及莫斯科中山大学和东方劳动者共产主义大学，但未明确说明邓小平先后入学，仅涉及1926年5月后的活动，不足以直接支持必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "19f4f87094cc427abed0f9b494903628c5255c2cf9a0db5ac3d562eb1393ceb3",
+          "relevance": 0,
+          "reason": "内容为1921年留法勤工俭学活动，与1926年在莫斯科的学校无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8906ad82c6ebc61563184f4a62b000eab58416f70eb006a191b9a0c01b41223a",
+          "relevance": 0,
+          "reason": "内容为1926年1月离开巴黎赴苏联的经过，未提及到达莫斯科后入读的学校。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "4034515a633949b8fec07712d21b9286850fe5ac17a6bc63c926aed1a893b141",
+          "relevance": 0,
+          "reason": "内容为1923年加入旅欧共青团及编辑刊物，与1926年在莫斯科的学校无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ]
     },
     {
       "id": "dev_semantic_contradiction",
@@ -1942,7 +2104,107 @@
         "“学习安排”可包括文娱活动，但列为可选事实，不作为必要覆盖。",
         "均为OCR页，需人工核对原页图像。"
       ],
-      "judgments": []
+      "judgments": [
+        {
+          "unit_id": "a7f87c3700a872e9693d281f783122ffb155b84f786ee2bb675e64a183aaf086",
+          "relevance": 0,
+          "reason": "仅目录，无具体描述",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "64f0e7bbbaca4a1b16e5fdac4d2103b7f65f3df0a0107fad01e25d69cdcfc02f",
+          "relevance": 0,
+          "reason": "仅书名，无内容",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "acfc0bb6010f2585500fbda8ca32c8af51cc491055d2114157f0e328e8e8c44a",
+          "relevance": 0,
+          "reason": "仅书名和译者，无内容",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ee4a90c27ef73eb00a058e1c29fb18d3fceb4db6dc32122f685517b83d983423",
+          "relevance": 0,
+          "reason": "关于朱德，与红军学校无关",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "47e97f20060f8332d33ede29c708490cd12d20600349a922c3ddab24b315b795",
+          "relevance": 1,
+          "reason": "描述列宁室和军事训练，但未直接支持任何必要事实",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "7fd0129792d1029e22ed567ae5def6d1d3db9d271cd9acbabb64194402c42380",
+          "relevance": 0,
+          "reason": "出版说明，无相关内容",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "89b2e351a6d0a0cf2461cabbe2f7f7eb32ba09965cd057c39b0722c934f1aaba",
+          "relevance": 0,
+          "reason": "出版背景，无相关内容",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "12b3732f91019eb31beb34dd0cdf95480ccc320a49545a0eeb4c571d0fb20ec9",
+          "relevance": 0,
+          "reason": "斯诺生平，无相关内容",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "571e7e2d0df3a27333c6bf4ce6f16902d88d881047d878a757d46a34083be713",
+          "relevance": 1,
+          "reason": "提到红军大学等学校，但未给出具体规模和训练安排",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "c44c60f964b45d96421aaebee47577fab509c953bb2f5d080d3f0b936010166c",
+          "relevance": 0,
+          "reason": "出版说明，无相关内容",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "2b85dd969e28c00ea4f2f762054af03f9ea02b31b4ea729fee90410c352f907a",
+          "relevance": 0,
+          "reason": "仅目录，无具体描述",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ]
     },
     {
       "id": "dev_multi_mao_hunan",
@@ -2429,7 +2691,114 @@
         "需要阶段性诊断：六年拆解与地点约束、逐年必要组召回、重排保留、真实生成上下文覆盖、逐年最终事实/引用；本轮无新运行，不声称已测或已通过。",
         "未建立本题充分分级的候选池。检索Precision/MRR/nDCG保持待候选标注状态；不得把湖南关键词附近的所有候选自动判相关，也不得把池外项判0。"
       ],
-      "judgments": [],
+      "judgments": [
+        {
+          "unit_id": "a2654187b7decb0afb5b6de5e1652b32c50a247180727c0f7158555b4eebc217",
+          "relevance": 1,
+          "reason": "涉及1926年湖南工农运动背景，但未直接支持任何必要事实，仅提供背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "e59099ad64b2ae7f42488c44cb4d0a4a1ab9c171516f9858941a11e65533498b",
+          "relevance": 2,
+          "reason": "明确记载1926年12月20日毛泽东出席湖南全省第一次农、工代表大会欢迎会并作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题，直接支持y1926_workers_peasants_welcome_speech。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "y1926_workers_peasants_welcome_speech"
+          ]
+        },
+        {
+          "unit_id": "07189eaae459cccc3ebdeeee94976253f5f8523974b44e379a54c56562e275c8",
+          "relevance": 1,
+          "reason": "涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "fc93ef0f94636078abb8f14e81a6aee508dae5495731ad4c68533878c78fcb35",
+          "relevance": 0,
+          "reason": "内容涉及国民党二大决议案修改，与问题中毛泽东在湖南的活动无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "3253e3ec73f626fbc86e5bab63813a7f6b0062f7429f9cb08d2a95d834b456b6",
+          "relevance": 2,
+          "reason": "明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "y1926_hunan_peasant_congress",
+            "y1926_workers_peasants_welcome_speech"
+          ]
+        },
+        {
+          "unit_id": "a722b83e507467aeab7c0fcdbc3e87644e750479a9a6f11c31805f6ea917635e",
+          "relevance": 0,
+          "reason": "内容涉及1927年6月马日事变后的活动，与问题时间范围不符。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "b4308a73ff20e28e982ab98e42e9a6c530f89fbe28fbc24737d43f3e4a614a61",
+          "relevance": 0,
+          "reason": "内容涉及1925年9月毛泽东离开湖南赴广州，与问题中1921-1926年在湖南的活动无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a020df2627d81ab90e83cb415d236b563f52591eff8b9f136083025d17c65159",
+          "relevance": 2,
+          "reason": "明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "y1922_xiang_committee"
+          ]
+        },
+        {
+          "unit_id": "0b7a35d0dfa207b283ea0dc497fe89d10f724fbd88ab6692ec8247f6bd2ec0e4",
+          "relevance": 0,
+          "reason": "内容涉及1921年10月湖南支部活动，但未直接支持任何必要事实，且部分信息与必要事实不符。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "60c21f68ff5160bf12359e80092bd5ba235ea5e03dc9a4a7db71dd1532bf2aa4",
+          "relevance": 1,
+          "reason": "涉及1926年12月湖南农民代表大会电请毛泽东指导，但未直接支持任何必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ad013bb4cf02723253f263ecb8ac0bd3df801385ca26d2147e69b76729d312f7",
+          "relevance": 0,
+          "reason": "内容涉及1926年1月国民党二大及中央宣传部代理部长任命，与问题中毛泽东在湖南的活动无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ],
       "refusal_basis": null,
       "not_applicable_metrics": {}
     },
@@ -2864,7 +3233,127 @@
         "庐山后果补到PDF第540页，不能仅凭第536页章节标题“严重后果”声称已经证成具体经济和组织后果。",
         "复合事实的两个证据组是AND；单页只给出日期或跨页指示词“这个讲话”时，不足以独立证明完整因果时间链。"
       ],
-      "judgments": [],
+      "judgments": [
+        {
+          "unit_id": "16777fac3338798e874746d0ecd833328b5a31520aa1d9fd6950f5207abee819",
+          "relevance": 2,
+          "reason": "明确提到1935年1月遵义会议纠正王明路线错误，支持遵义会议时间；提到1959年庐山会议彭德怀写信、讲人民公社办早了等，支持彭德怀信的内容。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "zunyi_date",
+            "lushan_letter_content"
+          ]
+        },
+        {
+          "unit_id": "08c1a462783b5a44a7f714a95fdb3e7756e546f99f134b2682d9dfeea33babbb",
+          "relevance": 2,
+          "reason": "明确提到1959年7月2日至8月1日政治局扩大会议和8月2日至16日八届八中全会，以及通过《关于以彭德怀同志为首的反党集团的错误的决议》，支持全会日期和决议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "lushan_plenum_date",
+            "lushan_plenum_decisions"
+          ]
+        },
+        {
+          "unit_id": "147ae167f51d87a7930552152e9f30f7a3dcc406923e18772df14c46bc5394f7",
+          "relevance": 1,
+          "reason": "提到1959年庐山会议与彭德怀的斗争是两个司令部的斗争，但未提供具体日期、内容或决议，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "c8eedefdfd503ad6a68dbb3c59fb4726161089942dd0763066ba985c2f1cf361",
+          "relevance": 2,
+          "reason": "明确记载庐山会议前期讨论十八个问题总结教训，彭德怀7月14日写信肯定成绩提出左倾倾向，7月16日印发讨论，7月23日毛泽东发言指责右倾，会议转为批判，支持多个必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "lushan_initial",
+            "lushan_letter_content",
+            "lushan_letter_discussion",
+            "lushan_turn_date",
+            "lushan_turn"
+          ]
+        },
+        {
+          "unit_id": "a1b0ac083019c55d6792cd98cc310df4058251010e28cb92a226c8ac18fbeba6",
+          "relevance": 2,
+          "reason": "提到1959年庐山会议彭德怀写信、讲人民公社办早了、得不偿失等，支持彭德怀信的内容。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "lushan_letter_content"
+          ]
+        },
+        {
+          "unit_id": "aa95f9e238b88284e6eebdfbcfbf482a27ab66f4c4bb7afdb18e29252af056e5",
+          "relevance": 1,
+          "reason": "提到庐山会议议定记录修正草案的讨论，但信息不完整，未直接支持任何必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "83897cc0d070f98128177f73a8c97bee50082a078ce0f5df8516c156b3636c01",
+          "relevance": 2,
+          "reason": "明确说明庐山会议原意是进一步纠正大跃进以来左的错误，支持庐山会议初衷。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "lushan_initial"
+          ]
+        },
+        {
+          "unit_id": "7c69df789ffd181136fc541603a2be036afec6001b667d50a0d6de3b4711dee1",
+          "relevance": 2,
+          "reason": "详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "lushan_letter_content"
+          ]
+        },
+        {
+          "unit_id": "6cd11fa8404529bfe388522b7260977cce3171061330774232833f998682ed4a",
+          "relevance": 2,
+          "reason": "记载庐山会议召开日期和毛泽东提出十八个问题，支持庐山会议构成与初衷。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "lushan_initial"
+          ]
+        },
+        {
+          "unit_id": "42afeccc968d3cc2b0b401d7ee0f78432d10ed57a13e6dc965243c1cf10c2ad6",
+          "relevance": 1,
+          "reason": "涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "6dc18d3e0846bdaf3a44f6fe00fa0d6c11b8e60054182c7a6eaa997c07e7aef7",
+          "relevance": 1,
+          "reason": "描述黄克诚、周小舟对彭德怀信的看法，但未直接支持任何必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ],
       "refusal_basis": null,
       "not_applicable_metrics": {
         "precision_at_k": "本批未采集或逐条判定候选；unknown，不按0计。待第2步候选盲审。",
@@ -3332,7 +3821,91 @@
         "人工裁定改为单一年份任务题；只取三项代表性任务，不声称穷尽1938年全部工作。",
         "OCR页，需人工核对原页图像。"
       ],
-      "judgments": []
+      "judgments": [
+        {
+          "unit_id": "bd2c980abe9964cce6f752c8636878d6a9172a8511c1c5fb0086fa10d5eb54c6",
+          "relevance": 0,
+          "reason": "内容涉及1938年9月后的行程和六届六中全会，未提及任何必要事实中的具体任务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a7256fd6f0187caf863046943ca5c7f29a086564b319a69a0ed726ad722bb2e9",
+          "relevance": 2,
+          "reason": "明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "d129_commissar"
+          ]
+        },
+        {
+          "unit_id": "9567843f97c244bb8ce85c1f618169dbdcdc46f71a98ecf4acf3cfdcdfc2ad81",
+          "relevance": 0,
+          "reason": "内容为1938年12月收阅电报，涉及区划调整，与必要事实无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "c435c64e05eafbdd71b79596b603400c3e258c3913803e5a499c79a211e32884",
+          "relevance": 0,
+          "reason": "内容为1938年6月活动，未涉及必要事实中的具体任务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8080eccd6bfed35f23357f257588f7a40d1a1d664f99999fbde11b0bbf68aa70",
+          "relevance": 0,
+          "reason": "内容为1938年2月活动，未涉及必要事实中的具体任务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "6f3db4a1a4ed8676dad42f6f6cfa1cb6edb92c9410b8cc57f9288c64baa0304b",
+          "relevance": 0,
+          "reason": "内容为1938年7月活动，未涉及必要事实中的具体任务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "23d28ba8aa9f47800747036ffc24caf3adf940e1e88deceefe65192723403bcf",
+          "relevance": 0,
+          "reason": "内容为1938年5月活动，未涉及必要事实中的具体任务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "b50b90ecddc5791993379c39df9fbc16aec0951da6321499a5481888a5b72509",
+          "relevance": 0,
+          "reason": "内容为1938年2月活动，未涉及必要事实中的具体任务。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "c608b7a9b536e6bb06938211ebcbc96d9020ae1c3102d749fa7b61672d0d8041",
+          "relevance": 0,
+          "reason": "内容为1938年3月活动，但未提及开辟冀西根据地或与张贻祥谈话，不直接支持west_base。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ]
     },
     {
       "id": "dev_intersection_mao_zhou_1949",
@@ -3463,7 +4036,93 @@
         "6月7日/6月8日及3月26日代表团说明仍是困难负例线索，不是历史否定；其他新直接证据须待核。",
         "尚未生成真实候选池或候选相关性标签；Precision/MRR/nDCG 待下一步标注。"
       ],
-      "judgments": [],
+      "judgments": [
+        {
+          "unit_id": "1f7649d7411888877fee1e68850c113d78d954ff9d9ca32c3b13efdcb479e45b",
+          "relevance": 2,
+          "reason": "明确记载1949年6月7日周恩来陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "joint_meeting_0607"
+          ]
+        },
+        {
+          "unit_id": "647408cdddf35b5e3efa1825921663f95071b896ca5f669946c01956cda98999",
+          "relevance": 0,
+          "reason": "内容涉及1949年6月下旬至7月初，无毛泽东与周恩来共同出席的会议记录。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "d44e2b000ce79d70d97851ba887830727c61fe542170b945d374799f51c06a0c",
+          "relevance": 0,
+          "reason": "内容为邓小平年谱，涉及政协会议和开国大典，但未提及毛泽东与周恩来共同出席的具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "e69a4184e5ff5e979c038c2e26539a5c38ce40f33ddc3352d9d2c3e3ad836781",
+          "relevance": 2,
+          "reason": "明确记载1949年9月25日毛泽东、周恩来约请各方人士开会协商确定国旗、国歌等问题，直接支持joint_consultation_0925。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "joint_consultation_0925"
+          ]
+        },
+        {
+          "unit_id": "0b36040e82d3b65deee85cd6de7b104fe277b97853d7b57cd3043d8fb0ac2a09",
+          "relevance": 0,
+          "reason": "内容为1950年1月，时间不符。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "32e39677191f6d55c8d1cb6debddec5f462a083afcaadde20bfb0c65e29c8ac1",
+          "relevance": 0,
+          "reason": "内容为1949年1月31日，时间不符。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "e24b37c977bc79066856db65481489a9de8c44ac59fbfbb2f4fffaf1ae58ac39",
+          "relevance": 0,
+          "reason": "内容为1949年9月18日至22日，未提及毛泽东与周恩来共同出席的会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "9481413cf99d180990140f9684b238473a8cf721ce566f8e61edd7375b2691ba",
+          "relevance": 0,
+          "reason": "内容为1949年11月25日，时间不符。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ea66074c16f9988c1e11ffda5b7fa9c19c25b4638d9019cd8564f4e4421a5a8a",
+          "relevance": 0,
+          "reason": "内容为注释和参考文献，无具体会议记录。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:40.447790+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ],
       "refusal_basis": null,
       "not_applicable_metrics": {}
     },
@@ -3550,7 +4209,111 @@
         "这是角色绑定负例：两段原文分别证明两人的不同职务，不能因为同师共事就把职务合并。",
         "OCR页，需人工核对原页图像。"
       ],
-      "judgments": []
+      "judgments": [
+        {
+          "unit_id": "8987487314ca9bd17862ca4b7e2088430a6fd9ec98f6a9bf0ec36f48ca273e6d",
+          "relevance": 2,
+          "reason": "明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "liu_commander"
+          ]
+        },
+        {
+          "unit_id": "1399c640774c67886a814e43bcd1f2093c9b23ba9e874e0c7df80d5761b52e87",
+          "relevance": 1,
+          "reason": "涉及一二九师和邓小平，但未明确提及邓小平任政治委员，仅部分背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a17207bedca2be8982e203ef56528c7f62f97a6c00c908a5c449f3fbb41bd427",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "dd2779ed9bade97df48f09319ae728a96f41559f1b748939c10493b049d48688",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "3f5f47f8e4ad97d37e59a506930f32e15dcbe362d98b4aa6a293dd157f4e618a",
+          "relevance": 2,
+          "reason": "明确写出刘伯承任八路军第一二九师师长，直接支持liu_commander。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "liu_commander"
+          ]
+        },
+        {
+          "unit_id": "0a30e3f3be96d9001537fe9fb45cf97788bc396fde92e3f20afe90caadc751b3",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "af6552f68441170492de0e5e870e360ff94edc6c63e80d58cfdbf9c0497ef2f5",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "3bfb3e1eb205eb97d643aa3c45e0dfd17b99458561bc1741b0b9d7ffde10e083",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "3a2ceb584d6d674cdfef7b3fa6915eb3867cd95403df92d80d6f7a946dbc17eb",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a148b5224bd841574918a233d2e0dd7365f9cadd1f1ca50157a59576f54888ec",
+          "relevance": 1,
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "acff31c9c86a6351174e9cf19487293edd961c824bcf9a56d4dd314b97ed7eca",
+          "relevance": 0,
+          "reason": "内容为1967年关于邓小平的谈话，与一二九师职务无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ]
     },
     {
       "id": "holdout_intersection_positive",
@@ -3695,7 +4458,113 @@
         "这是代表性最低覆盖，不声称穷尽1949年前所有共同指挥战役；额外有效战役允许补充。",
         "OCR页，需人工核对原页图像。"
       ],
-      "judgments": []
+      "judgments": [
+        {
+          "unit_id": "48f29e5d0bddaa7360dc415b8a4bce169b8a100ddd7a265d0008e43f432d5932",
+          "relevance": 2,
+          "reason": "原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关行动，如致电指示、报告战役经验，直接支持上党战役证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "shangdang_1945"
+          ]
+        },
+        {
+          "unit_id": "b0d3840ec1a66d35c4bb1d92970bce12e08477278f3a12905636eaa6459252c1",
+          "relevance": 1,
+          "reason": "原文涉及刘伯承、邓小平在1945年11月的共同活动，但未提及任何必要战役，仅提供背景。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a95eec2af5f9794aeeb546fd1975b0a1a50b9c6f5383557658d3cad225ba362e",
+          "relevance": 2,
+          "reason": "原文明确记载1945年8月刘伯承、邓小平致电报告上党战役部署，直接支持上党战役证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "shangdang_1945"
+          ]
+        },
+        {
+          "unit_id": "30496aced1c9ae412e45fb7a14ea902cf3f2ee2e6db91b8319ceebc5eeca67a1",
+          "relevance": 1,
+          "reason": "原文涉及1947年1月刘伯承、邓小平分别指挥豫皖边战役，但未提及任何必要战役，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "25d184d06e2dee761beb941859684f106a297fa7167a68270fe37ff0c672b359",
+          "relevance": 1,
+          "reason": "原文涉及1945年11月平汉战役结束及高树勋起义，未提及必要战役。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "6b09aaf20825ad5709d06519fa2940b24c6a192bd8dea39cbc18d3c6f008ef04",
+          "relevance": 0,
+          "reason": "原文涉及1948年2月大别山游击战部署，与必要战役无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "6129d1799e08c68a20a772d1bc046720987172d5b684158a67e957476efaeb90",
+          "relevance": 0,
+          "reason": "原文涉及1947年2-3月休整及指示，未提及必要战役。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "7aa921b3e125bb121e7914ce5b48c60932f2aae367b094d05f98eec34c95a10b",
+          "relevance": 2,
+          "reason": "原文明确记载1945年10月刘伯承、邓小平共同指挥上党战役相关战斗，如命令部队、突袭马法五部，直接支持上党战役证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "shangdang_1945"
+          ]
+        },
+        {
+          "unit_id": "6b4c088915bf32cf36182f3c88f2d27ad8c7a4e70b747e4973d3e4d7f6aeed96",
+          "relevance": 0,
+          "reason": "原文涉及1948年6月襄樊作战部署，与必要战役无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "e01e4e8f25743ca3732423cb60b0ce7055e359946285b0bfd1f875d48bff6965",
+          "relevance": 0,
+          "reason": "原文涉及1947年6-7月鲁西南战役，与必要战役无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ff20fa65ac6f4b38dc69902bf256f8f90609ba22f2a1a4c36d82d199b764d743",
+          "relevance": 0,
+          "reason": "原文涉及1939年3月刘伯承、邓小平活动，但未提及任何必要战役。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:49:24.138878+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ]
     },
     {
       "id": "dev_constraint_history_isolation",
@@ -4051,7 +4920,95 @@
         "页963的华东与964的中原/数量属于同一句的AND证据；孤立964页不得独立声称完整支持双方参战部队。",
         "战役发生在上轮时间区间内，因此仅凭答案年代无法检测时间条件泄漏；须检查plan/constraints trace是否继承1930—1949显式过滤，没有trace时该子项N/A。"
       ],
-      "judgments": [],
+      "judgments": [
+        {
+          "unit_id": "3fb31430198455865b183db874e3459e8fa7a7cd7b634b090059a74398537a77",
+          "relevance": 0,
+          "reason": "内容为1973年邓小平视察武钢，仅提及淮海战役时间长度作比喻，无战役细节。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "760e375add447fb95fbc74e114be311f392667bc7fed01497643b5f040a2d75e",
+          "relevance": 2,
+          "reason": "直接支持多个必要事实：战场范围、参战力量、总前委、历时和战果、战略影响、第一阶段。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "battle_geography",
+            "battle_forces_start",
+            "battle_forces_end",
+            "battle_command",
+            "battle_result",
+            "battle_impact",
+            "battle_stage_one"
+          ]
+        },
+        {
+          "unit_id": "689a5919443b4a0684a0c5078057a6c57138b30ed388e9643587f37734c9841f",
+          "relevance": 0,
+          "reason": "为注释内容，涉及淮海战役结果设想，但无直接支持必要事实的具体信息。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8714cf4e707d422a57385b186e85a935d6f59a147866e224bad366f2953df24d",
+          "relevance": 1,
+          "reason": "提及淮海战役中起义和投诚事件，与战役相关但未直接支持任何必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "fa9669315e2f11ff16bccaa655bee307073557c2f2e76e82e6e4338e12d36f74",
+          "relevance": 2,
+          "reason": "直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "battle_stage_three_time",
+            "battle_stage_three_result"
+          ]
+        },
+        {
+          "unit_id": "9123a12fbba67cc4cf4d963ac17833f649746ec4ff32edaffa12cde8e903e2d4",
+          "relevance": 2,
+          "reason": "直接支持作战方针：1948年10月11日毛泽东提出第一阶段歼灭黄百韬兵团。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "battle_planning"
+          ]
+        },
+        {
+          "unit_id": "e0f794418ae4e01b85fa257b4af7658d5d24b287c1eb37162598f4e7851b0d61",
+          "relevance": 2,
+          "reason": "直接支持粟裕提出淮海战役建议及军委接受：1948年9月军委电文称举行淮海战役甚为必要。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "battle_planning"
+          ]
+        },
+        {
+          "unit_id": "f080419eab8ebe43495ef54545189d2f0f86f746cc823f6451cc5b0366c70188",
+          "relevance": 1,
+          "reason": "涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        }
+      ],
       "refusal_basis": null,
       "not_applicable_metrics": {
         "precision_at_k": "本批未采集或逐条判定候选；unknown，不按0计。待第2步候选盲审。",

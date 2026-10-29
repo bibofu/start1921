@@ -11,7 +11,8 @@
 | [CASE_INVENTORY.md](CASE_INVENTORY.md) | 逐题原文、锚点、事实、拒答依据、状态 |
 | [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
-| [ranking_pools.json](ranking_pools.json) | 8 道有候选标签题的固定池 |
+| [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
+| [LLM_LABEL_REVIEW.md](LLM_LABEL_REVIEW.md) | 98 条 LLM 候选标签的人工抽检清单 |
 | [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
 | [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
 
@@ -22,12 +23,13 @@
 | 开发题 / 保留题 | 15 / 5 |
 | 可答 / 拒答 | 18 / 2 |
 | 必要事实 / 证据组 | 88 / 93 |
-| 有候选标签的题 | 8（95 条 Agent 判断） |
-| 有固定池的题 | 8 |
+| 有候选标签的题 | 18（95 条 Agent + 98 条 LLM，合计 193） |
+| 有固定池的题 | 18 |
 | 题目定义已批准 / 待审 | 5 / 15 |
 
 - 正式 Recall@K 只覆盖 5 道已批准开发题；正式 Precision/MRR/nDCG/Fact/Cit 仍为 0 题。
-- 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 只覆盖 8 道有候选标签的开发题，K≤5 稳定。
+- 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 也覆盖 18 道，K≤5 稳定。
+- 98 条 `llm_judge` 标签尚未人工抽检，不能当作正式标签。
 - 保留题全部待审，且保留集目前没有约束题和拒答题。
 - 逐题状态和每一条原文见 [CASE_INVENTORY.md](CASE_INVENTORY.md)。
 

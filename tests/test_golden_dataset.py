@@ -24,7 +24,7 @@ def _load() -> dict:
     return json.loads(DATASET.read_text(encoding="utf8"))
 
 
-def test_selected20_has_expected_counts_and_no_deleted_cases() -> None:
+def test_golden20_has_expected_counts_and_no_deleted_cases() -> None:
     dataset = PilotDataset.model_validate(_load())
     assert len(dataset.cases) == 20
     assert sum(case.split == "development" for case in dataset.cases) == 15
@@ -33,12 +33,12 @@ def test_selected20_has_expected_counts_and_no_deleted_cases() -> None:
     assert sum(case.answerability == "unanswerable" for case in dataset.cases) == 2
     assert sum(len(case.facts) for case in dataset.cases) == 88
     assert sum(len(case.evidence_groups) for case in dataset.cases) == 93
-    assert sum(len(case.judgments) for case in dataset.cases) == 95
+    assert sum(len(case.judgments) for case in dataset.cases) == 193
     assert sum(case.human_review.status == "approved" for case in dataset.cases) == 5
     assert not {case.id for case in dataset.cases} & DELETED
 
 
-def test_selected20_rewritten_questions_and_evidence_shapes() -> None:
+def test_golden20_rewritten_questions_and_evidence_shapes() -> None:
     dataset = PilotDataset.model_validate(_load())
     by_id = {case.id: case for case in dataset.cases}
 
@@ -62,8 +62,18 @@ def test_selected20_rewritten_questions_and_evidence_shapes() -> None:
     assert len(liu_deng.facts) == len(liu_deng.evidence_groups) == 4
 
 
-def test_selected20_candidate_labels_only_on_eight_cases() -> None:
+def test_golden20_candidate_labels_cover_all_answerable_cases() -> None:
     dataset = PilotDataset.model_validate(_load())
     labelled = {case.id for case in dataset.cases if case.judgments}
-    assert len(labelled) == 8
-    assert sum(len(case.judgments) for case in dataset.cases) == 95
+    assert len(labelled) == 18
+    assert sum(len(case.judgments) for case in dataset.cases) == 193
+    assert sum(
+        judgment.basis == "llm_judge"
+        for case in dataset.cases
+        for judgment in case.judgments
+    ) == 98
+    assert sum(
+        judgment.basis == "agent_review"
+        for case in dataset.cases
+        for judgment in case.judgments
+    ) == 95
