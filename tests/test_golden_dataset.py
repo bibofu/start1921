@@ -71,12 +71,12 @@ def test_golden20_candidate_labels_cover_all_answerable_cases() -> None:
         judgment.basis == "llm_judge"
         for case in dataset.cases
         for judgment in case.judgments
-    ) == 78
+    ) == 68
     assert sum(
         judgment.basis == "human_review"
         for case in dataset.cases
         for judgment in case.judgments
-    ) == 20
+    ) == 30
     assert sum(
         judgment.basis == "agent_review"
         for case in dataset.cases

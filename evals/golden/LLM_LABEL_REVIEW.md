@@ -1,6 +1,6 @@
-# LLM 候选标签抽检清单（20 条已人工通过）
+# LLM 候选标签抽检清单（30 条已人工处理）
 
-本清单列出 10 道题的候选标签（0/1/2）。其中 20 条已由用户人工抽检处理（18 条通过、2 条改判为 rel=1），改为 `human_review`；其余 `llm_judge` 仍待抽检。LLM 标签不是人工批准，不能直接作为正式 Golden 标签。
+本清单列出 10 道题的候选标签（0/1/2）。其中 30 条已由用户人工抽检处理（28 条通过、2 条改判为 rel=1），改为 `human_review`；其余 68 条 `llm_judge` 仍待抽检。LLM 标签不是人工批准，不能直接作为正式 Golden 标签。
 
 抽检重点：
 
@@ -10,7 +10,7 @@
 
 ## 高风险题
 
-- 所有待抽检的非锚点 rel=2 已人工处理：8 条通过，`dev_multi_meetings/a1b0ac0830` 与 `holdout_intersection_positive/a95eec2af5` 改判为 rel=1；剩余 78 条 LLM 标签中没有非锚点 rel=2。
+- 所有待抽检的非锚点 rel=2 已人工处理：8 条通过，`dev_multi_meetings/a1b0ac0830` 与 `holdout_intersection_positive/a95eec2af5` 改判为 rel=1；剩余 68 条 LLM 标签中没有非锚点 rel=2。
 - `holdout_semantic_observation`：池内 0 个锚点页、0 个 rel=2；这是召回缺失，不是标签问题。
 - `holdout_multi_period`：池内只有 1 个锚点页，另外两组必要事实未进池。
 - `dev_intersection_mao_zhou_1949`、`holdout_intersection_negative`：池内 0 个锚点页；非锚点 rel=2 已人工处理。
@@ -19,16 +19,16 @@
 
 | 题 | 标签数 | 已人工 | rel=2 | rel=1 | rel=0 | 非锚点页 rel=2 | 池内锚点页数 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `dev_exact_zunyi_election` | 11 | 1 | 2 | 3 | 6 | 1 | 1 |
-| `holdout_exact_date` | 6 | 0 | 1 | 1 | 4 | 0 | 1 |
+| `dev_exact_zunyi_election` | 11 | 2 | 2 | 3 | 6 | 1 | 1 |
+| `holdout_exact_date` | 6 | 1 | 1 | 1 | 4 | 0 | 1 |
 | `holdout_semantic_observation` | 11 | 2 | 0 | 2 | 9 | 0 | 0 |
-| `dev_multi_mao_hunan` | 11 | 1 | 3 | 3 | 5 | 1 | 2 |
-| `dev_multi_meetings` | 11 | 6 | 6 | 5 | 0 | 4 | 2 |
-| `holdout_multi_period` | 9 | 0 | 1 | 0 | 8 | 0 | 1 |
+| `dev_multi_mao_hunan` | 11 | 4 | 3 | 3 | 5 | 1 | 2 |
+| `dev_multi_meetings` | 11 | 8 | 6 | 5 | 0 | 4 | 2 |
+| `holdout_multi_period` | 9 | 1 | 1 | 0 | 8 | 0 | 1 |
 | `dev_intersection_mao_zhou_1949` | 9 | 2 | 2 | 0 | 7 | 2 | 0 |
 | `holdout_intersection_negative` | 11 | 2 | 2 | 8 | 1 | 2 | 0 |
 | `holdout_intersection_positive` | 11 | 3 | 2 | 4 | 5 | 2 | 0 |
-| `dev_constraint_history_isolation` | 8 | 3 | 4 | 2 | 2 | 3 | 1 |
+| `dev_constraint_history_isolation` | 8 | 5 | 4 | 2 | 2 | 3 | 1 |
 
 ## `dev_exact_zunyi_election`
 
@@ -39,7 +39,7 @@
 | 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
 | `f84ee4c70b` | mao_selected_works_combined PDF 2527 | 1 | — | 提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务，仅背景相关。 | LLM 待抽检  |
-| `a4d40f1a74` | cpc_history_volume_1 PDF 483 | 2 | zunyi_election | 明确写出遵义会议选举毛泽东为中央政治局常委。 | LLM 待抽检  |
+| `a4d40f1a74` | cpc_history_volume_1 PDF 483 | 2 | zunyi_election | 明确写出遵义会议选举毛泽东为中央政治局常委。（人工抽检通过） | 人工通过  |
 | `d84a62939d` | mao_zedong_chronology_volume_2 PDF 486 | 0 | — | 内容为1943年整风讲话，与遵义会议选举无关。 | LLM 待抽检  |
 | `d5e4aa5a2b` | mao_selected_works_combined PDF 2376 | 0 | — | 内容涉及苏联政治和四清运动，与遵义会议无关。 | LLM 待抽检  |
 | `2932a38955` | deng_xiaoping_chronology_1904_1974_upper PDF 123 | 2 | zunyi_election | 明确写出遵义会议增选毛泽东为中央政治局常委。（人工抽检通过） | 人工通过 非锚点 rel=2（已人工处理） |
@@ -73,7 +73,7 @@
 
 | 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
-| `e8fbd60295` | deng_xiaoping_chronology_1904_1974_upper PDF 33 | 2 | oriental_university, sun_yat_sen_university | 原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。 | LLM 待抽检  |
+| `e8fbd60295` | deng_xiaoping_chronology_1904_1974_upper PDF 33 | 2 | oriental_university, sun_yat_sen_university | 原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。（人工抽检通过） | 人工通过  |
 | `ae55014d8a` | deng_xiaoping_chronology_1904_1974_upper PDF 23 | 0 | — | 内容为1922年旅欧少年共产党成立及求学未成，与1926年在莫斯科的学校无关。 | LLM 待抽检  |
 | `373dd98397` | deng_xiaoping_chronology_1904_1974_upper PDF 36 | 1 | — | 提及莫斯科中山大学和东方劳动者共产主义大学，但未明确说明邓小平先后入学，仅涉及1926年5月后的活动，不足以直接支持必要事实。 | LLM 待抽检  |
 | `19f4f87094` | deng_xiaoping_chronology_1904_1974_upper PDF 20 | 0 | — | 内容为1921年留法勤工俭学活动，与1926年在莫斯科的学校无关。 | LLM 待抽检  |
@@ -150,12 +150,12 @@
 |---|---|---:|---|---|---|
 | `a2654187b7` | cpc_history_volume_1 PDF 246 | 1 | — | 涉及1926年湖南工农运动背景，但未直接支持任何必要事实，仅提供背景。 | LLM 待抽检  |
 | `e59099ad64` | cpc_history_volume_1 PDF 247 | 2 | y1926_workers_peasants_welcome_speech | 明确记载1926年12月20日毛泽东出席湖南全省第一次农、工代表大会欢迎会并作《工农商学联合的问题》演说，强调农民问题是国民革命的中心问题，直接支持y1926_workers_peasants_welcome_speech。（人工抽检通过） | 人工通过 非锚点 rel=2（已人工处理） |
-| `07189eaae4` | mao_zedong_chronology_volume_1 PDF 184 | 1 | — | 涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。 | LLM 待抽检  |
+| `07189eaae4` | mao_zedong_chronology_volume_1 PDF 184 | 1 | — | 涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。（人工抽检通过） | 人工通过  |
 | `fc93ef0f94` | mao_zedong_chronology_volume_1 PDF 161 | 0 | — | 内容涉及国民党二大决议案修改，与问题中毛泽东在湖南的活动无关。 | LLM 待抽检  |
-| `3253e3ec73` | mao_zedong_chronology_volume_1 PDF 183 | 2 | y1926_hunan_peasant_congress, y1926_workers_peasants_welcome_speech | 明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。 | LLM 待抽检  |
+| `3253e3ec73` | mao_zedong_chronology_volume_1 PDF 183 | 2 | y1926_hunan_peasant_congress, y1926_workers_peasants_welcome_speech | 明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。（人工抽检通过） | 人工通过  |
 | `a722b83e50` | mao_zedong_chronology_volume_1 PDF 211 | 0 | — | 内容涉及1927年6月马日事变后的活动，与问题时间范围不符。 | LLM 待抽检  |
 | `b4308a73ff` | mao_zedong_chronology_volume_1 PDF 145 | 0 | — | 内容涉及1925年9月毛泽东离开湖南赴广州，与问题中1921-1926年在湖南的活动无关。 | LLM 待抽检  |
-| `a020df2627` | mao_zedong_chronology_volume_1 PDF 104 | 2 | y1922_xiang_committee | 明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。 | LLM 待抽检  |
+| `a020df2627` | mao_zedong_chronology_volume_1 PDF 104 | 2 | y1922_xiang_committee | 明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。（人工抽检通过） | 人工通过  |
 | `0b7a35d0df` | mao_zedong_chronology_volume_1 PDF 98 | 0 | — | 内容涉及1921年10月湖南支部活动，但未直接支持任何必要事实，且部分信息与必要事实不符。 | LLM 待抽检  |
 | `60c21f68ff` | mao_zedong_chronology_volume_1 PDF 182 | 1 | — | 涉及1926年12月湖南农民代表大会电请毛泽东指导，但未直接支持任何必要事实。 | LLM 待抽检  |
 | `ad013bb4cf` | mao_zedong_chronology_volume_1 PDF 163 | 0 | — | 内容涉及1926年1月国民党二大及中央宣传部代理部长任命，与问题中毛泽东在湖南的活动无关。 | LLM 待抽检  |
@@ -200,9 +200,9 @@
 | `a1b0ac0830` | mao_selected_works_combined PDF 1705 | 1 | — | 提到1959年庐山会议彭德怀写信、讲人民公社办早了、得不偿失等，支持彭德怀信的内容；人工改判为1：非会议内容 | 人工改判  |
 | `aa95f9e238` | mao_zedong_chronology_volume_7 PDF 120 | 1 | — | 提到庐山会议议定记录修正草案的讨论，但信息不完整，未直接支持任何必要事实。 | LLM 待抽检  |
 | `83897cc0d0` | cpc_history_volume_2 PDF 526 | 2 | lushan_initial | 明确说明庐山会议原意是进一步纠正大跃进以来左的错误，支持庐山会议初衷。（人工抽检通过） | 人工通过  |
-| `7c69df789f` | cpc_history_volume_2 PDF 529 | 2 | lushan_letter_content | 详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。 | LLM 待抽检  |
+| `7c69df789f` | cpc_history_volume_2 PDF 529 | 2 | lushan_letter_content | 详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。（人工抽检通过） | 人工通过  |
 | `6cd11fa840` | mao_zedong_chronology_volume_7 PDF 88 | 2 | lushan_initial | 记载庐山会议召开日期和毛泽东提出十八个问题，支持庐山会议构成与初衷。（人工抽检通过） | 人工通过 非锚点 rel=2（已人工处理） |
-| `42afeccc96` | zhou_enlai_chronology_1949_1976 PDF 859 | 1 | — | 涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。 | LLM 待抽检  |
+| `42afeccc96` | zhou_enlai_chronology_1949_1976 PDF 859 | 1 | — | 涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。（人工抽检通过） | 人工通过  |
 | `6dc18d3e08` | cpc_history_volume_2 PDF 531 | 1 | — | 描述黄克诚、周小舟对彭德怀信的看法，但未直接支持任何必要事实。 | LLM 待抽检  |
 
 原文摘录：
@@ -230,7 +230,7 @@
 | 候选 | 文献/页 | rel | groups | 理由 | 状态/抽检提示 |
 |---|---|---:|---|---|---|
 | `bd2c980abe` | deng_xiaoping_chronology_1904_1974_upper PDF 237 | 0 | — | 内容涉及1938年9月后的行程和六届六中全会，未提及任何必要事实中的具体任务。 | LLM 待抽检  |
-| `a7256fd6f0` | deng_xiaoping_chronology_1904_1974_upper PDF 174 | 2 | d129_commissar | 明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。 | LLM 待抽检  |
+| `a7256fd6f0` | deng_xiaoping_chronology_1904_1974_upper PDF 174 | 2 | d129_commissar | 明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。（人工抽检通过） | 人工通过  |
 | `9567843f97` | deng_xiaoping_chronology_1904_1974_upper PDF 243 | 0 | — | 内容为1938年12月收阅电报，涉及区划调整，与必要事实无关。 | LLM 待抽检  |
 | `c435c64e05` | deng_xiaoping_chronology_1904_1974_upper PDF 223 | 0 | — | 内容为1938年6月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
 | `8080eccd6b` | deng_xiaoping_chronology_1904_1974_upper PDF 181 | 0 | — | 内容为1938年2月活动，未涉及必要事实中的具体任务。 | LLM 待抽检  |
@@ -376,10 +376,10 @@
 | `760e375add` | mao_selected_works_combined PDF 787 | 2 | battle_geography, battle_forces_start, battle_forces_end, battle_command, battle_result, battle_impact, battle_stage_one | 直接支持多个必要事实：战场范围、参战力量、总前委、历时和战果、战略影响、第一阶段。（人工抽检通过） | 人工通过 非锚点 rel=2（已人工处理） |
 | `689a591944` | mao_selected_works_combined PDF 787 | 0 | — | 为注释内容，涉及淮海战役结果设想，但无直接支持必要事实的具体信息。 | LLM 待抽检  |
 | `8714cf4e70` | mao_selected_works_combined PDF 797 | 1 | — | 提及淮海战役中起义和投诚事件，与战役相关但未直接支持任何必要事实。 | LLM 待抽检  |
-| `fa9669315e` | cpc_history_volume_1 PDF 965 | 2 | battle_stage_three_time, battle_stage_three_result | 直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。 | LLM 待抽检  |
+| `fa9669315e` | cpc_history_volume_1 PDF 965 | 2 | battle_stage_three_time, battle_stage_three_result | 直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。（人工抽检通过） | 人工通过  |
 | `9123a12fbb` | mao_selected_works_combined PDF 786 | 2 | battle_planning | 直接支持作战方针：1948年10月11日毛泽东提出第一阶段歼灭黄百韬兵团。（人工抽检通过） | 人工通过 非锚点 rel=2（已人工处理） |
 | `e0f794418a` | mao_zedong_chronology_volume_3 PDF 354 | 2 | battle_planning | 直接支持粟裕提出淮海战役建议及军委接受：1948年9月军委电文称举行淮海战役甚为必要。（人工抽检通过） | 人工通过 非锚点 rel=2（已人工处理） |
-| `f080419eab` | mao_zedong_chronology_volume_3 PDF 355 | 1 | — | 涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。 | LLM 待抽检  |
+| `f080419eab` | mao_zedong_chronology_volume_3 PDF 355 | 1 | — | 涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。（人工抽检通过） | 人工通过  |
 
 原文摘录：
 

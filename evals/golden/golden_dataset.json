@@ -592,10 +592,10 @@
         {
           "unit_id": "a4d40f1a749eef243146b1c1f674c5873bc1f764ee40b2b3a2a289fd0df2891b",
           "relevance": 2,
-          "reason": "明确写出遵义会议选举毛泽东为中央政治局常委。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "明确写出遵义会议选举毛泽东为中央政治局常委。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "zunyi_election"
           ]
@@ -1020,10 +1020,10 @@
         {
           "unit_id": "e8fbd60295ea7c184e2958e6df7a5d209e5fab402d9ada473f870720f59d5424",
           "relevance": 2,
-          "reason": "原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
-          "basis": "llm_judge",
+          "reason": "原文明确记载1926年1月中旬到达莫斯科，先入莫斯科东方劳动者共产主义大学学习，不久转入莫斯科中山大学，直接支持两个必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "oriental_university",
             "sun_yat_sen_university"
@@ -2715,10 +2715,10 @@
         {
           "unit_id": "07189eaae459cccc3ebdeeee94976253f5f8523974b44e379a54c56562e275c8",
           "relevance": 1,
-          "reason": "涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及1926年12月毛泽东在湖南的活动，但未直接支持任何必要事实，仅部分相关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2733,10 +2733,10 @@
         {
           "unit_id": "3253e3ec73f626fbc86e5bab63813a7f6b0062f7429f9cb08d2a95d834b456b6",
           "relevance": 2,
-          "reason": "明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1926年12月17日由汉口到长沙参加湖南全省第一次农民代表大会，并同湖南同志商讨起草决议案；12月20日出席欢迎大会并作演说，直接支持y1926_hunan_peasant_congress和y1926_workers_peasants_welcome_speech。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "y1926_hunan_peasant_congress",
             "y1926_workers_peasants_welcome_speech"
@@ -2763,10 +2763,10 @@
         {
           "unit_id": "a020df2627d81ab90e83cb415d236b563f52591eff8b9f136083025d17c65159",
           "relevance": 2,
-          "reason": "明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1922年5月底中共湘区执行委员会成立，毛泽东任书记，区委机关设在长沙清水塘，直接支持y1922_xiang_committee。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "y1922_xiang_committee"
           ]
@@ -3314,10 +3314,10 @@
         {
           "unit_id": "7c69df789ffd181136fc541603a2be036afec6001b667d50a0d6de3b4711dee1",
           "relevance": 2,
-          "reason": "详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "详细描述彭德怀写信的背景和内容，包括肯定成绩、提出左倾倾向、陈述经验教训，支持彭德怀信的内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "lushan_letter_content"
           ]
@@ -3336,10 +3336,10 @@
         {
           "unit_id": "42afeccc968d3cc2b0b401d7ee0f78432d10ed57a13e6dc965243c1cf10c2ad6",
           "relevance": 1,
-          "reason": "涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及庐山会议后的工作布置和传达反右倾精神，但未直接支持任何必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -3832,10 +3832,10 @@
         {
           "unit_id": "a7256fd6f0187caf863046943ca5c7f29a086564b319a69a0ed726ad722bb2e9",
           "relevance": 2,
-          "reason": "明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1938年1月5日邓小平接替张浩任一二九师政治委员，直接支持d129_commissar。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "d129_commissar"
           ]
@@ -4964,10 +4964,10 @@
         {
           "unit_id": "fa9669315e2f11ff16bccaa655bee307073557c2f2e76e82e6e4338e12d36f74",
           "relevance": 2,
-          "reason": "直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "直接支持第三阶段总攻和结束：1949年1月6日总攻，10日全歼邱李兵团，俘杜聿明。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "battle_stage_three_time",
             "battle_stage_three_result"
@@ -4998,10 +4998,10 @@
         {
           "unit_id": "f080419eab8ebe43495ef54545189d2f0f86f746cc823f6451cc5b0366c70188",
           "relevance": 1,
-          "reason": "涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及淮海战役发起时间和作战目标，但未直接支持必要事实中的具体日期或方针。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-29T18:55:28+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
