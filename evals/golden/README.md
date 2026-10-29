@@ -13,7 +13,8 @@
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
 | [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
 | [LLM_LABEL_REVIEW.md](LLM_LABEL_REVIEW.md) | 全部候选标签及抽检状态 |
-| [LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md) | 仅 72 条待人工抽检的 LLM 标签 |
+| [LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md) | 仅 72 条待人工抽检的 LLM 标签（含原文摘录） |
+| [LLM_LABELS_CHECKLIST.md](LLM_LABELS_CHECKLIST.md) | 72 条待抽检标签的紧凑复核表（按风险排序） |
 | [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
 | [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
 

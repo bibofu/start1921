@@ -10,7 +10,7 @@
 
 ## 高风险题
 
-- 所有待抽检的非锚点 rel=2 已人工处理：8 条通过，`dev_multi_meetings/a1b0ac0830` 改判为 rel=1；剩余 LLM 标签中没有非锚点 rel=2。
+- 待抽检的非锚点 rel=2 共 4 条，集中在两道交集题；此前人工处理的非锚点 rel=2 中 8 条通过、`dev_multi_meetings/a1b0ac0830` 改判为 rel=1。
 - `holdout_semantic_observation`：池内 0 个锚点页、0 个 rel=2；这是召回缺失，不是标签问题。
 - `holdout_multi_period`：池内只有 1 个锚点页，另外两组必要事实未进池。
 - `dev_intersection_mao_zhou_1949`、`holdout_intersection_negative`：池内 0 个锚点页；非锚点 rel=2 已人工处理。
@@ -19,16 +19,16 @@
 
 | 题 | 标签数 | 已人工 | rel=2 | rel=1 | rel=0 | 非锚点页 rel=2 | 池内锚点页数 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `dev_exact_zunyi_election` | 11 | 2 | 2 | 3 | 6 | 1 | 1 |
+| `dev_exact_zunyi_election` | 11 | 2 | 2 | 3 | 6 | 0 | 1 |
 | `holdout_exact_date` | 6 | 1 | 1 | 1 | 4 | 0 | 1 |
 | `holdout_semantic_observation` | 11 | 2 | 0 | 2 | 9 | 0 | 0 |
-| `dev_multi_mao_hunan` | 11 | 4 | 3 | 3 | 5 | 1 | 2 |
-| `dev_multi_meetings` | 11 | 8 | 6 | 5 | 0 | 4 | 2 |
+| `dev_multi_mao_hunan` | 11 | 4 | 3 | 3 | 5 | 0 | 2 |
+| `dev_multi_meetings` | 11 | 8 | 6 | 5 | 0 | 0 | 2 |
 | `holdout_multi_period` | 9 | 1 | 1 | 0 | 8 | 0 | 1 |
 | `dev_intersection_mao_zhou_1949` | 9 | 0 | 3 | 0 | 6 | 3 | 0 |
-| `holdout_intersection_negative` | 11 | 2 | 2 | 8 | 1 | 2 | 0 |
+| `holdout_intersection_negative` | 11 | 2 | 2 | 8 | 1 | 0 | 0 |
 | `holdout_intersection_positive` | 10 | 0 | 2 | 4 | 4 | 1 | 1 |
-| `dev_constraint_history_isolation` | 8 | 5 | 4 | 2 | 2 | 3 | 1 |
+| `dev_constraint_history_isolation` | 8 | 5 | 4 | 2 | 2 | 0 | 1 |
 
 ## `dev_exact_zunyi_election`
 

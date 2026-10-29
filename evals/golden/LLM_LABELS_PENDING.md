@@ -10,9 +10,9 @@
 - `锚点页 rel=0`：冻结锚点页被判不相关，优先看；
 - 未标记的也可能有边界争议。
 
-## 非锚点 rel=2（待抽检 0 条）
+## 非锚点 rel=2（待抽检 4 条）
 
-当前没有待抽检的非锚点 rel=2。此前的非锚点 rel=2 已人工处理：8 条通过，`dev_multi_meetings/a1b0ac0830` 改判为 rel=1。
+当前有 4 条待抽检的非锚点 rel=2；此前的非锚点 rel=2 已人工处理：8 条通过，`dev_multi_meetings/a1b0ac0830` 改判为 rel=1。
 
 - `dev_intersection_mao_zhou_1949` / `1f7649d741`：候选 `zhou_enlai_chronology_1949_1976` PDF 428；组：joint_meeting_0607；锚点页：mao_zedong_chronology_volume_3 PDF 521
   - 理由：明确记载1949年6月7日陪同陈嘉庚前往香山，和毛泽东、刘少奇等谈论中外局势，直接支持joint_meeting_0607。

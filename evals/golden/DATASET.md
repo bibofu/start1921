@@ -13,7 +13,7 @@
 - 当前数据集：[golden_dataset.json](golden_dataset.json)
 - 逐题原文与状态：[CASE_INVENTORY.md](CASE_INVENTORY.md)
 - LLM 标签抽检：[LLM_LABEL_REVIEW.md](LLM_LABEL_REVIEW.md)
-- 72 条待抽检标签：[LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md)
+- 72 条待抽检标签：[LLM_LABELS_PENDING.md](LLM_LABELS_PENDING.md)（原文摘录）、[LLM_LABELS_CHECKLIST.md](LLM_LABELS_CHECKLIST.md)（紧凑复核表）
 - 采集/复核/评分流程：[REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md)
 
 ## 本次删除与改写
