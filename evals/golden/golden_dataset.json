@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "golden-v2.3-selected-20-20261029",
+  "version": "golden-v2.4-selected-20-20261029",
   "description": "按用户2026-10-29裁定，从v6开发集与holdout v1中删除9题，并两次改写交集题后的20题工作集：15开发+5保留，18可答+2拒答；20题定义均已人工批准。不替代历史版本。",
   "annotation_status": "human_review_complete_20_of_20_approved",
   "evidence_group_semantics": {
@@ -3960,8 +3960,8 @@
       "human_review": {
         "status": "approved",
         "reviewed_by": "user_in_current_chat",
-        "reviewed_at": "2026-10-29T19:48:24+08:00",
-        "notes": "用户 2026-10-29 批准扩为七次会议后的题目定义。",
+        "reviewed_at": "2026-10-29T20:19:39+08:00",
+        "notes": "用户 2026-10-29 要求把 1949 年共同出席的政治局会议纳入本题；据此加入 7 次有原文列名的政治局会议，共 14 项。",
         "confirmations": {
           "question": true,
           "evidence": true,
@@ -4085,6 +4085,120 @@
           ]
         },
         {
+          "id": "politburo_19491026",
+          "description": "1949年10月26日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 35,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "同日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真(1)、董必武、林伯渠出席，薄一波、聂荣臻列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "politburo_19491102",
+          "description": "1949年11月2日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 41,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "11月2日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "politburo_19491109",
+          "description": "1949年11月9日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 45,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "11月9日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、林伯渠出席，薄一波、聂荣臻列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "politburo_19491125",
+          "description": "1949年11月25日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 54,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "11月25日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、董必武、林伯渠出席，饶漱石、李富春(1)、薄一波、聂荣臻列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "politburo_19491128",
+          "description": "1949年11月28日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 56,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "11月28日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "politburo_19491201",
+          "description": "1949年12月1日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 59,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "同日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、饶漱石、李富春、邓子恢、安子文列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
           "id": "joint_meeting_1201",
           "description": "1949年12月1日同十二位民主人士座谈，周恩来参加",
           "alternatives": [
@@ -4099,6 +4213,25 @@
                 "verified_at": "2026-10-29",
                 "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
                 "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "politburo_19491204",
+          "description": "1949年12月4日 中共中央政治局会议，周恩来出席",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_4",
+              "pdf_page": 60,
+              "file_sha256": "fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113",
+              "quote": "12月4日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石、邓子恢列席。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/pages/mao_zedong_chronology_volume_4.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation."
               }
             }
           ]
@@ -4154,11 +4287,67 @@
           ]
         },
         {
+          "id": "politburo_19491026",
+          "claim": "1949年10月26日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491026"
+          ]
+        },
+        {
+          "id": "politburo_19491102",
+          "claim": "1949年11月2日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491102"
+          ]
+        },
+        {
+          "id": "politburo_19491109",
+          "claim": "1949年11月9日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、林伯渠出席，薄一波、聂荣臻列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491109"
+          ]
+        },
+        {
+          "id": "politburo_19491125",
+          "claim": "1949年11月25日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、董必武、林伯渠出席，饶漱石、李富春、薄一波、聂荣臻列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491125"
+          ]
+        },
+        {
+          "id": "politburo_19491128",
+          "claim": "1949年11月28日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491128"
+          ]
+        },
+        {
+          "id": "politburo_19491201",
+          "claim": "1949年12月1日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、饶漱石、李富春、邓子恢、安子文列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491201"
+          ]
+        },
+        {
           "id": "joint_meeting_1201",
           "claim": "1949年12月1日，毛泽东同张澜、李济深、郭沫若、黄炎培、沈钧儒等十二位民主人士座谈，磋商毛泽东访问苏联时签订中苏条约事宜，朱德、周恩来、林伯渠参加。",
           "required": true,
           "evidence_group_ids": [
             "joint_meeting_1201"
+          ]
+        },
+        {
+          "id": "politburo_19491204",
+          "claim": "1949年12月4日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石、邓子恢列席。",
+          "required": true,
+          "evidence_group_ids": [
+            "politburo_19491204"
           ]
         }
       ],
@@ -4172,17 +4361,18 @@
           "reason": "6月8日条目没有列周恩来，6月7日的名单不能移植到次日。"
         },
         {
-          "claim": "以上七项就是毛泽东与周恩来1949年共同出席的全部会议。",
-          "reason": "年谱另有政治局会议等共同出席记录；本题只冻结七项可逐条核验的会议，不声称穷尽。"
+          "claim": "以上十四项就是毛泽东与周恩来1949年共同出席的全部会议。",
+          "reason": "年谱仍可能记载其他会议；本题只冻结可逐条核验的十四项，不声称穷尽。"
         }
       ],
-      "reference_answer": "可据原文列出以下七项，清单以年谱明确记载为限、不声称穷尽1949年全年：①6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚（毛3 PDF521）；②7月1日，同朱德、周恩来等出席纪念中国共产党成立二十八周年大会（毛3 PDF531）；③7月9日，同朱德、周恩来出席全国铁路职工临时代表会议等在中南海怀仁堂的集会（毛3 PDF536）；④9月8日，毛泽东会见和宴请程潜，朱德、刘少奇、周恩来等参加（毛3 PDF572）；⑤9月25日晚，毛泽东召集国旗、国徽、国歌、纪年、国都问题协商座谈会，周恩来出席（毛3 PDF585）；⑥10月24日，毛泽东接见绥远军区负责人和傅作义，周恩来参加（毛4 PDF32）；⑦12月1日，毛泽东同张澜等十二位民主人士座谈，磋商访苏签订中苏条约事宜，朱德、周恩来、林伯渠参加（毛4 PDF58）。共同出席必须逐条得到直接支持，不能把邻条、引文背景或只出现两人姓名的片段算作共同出席会议。",
+      "reference_answer": "可据原文列出以下十四项，清单以年谱明确记载为限、不声称穷尽1949年全年：①6月7日会见陈嘉庚（毛3 PDF521）；②7月1日纪念中国共产党成立二十八周年大会（毛3 PDF531）；③7月9日全国铁路职工临时代表会议等集会（毛3 PDF536）；④9月8日会见和宴请程潜（毛3 PDF572）；⑤9月25日国旗国徽国歌纪年国都协商座谈会（毛3 PDF585）；⑥10月24日接见绥远军区负责人和傅作义（毛4 PDF32）；⑦10月26日中共中央政治局会议（毛4 PDF35）；⑧11月2日政治局会议（PDF41）；⑨11月9日政治局会议（PDF45）；⑩11月25日政治局会议（PDF54）；⑪11月28日政治局会议（PDF56）；⑫12月1日政治局会议（PDF59）；⑬12月1日同十二位民主人士座谈（PDF58）；⑭12月4日政治局会议（PDF60）。共同出席必须逐条得到直接支持；政治局会议以原文列名“周恩来……出席”为准。",
       "review_notes": [
         "人工裁定改为“共同出席的会议”，因此删除了共同致电宋庆龄和共同离开西柏坡两条非会议事件。",
         "开放题最低覆盖为三个可核验的共同会见/座谈会，不是全年会议清单；额外有效会议允许补充，不以未标注直接判负。",
         "6月7日/6月8日及3月26日代表团说明仍是困难负例线索，不是历史否定；其他新直接证据须待核。",
         "尚未生成真实候选池或候选相关性标签；Precision/MRR/nDCG 待下一步标注。",
-        "2026-10-29 用户复核认为原答案不完整；按用户选择的改法重写事实、证据组和参考答案，待再次送审。"
+        "2026-10-29 用户复核认为原答案不完整；按用户选择的改法重写事实、证据组和参考答案，待再次送审。",
+        "2026-10-29 按用户要求加入 7 次政治局会议（10/26、11/2、11/9、11/25、11/28、12/1、12/4）。"
       ],
       "judgments": [
         {
@@ -4255,11 +4445,13 @@
         {
           "unit_id": "9481413cf99d180990140f9684b238473a8cf721ce566f8e61edd7375b2691ba",
           "relevance": 2,
-          "reason": "内容为1949年11月25日政治局会议，未涉及必要事实中的共同会议。；人工改判为2：原文明确记载周恩来出席11月25日政治局会议，但该会议不在冻结的七项必要事实内。",
+          "reason": "内容为1949年11月25日政治局会议；人工改判为2：原文明确记载周恩来出席，对应 politburo_19491125。",
           "reviewer": "user_in_current_chat",
           "reviewed_at": "2026-10-29T20:14:25+08:00",
           "basis": "human_review",
-          "supported_groups": []
+          "supported_groups": [
+            "politburo_19491125"
+          ]
         },
         {
           "unit_id": "ea66074c16f9988c1e11ffda5b7fa9c19c25b4638d9019cd8564f4e4421a5a8a",

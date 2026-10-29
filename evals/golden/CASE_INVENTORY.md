@@ -8,7 +8,7 @@
 |---|---:|
 | 开发题 / 保留题 | 15 / 5 |
 | 可答 / 拒答 | 18 / 2 |
-| 必要事实 / 证据组 | 91 / 97 |
+| 必要事实 / 证据组 | 98 / 104 |
 | 有候选标签的题 | 18（192 条候选判断） |
 | 有固定池的题 | 18 |
 | 题目定义已批准 / 待审 | 20 / 0 |
@@ -67,7 +67,7 @@
 | 11 | `dev_multi_meetings` | multi_evidence | development | answerable | 12 / 15 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
 | 12 | `dev_multi_zhou_periods` | multi_evidence | development | answerable | 7 / 7 | 10 / 10 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 13 | `holdout_multi_period` | multi_evidence | holdout | answerable | 3 / 3 | 9 / 9 | approved | R, P/MRR/nDCG(小池) |
-| 14 | `dev_intersection_mao_zhou_1949` | intersection_hard_negative | development | answerable | 7 / 7 | 9 / 9 | approved | R, P/MRR/nDCG(小池) |
+| 14 | `dev_intersection_mao_zhou_1949` | intersection_hard_negative | development | answerable | 14 / 14 | 9 / 9 | approved | R, P/MRR/nDCG(小池) |
 | 15 | `holdout_intersection_negative` | intersection_hard_negative | holdout | answerable | 2 / 2 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
 | 16 | `holdout_intersection_positive` | intersection_hard_negative | holdout | answerable | 3 / 4 | 10 / 10 | approved | R, P/MRR/nDCG(小池) |
 | 17 | `dev_constraint_history_isolation` | constraints_routing | development | answerable | 10 / 12 | 8 / 8 | approved | R, P/MRR/nDCG(小池) |
@@ -953,11 +953,11 @@
 
 - 文件：`golden_dataset.json`
 - 分层：`development`；类别：`intersection_hard_negative`；可答性：`answerable`；主题组：`mao_zhou_meetings_1949`
-- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:48:24+08:00`
-- 复核备注：用户 2026-10-29 批准扩为七次会议后的题目定义。
+- 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T20:19:39+08:00`
+- 复核备注：用户 2026-10-29 要求把 1949 年共同出席的政治局会议纳入本题；据此加入 7 次有原文列名的政治局会议，共 14 项。
 - 候选标签：9 条（{'human_review': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：毛泽东与周恩来在1949年有哪些有共同出席的会议？
-- 参考答案：可据原文列出以下七项，清单以年谱明确记载为限、不声称穷尽1949年全年：①6月7日，毛泽东同刘少奇、周恩来在香山双清别墅会见陈嘉庚（毛3 PDF521）；②7月1日，同朱德、周恩来等出席纪念中国共产党成立二十八周年大会（毛3 PDF531）；③7月9日，同朱德、周恩来出席全国铁路职工临时代表会议等在中南海怀仁堂的集会（毛3 PDF536）；④9月8日，毛泽东会见和宴请程潜，朱德、刘少奇、周恩来等参加（毛3 PDF572）；⑤9月25日晚，毛泽东召集国旗、国徽、国歌、纪年、国都问题协商座谈会，周恩来出席（毛3 PDF585）；⑥10月24日，毛泽东接见绥远军区负责人和傅作义，周恩来参加（毛4 PDF32）；⑦12月1日，毛泽东同张澜等十二位民主人士座谈，磋商访苏签订中苏条约事宜，朱德、周恩来、林伯渠参加（毛4 PDF58）。共同出席必须逐条得到直接支持，不能把邻条、引文背景或只出现两人姓名的片段算作共同出席会议。
+- 参考答案：可据原文列出以下十四项，清单以年谱明确记载为限、不声称穷尽1949年全年：①6月7日会见陈嘉庚（毛3 PDF521）；②7月1日纪念中国共产党成立二十八周年大会（毛3 PDF531）；③7月9日全国铁路职工临时代表会议等集会（毛3 PDF536）；④9月8日会见和宴请程潜（毛3 PDF572）；⑤9月25日国旗国徽国歌纪年国都协商座谈会（毛3 PDF585）；⑥10月24日接见绥远军区负责人和傅作义（毛4 PDF32）；⑦10月26日中共中央政治局会议（毛4 PDF35）；⑧11月2日政治局会议（PDF41）；⑨11月9日政治局会议（PDF45）；⑩11月25日政治局会议（PDF54）；⑪11月28日政治局会议（PDF56）；⑫12月1日政治局会议（PDF59）；⑬12月1日同十二位民主人士座谈（PDF58）；⑭12月4日政治局会议（PDF60）。共同出席必须逐条得到直接支持；政治局会议以原文列名“周恩来……出席”为准。
 
 **必要事实**
 
@@ -973,8 +973,22 @@
   - 证据组：`joint_consultation_0925`
 - `joint_meeting_1024`（必要）：1949年10月24日，毛泽东在中南海菊香书屋接见绥远军区负责人和傅作义，谈起义部队的团结改造及与非党人士长期合作，周恩来参加。
   - 证据组：`joint_meeting_1024`
+- `politburo_19491026`（必要）：1949年10月26日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻列席。
+  - 证据组：`politburo_19491026`
+- `politburo_19491102`（必要）：1949年11月2日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻列席。
+  - 证据组：`politburo_19491102`
+- `politburo_19491109`（必要）：1949年11月9日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、林伯渠出席，薄一波、聂荣臻列席。
+  - 证据组：`politburo_19491109`
+- `politburo_19491125`（必要）：1949年11月25日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、董必武、林伯渠出席，饶漱石、李富春、薄一波、聂荣臻列席。
+  - 证据组：`politburo_19491125`
+- `politburo_19491128`（必要）：1949年11月28日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石列席。
+  - 证据组：`politburo_19491128`
+- `politburo_19491201`（必要）：1949年12月1日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、饶漱石、李富春、邓子恢、安子文列席。
+  - 证据组：`politburo_19491201`
 - `joint_meeting_1201`（必要）：1949年12月1日，毛泽东同张澜、李济深、郭沫若、黄炎培、沈钧儒等十二位民主人士座谈，磋商毛泽东访问苏联时签订中苏条约事宜，朱德、周恩来、林伯渠参加。
   - 证据组：`joint_meeting_1201`
+- `politburo_19491204`（必要）：1949年12月4日，毛泽东主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石、邓子恢列席。
+  - 证据组：`politburo_19491204`
 
 **证据组与原文**
 
@@ -1008,17 +1022,52 @@
     - 原文：10月24日在中南海菊香书屋接见绥远军区负责人高克林、姚桔、裴周玉(1)和傅作义，谈对绥远起义部队的团结改造以及同非党人士长期合作问题。周恩来、薄一波、聂荣臻参加。
     - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
     - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `politburo_19491026`：1949年10月26日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 35 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：同日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真(1)、董必武、林伯渠出席，薄一波、聂荣臻列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
+- `politburo_19491102`：1949年11月2日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 41 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：11月2日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
+- `politburo_19491109`：1949年11月9日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 45 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：11月9日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、林伯渠出席，薄一波、聂荣臻列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
+- `politburo_19491125`：1949年11月25日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 54 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：11月25日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、彭真、董必武、林伯渠出席，饶漱石、李富春(1)、薄一波、聂荣臻列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
+- `politburo_19491128`：1949年11月28日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 56 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：11月28日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
+- `politburo_19491201`：1949年12月1日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 59 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：同日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、饶漱石、李富春、邓子恢、安子文列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
 - `joint_meeting_1201`：1949年12月1日同十二位民主人士座谈，周恩来参加
   - `mao_zedong_chronology_volume_4` PDF 第 58 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
     - 原文：12月1日同张澜、李济深、郭沫若、黄炎培、沈钧儒等十二位民主人士座谈，磋商毛泽东访问苏联时签订中苏条约事宜，朱德、周恩来、林伯渠参加。
     - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
     - 校验方法：Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation.
+- `politburo_19491204`：1949年12月4日 中共中央政治局会议，周恩来出席
+  - `mao_zedong_chronology_volume_4` PDF 第 60 页（SHA `fc9d8eb877991db15f55d3862fc949d4732b3e0bf5cf7d71fdfa4de2228b3113`；文本层）
+    - 原文：12月4日主持召开中共中央政治局会议，刘少奇、朱德、周恩来、陈云、彭真、董必武、林伯渠出席，薄一波、聂荣臻、李富春、饶漱石、邓子恢列席。
+    - Agent校验：status=verified_against_page_text; verified_at=2026-10-29
+    - 校验方法：Programmatic whitespace-only anchor check against the effective page text; date taken from the chronology entry context; PDF image review is still pending human confirmation.
 
 **禁止结论**
 
 - 仅据毛3 PDF476 的代表名单和谈判基础说明，断言毛泽东是1949年4月1日国共和谈中共代表团成员，并和周恩来共同出席该日谈判。（原因：代表名单不能证明毛泽东本人出席了该日谈判，属于邻近条目串用。）
 - 仅据毛3 PDF521，或跨用6月7日的参与名单，断言周恩来参加了1949年6月8日毛泽东会见傅作义。（原因：6月8日条目没有列周恩来，6月7日的名单不能移植到次日。）
-- 以上七项就是毛泽东与周恩来1949年共同出席的全部会议。（原因：年谱另有政治局会议等共同出席记录；本题只冻结七项可逐条核验的会议，不声称穷尽。）
+- 以上十四项就是毛泽东与周恩来1949年共同出席的全部会议。（原因：年谱仍可能记载其他会议；本题只冻结可逐条核验的十四项，不声称穷尽。）
 
 **复核提示**
 
@@ -1027,6 +1076,7 @@
 - 6月7日/6月8日及3月26日代表团说明仍是困难负例线索，不是历史否定；其他新直接证据须待核。
 - 尚未生成真实候选池或候选相关性标签；Precision/MRR/nDCG 待下一步标注。
 - 2026-10-29 用户复核认为原答案不完整；按用户选择的改法重写事实、证据组和参考答案，待再次送审。
+- 2026-10-29 按用户要求加入 7 次政治局会议（10/26、11/2、11/9、11/25、11/28、12/1、12/4）。
 
 ### 15. `holdout_intersection_negative`
 

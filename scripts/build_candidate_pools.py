@@ -28,7 +28,7 @@ from history_agent.log import log_event
 LOGGER = logging.getLogger(__name__)
 DATASET = Path("evals/golden/golden_dataset.json")
 POOLS = Path("evals/golden/ranking_pools.json")
-DEFAULT_CAPTURE = Path("data/reports/golden20_r2_20261029/capture.json")
+DEFAULT_CAPTURE = Path("data/reports/golden20_r3_20261029/capture.json")
 TARGET_CASES = [
     "dev_exact_zunyi_election",
     "dev_multi_meetings",

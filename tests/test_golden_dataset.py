@@ -31,8 +31,8 @@ def test_golden20_has_expected_counts_and_no_deleted_cases() -> None:
     assert sum(case.split == "holdout" for case in dataset.cases) == 5
     assert sum(case.answerability == "answerable" for case in dataset.cases) == 18
     assert sum(case.answerability == "unanswerable" for case in dataset.cases) == 2
-    assert sum(len(case.facts) for case in dataset.cases) == 91
-    assert sum(len(case.evidence_groups) for case in dataset.cases) == 97
+    assert sum(len(case.facts) for case in dataset.cases) == 98
+    assert sum(len(case.evidence_groups) for case in dataset.cases) == 104
     assert sum(len(case.judgments) for case in dataset.cases) == 192
     assert sum(case.human_review.status == "approved" for case in dataset.cases) == 20
     assert all(case.human_review.status == "approved" for case in dataset.cases)
@@ -52,9 +52,16 @@ def test_golden20_rewritten_questions_and_evidence_shapes() -> None:
         "joint_meeting_0908",
         "joint_consultation_0925",
         "joint_meeting_1024",
+        "politburo_19491026",
+        "politburo_19491102",
+        "politburo_19491109",
+        "politburo_19491125",
+        "politburo_19491128",
+        "politburo_19491201",
         "joint_meeting_1201",
+        "politburo_19491204",
     }
-    assert len(mao_zhou.facts) == len(mao_zhou.evidence_groups) == 7
+    assert len(mao_zhou.facts) == len(mao_zhou.evidence_groups) == 14
 
     liu_deng = by_id["holdout_intersection_positive"]
     assert liu_deng.question == (
