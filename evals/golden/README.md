@@ -9,6 +9,7 @@
 | [golden_dataset.json](golden_dataset.json) | 20 题数据集（PilotCase schema） |
 | [DATASET.md](DATASET.md) | 总量、题型覆盖、指标可计算性、缺口 |
 | [CASE_INVENTORY.md](CASE_INVENTORY.md) | 逐题原文、锚点、事实、拒答依据、状态 |
+| [DEFINITION_REVIEW.md](DEFINITION_REVIEW.md) | 15 道待批准题的逐题复核表（问题/事实/锚点/边界） |
 | [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
 | [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
@@ -31,6 +32,7 @@
 - 正式 Recall@K 只覆盖 5 道已批准开发题；正式 Precision/MRR/nDCG/Fact/Cit 仍为 0 题。
 - 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 也覆盖 18 道，K≤5 稳定。
 - 68 条 `llm_judge` 标签仍待人工抽检，30 条已人工处理（28 通过、2 改判）；人工抽检不改变题目定义的 pending 状态。
+- 15 道待批准题的复核材料（问题、必要事实、锚点原文、禁止说法、拒绝依据、池内覆盖）见 [DEFINITION_REVIEW.md](DEFINITION_REVIEW.md)。
 - 保留题全部待审，且保留集目前没有约束题和拒答题。
 - 逐题状态和每一条原文见 [CASE_INVENTORY.md](CASE_INVENTORY.md)。
 
