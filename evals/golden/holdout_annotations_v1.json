@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "version": "golden-v2-holdout-annotations-r1-20261029-draft6",
-  "description": "10道保留题的原文可行性审计与首批6题Agent预标注：4道可答（精确/语义/多证据/交集）+ 1道拒答（另有1道精确题，共6题）；其余4题因原文边界或题型需人工决定，暂不进入本包。",
+  "version": "golden-v2-holdout-annotations-r1-20261029",
+  "description": "保留题9题Agent预标注：8道可答（精确/语义/多证据/交集/约束）+ 1道拒答。原10题中的1943年精简机构关系题按人工裁定删除；七大参会题改为129师角色负例；1946年8月邯郸题改为同月同地菏泽正例；1937—1938比较题改为1938单年任务题。",
   "annotation_status": "agent_prepared_human_pending",
   "evidence_group_semantics": {
     "facts_to_groups": "AND：一条事实列出的所有 evidence_group_ids 都必须命中。",
@@ -781,6 +781,315 @@
         ],
         "meta_evidence_role": "说明本书是纪实报告，不是逐字对话记录；元证据不进入正向事实、Recall或排名分母。"
       }
+    },
+    {
+      "id": "holdout_multi_period",
+      "question": "邓小平在1938年承担了哪些主要工作任务？",
+      "category": "multi_evidence",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "holdout_deng_1938_tasks",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": null,
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "d129_commissar",
+          "description": "1938年1月任一二九师政治委员",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 174,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "邓小平接替张浩任一二九师政治委员",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "west_base",
+          "description": "1938年3月开辟冀西根据地",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 191,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "3月4日就开辟冀西根据地问题，同张贻祥谈话，向他介绍冀西的情况，提出准备在冀西建立军分区",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "jinan_counter",
+          "description": "1938年10月冀南反“扫荡”准备",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 240,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "10月15日鉴于日军即将大举“扫荡”华北，致电徐向前、宋任穷并告左权、刘伯承，对冀南反“扫荡”的准备工作提出四点建议",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "d129_commissar",
+          "claim": "1938年1月5日，邓小平接替张浩任八路军第一二九师政治委员。",
+          "required": true,
+          "evidence_group_ids": [
+            "d129_commissar"
+          ]
+        },
+        {
+          "id": "west_base",
+          "claim": "1938年3月，邓小平就开辟冀西根据地同张贻祥谈话，提出准备在冀西建立军分区。",
+          "required": true,
+          "evidence_group_ids": [
+            "west_base"
+          ]
+        },
+        {
+          "id": "jinan_counter",
+          "claim": "1938年10月15日，邓小平致电徐向前、宋任穷等，对冀南反“扫荡”准备工作提出建议。",
+          "required": true,
+          "evidence_group_ids": [
+            "jinan_counter"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "1938年邓小平任一二九师师长",
+          "reason": "1938年1月他接替张浩任政治委员；师长是刘伯承。"
+        }
+      ],
+      "reference_answer": "1938年1月任一二九师政治委员；3月就开辟冀西根据地提出建立军分区；10月就冀南反“扫荡”准备提出建议。",
+      "review_notes": [
+        "人工裁定改为单一年份任务题；只取三项代表性任务，不声称穷尽1938年全部工作。",
+        "OCR页，需人工核对原页图像。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_intersection_negative",
+      "question": "刘伯承和邓小平是否都担任过八路军第一二九师师长？",
+      "category": "intersection_hard_negative",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "holdout_liu_deng_129_roles",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": null,
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "liu_commander",
+          "description": "一二九师改编时的师长任命",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 158,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "以刘伯承为师长，徐向前为副师长，倪志亮为参谋长，张浩为师政训处主任",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "deng_commissar",
+          "description": "邓小平接任一二九师政治委员",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 174,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "邓小平接替张浩任一二九师政治委员",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "liu_commander",
+          "claim": "1937年9月一二九师改编时，刘伯承任师长。",
+          "required": true,
+          "evidence_group_ids": [
+            "liu_commander"
+          ]
+        },
+        {
+          "id": "deng_commissar",
+          "claim": "1938年1月，邓小平接替张浩任一二九师政治委员。",
+          "required": true,
+          "evidence_group_ids": [
+            "deng_commissar"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "刘伯承和邓小平都担任过一二九师师长",
+          "reason": "刘伯承为师长，邓小平为政治委员；不能把政委写成师长。"
+        }
+      ],
+      "reference_answer": "不是。刘伯承任一二九师师长，邓小平任一二九师政治委员。",
+      "review_notes": [
+        "这是角色绑定负例：两段原文分别证明两人的不同职务，不能因为同师共事就把职务合并。",
+        "OCR页，需人工核对原页图像。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_constraint_source_month",
+      "question": "只依据《邓小平年谱》上卷，1946年8月邓小平在菏泽有哪些活动？",
+      "category": "constraints_routing",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "holdout_deng_heze_1946_august",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": null,
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "heze_arrival",
+          "description": "1946年8月1日到达菏泽",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 630,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "8月1日和刘伯承、张际春、李达率晋冀鲁豫野战军指挥部到达菏泽，准备发起陇海战役",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "longhai_order",
+          "description": "1946年8月5日在菏泽下达陇海战役命令",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 630,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "8月5日和刘伯承在菏泽下达陇海战役基本命令",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        },
+        {
+          "id": "longhai_start",
+          "description": "1946年8月10日发起陇海战役",
+          "alternatives": [
+            {
+              "document_id": "deng_xiaoping_chronology_1904_1974_upper",
+              "pdf_page": 631,
+              "file_sha256": "8208c6ed269f34191a0c8236d53ee6c1b037ae35290fbf0be8f6996333c97c12",
+              "quote": "8月10日夜，和刘伯承指挥晋冀鲁豫野战军主力发起陇海战役",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "status": "verified_against_page_text",
+                "verified_at": "2026-10-29",
+                "text_source": "data/processed/ocr/deng_xiaoping_chronology_1904_1974_upper.jsonl",
+                "method": "Programmatic whitespace-only anchor check against the effective page text; PDF image review is still pending human confirmation."
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "heze_arrival",
+          "claim": "1946年8月1日，邓小平与刘伯承等率晋冀鲁豫野战军指挥部到达菏泽，准备发起陇海战役。",
+          "required": true,
+          "evidence_group_ids": [
+            "heze_arrival"
+          ]
+        },
+        {
+          "id": "longhai_order",
+          "claim": "8月5日，邓小平与刘伯承在菏泽下达陇海战役基本命令。",
+          "required": true,
+          "evidence_group_ids": [
+            "longhai_order"
+          ]
+        },
+        {
+          "id": "longhai_start",
+          "claim": "8月10日夜，邓小平与刘伯承指挥晋冀鲁豫野战军主力发起陇海战役。",
+          "required": true,
+          "evidence_group_ids": [
+            "longhai_start"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "1946年8月邓小平在邯郸指挥陇海战役",
+          "reason": "8月原文地点是菏泽/陇海前线；邯郸不是8月活动地点。"
+        }
+      ],
+      "reference_answer": "8月1日到达菏泽准备陇海战役；8月5日在菏泽下达陇海战役基本命令；8月10日夜指挥主力发起陇海战役。",
+      "review_notes": [
+        "人工裁定改为同月同地正例；来源、月份、地点三重约束，8月原文在菏泽，不能把2—3月邯郸活动或同月异地记录当命中。",
+        "OCR页，需人工核对原页图像。"
+      ],
+      "judgments": []
     }
   ]
 }

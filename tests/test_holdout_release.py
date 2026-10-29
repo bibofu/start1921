@@ -6,7 +6,7 @@ from pathlib import Path
 from history_agent.evaluation.pilot_models import PilotDataset
 
 ROOT = Path(__file__).resolve().parents[1]
-HOLDOUT = ROOT / "evals/golden/holdout_annotations_v1_draft6.json"
+HOLDOUT = ROOT / "evals/golden/holdout_annotations_v1.json"
 DEVELOPMENT = ROOT / "evals/golden/development_annotations_v6.json"
 
 
@@ -14,13 +14,13 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf8"))
 
 
-def test_holdout_draft_has_six_pending_cases_and_expected_denominators() -> None:
+def test_holdout_release_has_nine_pending_cases_and_expected_denominators() -> None:
     dataset = PilotDataset.model_validate(_load(HOLDOUT))
-    assert len(dataset.cases) == 6
+    assert len(dataset.cases) == 9
     assert all(case.split == "holdout" for case in dataset.cases)
     assert all(case.human_review.status == "pending" for case in dataset.cases)
-    assert sum(len(case.facts) for case in dataset.cases) == 20
-    assert sum(len(case.evidence_groups) for case in dataset.cases) == 21
+    assert sum(len(case.facts) for case in dataset.cases) == 28
+    assert sum(len(case.evidence_groups) for case in dataset.cases) == 29
     assert sum(case.answerability == "unanswerable" for case in dataset.cases) == 1
 
 
