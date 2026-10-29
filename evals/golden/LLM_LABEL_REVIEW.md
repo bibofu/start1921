@@ -8,11 +8,9 @@
 2. 池内没有任何锚点页的题（说明召回本身可能缺失，不是标签问题）；
 3. 0/1/2 的边界例子；每案建议至少抽 2 条，优先抽 rel=2 和 rel=0。
 
-## 高风险题（当前待抽检）
+## 高风险题
 
-- `dev_multi_meetings`：仍有 4 条待抽检的非锚点 rel=2。
-- `holdout_intersection_positive`：仍有 1 条待抽检的非锚点 rel=2。
-- `dev_constraint_history_isolation`：仍有 3 条待抽检的非锚点 rel=2。
+- 所有待抽检的非锚点 rel=2 已人工处理：8 条通过，`dev_multi_meetings/a1b0ac0830` 与 `holdout_intersection_positive/a95eec2af5` 改判为 rel=1；剩余 78 条 LLM 标签中没有非锚点 rel=2。
 - `holdout_semantic_observation`：池内 0 个锚点页、0 个 rel=2；这是召回缺失，不是标签问题。
 - `holdout_multi_period`：池内只有 1 个锚点页，另外两组必要事实未进池。
 - `dev_intersection_mao_zhou_1949`、`holdout_intersection_negative`：池内 0 个锚点页；非锚点 rel=2 已人工处理。
