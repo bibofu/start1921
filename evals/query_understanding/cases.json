@@ -1,0 +1,1042 @@
+{
+  "schema_version": 1,
+  "version": "query-understanding-seed-v1-20261030",
+  "description": "查询理解评测种子集：意图、路由、mention/canonical、时间、是否澄清。agent_prepared，尚未人工批准；仅用于基线测量，不用于 Golden 调参。",
+  "cases": [
+    {
+      "id": "qu_dev_fact_deng_1954",
+      "split": "development",
+      "question": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+      "history": [],
+      "intent": "timeline",
+      "route": "deep",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1954,
+        "end": 1954,
+        "precision": "month"
+      },
+      "constraints": [
+        "9月"
+      ],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_fact_deng_school_1926",
+      "split": "development",
+      "question": "《邓小平年谱》记载邓小平1926年在哪些学校学习？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "邓小平年谱",
+          "type": "document",
+          "canonical": [
+            "邓小平年谱"
+          ]
+        },
+        {
+          "text": "邓小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1926,
+        "end": 1926,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_congress_first",
+      "split": "development",
+      "question": "中共一大在哪一年召开？",
+      "history": [],
+      "intent": "general",
+      "route": "fast_fact",
+      "flags": [],
+      "mentions": [
+        {
+          "text": "中共一大",
+          "type": "congress",
+          "canonical": [
+            "中共一大"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_congress_short_seven",
+      "split": "development",
+      "question": "七大在哪一年召开？",
+      "history": [],
+      "intent": "general",
+      "route": "fast_fact",
+      "flags": [],
+      "mentions": [
+        {
+          "text": "七大",
+          "type": "congress",
+          "canonical": [
+            "中共七大"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_alias_mao_runzhi",
+      "split": "development",
+      "question": "毛润之在1949年出席了哪些会议？",
+      "history": [],
+      "intent": "general",
+      "route": "fast_fact",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "毛润之",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_group_liudeng",
+      "split": "development",
+      "question": "刘邓在1947年共同指挥了哪些战役？",
+      "history": [],
+      "intent": "intersection",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "multi_entity"
+      ],
+      "mentions": [
+        {
+          "text": "刘邓",
+          "type": "person_group",
+          "canonical": [
+            "刘伯承",
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1947,
+        "end": 1947,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_keyword_dump",
+      "split": "development",
+      "question": "解放战争期间  毛润之  七大  刘邓",
+      "history": [],
+      "intent": "general",
+      "route": "clarify",
+      "flags": [
+        "keyword_dump",
+        "multi_entity",
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "解放战争期间",
+          "type": "period",
+          "canonical": [
+            "解放战争"
+          ]
+        },
+        {
+          "text": "毛润之",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "七大",
+          "type": "congress",
+          "canonical": [
+            "中共七大"
+          ]
+        },
+        {
+          "text": "刘邓",
+          "type": "person_group",
+          "canonical": [
+            "刘伯承",
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1945,
+        "end": 1949,
+        "precision": "period"
+      },
+      "constraints": [],
+      "needs_clarification": true,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_comparison_meetings",
+      "split": "development",
+      "question": "比较遵义会议和庐山会议各自讨论的核心问题、会议进程和后续影响。",
+      "history": [],
+      "intent": "comparison",
+      "route": "deep",
+      "flags": [
+        "multi_entity",
+        "multi_hop"
+      ],
+      "mentions": [
+        {
+          "text": "遵义会议",
+          "type": "event",
+          "canonical": [
+            "遵义会议"
+          ]
+        },
+        {
+          "text": "庐山会议",
+          "type": "event",
+          "canonical": [
+            "庐山会议"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_multihop_zunyi",
+      "split": "development",
+      "question": "毛泽东在遵义会议后如何取得军事领导权，又怎样在抗战初期巩固？",
+      "history": [],
+      "intent": "causal_analysis",
+      "route": "deep",
+      "flags": [
+        "multi_hop",
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "遵义会议",
+          "type": "event",
+          "canonical": [
+            "遵义会议"
+          ]
+        },
+        {
+          "text": "抗战初期",
+          "type": "period",
+          "canonical": [
+            "抗日战争"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1937,
+        "end": 1945,
+        "precision": "period"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_observation_snow",
+      "split": "development",
+      "question": "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+      "history": [],
+      "intent": "observation",
+      "route": "deep",
+      "flags": [],
+      "mentions": [
+        {
+          "text": "斯诺",
+          "type": "person",
+          "canonical": [
+            "埃德加·斯诺"
+          ]
+        },
+        {
+          "text": "西行漫记",
+          "type": "document",
+          "canonical": [
+            "西行漫记"
+          ]
+        },
+        {
+          "text": "红军学校",
+          "type": "organization",
+          "canonical": [
+            "红军大学"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_viewpoint_persistent",
+      "split": "development",
+      "question": "毛泽东在《论持久战》中提出了哪些抗战策略？",
+      "history": [],
+      "intent": "viewpoint",
+      "route": "deep",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "论持久战",
+          "type": "document",
+          "canonical": [
+            "论持久战"
+          ]
+        },
+        {
+          "text": "抗战",
+          "type": "period",
+          "canonical": [
+            "抗日战争"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_timeline_zhou_1956",
+      "split": "development",
+      "question": "周恩来在1956年有哪些主要经历？",
+      "history": [],
+      "intent": "timeline",
+      "route": "fast_fact",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "周恩来",
+          "type": "person",
+          "canonical": [
+            "周恩来"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1956,
+        "end": 1956,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_intersection_maozhou",
+      "split": "development",
+      "question": "毛泽东与周恩来在1949年共同出席了哪些会议？",
+      "history": [],
+      "intent": "intersection",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "multi_entity"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "周恩来",
+          "type": "person",
+          "canonical": [
+            "周恩来"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_intersection_negative",
+      "split": "development",
+      "question": "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？",
+      "history": [],
+      "intent": "intersection",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "multi_entity"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "周恩来",
+          "type": "person",
+          "canonical": [
+            "周恩来"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "day"
+      },
+      "constraints": [
+        "10月9日"
+      ],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_source_deng_1973",
+      "split": "development",
+      "question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月邓小平恢复了什么职务？",
+      "history": [],
+      "intent": "timeline",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "source_constraint"
+      ],
+      "mentions": [
+        {
+          "text": "邓小平年谱（1904—1974）",
+          "type": "document",
+          "canonical": [
+            "邓小平年谱"
+          ]
+        },
+        {
+          "text": "邓小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1973,
+        "end": 1973,
+        "precision": "month"
+      },
+      "constraints": [
+        "下卷",
+        "3月",
+        "只依据"
+      ],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_month_place_deng_1949",
+      "split": "development",
+      "question": "1949年4月，邓小平在哪些地方参加了哪些会议？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "month"
+      },
+      "constraints": [
+        "4月"
+      ],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_refusal_2024",
+      "split": "development",
+      "question": "习近平在2024年考察了哪些地方？",
+      "history": [],
+      "intent": "out_of_scope",
+      "route": "fast_fact",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "习近平",
+          "type": "person",
+          "canonical": [
+            "习近平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 2024,
+        "end": 2024,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_followup_zhou_1957",
+      "split": "development",
+      "question": "那他在1957年呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "周恩来在1956年有哪些主要经历？"
+        },
+        {
+          "role": "assistant",
+          "content": "1956年，周恩来主要主持…"
+        }
+      ],
+      "intent": "timeline",
+      "route": "deep",
+      "flags": [
+        "follow_up",
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "他",
+          "type": "person",
+          "canonical": [
+            "周恩来"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1957,
+        "end": 1957,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_followup_deng_1953",
+      "split": "development",
+      "question": "1953年呢？",
+      "history": [
+        {
+          "role": "user",
+          "content": "1952年邓小平担任了哪些职务？"
+        },
+        {
+          "role": "assistant",
+          "content": "1952年，邓小平任…"
+        }
+      ],
+      "intent": "timeline",
+      "route": "deep",
+      "flags": [
+        "follow_up",
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1953,
+        "end": 1953,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_alias_xiaoping",
+      "split": "development",
+      "question": "小平在1975年做了什么？",
+      "history": [],
+      "intent": "timeline",
+      "route": "fast_fact",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1975,
+        "end": 1975,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_yenan_rectification",
+      "split": "development",
+      "question": "毛泽东在延安整风期间主要做了什么？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "延安整风",
+          "type": "event",
+          "canonical": [
+            "延安整风"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_event_chongqing",
+      "split": "development",
+      "question": "抗战胜利后毛泽东赴重庆谈判，达成了什么结果？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [
+        "multi_entity"
+      ],
+      "mentions": [
+        {
+          "text": "抗战",
+          "type": "period",
+          "canonical": [
+            "抗日战争"
+          ]
+        },
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "重庆谈判",
+          "type": "event",
+          "canonical": [
+            "重庆谈判"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_place_taihang",
+      "split": "development",
+      "question": "邓小平在太行山期间担任过哪些职务？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "type": "person",
+          "canonical": [
+            "邓小平"
+          ]
+        },
+        {
+          "text": "太行山",
+          "type": "place",
+          "canonical": [
+            "太行山"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_dev_document_persistent",
+      "split": "development",
+      "question": "《毛泽东选集》中《论持久战》的核心观点是什么？",
+      "history": [],
+      "intent": "viewpoint",
+      "route": "deep",
+      "flags": [],
+      "mentions": [
+        {
+          "text": "毛泽东选集",
+          "type": "document",
+          "canonical": [
+            "毛泽东选集"
+          ]
+        },
+        {
+          "text": "论持久战",
+          "type": "document",
+          "canonical": [
+            "论持久战"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_hold_multi3_mao_liu_zhou",
+      "split": "holdout",
+      "question": "毛泽东、刘少奇、周恩来在1949年共同出席了哪些会议？",
+      "history": [],
+      "intent": "intersection",
+      "route": "clarify",
+      "flags": [
+        "time_sensitive",
+        "multi_entity"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "刘少奇",
+          "type": "person",
+          "canonical": [
+            "刘少奇"
+          ]
+        },
+        {
+          "text": "周恩来",
+          "type": "person",
+          "canonical": [
+            "周恩来"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "constraints": [],
+      "needs_clarification": true,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_hold_keyword_dump_longmarch",
+      "split": "holdout",
+      "question": "长征  遵义会议  毛泽东  林彪",
+      "history": [],
+      "intent": "general",
+      "route": "clarify",
+      "flags": [
+        "keyword_dump",
+        "multi_entity",
+        "time_sensitive"
+      ],
+      "mentions": [
+        {
+          "text": "长征",
+          "type": "period",
+          "canonical": [
+            "长征"
+          ]
+        },
+        {
+          "text": "遵义会议",
+          "type": "event",
+          "canonical": [
+            "遵义会议"
+          ]
+        },
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        },
+        {
+          "text": "林彪",
+          "type": "person",
+          "canonical": [
+            "林彪"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1934,
+        "end": 1936,
+        "precision": "period"
+      },
+      "constraints": [],
+      "needs_clarification": true,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_hold_out_of_range_xinhai",
+      "split": "holdout",
+      "question": "辛亥革命的主要领导人是谁？",
+      "history": [],
+      "intent": "out_of_scope",
+      "route": "fast_fact",
+      "flags": [],
+      "mentions": [
+        {
+          "text": "辛亥革命",
+          "type": "event",
+          "canonical": [
+            "辛亥革命"
+          ]
+        }
+      ],
+      "time": null,
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_hold_comparison_parties",
+      "split": "holdout",
+      "question": "比较抗战时期国共两党的军事策略。",
+      "history": [],
+      "intent": "comparison",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "multi_entity"
+      ],
+      "mentions": [
+        {
+          "text": "抗战时期",
+          "type": "period",
+          "canonical": [
+            "抗日战争"
+          ]
+        },
+        {
+          "text": "国民党",
+          "type": "organization",
+          "canonical": [
+            "中国国民党"
+          ]
+        },
+        {
+          "text": "共产党",
+          "type": "organization",
+          "canonical": [
+            "中国共产党"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1937,
+        "end": 1945,
+        "precision": "period"
+      },
+      "constraints": [],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_hold_negation",
+      "split": "holdout",
+      "question": "毛泽东在1949年没有参加哪些会议？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "negation"
+      ],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "type": "person",
+          "canonical": [
+            "毛泽东"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "constraints": [
+        "否定"
+      ],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    },
+    {
+      "id": "qu_hold_source_month",
+      "split": "holdout",
+      "question": "只依据《周恩来年谱》，1950年1月周恩来在莫斯科做了什么？",
+      "history": [],
+      "intent": "general",
+      "route": "deep",
+      "flags": [
+        "time_sensitive",
+        "source_constraint"
+      ],
+      "mentions": [
+        {
+          "text": "周恩来年谱",
+          "type": "document",
+          "canonical": [
+            "周恩来年谱"
+          ]
+        },
+        {
+          "text": "周恩来",
+          "type": "person",
+          "canonical": [
+            "周恩来"
+          ]
+        },
+        {
+          "text": "莫斯科",
+          "type": "place",
+          "canonical": [
+            "莫斯科"
+          ]
+        }
+      ],
+      "time": {
+        "start": 1950,
+        "end": 1950,
+        "precision": "month"
+      },
+      "constraints": [
+        "1月",
+        "只依据"
+      ],
+      "needs_clarification": false,
+      "review_status": "agent_prepared"
+    }
+  ]
+}

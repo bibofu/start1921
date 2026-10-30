@@ -1,0 +1,1614 @@
+{
+  "mode": "rules",
+  "version": "query-understanding-seed-v1-20261030",
+  "result": {
+    "cases": 30,
+    "intent_accuracy": 0.7333333333333333,
+    "intent_family_accuracy": 0.8333333333333334,
+    "route_accuracy": 0.7333333333333333,
+    "mention": {
+      "true_positive": 26,
+      "predicted": 27,
+      "expected": 60,
+      "precision": 0.9629629629629629,
+      "recall": 0.43333333333333335,
+      "f1": 0.5977011494252873
+    },
+    "time": {
+      "evaluable": 20,
+      "exact_accuracy": 0.9
+    },
+    "clarification": {
+      "true_positive": 0,
+      "predicted": 0,
+      "expected": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "predicted_positive": 0,
+      "expected_positive": 3
+    },
+    "rows": [
+      {
+        "id": "qu_dev_fact_deng_1954",
+        "split": "development",
+        "intent": {
+          "expected": "timeline",
+          "predicted": "timeline",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "邓小平"
+          ],
+          "predicted": [
+            "邓小平"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1954,
+            "end": 1954,
+            "precision": "month"
+          },
+          "predicted": {
+            "start": 1954,
+            "end": 1954,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_fact_deng_school_1926",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "邓小平",
+            "邓小平年谱"
+          ],
+          "predicted": [
+            "邓小平"
+          ],
+          "missing": [
+            "邓小平年谱"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1926,
+            "end": 1926,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1926,
+            "end": 1926,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_congress_first",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "中共一大"
+          ],
+          "predicted": [
+            "中共一大"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_congress_short_seven",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "中共七大"
+          ],
+          "predicted": [],
+          "missing": [
+            "中共七大"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_alias_mao_runzhi",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "毛泽东"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_group_liudeng",
+        "split": "development",
+        "intent": {
+          "expected": "intersection",
+          "predicted": "intersection",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "刘伯承",
+            "邓小平"
+          ],
+          "predicted": [],
+          "missing": [
+            "刘伯承",
+            "邓小平"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1947,
+            "end": 1947,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1947,
+            "end": 1947,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_keyword_dump",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "clarify",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "中共七大",
+            "刘伯承",
+            "毛泽东",
+            "解放战争",
+            "邓小平"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [
+            "中共七大",
+            "刘伯承",
+            "解放战争",
+            "邓小平"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1945,
+            "end": 1949,
+            "precision": "period"
+          },
+          "predicted": {
+            "start": 1945,
+            "end": 1949,
+            "precision": "period"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": true,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_comparison_meetings",
+        "split": "development",
+        "intent": {
+          "expected": "comparison",
+          "predicted": "general",
+          "ok": false,
+          "family_ok": false
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "庐山会议",
+            "遵义会议"
+          ],
+          "predicted": [],
+          "missing": [
+            "庐山会议",
+            "遵义会议"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_multihop_zunyi",
+        "split": "development",
+        "intent": {
+          "expected": "causal_analysis",
+          "predicted": "general",
+          "ok": false,
+          "family_ok": false
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "抗日战争",
+            "毛泽东",
+            "遵义会议"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [
+            "抗日战争",
+            "遵义会议"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1937,
+            "end": 1945,
+            "precision": "period"
+          },
+          "predicted": null,
+          "ok": false
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_observation_snow",
+        "split": "development",
+        "intent": {
+          "expected": "observation",
+          "predicted": "observation",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "埃德加·斯诺",
+            "红军大学",
+            "西行漫记"
+          ],
+          "predicted": [
+            "埃德加·斯诺"
+          ],
+          "missing": [
+            "红军大学",
+            "西行漫记"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_viewpoint_persistent",
+        "split": "development",
+        "intent": {
+          "expected": "viewpoint",
+          "predicted": "viewpoint",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "抗日战争",
+            "毛泽东",
+            "论持久战"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [
+            "抗日战争",
+            "论持久战"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_timeline_zhou_1956",
+        "split": "development",
+        "intent": {
+          "expected": "timeline",
+          "predicted": "timeline",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "fast_fact",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "周恩来"
+          ],
+          "predicted": [
+            "周恩来"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1956,
+            "end": 1956,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1956,
+            "end": 1956,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_intersection_maozhou",
+        "split": "development",
+        "intent": {
+          "expected": "intersection",
+          "predicted": "intersection",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "周恩来",
+            "毛泽东"
+          ],
+          "predicted": [
+            "周恩来",
+            "毛泽东"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_intersection_negative",
+        "split": "development",
+        "intent": {
+          "expected": "intersection",
+          "predicted": "intersection",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "周恩来",
+            "毛泽东"
+          ],
+          "predicted": [
+            "周恩来",
+            "毛泽东"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "day"
+          },
+          "predicted": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_source_deng_1973",
+        "split": "development",
+        "intent": {
+          "expected": "timeline",
+          "predicted": "timeline",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "邓小平",
+            "邓小平年谱"
+          ],
+          "predicted": [
+            "邓小平"
+          ],
+          "missing": [
+            "邓小平年谱"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1973,
+            "end": 1973,
+            "precision": "month"
+          },
+          "predicted": {
+            "start": 1973,
+            "end": 1973,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_month_place_deng_1949",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "邓小平"
+          ],
+          "predicted": [
+            "邓小平"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "month"
+          },
+          "predicted": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_refusal_2024",
+        "split": "development",
+        "intent": {
+          "expected": "out_of_scope",
+          "predicted": "general",
+          "ok": false,
+          "family_ok": false
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "习近平"
+          ],
+          "predicted": [],
+          "missing": [
+            "习近平"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 2024,
+            "end": 2024,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 2024,
+            "end": 2024,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_followup_zhou_1957",
+        "split": "development",
+        "intent": {
+          "expected": "timeline",
+          "predicted": "general",
+          "ok": false,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "周恩来"
+          ],
+          "predicted": [],
+          "missing": [
+            "周恩来"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1957,
+            "end": 1957,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1957,
+            "end": 1957,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_followup_deng_1953",
+        "split": "development",
+        "intent": {
+          "expected": "timeline",
+          "predicted": "general",
+          "ok": false,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "邓小平"
+          ],
+          "predicted": [],
+          "missing": [
+            "邓小平"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1953,
+            "end": 1953,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1953,
+            "end": 1953,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_alias_xiaoping",
+        "split": "development",
+        "intent": {
+          "expected": "timeline",
+          "predicted": "timeline",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "fast_fact",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "邓小平"
+          ],
+          "predicted": [
+            "邓小平"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1975,
+            "end": 1975,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1975,
+            "end": 1975,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_yenan_rectification",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "延安整风",
+            "毛泽东"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [
+            "延安整风"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_event_chongqing",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "抗日战争",
+            "毛泽东",
+            "重庆谈判"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [
+            "抗日战争",
+            "重庆谈判"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_place_taihang",
+        "split": "development",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "太行山",
+            "邓小平"
+          ],
+          "predicted": [
+            "邓小平"
+          ],
+          "missing": [
+            "太行山"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_dev_document_persistent",
+        "split": "development",
+        "intent": {
+          "expected": "viewpoint",
+          "predicted": "viewpoint",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "毛泽东选集",
+            "论持久战"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [
+            "毛泽东选集",
+            "论持久战"
+          ],
+          "extra": [
+            "毛泽东"
+          ]
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_hold_multi3_mao_liu_zhou",
+        "split": "holdout",
+        "intent": {
+          "expected": "intersection",
+          "predicted": "intersection",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "clarify",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "刘少奇",
+            "周恩来",
+            "毛泽东"
+          ],
+          "predicted": [
+            "刘少奇",
+            "周恩来",
+            "毛泽东"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": true,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_hold_keyword_dump_longmarch",
+        "split": "holdout",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "clarify",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "林彪",
+            "毛泽东",
+            "遵义会议",
+            "长征"
+          ],
+          "predicted": [
+            "林彪",
+            "毛泽东"
+          ],
+          "missing": [
+            "遵义会议",
+            "长征"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1934,
+            "end": 1936,
+            "precision": "period"
+          },
+          "predicted": {
+            "start": 1934,
+            "end": 1936,
+            "precision": "period"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": true,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_hold_out_of_range_xinhai",
+        "split": "holdout",
+        "intent": {
+          "expected": "out_of_scope",
+          "predicted": "general",
+          "ok": false,
+          "family_ok": false
+        },
+        "route": {
+          "expected": "fast_fact",
+          "predicted": "deep",
+          "ok": false
+        },
+        "mentions": {
+          "expected": [
+            "辛亥革命"
+          ],
+          "predicted": [],
+          "missing": [
+            "辛亥革命"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": null,
+          "predicted": null,
+          "ok": null
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_hold_comparison_parties",
+        "split": "holdout",
+        "intent": {
+          "expected": "comparison",
+          "predicted": "viewpoint",
+          "ok": false,
+          "family_ok": false
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "中国共产党",
+            "中国国民党",
+            "抗日战争"
+          ],
+          "predicted": [],
+          "missing": [
+            "中国共产党",
+            "中国国民党",
+            "抗日战争"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1937,
+            "end": 1945,
+            "precision": "period"
+          },
+          "predicted": null,
+          "ok": false
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_hold_negation",
+        "split": "holdout",
+        "intent": {
+          "expected": "general",
+          "predicted": "general",
+          "ok": true,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "毛泽东"
+          ],
+          "predicted": [
+            "毛泽东"
+          ],
+          "missing": [],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "predicted": {
+            "start": 1949,
+            "end": 1949,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      },
+      {
+        "id": "qu_hold_source_month",
+        "split": "holdout",
+        "intent": {
+          "expected": "general",
+          "predicted": "timeline",
+          "ok": false,
+          "family_ok": true
+        },
+        "route": {
+          "expected": "deep",
+          "predicted": "deep",
+          "ok": true
+        },
+        "mentions": {
+          "expected": [
+            "周恩来",
+            "周恩来年谱",
+            "莫斯科"
+          ],
+          "predicted": [
+            "周恩来"
+          ],
+          "missing": [
+            "周恩来年谱",
+            "莫斯科"
+          ],
+          "extra": []
+        },
+        "time": {
+          "expected": {
+            "start": 1950,
+            "end": 1950,
+            "precision": "month"
+          },
+          "predicted": {
+            "start": 1950,
+            "end": 1950,
+            "precision": "year"
+          },
+          "ok": true
+        },
+        "clarification": {
+          "expected": false,
+          "predicted": false
+        }
+      }
+    ]
+  },
+  "predictions": {
+    "qu_dev_fact_deng_1954": {
+      "intent": "timeline",
+      "route": "deep",
+      "canonicals": [
+        "邓小平"
+      ],
+      "time": {
+        "start": 1954,
+        "end": 1954,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_fact_deng_school_1926": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "邓小平"
+      ],
+      "time": {
+        "start": 1926,
+        "end": 1926,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_congress_first": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "中共一大"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_congress_short_seven": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_alias_mao_runzhi": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_group_liudeng": {
+      "intent": "intersection",
+      "route": "deep",
+      "canonicals": [],
+      "time": {
+        "start": 1947,
+        "end": 1947,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_keyword_dump": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1945,
+        "end": 1949,
+        "precision": "period"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_comparison_meetings": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_multihop_zunyi": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_observation_snow": {
+      "intent": "observation",
+      "route": "deep",
+      "canonicals": [
+        "埃德加·斯诺"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_viewpoint_persistent": {
+      "intent": "viewpoint",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_timeline_zhou_1956": {
+      "intent": "timeline",
+      "route": "fast_fact",
+      "canonicals": [
+        "周恩来"
+      ],
+      "time": {
+        "start": 1956,
+        "end": 1956,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_intersection_maozhou": {
+      "intent": "intersection",
+      "route": "deep",
+      "canonicals": [
+        "周恩来",
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_intersection_negative": {
+      "intent": "intersection",
+      "route": "deep",
+      "canonicals": [
+        "周恩来",
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_source_deng_1973": {
+      "intent": "timeline",
+      "route": "deep",
+      "canonicals": [
+        "邓小平"
+      ],
+      "time": {
+        "start": 1973,
+        "end": 1973,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_month_place_deng_1949": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "邓小平"
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_refusal_2024": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [],
+      "time": {
+        "start": 2024,
+        "end": 2024,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_followup_zhou_1957": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [],
+      "time": {
+        "start": 1957,
+        "end": 1957,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_followup_deng_1953": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [],
+      "time": {
+        "start": 1953,
+        "end": 1953,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_alias_xiaoping": {
+      "intent": "timeline",
+      "route": "fast_fact",
+      "canonicals": [
+        "邓小平"
+      ],
+      "time": {
+        "start": 1975,
+        "end": 1975,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_dev_yenan_rectification": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_event_chongqing": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_place_taihang": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "邓小平"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_dev_document_persistent": {
+      "intent": "viewpoint",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_hold_multi3_mao_liu_zhou": {
+      "intent": "intersection",
+      "route": "deep",
+      "canonicals": [
+        "刘少奇",
+        "周恩来",
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_hold_keyword_dump_longmarch": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "林彪",
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1934,
+        "end": 1936,
+        "precision": "period"
+      },
+      "needs_clarification": false
+    },
+    "qu_hold_out_of_range_xinhai": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_hold_comparison_parties": {
+      "intent": "viewpoint",
+      "route": "deep",
+      "canonicals": [],
+      "time": null,
+      "needs_clarification": false
+    },
+    "qu_hold_negation": {
+      "intent": "general",
+      "route": "deep",
+      "canonicals": [
+        "毛泽东"
+      ],
+      "time": {
+        "start": 1949,
+        "end": 1949,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    },
+    "qu_hold_source_month": {
+      "intent": "timeline",
+      "route": "deep",
+      "canonicals": [
+        "周恩来"
+      ],
+      "time": {
+        "start": 1950,
+        "end": 1950,
+        "precision": "year"
+      },
+      "needs_clarification": false
+    }
+  }
+}

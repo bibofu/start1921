@@ -1,0 +1,22 @@
+{
+  "version": "query-understanding-seed-v1-20261030",
+  "cases": 30,
+  "rules": {
+    "intent_accuracy": 0.7333333333333333,
+    "intent_family_accuracy": 0.8333333333333334,
+    "route_accuracy": 0.7333333333333333,
+    "mention_f1": 0.5977011494252873,
+    "mention_recall": 0.43333333333333335,
+    "time_exact_accuracy": 0.9,
+    "clarification_f1": 0.0
+  },
+  "llm": {
+    "intent_accuracy": 0.4666666666666667,
+    "intent_family_accuracy": 0.9333333333333333,
+    "route_accuracy": 0.5666666666666667,
+    "mention_f1": 0.8947368421052632,
+    "mention_recall": 0.85,
+    "time_exact_accuracy": 0.85,
+    "clarification_f1": 0.0
+  }
+}
