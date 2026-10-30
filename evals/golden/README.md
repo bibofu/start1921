@@ -12,6 +12,7 @@
 | [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
 | [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
+| [POOL_REVIEW.md](POOL_REVIEW.md) | 18 个固定池的一页口径确认单 |
 | [label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md) | 63 条 LLM 标签复核记录（全部通过） |
 | [label_reviews/20261030_agent95_reviewed.md](label_reviews/20261030_agent95_reviewed.md) | 95 条 Agent 标签复核记录（84 通过、1 改判、10 删除） |
 | [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |

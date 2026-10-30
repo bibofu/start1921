@@ -14,6 +14,7 @@
 - 逐题原文与状态：[CASE_INVENTORY.md](CASE_INVENTORY.md)
 - LLM 标签复核记录：[label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md)（63 条全部通过）
 - Agent 标签复核记录：[label_reviews/20261030_agent95_reviewed.md](label_reviews/20261030_agent95_reviewed.md)（84 通过、1 改判、10 删除）
+- 固定池口径确认：[POOL_REVIEW.md](POOL_REVIEW.md)（18 个池）
 - 采集/复核/评分流程：[REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md)
 
 ## 本次删除与改写
