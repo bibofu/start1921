@@ -13,6 +13,7 @@
 - 当前数据集：[golden_dataset.json](golden_dataset.json)
 - 逐题原文与状态：[CASE_INVENTORY.md](CASE_INVENTORY.md)
 - LLM 标签复核记录：[label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md)（63 条全部通过）
+- Agent 标签复核：[AGENT_LABELS_CHECKLIST.md](AGENT_LABELS_CHECKLIST.md)（95 条，编号 A01–A95）
 - 采集/复核/评分流程：[REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md)
 
 ## 本次删除与改写

@@ -13,6 +13,7 @@
 | [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
 | [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
 | [label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md) | 63 条 LLM 标签复核记录（全部通过） |
+| [AGENT_LABELS_CHECKLIST.md](AGENT_LABELS_CHECKLIST.md) | 95 条 `agent_review` 逐条复核表（A01–A95） |
 | [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
 | [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
 
