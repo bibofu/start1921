@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
 from typing import Literal
 
 from history_agent.errors import RetrievalError
+from history_agent.processing.chunks import load_person_aliases
 from history_agent.retrieval.keyword import YEAR, has_explicit_year_range, search_keyword_index
 from history_agent.retrieval.models import (
     RetrievalPlan,
@@ -25,6 +28,10 @@ MIN_TEMPORAL_COVERAGE_YEARS = 5
 TEMPORAL_FOCUS_MARKERS = ("初期", "前期", "早期", "中期", "后期", "晚期", "末期")
 OBSERVATION_QUERY_MARKERS = ("怎样记述", "如何记述", "怎样描述", "如何描述")
 OBSERVATION_EXPANSION = "外貌 性格 生活 印象"
+OBSERVATION_TARGET = re.compile(
+    r"(?:怎样|如何)(?:描述|记述)(?:了)?(?P<target>[^？?。！!，,；;]{1,40})"
+)
+QUERY_ALIAS_FILE = "query_aliases.json"
 CAREER_QUERY_MARKERS = ("党内职务", "职务变化", "职务变动", "任职", "担任", "出任")
 CAREER_ROLE_MARKER = re.compile(
     r"(?:第一书记|副书记|书记|候补委员|常务委员|常委|委员|副主席|主席|"
@@ -147,15 +154,74 @@ def cpc_congress_ordinals(query: str) -> list[str]:
     return list(dict.fromkeys(ordinals))
 
 
-def expand_query(query: str) -> str:
-    """Add restrained search hints for source observations and named congresses."""
+def expand_congress(query: str) -> str:
+    """Normalize short congress names to their formal names."""
 
-    expansions: list[str] = []
-    if any(marker in query for marker in OBSERVATION_QUERY_MARKERS):
-        expansions.append(OBSERVATION_EXPANSION)
-    for ordinal in cpc_congress_ordinals(query):
-        expansions.append(f"中国共产党第{ordinal}次全国代表大会")
+    expansions = [
+        f"中国共产党第{ordinal}次全国代表大会"
+        for ordinal in cpc_congress_ordinals(query)
+    ]
     return f"{query} {' '.join(expansions)}" if expansions else query
+
+
+def _observation_target(query: str) -> str:
+    match = OBSERVATION_TARGET.search(query)
+    return match.group("target").strip() if match is not None else ""
+
+
+def expand_observation(query: str, person_names: list[str] | None = None) -> str:
+    """Add person-observation hints only when the described object is a person."""
+
+    if not any(marker in query for marker in OBSERVATION_QUERY_MARKERS):
+        return query
+    target = _observation_target(query)
+    if not target or not person_names:
+        return query
+    if not any(name and name in target for name in person_names):
+        return query
+    return f"{query} {OBSERVATION_EXPANSION}"
+
+
+def expand_query(query: str, person_names: list[str] | None = None) -> str:
+    """Apply congress normalization and, only for people, observation hints."""
+
+    return expand_observation(expand_congress(query), person_names)
+
+
+@lru_cache(maxsize=2)
+def _query_aliases(path: Path) -> tuple[tuple[str, str], ...]:
+    if not path.exists():
+        return ()
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    pairs: list[tuple[str, str]] = []
+    for entry in payload.get("entries", []):
+        canonical = str(entry.get("canonical", "")).strip()
+        if not canonical:
+            continue
+        for alias in entry.get("aliases", []):
+            alias = str(alias).strip()
+            if alias and alias != canonical:
+                pairs.append((alias, canonical))
+    return tuple(sorted(pairs, key=lambda item: -len(item[0])))
+
+
+def normalize_query(query: str, aliases_path: Path) -> str:
+    """Replace configured domain aliases without touching the raw query arm."""
+
+    normalized = query
+    for alias, canonical in _query_aliases(aliases_path.with_name(QUERY_ALIAS_FILE)):
+        normalized = normalized.replace(alias, canonical)
+    return normalized
+
+
+def _person_names(aliases_path: Path) -> list[str]:
+    if not aliases_path.exists():
+        return []
+    names: set[str] = set()
+    for canonical, aliases in load_person_aliases(aliases_path).items():
+        names.add(canonical)
+        names.update(aliases)
+    return sorted((name for name in names if name), key=len, reverse=True)
 
 
 def _career_relevant_hits(
@@ -563,7 +629,7 @@ def _search_one(
         candidate_k if candidate_k is not None
         else min(100, max(30, top_k * 4, congress_count * 12))
     )
-    search_query = expand_query(query)
+    search_query = query
     keyword_trace: list[RetrievalStageTrace] | None = [] if capture_trace else None
     vector_trace: list[RetrievalStageTrace] | None = [] if capture_trace else None
     keyword: SearchResponse | None = None
@@ -872,7 +938,21 @@ def search_hybrid_index(
         or not 1 <= candidate_k <= 100 or candidate_k < top_k
     ):
         raise RetrievalError("candidate_k must be an integer in 1..100 and >= top_k.")
-    queries = list(dict.fromkeys([query, *(additional_queries or [])]))
+    person_names = _person_names(aliases_path)
+    raw_query = expand_congress(query)
+    normalized = normalize_query(query, aliases_path)
+    variants = [raw_query]
+    if normalized != query:
+        normalized_query = expand_congress(normalized)
+        variants.append(normalized_query)
+        observed = expand_observation(normalized_query, person_names)
+        if observed != normalized_query:
+            variants.append(observed)
+    else:
+        observed = expand_observation(raw_query, person_names)
+        if observed != raw_query:
+            variants.append(observed)
+    queries = list(dict.fromkeys([*variants, *(additional_queries or [])]))
     responses = [
         _search_one(
             keyword_index_path=keyword_index_path,
@@ -896,8 +976,27 @@ def search_hybrid_index(
             if stage.stage == "final" else stage
             for response in responses for stage in response.trace or []
         ]
-    if plan is not None and len(responses) > 1:
-        return _fuse_query_variants(responses, query=query, top_k=top_k, plan=plan, trace=trace)
+    merge_internal = (
+        additional_queries is None
+        and len(variants) > 1
+        and len(responses) > 1
+    )
+    if len(responses) > 1 and (plan is not None or merge_internal):
+        effective_plan = plan
+        if effective_plan is None:
+            first = responses[0]
+            effective_plan = RetrievalPlan.model_validate(
+                {
+                    "query_intent": first.query_intent,
+                    "query_years": list(first.query_years),
+                    "query_year_range": list(first.query_year_range),
+                    "query_people": list(first.query_people),
+                    "coverage": "relevance",
+                }
+            )
+        return _fuse_query_variants(
+            responses, query=query, top_k=top_k, plan=effective_plan, trace=trace
+        )
     if trace is not None:
         started = _stage_start(trace)
         _record_stage(

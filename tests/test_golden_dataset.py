@@ -27,8 +27,8 @@ def _load() -> dict:
 def test_golden20_has_expected_counts_and_no_deleted_cases() -> None:
     dataset = PilotDataset.model_validate(_load())
     assert len(dataset.cases) == 20
-    assert sum(case.split == "development" for case in dataset.cases) == 15
-    assert sum(case.split == "holdout" for case in dataset.cases) == 5
+    assert sum(case.split == "development" for case in dataset.cases) == 16
+    assert sum(case.split == "holdout" for case in dataset.cases) == 4
     assert sum(case.answerability == "answerable" for case in dataset.cases) == 18
     assert sum(case.answerability == "unanswerable" for case in dataset.cases) == 2
     assert sum(len(case.facts) for case in dataset.cases) == 98

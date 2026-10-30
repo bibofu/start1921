@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "description": "Deterministic query-side aliases. Replacements are applied only to a separate retrieval arm; the raw question is always retrieved too.",
+  "entries": [
+    {
+      "canonical": "红军大学",
+      "aliases": ["红军学校", "红大"]
+    },
+    {
+      "canonical": "西行漫记",
+      "aliases": ["红星照耀中国"]
+    }
+  ]
+}

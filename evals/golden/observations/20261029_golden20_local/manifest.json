@@ -1,12 +1,12 @@
 {
-  "run_name": "golden20_r3_20261029",
-  "created_at": "2026-10-30T07:11:02.040001+00:00",
-  "capture_sha256": "dce19cd456c3967d7501f72c79a4703e06ec1df2942c2022d355546390f90839",
-  "dataset_sha256": "09fa20450c82430dc3d84b6c372f686dfb663c57e729b2621126a6e5c78de35f",
+  "run_name": "golden20_r5_20261030",
+  "created_at": "2026-10-30T07:49:14.365146+00:00",
+  "capture_sha256": "84e82397cb488a04629a0c8c3e5896bfe3090a99a9788cc6b0f2ca8771c2f98c",
+  "dataset_sha256": "c8d0cc4adfa4988426c94970f9f3bf267c113503e49564f1c66d20fd3a5da807",
   "corpus_sha256": "a9225af6a1996d1721f34963cea1bdfcd5409a4a2edef73f8fbfed347dee430d",
-  "source_sha256": "b85671ca3caf6c9e51e284d84bd7c52d5444fd53cb3d6c2f52e83eead7ff0f8e",
+  "source_sha256": "fc707968d31d6fd2e429bd7697ce2d60cf87b3cae78760e25e4e848beb337787",
   "git": {
-    "commit": "a8842c38681d5ea14f08f23762c2ae861569b07d",
+    "commit": "fc328082fc3a8b912fc35f84a6c473d2ac673989",
     "branch": "main",
     "dirty": true
   },
@@ -34,7 +34,7 @@
   "degraded_cases": {},
   "dataset": "evals/golden/golden_dataset.json",
   "local_artifacts": {
-    "capture": "data/reports/golden20_r3_20261029/capture.json",
-    "report": "data/reports/golden20_r3_20261029/report.json"
+    "capture": "data/reports/golden20_r5_20261030/capture.json",
+    "report": "data/reports/golden20_r5_20261030/report.json"
   }
 }

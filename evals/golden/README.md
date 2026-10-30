@@ -7,7 +7,8 @@
 | 文件 | 内容 |
 |---|---|
 | [golden_dataset.json](golden_dataset.json) | 20 题数据集（PilotCase schema） |
-| [RELEASE_v1.0.md](RELEASE_v1.0.md) | Golden v1.0 冻结记录（身份、基线、使用规则） |
+| [RELEASE_v1.1.md](RELEASE_v1.1.md) | Golden v1.1 冻结记录（当前版本） |
+| [RELEASE_v1.0.md](RELEASE_v1.0.md) | Golden v1.0 历史记录 |
 | [diagnostics/20261030_holdout_semantic_observation.md](diagnostics/20261030_holdout_semantic_observation.md) | 零召回诊断：意图扩展、512 截断、词面不匹配 |
 | [DATASET.md](DATASET.md) | 总量、题型覆盖、指标可计算性、缺口 |
 | [CASE_INVENTORY.md](CASE_INVENTORY.md) | 逐题原文、锚点、事实、拒答依据、状态 |
@@ -24,14 +25,14 @@
 
 | 项目 | 数值 |
 |---|---:|
-| 开发题 / 保留题 | 15 / 5 |
+| 开发题 / 保留题 | 16 / 4 |
 | 可答 / 拒答 | 18 / 2 |
 | 必要事实 / 证据组 | 98 / 104 |
 | 有候选标签的题 | 18（182 条，全部人工复核） |
 | 有固定池的题 | 18 |
 | 题目定义已批准 / 待审 | 20 / 0 |
 
-- 正式 Recall/Precision/MRR/nDCG 覆盖全部 18 道可答题（P 0.578、MRR 0.861、nDCG 0.644），Fact/Cit 仍为 0 题。
+- 正式 Recall/Precision/MRR/nDCG 覆盖全部 18 道可答题（P 0.589、MRR 0.917、nDCG 0.678），Fact/Cit 仍为 0 题。
 - 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 也覆盖 18 道，K≤5 稳定。
 - 全部 182 条候选标签均已人工复核；`agent_review` 与 `llm_judge` 均为 0。
 - 20 题定义全部已批准；保留集目前没有约束题和拒答题。

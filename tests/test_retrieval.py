@@ -1,3 +1,4 @@
+import json
 from threading import Barrier
 
 import pytest
@@ -9,6 +10,7 @@ from history_agent.retrieval.hybrid import (
     cpc_congress_ordinals,
     expand_query,
     fuse_search_responses,
+    normalize_query,
     search_hybrid_index,
 )
 from history_agent.retrieval.keyword import (
@@ -85,11 +87,33 @@ def test_query_routing_extracts_intent_and_period() -> None:
     ]
 
 
-def test_observation_query_expansion_is_restrained() -> None:
-    expanded = expand_query("斯诺在西行漫记中怎样记述毛泽东？")
+def test_observation_query_expansion_requires_a_person_object() -> None:
+    names = ["毛泽东", "埃德加·斯诺"]
+    expanded = expand_query("斯诺在西行漫记中怎样记述毛泽东？", names)
 
     assert expanded.endswith("外貌 性格 生活 印象")
-    assert expand_query("周恩来在1956年有哪些经历？") == "周恩来在1956年有哪些经历？"
+    institution = "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？"
+    assert expand_query(institution, names) == institution
+    assert expand_query("周恩来在1956年有哪些经历？", names) == "周恩来在1956年有哪些经历？"
+
+
+def test_query_aliases_are_normalized_from_config(work_path) -> None:
+    (work_path / "query_aliases.json").write_text(
+        json.dumps(
+            {
+                "entries": [
+                    {"canonical": "红军大学", "aliases": ["红军学校", "红大"]}
+                ]
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    aliases = work_path / "person_aliases.json"
+
+    assert normalize_query("红军学校怎样训练", aliases) == "红军大学怎样训练"
+    assert normalize_query("红大的课程", aliases) == "红军大学的课程"
+    assert normalize_query("无关问题", aliases) == "无关问题"
 
 
 def test_career_query_removes_person_mentions_without_a_role_change() -> None:

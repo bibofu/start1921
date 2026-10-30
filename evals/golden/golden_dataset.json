@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "version": "golden-v2.6-selected-20-20261030",
-  "description": "按用户2026-10-29/30裁定形成的工作集：20题、15开发+5保留、18可答+2拒答，20题定义与182条候选标签均已人工批准；固定池口径仍待批准。不替代历史版本。",
+  "version": "golden-v2.7-selected-20-20261030",
+  "description": "按用户2026-10-29/30裁定形成的工作集：20题、16开发+4保留、18可答+2拒答，20题定义与182条候选标签均已人工批准；holdout_semantic_observation 因参与诊断改归开发集。",
   "annotation_status": "cases_and_candidate_labels_human_approved_pools_pending",
   "evidence_group_semantics": {
     "facts_to_groups": "AND：一条事实列出的所有 evidence_group_ids 都必须命中。",
@@ -1875,7 +1875,7 @@
       "question": "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
       "category": "semantic_retrieval",
       "answerability": "answerable",
-      "split": "holdout",
+      "split": "development",
       "topic_group": "holdout_snow_red_army_schools",
       "human_review": {
         "status": "approved",
@@ -2038,7 +2038,8 @@
       "review_notes": [
         "这是开放语义题，允许同义改写和有据扩展；最低事实是四个分部/规模、第一分部训练、其他分部、课程。",
         "“学习安排”可包括文娱活动，但列为可选事实，不作为必要覆盖。",
-        "均为OCR页，需人工核对原页图像。"
+        "均为OCR页，需人工核对原页图像。",
+        "2026-10-30 该题被用于诊断查询扩展缺陷并据此修改检索代码，已不具备保留资格，改归开发集；观察类保留题待补。"
       ],
       "judgments": [
         {
