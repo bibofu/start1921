@@ -29,7 +29,7 @@
 | 有固定池的题 | 18 |
 | 题目定义已批准 / 待审 | 20 / 0 |
 
-- 正式 Recall@K 覆盖 18 道可答题；正式 Precision@5 与 MRR@5 覆盖 18 题（0.578 / 0.861），nDCG/Fact/Cit 仍为 0 题。
+- 正式 Recall/Precision/MRR/nDCG 覆盖全部 18 道可答题（P 0.578、MRR 0.861、nDCG 0.644），Fact/Cit 仍为 0 题。
 - 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 也覆盖 18 道，K≤5 稳定。
 - 全部 182 条候选标签均已人工复核；`agent_review` 与 `llm_judge` 均为 0。
 - 20 题定义全部已批准；保留集目前没有约束题和拒答题。

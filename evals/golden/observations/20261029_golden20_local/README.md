@@ -23,6 +23,7 @@
 | 固定池 nDCG@5 | 0.644（18 题） |
 | 正式 Recall@20 | 59.3%（18 道可答题；微平均 48/104 组） |
 | 正式 Precision@5 / MRR@5 | 0.578 / 0.861（各 18 题） |
+| 正式固定池 nDCG@5 | 0.644（18 题，池已人工批准） |
 | 生成模型调用 / Token | 0 / N/A |
 
 限制：
@@ -31,7 +32,7 @@
 - 18 道可答题都有固定池；182 条候选标签全部人工复核（178 通过、4 改判）；`agent_review` 与 `llm_judge` 均为 0。
 - **59.3% 的暂定 Recall 包含 182 条人工 `supported_groups` 匹配**；与上一版 63.1% 不可直接比较，因为两道交集题重写、固定池重建。
 - 部分题的池内没有 gold 锚点页（`holdout_semantic_observation`、`dev_intersection_mao_zhou_1949`、`holdout_intersection_negative`、`holdout_intersection_positive`）；LLM 只能标注返回的候选，池外召回缺失不会被标签补回。
-- 正式 Recall/Precision/MRR 均覆盖 18 题；nDCG 仍为 0 题，因为固定池口径还未批准。
+- 正式 Recall/Precision/MRR/nDCG 均覆盖 18 题；Fact/Cit 仍未复核。
 - 答案未复核，Fact/Cit/来源/时间/路由/拒答均不可评。
 - `index_attribution.attribution_safe=false`，原因仍是 Qdrant 服务集合没有独立可验证的 artifact manifest。
 - 旧的 29 题版本及其清单已在 2026-10-29 清理；当前唯一工作集是 `golden_dataset.json`（20 题）。

@@ -156,7 +156,7 @@ HTTP 接口与命令行共用业务实现：
 
 ## 评测与开发检查
 
-当前评测集为 **20 题**（15 开发 + 5 保留，18 可答 + 2 拒答）：98 个必要事实、104 个证据组；20 题定义均已人工批准；18 道可答题都有固定池，182 条候选标签全部人工复核（178 通过、4 改判）。正式 Recall 覆盖全部 18 道可答题，正式 Precision/MRR 覆盖全部 18 道可答题，nDCG/Fact/Cit 仍为 0 题。总索引、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，逐题原文与状态见 [CASE_INVENTORY.md](evals/golden/CASE_INVENTORY.md)，当前本地基线见 [Golden 20 题本地基线](evals/golden/observations/20261029_golden20_local/README.md)。
+当前评测集为 **20 题**（15 开发 + 5 保留，18 可答 + 2 拒答）：98 个必要事实、104 个证据组；20 题定义均已人工批准；18 道可答题都有固定池，182 条候选标签全部人工复核（178 通过、4 改判）。正式 Recall 覆盖全部 18 道可答题，正式 Recall/Precision/MRR/nDCG 均覆盖全部 18 道可答题，Fact/Cit 仍为 0 题。总索引、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，逐题原文与状态见 [CASE_INVENTORY.md](evals/golden/CASE_INVENTORY.md)，当前本地基线见 [Golden 20 题本地基线](evals/golden/observations/20261029_golden20_local/README.md)。
 
 2026-10-29 的 [v6 真实模型观察](evals/golden/observations/20261029_v6_live/README.md) 仅作历史对照：其 v6 标注/协议文件已清理，答案未人工复核，不代表当前 20 题的正式成绩。仍待完成：18 个固定池的口径批准、20 题答案复核。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。
 
