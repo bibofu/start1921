@@ -69,7 +69,7 @@
 
 ## 本次本地运行
 
-详见 [Golden 20 题本地基线](observations/20261029_golden20_local/README.md)（完整 capture/report 留在本地忽略目录 `data/reports/golden20_r5_20261030/`）：
+详见 [2026-10-30 当前重跑](observations/20261030_current_run/README.md)（逐题报告 [CASES.md](observations/20261030_current_run/CASES.md)；完整 capture/report 在本地 `data/reports/golden20_20261030_current/`）：
 
 | 指标 | 结果 |
 |---|---:|

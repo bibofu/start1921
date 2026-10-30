@@ -1,6 +1,6 @@
 # Golden 20 题评测流程
 
-当前数据集：[golden_dataset.json](golden_dataset.json)。它是单轮 PilotCase schema，15 开发 + 5 保留，18 可答 + 2 拒答。没有多臂执行协议；`dev_constraint_history_isolation` 在本数据集中只作为单轮问题。
+当前数据集：[golden_dataset.json](golden_dataset.json)。它是单轮 PilotCase schema，16 开发 + 4 保留，18 可答 + 2 拒答。没有多臂执行协议；`dev_constraint_history_isolation` 在本数据集中只作为单轮问题。
 
 ## 1. 采集
 
