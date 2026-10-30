@@ -1,6 +1,6 @@
 {
   "cases": 30,
-  "detection": {
+  "dictionary_detection": {
     "true_positive": 62,
     "predicted": 62,
     "expected": 63,
@@ -8,15 +8,26 @@
     "recall": 0.9841269841269841,
     "f1": 0.9919999999999999
   },
-  "anchoring": {
+  "with_llm_detection": {
     "true_positive": 62,
     "predicted": 62,
     "expected": 63,
     "precision": 1.0,
     "recall": 0.9841269841269841,
     "f1": 0.9919999999999999
+  },
+  "llm_statuses": {
+    "used": 5
+  },
+  "llm_calls": 5,
+  "llm_usage": {
+    "prompt_tokens": 17086,
+    "completion_tokens": 95,
+    "total_tokens": 17181
   },
   "unresolved_rate": 0.0,
+  "arms_total": 112,
+  "arms_valid": 112,
   "rows": [
     {
       "id": "qu_dev_fact_deng_1954",
@@ -28,19 +39,44 @@
         "国防委员会",
         "邓小平"
       ],
-      "detected": [
-        "国务院",
-        "国防委员会",
-        "邓小平"
-      ],
-      "anchored": [
-        "国务院",
-        "国防委员会",
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "国务院",
+          "国防委员会",
+          "邓小平"
+        ],
+        "anchored": [
+          "国务院",
+          "国防委员会",
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "1954年9月",
+          "分别担任什么职务"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "国务院",
+          "国防委员会",
+          "邓小平"
+        ],
+        "anchored": [
+          "国务院",
+          "国防委员会",
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -185,17 +221,39 @@
         "邓小平",
         "邓小平年谱"
       ],
-      "detected": [
-        "邓小平",
-        "邓小平年谱"
-      ],
-      "anchored": [
-        "邓小平",
-        "邓小平年谱"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "anchored": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "1926年在哪些学校学习"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "anchored": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -294,15 +352,41 @@
       "expected": [
         "中共一大"
       ],
-      "detected": [
-        "中共一大"
-      ],
-      "anchored": [
-        "中共一大"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "中共一大"
+        ],
+        "anchored": [
+          "中共一大"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "used",
+        "spans": [
+          "哪一"
+        ],
+        "raw_spans": [
+          "在哪一年召开"
+        ],
+        "candidates": [],
+        "usage": {
+          "prompt_tokens": 3412,
+          "completion_tokens": 6,
+          "total_tokens": 3418
+        },
+        "duration_ms": 1050.57,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "中共一大"
+        ],
+        "anchored": [
+          "中共一大"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -349,15 +433,41 @@
       "expected": [
         "中共七大"
       ],
-      "detected": [
-        "中共七大"
-      ],
-      "anchored": [
-        "中共七大"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "中共七大"
+        ],
+        "anchored": [
+          "中共七大"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "used",
+        "spans": [
+          "哪一"
+        ],
+        "raw_spans": [
+          "在哪一年召开"
+        ],
+        "candidates": [],
+        "usage": {
+          "prompt_tokens": 3411,
+          "completion_tokens": 6,
+          "total_tokens": 3417
+        },
+        "duration_ms": 1129.09,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "中共七大"
+        ],
+        "anchored": [
+          "中共七大"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -411,15 +521,35 @@
       "expected": [
         "毛泽东"
       ],
-      "detected": [
-        "毛泽东"
-      ],
-      "anchored": [
-        "毛泽东"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "毛泽东"
+        ],
+        "anchored": [
+          "毛泽东"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1949年出席了哪些会议"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "毛泽东"
+        ],
+        "anchored": [
+          "毛泽东"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -474,17 +604,39 @@
         "刘伯承",
         "邓小平"
       ],
-      "detected": [
-        "刘伯承",
-        "邓小平"
-      ],
-      "anchored": [
-        "刘伯承",
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "刘伯承",
+          "邓小平"
+        ],
+        "anchored": [
+          "刘伯承",
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1947年共同指挥了哪些战役"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "刘伯承",
+          "邓小平"
+        ],
+        "anchored": [
+          "刘伯承",
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -558,23 +710,49 @@
         "解放战争",
         "邓小平"
       ],
-      "detected": [
-        "中共七大",
-        "刘伯承",
-        "毛泽东",
-        "解放战争",
-        "邓小平"
-      ],
-      "anchored": [
-        "中共七大",
-        "刘伯承",
-        "毛泽东",
-        "解放战争",
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "中共七大",
+          "刘伯承",
+          "毛泽东",
+          "解放战争",
+          "邓小平"
+        ],
+        "anchored": [
+          "中共七大",
+          "刘伯承",
+          "毛泽东",
+          "解放战争",
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "中共七大",
+          "刘伯承",
+          "毛泽东",
+          "解放战争",
+          "邓小平"
+        ],
+        "anchored": [
+          "中共七大",
+          "刘伯承",
+          "毛泽东",
+          "解放战争",
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -716,17 +894,46 @@
         "庐山会议",
         "遵义会议"
       ],
-      "detected": [
-        "庐山会议",
-        "遵义会议"
-      ],
-      "anchored": [
-        "庐山会议",
-        "遵义会议"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "庐山会议",
+          "遵义会议"
+        ],
+        "anchored": [
+          "庐山会议",
+          "遵义会议"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "used",
+        "spans": [
+          "会议进程"
+        ],
+        "raw_spans": [
+          "各自讨论的核心问题",
+          "会议进程和后续影响"
+        ],
+        "candidates": [],
+        "usage": {
+          "prompt_tokens": 3423,
+          "completion_tokens": 45,
+          "total_tokens": 3468
+        },
+        "duration_ms": 981.39,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "庐山会议",
+          "遵义会议"
+        ],
+        "anchored": [
+          "庐山会议",
+          "遵义会议"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -846,19 +1053,45 @@
         "毛泽东",
         "遵义会议"
       ],
-      "detected": [
-        "抗日战争",
-        "毛泽东",
-        "遵义会议"
-      ],
-      "anchored": [
-        "抗日战争",
-        "毛泽东",
-        "遵义会议"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "抗日战争",
+          "毛泽东",
+          "遵义会议"
+        ],
+        "anchored": [
+          "抗日战争",
+          "毛泽东",
+          "遵义会议"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "后如何取得军事领导权",
+          "又怎样",
+          "巩固"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "抗日战争",
+          "毛泽东",
+          "遵义会议"
+        ],
+        "anchored": [
+          "抗日战争",
+          "毛泽东",
+          "遵义会议"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1004,19 +1237,50 @@
         "红军大学",
         "西行漫记"
       ],
-      "detected": [
-        "埃德加·斯诺",
-        "红军大学",
-        "西行漫记"
-      ],
-      "anchored": [
-        "埃德加·斯诺",
-        "红军大学",
-        "西行漫记"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "埃德加·斯诺",
+          "红军大学",
+          "西行漫记"
+        ],
+        "anchored": [
+          "埃德加·斯诺",
+          "红军大学",
+          "西行漫记"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "used",
+        "spans": [
+          "学习"
+        ],
+        "raw_spans": [
+          "中怎样描",
+          "的学习和训练安排"
+        ],
+        "candidates": [],
+        "usage": {
+          "prompt_tokens": 3424,
+          "completion_tokens": 6,
+          "total_tokens": 3430
+        },
+        "duration_ms": 937.06,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "埃德加·斯诺",
+          "红军大学",
+          "西行漫记"
+        ],
+        "anchored": [
+          "埃德加·斯诺",
+          "红军大学",
+          "西行漫记"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1143,19 +1407,44 @@
         "毛泽东",
         "论持久战"
       ],
-      "detected": [
-        "抗日战争",
-        "毛泽东",
-        "论持久战"
-      ],
-      "anchored": [
-        "抗日战争",
-        "毛泽东",
-        "论持久战"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "抗日战争",
+          "毛泽东",
+          "论持久战"
+        ],
+        "anchored": [
+          "抗日战争",
+          "毛泽东",
+          "论持久战"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "中提出了哪些",
+          "策略"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "抗日战争",
+          "毛泽东",
+          "论持久战"
+        ],
+        "anchored": [
+          "抗日战争",
+          "毛泽东",
+          "论持久战"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1261,15 +1550,35 @@
       "expected": [
         "周恩来"
       ],
-      "detected": [
-        "周恩来"
-      ],
-      "anchored": [
-        "周恩来"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "周恩来"
+        ],
+        "anchored": [
+          "周恩来"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1956年有哪些主要经历"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "周恩来"
+        ],
+        "anchored": [
+          "周恩来"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1317,17 +1626,39 @@
         "周恩来",
         "毛泽东"
       ],
-      "detected": [
-        "周恩来",
-        "毛泽东"
-      ],
-      "anchored": [
-        "周恩来",
-        "毛泽东"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "周恩来",
+          "毛泽东"
+        ],
+        "anchored": [
+          "周恩来",
+          "毛泽东"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1949年共同出席了哪些会议"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "周恩来",
+          "毛泽东"
+        ],
+        "anchored": [
+          "周恩来",
+          "毛泽东"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1428,19 +1759,43 @@
         "周恩来",
         "毛泽东"
       ],
-      "detected": [
-        "中国人民政治协商会议",
-        "周恩来",
-        "毛泽东"
-      ],
-      "anchored": [
-        "中国人民政治协商会议",
-        "周恩来",
-        "毛泽东"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "中国人民政治协商会议",
+          "周恩来",
+          "毛泽东"
+        ],
+        "anchored": [
+          "中国人民政治协商会议",
+          "周恩来",
+          "毛泽东"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1949年10月9日是否共同当选"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "中国人民政治协商会议",
+          "周恩来",
+          "毛泽东"
+        ],
+        "anchored": [
+          "中国人民政治协商会议",
+          "周恩来",
+          "毛泽东"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1585,17 +1940,44 @@
         "邓小平",
         "邓小平年谱"
       ],
-      "detected": [
-        "邓小平",
-        "邓小平年谱"
-      ],
-      "anchored": [
-        "邓小平",
-        "邓小平年谱"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "anchored": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "只依据",
+          "1904",
+          "1974",
+          "下卷",
+          "1973年3",
+          "恢复了什么职务"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "anchored": [
+          "邓小平",
+          "邓小平年谱"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1694,15 +2076,36 @@
       "expected": [
         "邓小平"
       ],
-      "detected": [
-        "邓小平"
-      ],
-      "anchored": [
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "邓小平"
+        ],
+        "anchored": [
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "1949年4月",
+          "在哪些地方参加了哪些会议"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "邓小平"
+        ],
+        "anchored": [
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1749,15 +2152,31 @@
       "expected": [
         "习近平"
       ],
-      "detected": [],
-      "anchored": [],
-      "missing_detection": [
-        "习近平"
-      ],
-      "missing_anchor": [
-        "习近平"
-      ],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [],
+        "anchored": [],
+        "missing": [
+          "习近平"
+        ]
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "习近平在2024年考察了哪些地方"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [],
+        "anchored": [],
+        "missing": [
+          "习近平"
+        ]
+      },
       "unresolved_mentions": [],
       "mentions": [],
       "arms": [
@@ -1779,15 +2198,35 @@
       "expected": [
         "周恩来"
       ],
-      "detected": [
-        "周恩来"
-      ],
-      "anchored": [
-        "周恩来"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "周恩来"
+        ],
+        "anchored": [
+          "周恩来"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1957年呢"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "周恩来"
+        ],
+        "anchored": [
+          "周恩来"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1862,15 +2301,35 @@
       "expected": [
         "邓小平"
       ],
-      "detected": [
-        "邓小平"
-      ],
-      "anchored": [
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "邓小平"
+        ],
+        "anchored": [
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "1953年呢"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "邓小平"
+        ],
+        "anchored": [
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1917,15 +2376,35 @@
       "expected": [
         "邓小平"
       ],
-      "detected": [
-        "邓小平"
-      ],
-      "anchored": [
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "邓小平"
+        ],
+        "anchored": [
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1975年做了什么"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "邓小平"
+        ],
+        "anchored": [
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -1980,17 +2459,39 @@
         "延安整风",
         "毛泽东"
       ],
-      "detected": [
-        "延安整风",
-        "毛泽东"
-      ],
-      "anchored": [
-        "延安整风",
-        "毛泽东"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "延安整风",
+          "毛泽东"
+        ],
+        "anchored": [
+          "延安整风",
+          "毛泽东"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "期间主要做了什么"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "延安整风",
+          "毛泽东"
+        ],
+        "anchored": [
+          "延安整风",
+          "毛泽东"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2091,19 +2592,44 @@
         "毛泽东",
         "重庆谈判"
       ],
-      "detected": [
-        "抗日战争",
-        "毛泽东",
-        "重庆谈判"
-      ],
-      "anchored": [
-        "抗日战争",
-        "毛泽东",
-        "重庆谈判"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "抗日战争",
+          "毛泽东",
+          "重庆谈判"
+        ],
+        "anchored": [
+          "抗日战争",
+          "毛泽东",
+          "重庆谈判"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "胜利",
+          "达成了什么结果"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "抗日战争",
+          "毛泽东",
+          "重庆谈判"
+        ],
+        "anchored": [
+          "抗日战争",
+          "毛泽东",
+          "重庆谈判"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2248,17 +2774,39 @@
         "太行山",
         "邓小平"
       ],
-      "detected": [
-        "太行山",
-        "邓小平"
-      ],
-      "anchored": [
-        "太行山",
-        "邓小平"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "太行山",
+          "邓小平"
+        ],
+        "anchored": [
+          "太行山",
+          "邓小平"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "期间担任过哪些职务"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "太行山",
+          "邓小平"
+        ],
+        "anchored": [
+          "太行山",
+          "邓小平"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2358,17 +2906,39 @@
         "毛泽东选集",
         "论持久战"
       ],
-      "detected": [
-        "毛泽东选集",
-        "论持久战"
-      ],
-      "anchored": [
-        "毛泽东选集",
-        "论持久战"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "毛泽东选集",
+          "论持久战"
+        ],
+        "anchored": [
+          "毛泽东选集",
+          "论持久战"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "的核心观点是什么"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "毛泽东选集",
+          "论持久战"
+        ],
+        "anchored": [
+          "毛泽东选集",
+          "论持久战"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2450,19 +3020,43 @@
         "周恩来",
         "毛泽东"
       ],
-      "detected": [
-        "刘少奇",
-        "周恩来",
-        "毛泽东"
-      ],
-      "anchored": [
-        "刘少奇",
-        "周恩来",
-        "毛泽东"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "刘少奇",
+          "周恩来",
+          "毛泽东"
+        ],
+        "anchored": [
+          "刘少奇",
+          "周恩来",
+          "毛泽东"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1949年共同出席了哪些会议"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "刘少奇",
+          "周恩来",
+          "毛泽东"
+        ],
+        "anchored": [
+          "刘少奇",
+          "周恩来",
+          "毛泽东"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2562,21 +3156,45 @@
         "遵义会议",
         "长征"
       ],
-      "detected": [
-        "林彪",
-        "毛泽东",
-        "遵义会议",
-        "长征"
-      ],
-      "anchored": [
-        "林彪",
-        "毛泽东",
-        "遵义会议",
-        "长征"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "林彪",
+          "毛泽东",
+          "遵义会议",
+          "长征"
+        ],
+        "anchored": [
+          "林彪",
+          "毛泽东",
+          "遵义会议",
+          "长征"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "林彪",
+          "毛泽东",
+          "遵义会议",
+          "长征"
+        ],
+        "anchored": [
+          "林彪",
+          "毛泽东",
+          "遵义会议",
+          "长征"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2698,15 +3316,35 @@
       "expected": [
         "辛亥革命"
       ],
-      "detected": [
-        "辛亥革命"
-      ],
-      "anchored": [
-        "辛亥革命"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "辛亥革命"
+        ],
+        "anchored": [
+          "辛亥革命"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "的主要领导人是谁"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "辛亥革命"
+        ],
+        "anchored": [
+          "辛亥革命"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2755,19 +3393,56 @@
         "中国国民党",
         "抗日战争"
       ],
-      "detected": [
-        "中国共产党",
-        "中国国民党",
-        "抗日战争"
-      ],
-      "anchored": [
-        "中国共产党",
-        "中国国民党",
-        "抗日战争"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "中国共产党",
+          "中国国民党",
+          "抗日战争"
+        ],
+        "anchored": [
+          "中国共产党",
+          "中国国民党",
+          "抗日战争"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "used",
+        "spans": [
+          "两党"
+        ],
+        "raw_spans": [
+          "两党的军事策略"
+        ],
+        "candidates": [
+          {
+            "mention_text": "两党",
+            "entity_id": "group:10",
+            "canonical": "国共",
+            "confidence": 0.9
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 3416,
+          "completion_tokens": 32,
+          "total_tokens": 3448
+        },
+        "duration_ms": 1429.63,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "中国共产党",
+          "中国国民党",
+          "抗日战争"
+        ],
+        "anchored": [
+          "中国共产党",
+          "中国国民党",
+          "抗日战争"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2882,15 +3557,35 @@
       "expected": [
         "毛泽东"
       ],
-      "detected": [
-        "毛泽东"
-      ],
-      "anchored": [
-        "毛泽东"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "毛泽东"
+        ],
+        "anchored": [
+          "毛泽东"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "在1949年没有参加哪些会议"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "毛泽东"
+        ],
+        "anchored": [
+          "毛泽东"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {
@@ -2939,19 +3634,45 @@
         "周恩来年谱",
         "莫斯科"
       ],
-      "detected": [
-        "周恩来",
-        "周恩来年谱",
-        "莫斯科"
-      ],
-      "anchored": [
-        "周恩来",
-        "周恩来年谱",
-        "莫斯科"
-      ],
-      "missing_detection": [],
-      "missing_anchor": [],
-      "extra_anchor": [],
+      "dictionary": {
+        "detected": [
+          "周恩来",
+          "周恩来年谱",
+          "莫斯科"
+        ],
+        "anchored": [
+          "周恩来",
+          "周恩来年谱",
+          "莫斯科"
+        ],
+        "missing": []
+      },
+      "llm": {
+        "status": "skipped",
+        "spans": [],
+        "raw_spans": [
+          "只依据",
+          "1950年1",
+          "做了什么"
+        ],
+        "candidates": [],
+        "usage": null,
+        "duration_ms": null,
+        "error_code": null
+      },
+      "with_llm": {
+        "detected": [
+          "周恩来",
+          "周恩来年谱",
+          "莫斯科"
+        ],
+        "anchored": [
+          "周恩来",
+          "周恩来年谱",
+          "莫斯科"
+        ],
+        "missing": []
+      },
       "unresolved_mentions": [],
       "mentions": [
         {

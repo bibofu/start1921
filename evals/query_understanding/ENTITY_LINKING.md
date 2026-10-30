@@ -55,11 +55,15 @@
 | 查询臂总数 | 112 |
 | 查询臂校验通过率 | 100.0% |
 
-逐题结果在 [entity_linking/report.md](entity_linking/report.md)。查询臂 A/B 结论见 [QUERY_ARMS_AB.md](QUERY_ARMS_AB.md)：目前不接入生产。LLM 候选生成见 [LLM_CANDIDATES.md](LLM_CANDIDATES.md)。
+逐题结果在 [entity_linking/report.md](entity_linking/report.md)。
+
+LLM 候选已接入 shadow 主流程：只在“未覆盖且形似实体别名”的片段上调用，30 条用例触发 5 次，共 17,181 tokens；当前这 30 条没有新增命中（唯一漏检 `习近平` 不在索引内），所以指标不变。变体/错字用例上的收益见 [LLM_CANDIDATES.md](LLM_CANDIDATES.md)（F1 66.7% → 93.3%）。
+
+查询臂 A/B 结论见 [QUERY_ARMS_AB.md](QUERY_ARMS_AB.md)：目前不接入生产。LLM 候选生成见 [LLM_CANDIDATES.md](LLM_CANDIDATES.md)。
 
 ## 剩余缺口
 
-1. **索引外人物**：`习近平` 不在索引中，检测为空；这符合“不锚定索引外实体”的原则。LLM 候选生成尚未接入。
+1. **索引外人物**：`习近平` 不在索引中，LLM 也 abstain；这符合“不锚定索引外实体”的原则。
 2. **回指是启发式**：只处理代词和“年份+呢”的短追问，复杂省略式追问仍可能漏。
 3. **模糊匹配阈值未调优**：0.82/长度差 2 是在 30 条种子上选的经验值，需更大样本验证误报。
 4. **事件/地点/组织没有文档引用**：索引里 documents 为空，不能用于过滤或共现加权，只能用于 mention 识别。
@@ -68,7 +72,6 @@
 
 ## 下一步（P2 剩余）
 
-1. LLM 候选生成：对未命中 span 让模型只在实体索引内提名，再由模糊匹配校验；
-2. 查询臂接入检索：raw/canonical/per-entity 三路 RRF，开关控制，只在开发题做 A/B；
-3. 用更大样本验证模糊阈值和回指规则；
-4. 在 shadow 日志中记录每次 mention、候选、锚定分数，积累误判样本。
+1. 查询臂接入检索：raw/canonical/per-entity 三路 RRF，开关控制；A/B 已显示当前不接入；
+2. 用更大样本验证模糊阈值、回指规则和 LLM 调用触发条件；
+3. 把 LLM 调用和候选写入常规 shadow 日志，积累误判样本。
