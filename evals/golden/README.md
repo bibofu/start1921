@@ -8,6 +8,7 @@
 |---|---|
 | [golden_dataset.json](golden_dataset.json) | 20 题数据集（PilotCase schema） |
 | [RELEASE_v1.0.md](RELEASE_v1.0.md) | Golden v1.0 冻结记录（身份、基线、使用规则） |
+| [diagnostics/20261030_holdout_semantic_observation.md](diagnostics/20261030_holdout_semantic_observation.md) | 零召回诊断：意图扩展、512 截断、词面不匹配 |
 | [DATASET.md](DATASET.md) | 总量、题型覆盖、指标可计算性、缺口 |
 | [CASE_INVENTORY.md](CASE_INVENTORY.md) | 逐题原文、锚点、事实、拒答依据、状态 |
 | [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
