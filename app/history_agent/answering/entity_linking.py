@@ -179,6 +179,25 @@ def detect_mentions(
     return mentions
 
 
+def uncovered_spans(query: str, mentions: list[DetectedMention]) -> list[str]:
+    """Return CJK/alnum runs not covered by a detected mention."""
+
+    covered = [(mention.start, mention.end) for mention in mentions]
+    spans: list[str] = []
+    for match in re.finditer(r"[一-鿿A-Za-z0-9]{2,30}", query):
+        start, end = match.span()
+        cursor = start
+        for left, right in sorted(covered):
+            if right <= cursor or left >= end:
+                continue
+            if left > cursor:
+                spans.append(query[cursor:left])
+            cursor = max(cursor, right)
+        if cursor < end:
+            spans.append(query[cursor:end])
+    return [span for span in dict.fromkeys(spans) if len(span) >= 2][:8]
+
+
 PRONOUNS = ("他", "她", "它", "其", "该人", "此人", "该同志")
 
 

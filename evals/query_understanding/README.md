@@ -10,6 +10,7 @@
 - [BASELINE.md](BASELINE.md)：两套基线对比与问题清单
 - [ENTITY_LINKING.md](ENTITY_LINKING.md)：实体索引 v1 与 shadow 结果
 - [QUERY_ARMS_AB.md](QUERY_ARMS_AB.md)：查询臂在开发题上的 A/B 结论
+- [LLM_CANDIDATES.md](LLM_CANDIDATES.md)：LLM 实体候选生成 shadow 结果
 
 ## 标注字段
 

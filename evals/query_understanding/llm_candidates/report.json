@@ -1,0 +1,228 @@
+{
+  "version": "entity-candidate-shadow-v1-20261030",
+  "statuses": {
+    "used": 8
+  },
+  "dictionary": {
+    "true_positive": 8,
+    "predicted": 9,
+    "expected": 15,
+    "precision": 0.8888888888888888,
+    "recall": 0.5333333333333333,
+    "f1": 0.6666666666666667
+  },
+  "with_llm": {
+    "true_positive": 14,
+    "predicted": 15,
+    "expected": 15,
+    "precision": 0.9333333333333333,
+    "recall": 0.9333333333333333,
+    "f1": 0.9333333333333333
+  },
+  "rows": [
+    {
+      "id": "cand_mao_typo",
+      "question": "毛润芝在1949年出席了哪些会议？",
+      "expected": [
+        "毛泽东"
+      ],
+      "dictionary": [],
+      "llm_status": "used",
+      "llm_candidates": [
+        {
+          "mention_text": "毛润芝",
+          "entity_id": "person:mao_zedong",
+          "canonical": "毛泽东",
+          "confidence": 1.0
+        }
+      ],
+      "with_llm": [
+        "毛泽东"
+      ],
+      "missing_dictionary": [
+        "毛泽东"
+      ],
+      "missing_with_llm": []
+    },
+    {
+      "id": "cand_liu_typo",
+      "question": "刘伯成和邓小平在1947年共同指挥了哪些战役？",
+      "expected": [
+        "刘伯承",
+        "邓小平"
+      ],
+      "dictionary": [
+        "邓小平"
+      ],
+      "llm_status": "used",
+      "llm_candidates": [
+        {
+          "mention_text": "刘伯成",
+          "entity_id": "person:liu_bocheng",
+          "canonical": "刘伯承",
+          "confidence": 0.9
+        }
+      ],
+      "with_llm": [
+        "刘伯承",
+        "邓小平"
+      ],
+      "missing_dictionary": [
+        "刘伯承"
+      ],
+      "missing_with_llm": []
+    },
+    {
+      "id": "cand_zhou_traditional",
+      "question": "周恩來在重慶参加了哪些谈判？",
+      "expected": [
+        "周恩来",
+        "重庆"
+      ],
+      "dictionary": [],
+      "llm_status": "used",
+      "llm_candidates": [
+        {
+          "mention_text": "周恩來",
+          "entity_id": "person:zhou_enlai",
+          "canonical": "周恩来",
+          "confidence": 1.0
+        },
+        {
+          "mention_text": "重慶",
+          "entity_id": "place:chongqing",
+          "canonical": "重庆",
+          "confidence": 1.0
+        }
+      ],
+      "with_llm": [
+        "周恩来",
+        "重庆"
+      ],
+      "missing_dictionary": [
+        "周恩来",
+        "重庆"
+      ],
+      "missing_with_llm": []
+    },
+    {
+      "id": "cand_zhu_typo",
+      "question": "朱徳在1949年担任了什么职务？",
+      "expected": [
+        "朱德"
+      ],
+      "dictionary": [],
+      "llm_status": "used",
+      "llm_candidates": [
+        {
+          "mention_text": "朱徳",
+          "entity_id": "person:zhu_de",
+          "canonical": "朱德",
+          "confidence": 1.0
+        }
+      ],
+      "with_llm": [
+        "朱德"
+      ],
+      "missing_dictionary": [
+        "朱德"
+      ],
+      "missing_with_llm": []
+    },
+    {
+      "id": "cand_peng_typo",
+      "question": "彭徳怀在1959年庐山会议上做了什么？",
+      "expected": [
+        "庐山会议",
+        "彭德怀"
+      ],
+      "dictionary": [
+        "庐山会议"
+      ],
+      "llm_status": "used",
+      "llm_candidates": [
+        {
+          "mention_text": "彭徳怀",
+          "entity_id": "person:peng_dehuai",
+          "canonical": "彭德怀",
+          "confidence": 1.0
+        }
+      ],
+      "with_llm": [
+        "庐山会议",
+        "彭德怀"
+      ],
+      "missing_dictionary": [
+        "彭德怀"
+      ],
+      "missing_with_llm": []
+    },
+    {
+      "id": "cand_yanan_variant",
+      "question": "毛泽东在延安整風期间做了什么？",
+      "expected": [
+        "延安整风",
+        "毛泽东"
+      ],
+      "dictionary": [
+        "延安",
+        "毛泽东"
+      ],
+      "llm_status": "used",
+      "llm_candidates": [],
+      "with_llm": [
+        "延安",
+        "毛泽东"
+      ],
+      "missing_dictionary": [
+        "延安整风"
+      ],
+      "missing_with_llm": [
+        "延安整风"
+      ]
+    },
+    {
+      "id": "cand_control_taihang",
+      "question": "邓小平在太行山时期担任什么职务？",
+      "expected": [
+        "太行山",
+        "邓小平"
+      ],
+      "dictionary": [
+        "太行山",
+        "邓小平"
+      ],
+      "llm_status": "used",
+      "llm_candidates": [],
+      "with_llm": [
+        "太行山",
+        "邓小平"
+      ],
+      "missing_dictionary": [],
+      "missing_with_llm": []
+    },
+    {
+      "id": "cand_control_snow",
+      "question": "斯诺在《西行漫记》中怎样描述红军大学？",
+      "expected": [
+        "埃德加·斯诺",
+        "红军大学",
+        "西行漫记"
+      ],
+      "dictionary": [
+        "埃德加·斯诺",
+        "红军大学",
+        "西行漫记"
+      ],
+      "llm_status": "used",
+      "llm_candidates": [],
+      "with_llm": [
+        "埃德加·斯诺",
+        "红军大学",
+        "西行漫记"
+      ],
+      "missing_dictionary": [],
+      "missing_with_llm": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "version": "entity-candidate-shadow-v1-20261030",
+  "description": "Typo and variant queries for LLM candidate generation. agent_prepared, not human approved.",
+  "cases": [
+    {"id": "cand_mao_typo", "question": "毛润芝在1949年出席了哪些会议？", "expected": ["毛泽东"]},
+    {"id": "cand_liu_typo", "question": "刘伯成和邓小平在1947年共同指挥了哪些战役？", "expected": ["刘伯承", "邓小平"]},
+    {"id": "cand_zhou_traditional", "question": "周恩來在重慶参加了哪些谈判？", "expected": ["周恩来", "重庆"]},
+    {"id": "cand_zhu_typo", "question": "朱徳在1949年担任了什么职务？", "expected": ["朱德"]},
+    {"id": "cand_peng_typo", "question": "彭徳怀在1959年庐山会议上做了什么？", "expected": ["彭德怀", "庐山会议"]},
+    {"id": "cand_yanan_variant", "question": "毛泽东在延安整風期间做了什么？", "expected": ["毛泽东", "延安整风"]},
+    {"id": "cand_control_taihang", "question": "邓小平在太行山时期担任什么职务？", "expected": ["邓小平", "太行山"]},
+    {"id": "cand_control_snow", "question": "斯诺在《西行漫记》中怎样描述红军大学？", "expected": ["埃德加·斯诺", "西行漫记", "红军大学"]}
+  ]
+}
