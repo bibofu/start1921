@@ -1,4 +1,4 @@
-# 当前评测集索引（20 题，2026-10-30）
+# 当前评测集索引（20 题，2026-10-30，Golden v1.0）
 
 按用户 2026-10-29 裁定，从 29 题中删除 9 题并两次改写交集题后，当前工作集为 **20 题**。旧 v3–v6 标注、协议、29 题集、旧复核队列和旧观测已清理；本文件是当前唯一数据集索引。
 
@@ -11,6 +11,7 @@
 | **合计** | **20** | **18 / 2** | **98** | **104** | **20 / 20** |
 
 - 当前数据集：[golden_dataset.json](golden_dataset.json)
+- 冻结记录：[RELEASE_v1.0.md](RELEASE_v1.0.md)
 - 逐题原文与状态：[CASE_INVENTORY.md](CASE_INVENTORY.md)
 - LLM 标签复核记录：[label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md)（63 条全部通过）
 - Agent 标签复核记录：[label_reviews/20261030_agent95_reviewed.md](label_reviews/20261030_agent95_reviewed.md)（84 通过、1 改判、10 删除）
