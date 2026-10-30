@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "version": "golden-v2.4-selected-20-20261029",
-  "description": "按用户2026-10-29裁定，从v6开发集与holdout v1中删除9题，并两次改写交集题后的20题工作集：15开发+5保留，18可答+2拒答；20题定义均已人工批准。不替代历史版本。",
-  "annotation_status": "human_review_complete_20_of_20_approved",
+  "version": "golden-v2.5-selected-20-20261030",
+  "description": "按用户2026-10-29/30裁定形成的工作集：20题、15开发+5保留、18可答+2拒答，20题定义均已人工批准；候选标签97条人工复核、95条仍为agent_review。不替代历史版本。",
+  "annotation_status": "case_definitions_approved_labels_97_human_95_agent",
   "evidence_group_semantics": {
     "facts_to_groups": "AND：一条事实列出的所有 evidence_group_ids 都必须命中。",
     "group_alternatives": "OR：同一 evidence group 内任一 alternative 命中即可，一个组只计一次。",
@@ -593,10 +593,10 @@
         {
           "unit_id": "f84ee4c70b388304a02ea0b929b21dacfbe873a3f62fab36592c5063ce1c9d2c",
           "relevance": 1,
-          "reason": "提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务，仅背景相关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务，仅背景相关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -613,19 +613,19 @@
         {
           "unit_id": "d84a62939db0ead1c6905d13edde9f69c7491f1e8914d7a6a6846680353155d7",
           "relevance": 0,
-          "reason": "内容为1943年整风讲话，与遵义会议选举无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1943年整风讲话，与遵义会议选举无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "d5e4aa5a2baac4a7e3079a7fb4d2628cded05f19ae14b8b2914b3825166f77f3",
           "relevance": 0,
-          "reason": "内容涉及苏联政治和四清运动，与遵义会议无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及苏联政治和四清运动，与遵义会议无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -642,55 +642,55 @@
         {
           "unit_id": "02b7b7dafcbae14bbc8f6835e4c9234a33fdfc6ef21ced1efaf1347a5876e998",
           "relevance": 0,
-          "reason": "内容为井冈山时期特委选举，与遵义会议无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为井冈山时期特委选举，与遵义会议无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "f75f5ffcc948419ba8d444b89200431a6878e5fe32a85525f1c547773cae5770",
           "relevance": 1,
-          "reason": "提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "提到遵义会议及张闻天会后分工，但未明确毛泽东当选职务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "aa0e7b86cadbeb7ca144c480b89ef45e0912b7d534c45242c3dc10b2362d37e5",
           "relevance": 0,
-          "reason": "仅评价遵义会议意义，未提及选举职务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "仅评价遵义会议意义，未提及选举职务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b41e283c43618dcd3bb82809c914b393677989cb7f40a3f5bc6d1d62904ca46d",
           "relevance": 1,
-          "reason": "提到王稼祥在遵义会议后被增选为政治局委员，但未提及毛泽东职务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "提到王稼祥在遵义会议后被增选为政治局委员，但未提及毛泽东职务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "d0c43c829ed121cc76552c41f0f764f81bc603e299472600404f848ef25fb7e9",
           "relevance": 0,
-          "reason": "内容为秋收起义后处分及王明路线背景，与遵义会议选举无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为秋收起义后处分及王明路线背景，与遵义会议选举无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5c40d3509a82b05212fa101e43d5c2c797101986bf972d2f4e8c1fdd98db92ca",
           "relevance": 0,
-          "reason": "内容为1954年宪法及国家主席选举，与遵义会议无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:07.761355+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1954年宪法及国家主席选举，与遵义会议无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -1052,46 +1052,46 @@
         {
           "unit_id": "ae55014d8a592aef0e7d83e0b89ea00aef092152f38c58181040388869d6d36a",
           "relevance": 0,
-          "reason": "内容为1922年旅欧少年共产党成立及求学未成，与1926年在莫斯科的学校无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1922年旅欧少年共产党成立及求学未成，与1926年在莫斯科的学校无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "373dd983979ee5c4a6896a11edae3f916c7f129d17f4f9a0acdd1f88797f910a",
           "relevance": 1,
-          "reason": "提及莫斯科中山大学和东方劳动者共产主义大学，但未明确说明邓小平先后入学，仅涉及1926年5月后的活动，不足以直接支持必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
-          "basis": "llm_judge",
+          "reason": "提及莫斯科中山大学和东方劳动者共产主义大学，但未明确说明邓小平先后入学，仅涉及1926年5月后的活动，不足以直接支持必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "19f4f87094cc427abed0f9b494903628c5255c2cf9a0db5ac3d562eb1393ceb3",
           "relevance": 0,
-          "reason": "内容为1921年留法勤工俭学活动，与1926年在莫斯科的学校无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1921年留法勤工俭学活动，与1926年在莫斯科的学校无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "8906ad82c6ebc61563184f4a62b000eab58416f70eb006a191b9a0c01b41223a",
           "relevance": 0,
-          "reason": "内容为1926年1月离开巴黎赴苏联的经过，未提及到达莫斯科后入读的学校。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1926年1月离开巴黎赴苏联的经过，未提及到达莫斯科后入读的学校。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "4034515a633949b8fec07712d21b9286850fe5ac17a6bc63c926aed1a893b141",
           "relevance": 0,
-          "reason": "内容为1923年加入旅欧共青团及编辑刊物，与1926年在莫斯科的学校无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:56.456505+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1923年加入旅欧共青团及编辑刊物，与1926年在莫斯科的学校无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ]
@@ -2138,10 +2138,10 @@
         {
           "unit_id": "a7f87c3700a872e9693d281f783122ffb155b84f786ee2bb675e64a183aaf086",
           "relevance": 0,
-          "reason": "仅目录，无具体描述",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "仅目录，无具体描述。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2156,10 +2156,10 @@
         {
           "unit_id": "acfc0bb6010f2585500fbda8ca32c8af51cc491055d2114157f0e328e8e8c44a",
           "relevance": 0,
-          "reason": "仅书名和译者，无内容",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "仅书名和译者，无内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2174,64 +2174,64 @@
         {
           "unit_id": "47e97f20060f8332d33ede29c708490cd12d20600349a922c3ddab24b315b795",
           "relevance": 1,
-          "reason": "描述列宁室和军事训练，但未直接支持任何必要事实",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "描述列宁室和军事训练，但未直接支持任何必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "7fd0129792d1029e22ed567ae5def6d1d3db9d271cd9acbabb64194402c42380",
           "relevance": 0,
-          "reason": "出版说明，无相关内容",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "出版说明，无相关内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "89b2e351a6d0a0cf2461cabbe2f7f7eb32ba09965cd057c39b0722c934f1aaba",
           "relevance": 0,
-          "reason": "出版背景，无相关内容",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "出版背景，无相关内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "12b3732f91019eb31beb34dd0cdf95480ccc320a49545a0eeb4c571d0fb20ec9",
           "relevance": 0,
-          "reason": "斯诺生平，无相关内容",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "斯诺生平，无相关内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "571e7e2d0df3a27333c6bf4ce6f16902d88d881047d878a757d46a34083be713",
           "relevance": 1,
-          "reason": "提到红军大学等学校，但未给出具体规模和训练安排",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "提到红军大学等学校，但未给出具体规模和训练安排。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "c44c60f964b45d96421aaebee47577fab509c953bb2f5d080d3f0b936010166c",
           "relevance": 0,
-          "reason": "出版说明，无相关内容",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "出版说明，无相关内容。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "2b85dd969e28c00ea4f2f762054af03f9ea02b31b4ea729fee90410c352f907a",
           "relevance": 0,
-          "reason": "仅目录，无具体描述",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:02.774669+00:00",
-          "basis": "llm_judge",
+          "reason": "仅目录，无具体描述。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ]
@@ -2730,10 +2730,10 @@
         {
           "unit_id": "a2654187b7decb0afb5b6de5e1652b32c50a247180727c0f7158555b4eebc217",
           "relevance": 1,
-          "reason": "涉及1926年湖南工农运动背景，但未直接支持任何必要事实，仅提供背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及1926年湖南工农运动背景，但未直接支持任何必要事实，仅提供背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2759,10 +2759,10 @@
         {
           "unit_id": "fc93ef0f94636078abb8f14e81a6aee508dae5495731ad4c68533878c78fcb35",
           "relevance": 0,
-          "reason": "内容涉及国民党二大决议案修改，与问题中毛泽东在湖南的活动无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及国民党二大决议案修改，与问题中毛泽东在湖南的活动无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2780,19 +2780,19 @@
         {
           "unit_id": "a722b83e507467aeab7c0fcdbc3e87644e750479a9a6f11c31805f6ea917635e",
           "relevance": 0,
-          "reason": "内容涉及1927年6月马日事变后的活动，与问题时间范围不符。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及1927年6月马日事变后的活动，与问题时间范围不符。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b4308a73ff20e28e982ab98e42e9a6c530f89fbe28fbc24737d43f3e4a614a61",
           "relevance": 0,
-          "reason": "内容涉及1925年9月毛泽东离开湖南赴广州，与问题中1921-1926年在湖南的活动无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及1925年9月毛泽东离开湖南赴广州，与问题中1921-1926年在湖南的活动无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -2809,28 +2809,28 @@
         {
           "unit_id": "0b7a35d0dfa207b283ea0dc497fe89d10f724fbd88ab6692ec8247f6bd2ec0e4",
           "relevance": 0,
-          "reason": "内容涉及1921年10月湖南支部活动，但未直接支持任何必要事实，且部分信息与必要事实不符。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及1921年10月湖南支部活动，但未直接支持任何必要事实，且部分信息与必要事实不符。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "60c21f68ff5160bf12359e80092bd5ba235ea5e03dc9a4a7db71dd1532bf2aa4",
           "relevance": 1,
-          "reason": "涉及1926年12月湖南农民代表大会电请毛泽东指导，但未直接支持任何必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及1926年12月湖南农民代表大会电请毛泽东指导，但未直接支持任何必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "ad013bb4cf02723253f263ecb8ac0bd3df801385ca26d2147e69b76729d312f7",
           "relevance": 0,
-          "reason": "内容涉及1926年1月国民党二大及中央宣传部代理部长任命，与问题中毛泽东在湖南的活动无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:29.191772+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及1926年1月国民党二大及中央宣传部代理部长任命，与问题中毛泽东在湖南的活动无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -3301,10 +3301,10 @@
         {
           "unit_id": "147ae167f51d87a7930552152e9f30f7a3dcc406923e18772df14c46bc5394f7",
           "relevance": 1,
-          "reason": "提到1959年庐山会议与彭德怀的斗争是两个司令部的斗争，但未提供具体日期、内容或决议，仅部分相关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "提到1959年庐山会议与彭德怀的斗争是两个司令部的斗争，但未提供具体日期、内容或决议，仅部分相关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -3334,10 +3334,10 @@
         {
           "unit_id": "aa95f9e238b88284e6eebdfbcfbf482a27ab66f4c4bb7afdb18e29252af056e5",
           "relevance": 1,
-          "reason": "提到庐山会议议定记录修正草案的讨论，但信息不完整，未直接支持任何必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "提到庐山会议议定记录修正草案的讨论，但信息不完整，未直接支持任何必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -3385,10 +3385,10 @@
         {
           "unit_id": "6dc18d3e0846bdaf3a44f6fe00fa0d6c11b8e60054182c7a6eaa997c07e7aef7",
           "relevance": 1,
-          "reason": "描述黄克诚、周小舟对彭德怀信的看法，但未直接支持任何必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:16.225680+00:00",
-          "basis": "llm_judge",
+          "reason": "描述黄克诚、周小舟对彭德怀信的看法，但未直接支持任何必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -3868,10 +3868,10 @@
         {
           "unit_id": "bd2c980abe9964cce6f752c8636878d6a9172a8511c1c5fb0086fa10d5eb54c6",
           "relevance": 0,
-          "reason": "内容涉及1938年9月后的行程和六届六中全会，未提及任何必要事实中的具体任务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容涉及1938年9月后的行程和六届六中全会，未提及任何必要事实中的具体任务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -3888,64 +3888,64 @@
         {
           "unit_id": "9567843f97c244bb8ce85c1f618169dbdcdc46f71a98ecf4acf3cfdcdfc2ad81",
           "relevance": 0,
-          "reason": "内容为1938年12月收阅电报，涉及区划调整，与必要事实无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年12月收阅电报，涉及区划调整，与必要事实无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "c435c64e05eafbdd71b79596b603400c3e258c3913803e5a499c79a211e32884",
           "relevance": 0,
-          "reason": "内容为1938年6月活动，未涉及必要事实中的具体任务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年6月活动，未涉及必要事实中的具体任务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "8080eccd6bfed35f23357f257588f7a40d1a1d664f99999fbde11b0bbf68aa70",
           "relevance": 0,
-          "reason": "内容为1938年2月活动，未涉及必要事实中的具体任务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年2月活动，未涉及必要事实中的具体任务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6f3db4a1a4ed8676dad42f6f6cfa1cb6edb92c9410b8cc57f9288c64baa0304b",
           "relevance": 0,
-          "reason": "内容为1938年7月活动，未涉及必要事实中的具体任务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年7月活动，未涉及必要事实中的具体任务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "23d28ba8aa9f47800747036ffc24caf3adf940e1e88deceefe65192723403bcf",
           "relevance": 0,
-          "reason": "内容为1938年5月活动，未涉及必要事实中的具体任务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年5月活动，未涉及必要事实中的具体任务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b50b90ecddc5791993379c39df9fbc16aec0951da6321499a5481888a5b72509",
           "relevance": 0,
-          "reason": "内容为1938年2月活动，未涉及必要事实中的具体任务。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年2月活动，未涉及必要事实中的具体任务。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "c608b7a9b536e6bb06938211ebcbc96d9020ae1c3102d749fa7b61672d0d8041",
           "relevance": 0,
-          "reason": "内容为1938年3月活动，但未提及开辟冀西根据地或与张贻祥谈话，不直接支持west_base。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:09.441917+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1938年3月活动，但未提及开辟冀西根据地或与张贻祥谈话，不直接支持west_base。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ]
@@ -4569,28 +4569,28 @@
         {
           "unit_id": "1399c640774c67886a814e43bcd1f2093c9b23ba9e874e0c7df80d5761b52e87",
           "relevance": 1,
-          "reason": "涉及一二九师和邓小平，但未明确提及邓小平任政治委员，仅部分背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及一二九师和邓小平，但未明确提及邓小平任政治委员，仅部分背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "a17207bedca2be8982e203ef56528c7f62f97a6c00c908a5c449f3fbb41bd427",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "dd2779ed9bade97df48f09319ae728a96f41559f1b748939c10493b049d48688",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -4607,55 +4607,55 @@
         {
           "unit_id": "0a30e3f3be96d9001537fe9fb45cf97788bc396fde92e3f20afe90caadc751b3",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "af6552f68441170492de0e5e870e360ff94edc6c63e80d58cfdbf9c0497ef2f5",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "3bfb3e1eb205eb97d643aa3c45e0dfd17b99458561bc1741b0b9d7ffde10e083",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "3a2ceb584d6d674cdfef7b3fa6915eb3867cd95403df92d80d6f7a946dbc17eb",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "a148b5224bd841574918a233d2e0dd7365f9cadd1f1ca50157a59576f54888ec",
           "relevance": 1,
-          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及刘伯承、邓小平和一二九师，但未提及职务任命，仅背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "acff31c9c86a6351174e9cf19487293edd961c824bcf9a56d4dd314b97ed7eca",
           "relevance": 0,
-          "reason": "内容为1967年关于邓小平的谈话，与一二九师职务无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:49:16.196140+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1967年关于邓小平的谈话，与一二九师职务无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ]
@@ -4814,10 +4814,10 @@
         {
           "unit_id": "05f1ae947965fd40771ded55116f201f37de71a3ce8d1703b9145e76d8490482",
           "relevance": 2,
-          "reason": "明确记载1948年11月16日中央军委决定成立淮海战役总前委，由刘陈邓粟谭组成，刘陈邓为常委，邓小平为书记，直接支持huaihai_1948。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载1948年11月16日中央军委决定成立淮海战役总前委，由刘陈邓粟谭组成，刘陈邓为常委，邓小平为书记，直接支持huaihai_1948。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "huaihai_1948"
           ]
@@ -4825,82 +4825,82 @@
         {
           "unit_id": "7bc1eb214cabfbc32ea88867b6ecfaabb0c6cbb9c221b6b4e466d9b6a67e51ac",
           "relevance": 1,
-          "reason": "涉及淮海战役期间中央军委对刘伯承、陈毅、邓小平的作战指示，但未提及总前委组成或邓小平任书记，仅部分背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及淮海战役期间中央军委对刘伯承、陈毅、邓小平的作战指示，但未提及总前委组成或邓小平任书记，仅部分背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "0698f5b64bee254e2a5494e0c52bc81f3df075477a2c2f5a3511cf1f1f64d890",
           "relevance": 0,
-          "reason": "内容为1949年10月关于四野部署和华中军政委员会，与问题时间范围不符，且未涉及刘邓共同指挥。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1949年10月关于四野部署和华中军政委员会，与问题时间范围不符，且未涉及刘邓共同指挥。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6bf8265868926bad5410918f0b33d6cd008285913ccb3be84c5f366cd872676d",
           "relevance": 1,
-          "reason": "涉及1948年11-12月刘伯承、邓小平、陈毅等联名电报，但未直接提及总前委组成或渡江、西南进军，仅部分背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及1948年11-12月刘伯承、邓小平、陈毅等联名电报，但未直接提及总前委组成或渡江、西南进军，仅部分背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "dcd8c38bf855c906d27ad7bdf46b25bcbbc30a68ca66bf82d8dfff8859121860",
           "relevance": 1,
-          "reason": "涉及淮海战役期间中央军委与刘伯承、陈毅、邓小平的电报往来，但未直接提及总前委组成或邓小平任书记。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及淮海战役期间中央军委与刘伯承、陈毅、邓小平的电报往来，但未直接提及总前委组成或邓小平任书记。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6b4c088915bf32cf36182f3c88f2d27ad8c7a4e70b747e4973d3e4d7f6aeed96",
           "relevance": 0,
-          "reason": "内容为1948年6月刘伯承、邓小平关于襄樊作战等，时间不在问题范围内，且与淮海、渡江、西南无关。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1948年6月刘伯承、邓小平关于襄樊作战等，时间不在问题范围内，且与淮海、渡江、西南无关。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "1e02deb21a35ee0f1b74911f194cce827bc5e2b6a6c1c6189dd64b66e6453e0d",
           "relevance": 0,
-          "reason": "内容为1948年1月刘伯承、邓小平、李先念关于大别山作战，时间不在问题范围内。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1948年1月刘伯承、邓小平、李先念关于大别山作战，时间不在问题范围内。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "27825b7587bda4edf93bf8b7f60b0a3132ce08f8c12d992479c10ebae38d8305",
           "relevance": 1,
-          "reason": "涉及1948年12月淮海战役后期及渡江作战准备，但未直接提及总前委组成或渡江具体行动，仅部分背景。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "涉及1948年12月淮海战役后期及渡江作战准备，但未直接提及总前委组成或渡江具体行动，仅部分背景。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6b09aaf20825ad5709d06519fa2940b24c6a192bd8dea39cbc18d3c6f008ef04",
           "relevance": 0,
-          "reason": "内容为1948年2-3月大别山游击战部署，时间不在问题范围内。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1948年2-3月大别山游击战部署，时间不在问题范围内。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "8c1a66d8c503aa78d601f75b7a399ff89db41d37b33412112f3183b1944c86d8",
           "relevance": 2,
-          "reason": "明确记载淮海战役总前委由刘伯承、陈毅、邓小平、粟裕、谭震林组成，刘陈邓为常委，邓小平为书记，直接支持huaihai_1948。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T11:24:11.802572+00:00",
-          "basis": "llm_judge",
+          "reason": "明确记载淮海战役总前委由刘伯承、陈毅、邓小平、粟裕、谭震林组成，刘陈邓为常委，邓小平为书记，直接支持huaihai_1948。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "huaihai_1948"
           ]
@@ -5270,10 +5270,10 @@
         {
           "unit_id": "3fb31430198455865b183db874e3459e8fa7a7cd7b634b090059a74398537a77",
           "relevance": 0,
-          "reason": "内容为1973年邓小平视察武钢，仅提及淮海战役时间长度作比喻，无战役细节。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "内容为1973年邓小平视察武钢，仅提及淮海战役时间长度作比喻，无战役细节。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
@@ -5296,19 +5296,19 @@
         {
           "unit_id": "689a5919443b4a0684a0c5078057a6c57138b30ed388e9643587f37734c9841f",
           "relevance": 0,
-          "reason": "为注释内容，涉及淮海战役结果设想，但无直接支持必要事实的具体信息。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "为注释内容，涉及淮海战役结果设想，但无直接支持必要事实的具体信息。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "8714cf4e707d422a57385b186e85a935d6f59a147866e224bad366f2953df24d",
           "relevance": 1,
-          "reason": "提及淮海战役中起义和投诚事件，与战役相关但未直接支持任何必要事实。",
-          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-10-29T08:48:47.240503+00:00",
-          "basis": "llm_judge",
+          "reason": "提及淮海战役中起义和投诚事件，与战役相关但未直接支持任何必要事实。（人工抽检通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T11:47:39+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
