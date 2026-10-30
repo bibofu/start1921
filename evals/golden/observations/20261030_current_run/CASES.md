@@ -7,8 +7,8 @@
 | 项目 | 值 |
 |---|---|
 | 数据集指纹 | `c8d0cc4adfa4988426c94970f9f3bf267c113503e49564f1c66d20fd3a5da807` |
-| 采集指纹 | `039a0b093ea93c651bfd6114fa2b54d1af06e78b3f43473258d9ccddf7b1434f` |
-| 源码指纹 | `b525fa19e3c9cc08b17e09237a626a691d39c0095551be7d8b4b755c9bdd0841` |
+| 采集指纹 | `6d376a9feb01a713649096461118ad291fee7806a68c5b626a198bb9c06ef116` |
+| 源码指纹 | `927a3d95815ab99992d11b9b39304977ccd95877da823c4e5e2e8e9794b3b65a` |
 | 语料指纹 | `a9225af6a1996d1721f34963cea1bdfcd5409a4a2edef73f8fbfed347dee430d` |
 | 配置 | `candidate_k=30`、`top_k=20`、`answer_top_k=10`、`with_llm=false` |
 
@@ -16,13 +16,13 @@
 
 | 指标 | 宏平均 | 可评题数 |
 |---|---:|---:|
-| Recall@10（主指标） | 0.592 | 18 |
-| Precision@5（主指标） | 0.589 | 18 |
-| MRR@10（主指标） | 0.917 | 18 |
-| 固定池 nDCG@5（主指标） | 0.678 | 18 |
-| Recall@12（线上对齐） | 0.596 | 18 |
-| Recall@20（诊断，不作主指标） | 0.615 | 18 |
-| Recall@10 微平均 | 0.462（48/104 组） | 18 |
+| Recall@10（主指标） | 0.626 | 18 |
+| Precision@5（主指标） | 0.624 | 17 |
+| MRR@10（主指标） | 0.971 | 17 |
+| 固定池 nDCG@5（主指标） | 0.717 | 17 |
+| Recall@12（线上对齐） | 0.629 | 18 |
+| Recall@20（诊断，不作主指标） | 0.648 | 18 |
+| Recall@10 微平均 | 0.490（51/104 组） | 18 |
 
 ## 分类汇总
 
@@ -32,7 +32,7 @@
 | `exact_fact` | 5 | 0.900 |
 | `intersection_hard_negative` | 3 | 0.464 |
 | `multi_evidence` | 4 | 0.342 |
-| `semantic_retrieval` | 4 | 0.454 |
+| `semantic_retrieval` | 4 | 0.604 |
 
 ## 逐题结果
 
@@ -44,7 +44,7 @@
 | `pilot_exact_deng_1952_appointment` | development | exact_fact | 1.000 | 1.000 | 1.000 | 0.600 | 1.000 | 0.633 | 1/1 |
 | `holdout_exact_date` | holdout | exact_fact | 1.000 | 1.000 | 1.000 | 0.400 | 0.500 | 0.659 | 2/2 |
 | `dev_semantic_contradiction` | development | semantic_retrieval | 0.667 | 0.667 | 0.667 | 0.800 | 1.000 | 0.922 | 2/3 |
-| `dev_semantic_first_congress` | development | semantic_retrieval | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 5/5 |
+| `dev_semantic_first_congress` | development | semantic_retrieval | 0.600 | 0.600 | 0.600 | N/A | N/A | N/A | 5/5 |
 | `dev_semantic_investigation` | development | semantic_retrieval | 0.750 | 0.750 | 0.750 | 1.000 | 1.000 | 0.857 | 0/4 |
 | `holdout_semantic_observation` | development | semantic_retrieval | 0.400 | 0.400 | 0.400 | 0.200 | 1.000 | 0.613 | 0/5 |
 | `dev_multi_mao_hunan` | development | multi_evidence | 0.214 | 0.214 | 0.214 | 0.600 | 1.000 | 0.471 | 3/14 |
@@ -66,7 +66,7 @@
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 2 条；证据组 2 个；候选标签 9 条；池内锚点组 2/2
 - 主指标：R@10 1.000；P@5 0.600；MRR@10 1.000；nDCG@5 0.563；线上对齐 R@12 1.000；诊断 R@20 1.000
-- 命中证据组：`deng_defense_vice_chair_1954`、`deng_vice_premier_1954`
+- Top10 命中证据组：`deng_defense_vice_chair_1954`、`deng_vice_premier_1954`
 
 最终 Top 8：
 
@@ -88,8 +88,8 @@
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 6 条；证据组 6 个；候选标签 9 条；池内锚点组 3/6
 - 主指标：R@10 0.500；P@5 1.000；MRR@10 1.000；nDCG@5 0.921；线上对齐 R@12 0.500；诊断 R@20 0.500
-- 命中证据组：`zhou_cppcc_1954`、`zhou_foreign_minister_1954`、`zhou_premier_1954`
-- 未命中证据组：
+- Top10 命中证据组：`zhou_cppcc_1954`、`zhou_foreign_minister_1954`、`zhou_premier_1954`
+- Top10 未命中证据组：
   - `zhou_roles_before_1954_changes`：职务沿革注列明周恩来原任书记处书记、政务院总理兼外长、全国政协副主席，并注明1956年9月/1954年12月任职变化。须结合当年条目，不把1953年页眉当1954年活动日期。（锚点：mao_zedong_chronology_volume_5 PDF 7）
   - `zhou_government_work_jan1954`：1954年1月14日主持政务院会议，将职务沿革中的政务院任职落实到题目年份；单凭主持会议不能独立推断正式任命。（锚点：zhou_enlai_chronology_1949_1976 PDF 597）
   - `zhou_government_transition_sep1954`：政务院于1954年9月改为国务院的制度名称时间说明。注[1]解释机关更名，不将邓小平副总理职务转绑周恩来。（锚点：mao_zedong_chronology_volume_5 PDF 7）
@@ -112,7 +112,7 @@
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 1 条；证据组 1 个；候选标签 11 条；池内锚点组 1/1
 - 主指标：R@10 1.000；P@5 0.400；MRR@10 1.000；nDCG@5 0.348；线上对齐 R@12 1.000；诊断 R@20 1.000
-- 命中证据组：`zunyi_election`
+- Top10 命中证据组：`zunyi_election`
 
 最终 Top 8：
 
@@ -134,7 +134,7 @@
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 1 条；证据组 1 个；候选标签 9 条；池内锚点组 1/1
 - 主指标：R@10 1.000；P@5 0.600；MRR@10 1.000；nDCG@5 0.633；线上对齐 R@12 1.000；诊断 R@20 1.000
-- 命中证据组：`appointment`
+- Top10 命中证据组：`appointment`
 
 最终 Top 8：
 
@@ -156,7 +156,7 @@
 - 分片：`holdout`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 2 条；证据组 2 个；候选标签 6 条；池内锚点组 2/2
 - 主指标：R@10 1.000；P@5 0.400；MRR@10 0.500；nDCG@5 0.659；线上对齐 R@12 1.000；诊断 R@20 1.000
-- 命中证据组：`oriental_university`、`sun_yat_sen_university`
+- Top10 命中证据组：`oriental_university`、`sun_yat_sen_university`
 
 最终 Top 8：
 
@@ -178,13 +178,15 @@
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 3 条；证据组 3 个；候选标签 12 条；池内锚点组 2/3
 - 主指标：R@10 0.667；P@5 0.800；MRR@10 1.000；nDCG@5 0.922；线上对齐 R@12 0.667；诊断 R@20 0.667
-- 命中证据组：`changing_conditions_change_priority`、`find_and_prioritize_principal`、`principal_role`
+- Top10 命中证据组：`find_and_prioritize_principal`、`principal_role`
+- Top10 未命中证据组：
+  - `changing_conditions_change_priority`：主次地位取决于具体阶段和条件，以侵略战争与非战争压迫作比较（锚点：mao_selected_works_combined PDF 197）
 
 最终 Top 8：
 
 | 排名 | 文献 / 页 | rel | 命中组 | 原文摘录 |
 |---:|---|---:|---|---|
-| 1 | mao_selected_works_combined PDF 197 | 2 | changing_conditions_change_priority、find_and_prioritize_principal、principal_role | 当着国内革命战争发展到从根本上威胁帝国主义及其走狗国内反动派的存在的时候，帝国主义就往往采取上述方法以外的方法，企图维持其统治：或者分化革命阵线的内部，或者直接出兵援助国内反动派。这时，外国帝国主义和国内反动派完全公开地站在一个极端，人民大 |
+| 1 | mao_selected_works_combined PDF 197 | 2 | find_and_prioritize_principal、principal_role | 当着国内革命战争发展到从根本上威胁帝国主义及其走狗国内反动派的存在的时候，帝国主义就往往采取上述方法以外的方法，企图维持其统治：或者分化革命阵线的内部，或者直接出兵援助国内反动派。这时，外国帝国主义和国内反动派完全公开地站在一个极端，人民大 |
 | 2 | mao_selected_works_combined PDF 195 | 1 | — | 和人民大众的矛盾。现在抗日时期，国民党和日本帝国主义有矛盾，它一面要联合共产党，同时它对共产党和国内人民并不放松其斗争和压迫。共产党则无论在哪一时期，均和人民大众站在一道，反对帝国主义和封建主义；但在现在的抗日时期，由于国民党表示抗日，它对 |
 | 3 | mao_selected_works_combined PDF 192 | 1 | — | 方面的特殊性，否则暴露过程的本质成为不可能，这也是我们作研究工作时必须十分注意的。一个大的事物，在其发展过程中，包含着许多的矛盾。例如，在中国资产阶级民主革命过程中，有中国社会各被压迫阶级和帝国主义的矛盾，有人民大众和封建制度的矛盾，有无产 |
 | 4 | mao_zedong_chronology_volume_2 PDF 16 | 1 | — | 1 9 3 7 年8 月朱德同志以即去南京一行为有利。”(1)8 月7 日写完《辩证法唯物论（讲授提纲）》第三章第一节”矛盾统一法则“，并以此为讲稿在抗大作过讲演。这一节后来经作者作了部分补充、删节和修改，以《矛盾论》为篇名收入《毛泽东选集 |
@@ -199,27 +201,24 @@
 
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 5 条；证据组 5 个；候选标签 13 条；池内锚点组 5/5
-- 主指标：R@10 0.000；P@5 0.000；MRR@10 0.000；nDCG@5 0.000；线上对齐 R@12 0.000；诊断 R@20 0.000
-- 命中证据组：—
-- 未命中证据组：
+- 主指标：R@10 0.600；P@5 N/A；MRR@10 N/A；nDCG@5 N/A；线上对齐 R@12 0.600；诊断 R@20 0.600
+- Top10 命中证据组：`central_bureau_election`、`independent_policy`、`worker_movement_priority`
+- Top10 未命中证据组：
   - `programme_and_name`：通过党的纲领、确定名称和根本目标（锚点：cpc_history_volume_1 PDF 121）
   - `organization_discipline`：党纲含有统一组织和严格纪律要求（锚点：cpc_history_volume_1 PDF 121）
-  - `worker_movement_priority`：集中领导工人运动，首先组织工会和教育工人（锚点：cpc_history_volume_1 PDF 121）
-  - `independent_policy`：当前实际工作决议与维护无产阶级利益的独立政策（锚点：cpc_history_volume_1 PDF 122）
-  - `central_bureau_election`：暂设中央局，陈独秀任书记及成员分工（锚点：cpc_history_volume_1 PDF 122）
 
 最终 Top 8：
 
 | 排名 | 文献 / 页 | rel | 命中组 | 原文摘录 |
 |---:|---|---:|---|---|
-| 1 | cpc_history_volume_2 PDF 956 | 0 | — | 鉴于党的十大以来国内形势的重大变化，十届三中全会批准3月中央工作会议关于提前召开党的十一大的决定，并为大会的召开作了必要的准备。全会一致通过党的第十一次全国代表大会议程，讨论并基本通过第十届中央委员会的政治报告、关于修改党的章程的报告和党章 |
-| 2 | cpc_history_volume_2 PDF 955 | 0 | — | 跑，结果只能事与愿违。况且，片面突出钢铁、石油等重工业部门，追求高投资、高积累，这只能进一步加剧在“文化大革命”中已经相当严重的国民经济各方面比例关系的失调。三、党的第十一次全国代表大会十届三中全会和邓小平再次复职粉碎“四人帮”后，根据形势 |
-| 3 | deng_xiaoping_chronology_1904_1974_upper PDF 93 | 0 | — | 1931年9月地的毛泽东、朱德等汇报瑞金的工作，得到充分肯定。毛泽东、朱德等原定此行到福建筹粮筹款、休整补充，并筹备召开全国苏维埃代表大会。到瑞金后作出调整：选定叶坪村为苏区中央局和红军总部驻地；在叶坪村召开中华苏维埃第一次全国代表大会，建 |
-| 4 | mao_zedong_chronology_volume_2 PDF 611 | 0 | — | 6 月.同日致电邓小平：＂拟在最近举行一中全会，你在七大当选为中委，望接电即赶回总部，待美国飞机去太行时，就便乘机回延开会。”同日和全体中共中央委员和七大代表一起观看鲁艺演出的大型歌剧《白毛女》。6 月日出席中国共产党第七次全国代表大会。大 |
-| 5 | cpc_history_volume_1 PDF 187 | 0 | — | 1925年1月26日至30日，中国社会主义青年团在上海召开第三次全国代表大会。会议决定动员全体团员贯彻党的四大决议，积极开展青年工人运动、青年农民运动和青年学生运动，并决定把社会主义青年团改称为共产主义青年团。张太雷当选为团中央总书记。 |
-| 6 | cpc_history_volume_2 PDF 263 | 0 | — | 宪法（草案）》在毛泽东的主持下起草完成，经反复讨论、修改，通过中央人民政府委员会会议的审议。在一切准备工作就绪后，1954年9月15日至28日，第一届全国人民代表大会第一次会议在北京隆重举行。出席大会的代表具有广泛的代表性。其中，有各民主阶 |
-| 7 | zhou_enlai_chronology_1949_1976 PDF 93 | 0 | — | 【1929 年12 月20 日】△出席中共中央政治局会议。会议通过由李立三起草、周恩来修改的《中国共产党接受共产国际第十次全体会议决议的决议》。决议表示；完全同意第十次全体会的精神、路线与一切决议，全会指出的“’政治罢工，成为直接的时代的坚 |
-| 8 | cpc_history_volume_1 PDF 166 | 0 | — | 一、党的第三次全国代表大会20世纪20年代初，中国仍然处于军阀割据、四分五裂的状态。在各派军阀中，以曹锟、吴佩孚为首的直系军阀势力最强。他们在英、美等国支持下，于1920年的直皖战争和1922年的第一次直奉战争中取得胜利，控制了中央政权。1 |
+| 1 | cpc_history_volume_1 PDF 120 | — | — | 四、党的第一次全国代表大会一大的召开1921年6月初，共产国际代表马林(24)和共产国际远东书记处代表尼克尔斯基(25)先后到达上海，并与上海的共产党早期组织成员李达、李汉俊建立了联系。经过几次交谈，他们一致认为应尽快召开全国代表大会，正式 |
+| 2 | cpc_history_volume_1 PDF 135 | — | — | 况，解决中国革命问题的新起点。它为党的第二次全国代表大会完成制定党的民主革命纲领的历史任务，奠定了基础。民主革命纲领的制定1922年7月16日至23日，中国共产党在上海举行第二次全国代表大会。出席大会的有中央局成员、党的地方组织的代表和参加 |
+| 3 | cpc_history_volume_1 PDF 174 | — | — | 共产国际执委会东方部充分肯定中国共产党在改组国民党工作中的作用，认为“在从思想上和组织上建设国民党的整个工作中，我们中国共产党的那些加入国民党的同志起了巨大的作用”，“最近几个月，党把自己的全部力量都投入到这项工作中来了”(6)。国共合作的 |
+| 4 | cpc_history_volume_1 PDF 176 | — | — | 中国国民党第一次全国代表大会的召开，标志着国民党改组的完成和第一次国共合作的正式形成。这是中国共产党实践民主革命纲领和民主联合战线政策的重大胜利，也是孙中山晚年推进中国革命的一大历史功绩。实行国共合作，既是国共两党反对帝国主义和封建军阀的共 |
+| 5 | cpc_history_volume_1 PDF 122 | 2 | central_bureau_election、independent_policy | 作的决议》，对开展工人运动的组织工作和宣传工作，作了具体的规定。大会决定，在反对军阀官僚的斗争中，在争取言论、出版、集会自由的斗争中，党应采取独立的政策以维护无产阶级的利益，不同其他党派建立任何联系。这时，中国的共产主义者还没有深刻地认识中 |
+| 6 | mao_selected_works_combined PDF 1666 | — | — | 一九七九年死于加拿大。刘仁静，一九二一年七月以北京共产主义小组代表身分，出席中国共产党第一次全国代表大会。一九二六年赴苏联莫斯科国际列宁主义学院学习，后参加托派。一九二九年被开除出党。建国后长期担任人民出版社特约编辑，从事翻译工作。一九八七 |
+| 7 | cpc_history_volume_1 PDF 133 | — | — | 这是中国共产党成立后第一次正式派出代表参加大型国际会。这次大会揭露了华盛顿会议的实质及其瓜分中国的图谋，总结和交流了远东各国人民开展革命斗争的情况和经验。会议根据列宁的民 |
+| 8 | mao_selected_works_combined PDF 2622 | — | — | 曾任中共中央委员、中央政治局委员、中央政治局常委，一九三五年六月红军第一、第四方面军在四川懋功（今小金）地区会师后，任红军总政治委员。他反对中央关于红军北上的决定，进行分裂、危害党和红军的活动，另立中央。一九三六年六月被迫取消第二中央，随后 |
 
 ## `dev_semantic_investigation`
 
@@ -228,8 +227,8 @@
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 4 条；证据组 4 个；候选标签 14 条；池内锚点组 0/4
 - 主指标：R@10 0.750；P@5 1.000；MRR@10 1.000；nDCG@5 0.857；线上对齐 R@12 0.750；诊断 R@20 0.750
-- 命中证据组：`investigate_before_concluding`、`learn_from_people_through_discussion`、`personal_in_depth_investigation`
-- 未命中证据组：
+- Top10 命中证据组：`investigate_before_concluding`、`learn_from_people_through_discussion`、`personal_in_depth_investigation`
+- Top10 未命中证据组：
   - `theory_with_actual_conditions`：学习理论与中国实际结合，反对脱离实际的本本主义（锚点：mao_selected_works_combined PDF 82）
 
 最终 Top 8：
@@ -252,8 +251,8 @@
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 5 条；证据组 5 个；候选标签 11 条；池内锚点组 0/5
 - 主指标：R@10 0.400；P@5 0.200；MRR@10 1.000；nDCG@5 0.613；线上对齐 R@12 0.400；诊断 R@20 0.400
-- 命中证据组：`first_division_training`、`other_divisions`
-- 未命中证据组：
+- Top10 命中证据组：`first_division_training`、`other_divisions`
+- Top10 未命中证据组：
   - `red_university_size`：红军大学的规模和分部（锚点：red_star_over_china PDF 143）
   - `curriculum`：政治课程和军事课程（锚点：red_star_over_china PDF 146）
   - `recreation`：文娱时间和学习活动（锚点：red_star_over_china PDF 143）
@@ -278,8 +277,8 @@
 - 分片：`development`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 14 条；证据组 14 个；候选标签 11 条；池内锚点组 3/14
 - 主指标：R@10 0.214；P@5 0.600；MRR@10 1.000；nDCG@5 0.471；线上对齐 R@12 0.214；诊断 R@20 0.214
-- 命中证据组：`y1922_xiang_committee`、`y1926_hunan_peasant_congress`、`y1926_workers_peasants_welcome_speech`
-- 未命中证据组：
+- Top10 命中证据组：`y1922_xiang_committee`、`y1926_hunan_peasant_congress`、`y1926_workers_peasants_welcome_speech`
+- Top10 未命中证据组：
   - `y1921_self_study_university`：1921年8月中旬回到长沙，同何叔衡创办湖南自修大学，任指导主任并负实际领导责任。（锚点：mao_zedong_chronology_volume_1 PDF 95）
   - `y1921_hunan_branch`：1921年10月10日在长沙建立中国共产党湖南支部，任支部书记。（锚点：mao_zedong_chronology_volume_1 PDF 97）
   - `y1922_changsha_carpenters_strike`：1922年10月初在长沙清水塘同任树德等研究泥木工人罢工，认为时机成熟；长沙泥木工人于10月6日罢工。（锚点：mao_zedong_chronology_volume_1 PDF 110）
@@ -312,8 +311,8 @@
 - 分片：`development`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 12 条；证据组 15 个；候选标签 11 条；池内锚点组 2/15
 - 主指标：R@10 0.533；P@5 1.000；MRR@10 1.000；nDCG@5 0.657；线上对齐 R@12 0.533；诊断 R@20 0.533
-- 命中证据组：`lushan_initial`、`lushan_letter_content`、`lushan_letter_discussion`、`lushan_plenum_date`、`lushan_plenum_decisions`、`lushan_turn`、`lushan_turn_date`、`zunyi_date`
-- 未命中证据组：
+- Top10 命中证据组：`lushan_initial`、`lushan_letter_content`、`lushan_letter_discussion`、`lushan_plenum_date`、`lushan_plenum_decisions`、`lushan_turn`、`lushan_turn_date`、`zunyi_date`
+- Top10 未命中证据组：
   - `zunyi_core`：核心议题及讨论边界（锚点：cpc_history_volume_1 PDF 484）
   - `zunyi_process`：发言分歧和决议形成程序（锚点：cpc_history_volume_1 PDF 482）
   - `zunyi_organization`：会议直接组织决定（锚点：cpc_history_volume_1 PDF 483）
@@ -342,8 +341,8 @@
 - 分片：`development`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 7 条；证据组 7 个；候选标签 10 条；池内锚点组 1/7
 - 主指标：R@10 0.286；P@5 0.800；MRR@10 1.000；nDCG@5 0.750；线上对齐 R@12 0.286；诊断 R@20 0.286
-- 命中证据组：`zhou_1954_cppcc`、`zhou_1954_government`
-- 未命中证据组：
+- Top10 命中证据组：`zhou_1954_cppcc`、`zhou_1954_government`
+- Top10 未命中证据组：
   - `zhou_1954_geneva`：1954年4月以首席代表身份率中国代表团赴日内瓦会议。（锚点：zhou_enlai_chronology_1949_1976 PDF 604）
   - `zhou_1955_bandung`：1955年4月参加亚非会议并提出求同存异。（锚点：zhou_enlai_chronology_1949_1976 PDF 653）
   - `zhou_1955_first_plan`：1955年6月27日向人大常委会说明一五计划草案。（锚点：zhou_enlai_chronology_1949_1976 PDF 664）
@@ -370,9 +369,10 @@
 - 分片：`holdout`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 3 条；证据组 3 个；候选标签 9 条；池内锚点组 1/3
 - 主指标：R@10 0.333；P@5 0.200；MRR@10 1.000；nDCG@5 1.000；线上对齐 R@12 0.333；诊断 R@20 0.667
-- 命中证据组：`d129_commissar`、`jinan_counter`
-- 未命中证据组：
+- Top10 命中证据组：`d129_commissar`
+- Top10 未命中证据组：
   - `west_base`：1938年3月开辟冀西根据地（锚点：deng_xiaoping_chronology_1904_1974_upper PDF 191）
+  - `jinan_counter`：1938年10月冀南反“扫荡”准备（锚点：deng_xiaoping_chronology_1904_1974_upper PDF 240）
 
 最终 Top 8：
 
@@ -394,8 +394,8 @@
 - 分片：`development`；类别：`intersection_hard_negative`；可答性：`answerable`；定义：`approved`
 - 必要事实 14 条；证据组 14 个；候选标签 9 条；池内锚点组 1/14
 - 主指标：R@10 0.143；P@5 0.600；MRR@10 1.000；nDCG@5 0.556；线上对齐 R@12 0.214；诊断 R@20 0.214
-- 命中证据组：`joint_consultation_0925`、`joint_meeting_0701`、`politburo_19491125`
-- 未命中证据组：
+- Top10 命中证据组：`joint_consultation_0925`、`joint_meeting_0701`
+- Top10 未命中证据组：
   - `joint_meeting_0607`：1949年6月7日会见陈嘉庚，周恩来参加（锚点：mao_zedong_chronology_volume_3 PDF 521）
   - `joint_meeting_0709`：1949年7月9日全国铁路职工临时代表会议等集会，周恩来出席（锚点：mao_zedong_chronology_volume_3 PDF 536）
   - `joint_meeting_0908`：1949年9月8日会见和宴请程潜，周恩来参加（锚点：mao_zedong_chronology_volume_3 PDF 572）
@@ -403,6 +403,7 @@
   - `politburo_19491026`：1949年10月26日 中共中央政治局会议，周恩来出席（锚点：mao_zedong_chronology_volume_4 PDF 35）
   - `politburo_19491102`：1949年11月2日 中共中央政治局会议，周恩来出席（锚点：mao_zedong_chronology_volume_4 PDF 41）
   - `politburo_19491109`：1949年11月9日 中共中央政治局会议，周恩来出席（锚点：mao_zedong_chronology_volume_4 PDF 45）
+  - `politburo_19491125`：1949年11月25日 中共中央政治局会议，周恩来出席（锚点：mao_zedong_chronology_volume_4 PDF 54）
   - `politburo_19491128`：1949年11月28日 中共中央政治局会议，周恩来出席（锚点：mao_zedong_chronology_volume_4 PDF 56）
   - `politburo_19491201`：1949年12月1日 中共中央政治局会议，周恩来出席（锚点：mao_zedong_chronology_volume_4 PDF 59）
   - `joint_meeting_1201`：1949年12月1日同十二位民主人士座谈，周恩来参加（锚点：mao_zedong_chronology_volume_4 PDF 58）
@@ -428,7 +429,7 @@
 - 分片：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；定义：`approved`
 - 必要事实 2 条；证据组 2 个；候选标签 11 条；池内锚点组 0/2
 - 主指标：R@10 1.000；P@5 0.800；MRR@10 1.000；nDCG@5 0.938；线上对齐 R@12 1.000；诊断 R@20 1.000
-- 命中证据组：`deng_commissar`、`liu_commander`
+- Top10 命中证据组：`deng_commissar`、`liu_commander`
 
 最终 Top 8：
 
@@ -449,8 +450,8 @@
 - 分片：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；定义：`approved`
 - 必要事实 3 条；证据组 4 个；候选标签 10 条；池内锚点组 1/4
 - 主指标：R@10 0.250；P@5 0.400；MRR@10 1.000；nDCG@5 0.369；线上对齐 R@12 0.250；诊断 R@20 0.250
-- 命中证据组：`huaihai_1948`
-- 未命中证据组：
+- Top10 命中证据组：`huaihai_1948`
+- Top10 未命中证据组：
   - `yangtze_planning_1949`：总前委讨论渡江作战，邓小平与刘伯承等联名报告（锚点：deng_xiaoping_chronology_1904_1974_middle PDF 155）
   - `yangtze_crossing_1949`：第二、第三野战军百万余人强渡长江（锚点：deng_xiaoping_chronology_1904_1974_middle PDF 173）
   - `southwest_1949`：刘伯承、邓小平联名安排二野进军西南保障（锚点：deng_xiaoping_chronology_1904_1974_middle PDF 189）
@@ -475,8 +476,9 @@
 - 分片：`development`；类别：`constraints_routing`；可答性：`answerable`；定义：`approved`
 - 必要事实 10 条；证据组 12 个；候选标签 8 条；池内锚点组 5/12
 - 主指标：R@10 0.833；P@5 1.000；MRR@10 1.000；nDCG@5 0.940；线上对齐 R@12 0.833；诊断 R@20 0.833
-- 命中证据组：`battle_command`、`battle_forces_end`、`battle_forces_start`、`battle_geography`、`battle_impact`、`battle_planning`、`battle_result`、`battle_stage_one`、`battle_stage_three_result`、`battle_stage_three_time`、`battle_stage_two`
-- 未命中证据组：
+- Top10 命中证据组：`battle_command`、`battle_forces_end`、`battle_forces_start`、`battle_geography`、`battle_impact`、`battle_planning`、`battle_result`、`battle_stage_one`、`battle_stage_three_result`、`battle_stage_three_time`
+- Top10 未命中证据组：
+  - `battle_stage_two`：第二阶段的时间和主要作战结果（锚点：cpc_history_volume_1 PDF 965）
   - `battle_civilian_support`：群众支前的作用（锚点：cpc_history_volume_1 PDF 969）
 
 最终 Top 8：
@@ -487,7 +489,7 @@
 | 2 | mao_zedong_chronology_volume_3 PDF 355 | 1 | — | 沽之线，直迫天津城下，迫使国民党用空运方法从沈阳调兵增防平、津“。同日为中共中央军委起草致杨得志、罗瑞卿、耿麾，杨成武、李井泉、李天焕并告林彪、罗荣桓、刘亚楼，华北局，东北局电，规定战争第三年全军各部的歼敌任务。在战争的第三年（今年七月至明 |
 | 3 | mao_selected_works_combined PDF 786 | 2 | battle_planning | 关于淮海战役的的作战方针*（一九四八年十月十一日）关于淮海战役〔1〕部署，现在提出几点意见，供你们考虑。（一）本战役第一阶段的重心，是集中兵力歼灭黄百韬兵团，完成中间突破，占领新安镇、运河车站、曹八集、峄县、枣庄、临城、韩庄、沭阳、邳县、郯 |
 | 4 | mao_zedong_chronology_volume_3 PDF 354 | 2 | battle_planning | 1948年9月告我们审查。”本日晚七时，又为中央军委起草致饶漱石、粟裕并告许世友、谭震林、王建安，刘伯承、陈毅、李达电，指出：“我们认为举行淮海战役，甚为必要。目前不需要大休整，待准海战役后再进行一次休整。淮海战役可於十月十号左右开始行动。 |
-| 5 | cpc_history_volume_1 PDF 965 | 2 | battle_command、battle_stage_one、battle_stage_three_result、battle_stage_three_time、battle_stage_two | 但杜聿明等高级将领仍拒绝投降。1949年1月6日，华东野战军发起对杜聿明部的总攻，经四天激战，于10日全歼邱清泉、李弥两个兵团约20万人，俘杜聿明，击毙邱清泉，仅李弥等少数人逃脱。至此，淮海战役以大获全胜而结束。淮海战役是解放战争战略决战三 |
+| 5 | cpc_history_volume_1 PDF 965 | 2 | battle_stage_three_result、battle_stage_three_time | 但杜聿明等高级将领仍拒绝投降。1949年1月6日，华东野战军发起对杜聿明部的总攻，经四天激战，于10日全歼邱清泉、李弥两个兵团约20万人，俘杜聿明，击毙邱清泉，仅李弥等少数人逃脱。至此，淮海战役以大获全胜而结束。淮海战役是解放战争战略决战三 |
 | 6 | cpc_history_volume_1 PDF 1025 | — | — | 淮海战役示意图（1948年11月–1949年1月）附图24 |
 | 7 | cpc_history_volume_1 PDF 964 | — | battle_forces_end、battle_planning | 中原两支野战军和华东、中原两军区，以及晋冀鲁豫军区的部分部队共约60万人。济南战役后，国民党军队在徐州周围地区大量集结兵力，企图利用在徐州交会的津浦、陇海两条铁路线便于机动增援的条件，用重兵堵防的办法阻止解放军南下，以巩固江淮，屏障南京。徐 |
 | 8 | mao_selected_works_combined PDF 819 | — | — | 前委〔3〕和第三野战军前委一同工作，集中精力布置南进。一切后方工作交山东分局负责。注 释* 这是毛泽东为中共中央军事委员会写的复第二野战军和第三野战军的电报。这个电报，同时发给其他有关的野战军和有关的中央局。这个电报估计到在辽沈、淮海、平津 |
@@ -499,8 +501,8 @@
 - 分片：`development`；类别：`constraints_routing`；可答性：`answerable`；定义：`approved`
 - 必要事实 4 条；证据组 4 个；候选标签 9 条；池内锚点组 1/4
 - 主指标：R@10 0.750；P@5 0.200；MRR@10 1.000；nDCG@5 1.000；线上对齐 R@12 0.750；诊断 R@20 0.750
-- 命中证据组：`mao_arrive_beiping_march25`、`mao_xiyuan_march25`、`mao_yangtze_command_late_march`
-- 未命中证据组：
+- Top10 命中证据组：`mao_arrive_beiping_march25`、`mao_xiyuan_march25`、`mao_yangtze_command_late_march`
+- Top10 未命中证据组：
   - `mao_xiangshan_march31`：3月31日在香山接见并宴请第四野战军师以上干部。（锚点：mao_zedong_chronology_volume_3 PDF 477）
 
 最终 Top 8：

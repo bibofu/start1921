@@ -76,6 +76,11 @@ CPC_CONGRESS_NUMBER = {
     ordinal: number for number, ordinal in enumerate(CPC_CONGRESS_ORDINALS, start=1)
 }
 CPC_CONGRESS_SHORT_NAME = re.compile(r"中共(?:第)?(?P<ordinal>[一二三四五六七八九十]{1,3})大")
+CPC_CONGRESS_NATURAL_NAME = re.compile(
+    r"(?:(?:中国共产党|中共|党的)(?P<prefixed>头一次|首次|第?[一二三四五六七八九十]{1,3}次)"
+    r"|(?<![一-鿿])(?P<bare>头一次|首次|第?[一二三四五六七八九十]{1,3}次))"
+    r"全国(?:代表)?大会"
+)
 CPC_CONGRESS_RANGE = re.compile(
     r"中共(?:第)?(?P<start>[一二三四五六七八九十]{1,3})大\s*"
     r"(?:至|到|—|–|-|~|～)\s*"
@@ -152,6 +157,24 @@ def cpc_congress_ordinals(query: str) -> list[str]:
         )
     ordinals.extend(match.group("ordinal") for match in CPC_CONGRESS_SHORT_NAME.finditer(query))
     return list(dict.fromkeys(ordinals))
+
+
+def normalize_congress_phrases(query: str) -> str:
+    """Map natural-language congress descriptions to 中共X大."""
+
+    result = query
+    for match in reversed(list(CPC_CONGRESS_NATURAL_NAME.finditer(query))):
+        raw_ordinal = match.group("prefixed") or match.group("bare")
+        ordinal = raw_ordinal.replace("第", "").replace("次", "")
+        ordinal = {"头一": "一", "首": "一"}.get(ordinal, ordinal)
+        if ordinal not in CPC_CONGRESS_NUMBER:
+            continue
+        result = (
+            result[: match.start()]
+            + f"中共{ordinal}大"
+            + result[match.end() :]
+        )
+    return result
 
 
 def expand_congress(query: str) -> str:
@@ -939,19 +962,29 @@ def search_hybrid_index(
     ):
         raise RetrievalError("candidate_k must be an integer in 1..100 and >= top_k.")
     person_names = _person_names(aliases_path)
-    raw_query = expand_congress(query)
-    normalized = normalize_query(query, aliases_path)
-    variants = [raw_query]
-    if normalized != query:
-        normalized_query = expand_congress(normalized)
-        variants.append(normalized_query)
-        observed = expand_observation(normalized_query, person_names)
-        if observed != normalized_query:
+    congress_normalized = normalize_congress_phrases(query)
+    normalized = normalize_query(congress_normalized, aliases_path)
+    if congress_normalized != query:
+        # A high-confidence natural-language congress description is replaced
+        # by its canonical form; the raw phrase is not useful for retrieval.
+        canonical_query = expand_congress(normalized)
+        variants = [canonical_query]
+        observed = expand_observation(canonical_query, person_names)
+        if observed != canonical_query:
             variants.append(observed)
     else:
-        observed = expand_observation(raw_query, person_names)
-        if observed != raw_query:
-            variants.append(observed)
+        raw_query = expand_congress(query)
+        variants = [raw_query]
+        if normalized != query:
+            normalized_query = expand_congress(normalized)
+            variants.append(normalized_query)
+            observed = expand_observation(normalized_query, person_names)
+            if observed != normalized_query:
+                variants.append(observed)
+        else:
+            observed = expand_observation(raw_query, person_names)
+            if observed != raw_query:
+                variants.append(observed)
     queries = list(dict.fromkeys([*variants, *(additional_queries or [])]))
     responses = [
         _search_one(

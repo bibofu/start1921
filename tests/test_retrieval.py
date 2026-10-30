@@ -10,6 +10,7 @@ from history_agent.retrieval.hybrid import (
     cpc_congress_ordinals,
     expand_query,
     fuse_search_responses,
+    normalize_congress_phrases,
     normalize_query,
     search_hybrid_index,
 )
@@ -97,6 +98,16 @@ def test_observation_query_expansion_requires_a_person_object() -> None:
     institution = "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？"
     assert expand_query(institution, names) == institution
     assert expand_query("周恩来在1956年有哪些经历？", names) == "周恩来在1956年有哪些经历？"
+
+
+def test_natural_congress_phrases_are_normalized() -> None:
+    assert normalize_congress_phrases("党的头一次全国大会讲了什么？") == "中共一大讲了什么？"
+    assert normalize_congress_phrases("第一次全国代表大会通过了什么？") == "中共一大通过了什么？"
+    assert normalize_congress_phrases("中共第七次全国代表大会何时召开？") == "中共七大何时召开？"
+    kmt = "中国国民党第一次全国代表大会是什么？"
+    soviet = "中华苏维埃第一次全国代表大会是什么？"
+    assert normalize_congress_phrases(kmt) == kmt
+    assert normalize_congress_phrases(soviet) == soviet
 
 
 def test_query_aliases_are_normalized_from_config(work_path) -> None:
