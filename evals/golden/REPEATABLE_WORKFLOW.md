@@ -19,7 +19,7 @@
 
 ## 1.1 候选池与 LLM 预标
 
-当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；候选标签为 95 条 `agent_review` + 97 条人工复核；`llm_judge` 已清零。
+当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；182 条候选标签全部为 `human_review`；`agent_review` 与 `llm_judge` 均为 0。
 
 复现/扩展命令：
 
@@ -27,7 +27,7 @@
 .\.venv\Scripts\python.exe -B scripts/build_candidate_pools.py --write
 ```
 
-63 条 LLM 标签的复核记录见 [label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md)。复核通过后，应把对应判断改为 `human_review` 并记录 reviewer/time；剩余 95 条 `agent_review` 仍需逐条人工复核。
+LLM 与 Agent 标签的复核记录见 [label_reviews/](label_reviews/)。复核后应把对应判断改为 `human_review` 并记录 reviewer/time；当前候选标签已全部人工复核。
 
 ## 2. 生成复核包
 

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "version": "golden-v2.5-selected-20-20261030",
-  "description": "按用户2026-10-29/30裁定形成的工作集：20题、15开发+5保留、18可答+2拒答，20题定义均已人工批准；候选标签97条人工复核、95条仍为agent_review。不替代历史版本。",
-  "annotation_status": "case_definitions_approved_labels_97_human_95_agent",
+  "version": "golden-v2.6-selected-20-20261030",
+  "description": "按用户2026-10-29/30裁定形成的工作集：20题、15开发+5保留、18可答+2拒答，20题定义与182条候选标签均已人工批准；固定池口径仍待批准。不替代历史版本。",
+  "annotation_status": "cases_and_candidate_labels_human_approved_pools_pending",
   "evidence_group_semantics": {
     "facts_to_groups": "AND：一条事实列出的所有 evidence_group_ids 都必须命中。",
     "group_alternatives": "OR：同一 evidence group 内任一 alternative 命中即可，一个组只计一次。",
@@ -122,10 +122,10 @@
         {
           "unit_id": "0d6081995ad558e2f4b23478fbcf65432009061a05e7105ced9730b31449c64e",
           "relevance": 2,
-          "reason": "1954年9月国务院组成人员名单明确将邓小平列入副总理；本片段不支持其国防委员会职务。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年9月国务院组成人员名单明确将邓小平列入副总理；本片段不支持其国防委员会职务（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "deng_vice_premier_1954"
           ]
@@ -133,10 +133,10 @@
         {
           "unit_id": "3668a7cc6911edab74aa0515706d35b9807283d9f1e64a6677443de3059a296f",
           "relevance": 2,
-          "reason": "中卷1954年9月条目直接同时给出国务院副总理和国防委员会副主席。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "中卷1954年9月条目直接同时给出国务院副总理和国防委员会副主席（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "deng_vice_premier_1954",
             "deng_defense_vice_chair_1954"
@@ -145,10 +145,10 @@
         {
           "unit_id": "f6250636815dfaac3e0e8ba2388242868c5eb07630e1b7ae2fd16c1aabacb867",
           "relevance": 2,
-          "reason": "国家主席任命令将邓小平分别列入国务院副总理、国防委员会副主席名单，属于直接支持。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "国家主席任命令将邓小平分别列入国务院副总理、国防委员会副主席名单，属于直接支持（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "deng_vice_premier_1954",
             "deng_defense_vice_chair_1954"
@@ -157,55 +157,55 @@
         {
           "unit_id": "d3ddb192fbf4b7741dc0d0decc58e69860644d33e584d32e4beefb218b3ec428",
           "relevance": 1,
-          "reason": "1954年9月党内军委组成、国务院会议和陈毅常务副总理，相关但未直接说明邓小平所问两项职务。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年9月党内军委组成、国务院会议和陈毅常务副总理，相关但未直接说明邓小平所问两项职务（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5fd7cd48d59207846337a0500b4b2c34a57f73006aff87add225fcc3f8f914a1",
           "relevance": 0,
-          "reason": "主体事件为1953年；1954/1956任职脚注属于聂荣臻，不能转绑到邓小平。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "主体事件为1953年；1954/1956任职脚注属于聂荣臻，不能转绑到邓小平（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "2c58f7eca1792aa75358601f70e409fc9c7ac57a3f59b7880af18a167ff8d5ed",
           "relevance": 0,
-          "reason": "1954年10月党内军委称谓及咨询机关性质，不给出邓小平9月所问两项职务；军委与国防委员会不可混用。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年10月党内军委称谓及咨询机关性质，不给出邓小平9月所问两项职务；军委与国防委员会不可混用（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "47e8dfe5acb5018cda30193a39b4c8ba185a9f71980d808a3961da10be5cc9d4",
           "relevance": 0,
-          "reason": "1954年7月干部安排和日内瓦返国接待，不支持9月两个机构职务。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年7月干部安排和日内瓦返国接待，不支持9月两个机构职务（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b4f8c397e5a8e9c77455244b222be28bd3d0613748df8b66c4df6f624ab34b21",
           "relevance": 1,
-          "reason": "1954年9月撤销邓小平的西南财政经济职务及宪法准备是任职调整背景，但不是所问两项任命。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年9月撤销邓小平的西南财政经济职务及宪法准备是任职调整背景，但不是所问两项任命（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "d3bde304b2295d26d81ff1d3363d9236cb972956fd85b8324cba6a30b8d99605",
           "relevance": 0,
-          "reason": "1954年6月财政部及政务院财委免职，不等于9月国务院/国防委员会新任职。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年6月财政部及政务院财委免职，不等于9月国务院/国防委员会新任职（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -437,10 +437,10 @@
         {
           "unit_id": "0d6081995ad558e2f4b23478fbcf65432009061a05e7105ced9730b31449c64e",
           "relevance": 2,
-          "reason": "片段直接写明周恩来为国务院总理及兼任外交部部长，可核对1954年9月条目。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "片段直接写明周恩来为国务院总理及兼任外交部部长，可核对1954年9月条目（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "zhou_premier_1954",
             "zhou_foreign_minister_1954"
@@ -449,73 +449,73 @@
         {
           "unit_id": "47e8dfe5acb5018cda30193a39b4c8ba185a9f71980d808a3961da10be5cc9d4",
           "relevance": 0,
-          "reason": "主体是邓小平1954年7月处理王恩茂、张鼎丞等干部安排；仅提转周恩来的电报，不证明周的任何必要职务。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "主体是邓小平1954年7月处理王恩茂、张鼎丞等干部安排；仅提转周恩来的电报，不证明周的任何必要职务（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "3b439f6113eaf84e2788ed2cd765d005fa144e36707093f1e55f82b79c4acdf0",
           "relevance": 0,
-          "reason": "记载邓小平、薄一波等任免及其他人物脚注；周恩来只在会议名单，未给出所问职务。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "记载邓小平、薄一波等任免及其他人物脚注；周恩来只在会议名单，未给出所问职务（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "f26c590c30abb0813fa927aed26f27b5228fceb8c7230aa3efae8fa0a4eb56be",
           "relevance": 1,
-          "reason": "1954年日内瓦外交活动的背景，说明参加会议但未给出国务院总理/外长/政协主席任职。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年日内瓦外交活动的背景，说明参加会议但未给出国务院总理/外长/政协主席任职（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "3fe16525cbb9c842987e8d5741d5ee91b0b70438e0bc42b558b073f7eac282ae",
           "relevance": 1,
-          "reason": "同年日内瓦会议发言和外交行动背景，无必要职务的明确任命或名称。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "同年日内瓦会议发言和外交行动背景，无必要职务的明确任命或名称（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6f188ad94ce399df6531ac6c171d69b6da751416a487839bf45ed5eeb02bcb88",
           "relevance": 1,
-          "reason": "1954年外交部干部工作和一五计划活动可作职责背景，但不能单凭活动推断正式头衔。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年外交部干部工作和一五计划活动可作职责背景，但不能单凭活动推断正式头衔（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "96063d954d26a71869caace2289a809768bbc3941b9b5e7da5936b848b1c218c",
           "relevance": 1,
-          "reason": "周恩来作政府工作报告及参加1954年国家领导人安排讨论，只是相关背景，没有任职结果。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "周恩来作政府工作报告及参加1954年国家领导人安排讨论，只是相关背景，没有任职结果（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "65a78c53fe656b5b97470d98704ffd489c3612bc14dcf8db3f16bd07b24d7230",
           "relevance": 1,
-          "reason": "1954年10月主持国务院会议、分管外交部与华侨委员会是职责背景，未直接给出本人总理及外长头衔。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年10月主持国务院会议、分管外交部与华侨委员会是职责背景，未直接给出本人总理及外长头衔（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5b9a22f086132feb8eecd5d3eee83ceb71ceed202439f1dde70850fa99a98e41",
           "relevance": 2,
-          "reason": "明确记载二十五日当选政协第二届全国委员会主席，邻接1954年12月25日日期。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "明确记载二十五日当选政协第二届全国委员会主席，邻接1954年12月25日日期（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "zhou_cppcc_1954"
           ]
@@ -768,10 +768,10 @@
         {
           "unit_id": "5593566502ee54d366e9d406c51f7bdb7c162e0a9ffe98b775934cc6f09129b5",
           "relevance": 2,
-          "reason": "脚注明确写一九五二年八月七日、中央人民政府第十七次会议、任命邓小平为政务院副总理，日期、人物、职务全部直接对应；是原邓年谱之外的有效替代证据。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "脚注明确写一九五二年八月七日、中央人民政府第十七次会议、任命邓小平为政务院副总理，日期、人物、职务全部直接对应；是原邓年谱之外的有效替代证据（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "appointment"
           ]
@@ -779,19 +779,19 @@
         {
           "unit_id": "78959a999968077a3f795a97d63bbc06d41eca25f013a3de87744cf18f038a34",
           "relevance": 1,
-          "reason": "1952年8月6日至8日条目记载第十七次会议为加强政务院领导而任命邓小平为副总理，直接支持职务，但片段没有把任命唯一定位到8月7日；仅部分支持完整带日期命题。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "1952年8月6日至8日条目记载第十七次会议为加强政务院领导而任命邓小平为副总理，直接支持职务，但片段没有把任命唯一定位到8月7日；仅部分支持完整带日期命题（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "bbc4ff1d06fd352d2b54e950b976ae120a7c372968069bc26a31ebd46588f2e6",
           "relevance": 2,
-          "reason": "正文有8月7日中央人民政府任命邓小平为政务院副总理，且页首可见1952年；条目月份应优先于7月页眉。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "正文有8月7日中央人民政府任命邓小平为政务院副总理，且页首可见1952年；条目月份应优先于7月页眉（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "appointment"
           ]
@@ -799,149 +799,55 @@
         {
           "unit_id": "8ed04cd564df704a06f885cab17e542ede7299dcf746780061f478142d8a6324",
           "relevance": 1,
-          "reason": "8月13日与到京上任的邓小平谈政务院工作，并宣布赴苏期间由其代理总理；属于同次中央任职的后续背景，但代理总理不是8月7日任命的职务，不能满足appointment组。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "8月13日与到京上任的邓小平谈政务院工作，并宣布赴苏期间由其代理总理；属于同次中央任职的后续背景，但代理总理不是8月7日任命的职务，不能满足appointment组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "1994cadab6c9b8082a45b2e79866f2dc6b51fb15792679d6c1abb6bd91dcb3d3",
           "relevance": 1,
-          "reason": "7月13日复电要求邓小平七月下旬到中央先行工作，是随后任命的直接调任背景；本段任命名单是四川省政府人员，没有8月7日给邓小平的职务。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "7月13日复电要求邓小平七月下旬到中央先行工作，是随后任命的直接调任背景；本段任命名单是四川省政府人员，没有8月7日给邓小平的职务（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "8835360eb90acf2dd1464a821e72b6d5662b33c3d2352cfe2f804172f45fcdc1",
           "relevance": 0,
-          "reason": "实际内容为1952年12月民船工作、统计工作和西藏工委批示，未叙述8月任命；不能由其处理政务反推当日被任命何职。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "实际内容为1952年12月民船工作、统计工作和西藏工委批示，未叙述8月任命；不能由其处理政务反推当日被任命何职（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "ed281de994d6979d1f868853772287f1259f3cf6cb08588aa8f99938766a8ee4",
           "relevance": 0,
-          "reason": "内容是1952年10月五反、工矿安全和高校思想改造，虽记载主持政务院会议，但没有8月7日任命或其职务名称，不能作为任命证据。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "内容是1952年10月五反、工矿安全和高校思想改造，虽记载主持政务院会议，但没有8月7日任命或其职务名称，不能作为任命证据（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5d4353b623bc0524c1f9632ff3af7ca6804fcbb4065f16d914a99f6726a0e372",
           "relevance": 1,
-          "reason": "8月10日建议、13日同意邓小平任政府党组干事会第二副书记，并列政务会议活动；为同段中央任职背景，但属于另一个党内岗位与日期，不能替代8月7日政务院副总理任命。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
+          "reason": "8月10日建议、13日同意邓小平任政府党组干事会第二副书记，并列政务会议活动；为同段中央任职背景，但属于另一个党内岗位与日期，不能替代8月7日政务院副总理任命（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "a5182aea991f9effa4acce91d3a15843ee8a1f1558d01c6536be31af78779413",
           "relevance": 0,
-          "reason": "内容为1952年2月至3月西南三反五反、转业干部和地方建设经费，与8月7日中央任命无直接关系；其中其他人的注释职务不能绑定给邓小平。",
-          "reviewer": "agent:eval_case_design",
-          "reviewed_at": "2026-09-22T10:48:01Z",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "f339523441ae7ff0de261c97ec93fec6740ba61c85ec1731ef26c336db98ede0",
-          "relevance": 2,
-          "reason": "脚注明确列出1952年8月7日任命邓小平为政务院副总理，直接支持目标任命。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": [
-            "appointment"
-          ]
-        },
-        {
-          "unit_id": "5b6b80ba9b627043eb233fd59a728fa40f63d82b257ba041f87fd174e0cca9db",
-          "relevance": 2,
-          "reason": "裁剪片段仍保留8月7日任命邓小平为政务院副总理的原句，所属1952年文献段与E1交叉支持。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": [
-            "appointment"
-          ]
-        },
-        {
-          "unit_id": "9de7909bf1864e140f322caf535f9201c536bee9d585792b2b4d64bf5949da7c",
-          "relevance": 1,
-          "reason": "保留7月赴中央工作的调任背景，任命名单为四川政府人员，不能替代8月7日邓小平的任命。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "db8ba2af1b97e99b39010e3843d69c817407a1f654d6b654b49e703a9b89f428",
-          "relevance": 1,
-          "reason": "八月到中央后的党组任职与政务会议属于同期背景，未给出8月7日政务院副总理任命。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "9450875f5c7e0114fd7e56358991fd88c8edcd09ed3ebf8ff615b5f628ce51cb",
-          "relevance": 0,
-          "reason": "十二月西藏工委工作批示与目标任命无关。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "6c74b321af9bf21c40cea67f9b4a097cba194de962643648383420d1d21a5570",
-          "relevance": 0,
-          "reason": "三反五反和西南干部工作未涉及8月7日中央任命。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "279ee909fb22eb34fb9d16c752c3d646cff5d78e1181cc42f1ae9e62ca499399",
-          "relevance": 0,
-          "reason": "十月高校教师思想改造会议与目标日期及任命职务无关。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "dddce59fdeefea777bb82937e31731d693eabe2274d98fa3b54123b1b28a94f7",
-          "relevance": 0,
-          "reason": "十一月扩大会议和过渡计划讨论只有普通参会或收信提及，不支持八月任命。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "f9a6b3b49268916da560a0266c7748af725b01c6ba05999d90275b172085d796",
-          "relevance": 0,
-          "reason": "九月会议及黄炎培讲稿批示与目标任命无关。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "8ffaf59c91b1fb8496dab192936ac89c1e9d22d1250d89f6d82e2434deefdca5",
-          "relevance": 0,
-          "reason": "八月大米贸易和军需等工作记录没有邓小平任命，普通名单出现不构成支持。",
-          "reviewer": "agent:root",
-          "reviewed_at": "2026-09-22T12:44:46.577148+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1952年2月至3月西南三反五反、转业干部和地方建设经费，与8月7日中央任命无直接关系；其中其他人的注释职务不能绑定给邓小平（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -1228,28 +1134,28 @@
         {
           "unit_id": "c9e818e0653b8c18f7392ee189e9d0dbd5a4249bd5563c494194a0bb1df8850d",
           "relevance": 0,
-          "reason": "目录仅出现《矛盾论》标题，没有主要矛盾的定义、方法或论证，不能作为观点证据。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "目录仅出现《矛盾论》标题，没有主要矛盾的定义、方法或论证，不能作为观点证据（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "66c634e6d7b8e890c62df362fbdfaf493dd866c6513a48ee5b215f6b1eba84b5",
           "relevance": 0,
-          "reason": "另一目录页仅罗列篇名，未载本文论证；标题命中不等于相关证据。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "另一目录页仅罗列篇名，未载本文论证；标题命中不等于相关证据（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b21a355296616eefa71f0bc9b1971b509f1c163e5b5d95104f284230a28b071c",
           "relevance": 2,
-          "reason": "《矛盾论》正文明确主要矛盾规定或影响其他矛盾、起领导决定作用，并要求全力找出抓住主要矛盾。虽提各阶段，但缺侵略战争令国内矛盾下降的完整变化例子，不满计第三组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "《矛盾论》正文明确主要矛盾规定或影响其他矛盾、起领导决定作用，并要求全力找出抓住主要矛盾。虽提各阶段，但缺侵略战争令国内矛盾下降的完整变化例子，不满计第三组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "principal_role",
             "find_and_prioritize_principal"
@@ -1258,82 +1164,82 @@
         {
           "unit_id": "75cf1551afae203194af165d75527c05880a5101099f85b4d293298745ab15fb",
           "relevance": 0,
-          "reason": "介绍中农与贫农的划分，不是《矛盾论》对主要矛盾的分析。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "介绍中农与贫农的划分，不是《矛盾论》对主要矛盾的分析（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "f7e72869b4737058d6ae1a46e794f1a0364e820c2011430fda03367ea1d1ecdb",
           "relevance": 0,
-          "reason": "后期讲话讨论国共力量和分析综合方法，不属于题目指定《矛盾论》，也未直接阐释主要矛盾概念。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "后期讲话讨论国共力量和分析综合方法，不属于题目指定《矛盾论》，也未直接阐释主要矛盾概念（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5186fb9ebc13b4da56b42b5acc0f9cbe61161cde8cef8e8127e0080dae208dc2",
           "relevance": 0,
-          "reason": "只有揭露矛盾而非掩盖矛盾的泛论，缺指定篇目和主要矛盾分析。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "只有揭露矛盾而非掩盖矛盾的泛论，缺指定篇目和主要矛盾分析（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "3c6844cc8ff45481a1ec00d69502dcca297c277c7f6ef7971f1613f4b32e94b1",
           "relevance": 0,
-          "reason": "年谱记载后期关于国内阶级矛盾的判断，不能当作1937年《矛盾论》原文，人物与关键词相同不足以相关。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "年谱记载后期关于国内阶级矛盾的判断，不能当作1937年《矛盾论》原文，人物与关键词相同不足以相关（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "96c573d5975913e94bb7ff8ce11620eb404686ff7cce199d4f793863bc84818a",
           "relevance": 0,
-          "reason": "内容为1950年代整风时对敌我/人民内部矛盾及国内主要矛盾的判断，不是指定篇目的论证。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1950年代整风时对敌我/人民内部矛盾及国内主要矛盾的判断，不是指定篇目的论证（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "467d47f2418e8f1cc3f39008f7896f0e7e708487d6bc27abcde73f0549b905e1",
           "relevance": 1,
-          "reason": "记录毛泽东向斯诺解释《矛盾论》的写作年代、授课和经验来源，属于篇目背景；没有主要矛盾的具体分析，不能支持任一必要组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "记录毛泽东向斯诺解释《矛盾论》的写作年代、授课和经验来源，属于篇目背景；没有主要矛盾的具体分析，不能支持任一必要组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "4b1c721f9a8f4f9a329b5dd0756e0621c93cba96e74d324f2fef283e8009c965",
           "relevance": 1,
-          "reason": "年谱概述《矛盾论》的写作目的、普遍性与特殊性，末尾才到主要矛盾但句子截断，属于相关理论背景，不能自行补全后页。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "年谱概述《矛盾论》的写作目的、普遍性与特殊性，末尾才到主要矛盾但句子截断，属于相关理论背景，不能自行补全后页（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "da39b32c0a4c8f1b805dca819df899a14a1c4a8659482d37cd67d9836844fff3",
           "relevance": 1,
-          "reason": "是《矛盾论》正文对具体分析及国共关系的论证，可作方法背景，但没有主次矛盾的定义或优先抓主要矛盾的完整命题。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "是《矛盾论》正文对具体分析及国共关系的论证，可作方法背景，但没有主次矛盾的定义或优先抓主要矛盾的完整命题（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "861e93c4c38aa03b40986d5595ccd6c626c67ef3b060c635813e2c7a07a01b69",
           "relevance": 1,
-          "reason": "正文说明矛盾及各方面的特殊性、应具体全面分析，属于主要矛盾论证的邻近理论背景，未直接给出当前三个必要组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "正文说明矛盾及各方面的特殊性、应具体全面分析，属于主要矛盾论证的邻近理论背景，未直接给出当前三个必要组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -1527,100 +1433,100 @@
         {
           "unit_id": "3870dac527f8f469927631f8308ccd4a175f86fc32a8376a4fb581d77630216b",
           "relevance": 0,
-          "reason": "1931年中华苏维埃第一次全国代表大会和赣南会议，会议实体与1921年党的一大不同。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1931年中华苏维埃第一次全国代表大会和赣南会议，会议实体与1921年党的一大不同（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5bc09af2c96df5bdaa416d7ad454b25fd075c048cc8ccfa51dd38ec01e45c330",
           "relevance": 0,
-          "reason": "1925年青年团第三次全国代表大会，组织及届次均不符。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1925年青年团第三次全国代表大会，组织及届次均不符（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "87c3a88ba3b3abdcc6e578a3a94772131ace3286024c6b8be7f385b13738c6fe",
           "relevance": 0,
-          "reason": "1923年党的第三次全国代表大会讨论国共合作，不能替代一大的党纲和决议。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1923年党的第三次全国代表大会讨论国共合作，不能替代一大的党纲和决议（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "d873621da10a7dacf458f66efe4701681ca3742e9f19d77212cb719229350352",
           "relevance": 0,
-          "reason": "1971年筹备联合国大会中国代表团首次发言，非中国共产党第一次全国代表大会。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1971年筹备联合国大会中国代表团首次发言，非中国共产党第一次全国代表大会（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "e16875c2b0ba2a47d6dda60df161ce38da9dab2f844f0bf272f02e6b66863930",
           "relevance": 0,
-          "reason": "目录列党三大、四大及国共合作等标题，无一大决定的原文。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "目录列党三大、四大及国共合作等标题，无一大决定的原文（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b83def078dc623b6078588f0149a6fc34eb7e471a92a6e647b7700153986ee22",
           "relevance": 0,
-          "reason": "1945年党的七大闭幕、党章和中央委员会选举，不是1921年一大。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1945年党的七大闭幕、党章和中央委员会选举，不是1921年一大（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "f8b2a6ea1c6652b434e1f19b911c32f7a1278f7eafebc6b4a7bf3959be108fa8",
           "relevance": 0,
-          "reason": "1954年第一届全国人民代表大会第一次会议制定宪法，与党的一大属不同会议制度。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1954年第一届全国人民代表大会第一次会议制定宪法，与党的一大属不同会议制度（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "31dfeed932820fc7bce42ae2031cadb240a8112659364ef18ceabc3e6070a8b8",
           "relevance": 0,
-          "reason": "1929年政治局会议及革命互济会全国代表大会，时间、组织、会议皆不符。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1929年政治局会议及革命互济会全国代表大会，时间、组织、会议皆不符（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "09389c82aae44f3ad2a5ceb88b4441aa737c0ece81919f18b6824a264ca603a8",
           "relevance": 0,
-          "reason": "1977年党的十一大及其筹备和新中央委员会，不能因'第一次'或'大会'近似命中作为一大证据。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1977年党的十一大及其筹备和新中央委员会，不能因'第一次'或'大会'近似命中作为一大证据（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "e0b2f2213585adf6e210c39146c7efab63232c9b918b529b0077bb950733a0db",
           "relevance": 0,
-          "reason": "1977年十届三中全会与十一大筹备、邓小平复职，不涉及1921年一大决定。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1977年十届三中全会与十一大筹备、邓小平复职，不涉及1921年一大决定（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "49d74f1274bfea9e25bb252ea35c58007571fd0f0c16259d8f64f1b60e3d2e84",
           "relevance": 2,
-          "reason": "独立从当前真实chunk文件取出：一大通过党纲、确定名称和纲领内容，并规定统一组织及纪律；直接支持两个必要组。该chunk未被本轮原问法三分支前5返回，加入固定评价池而非任何运行排名。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "独立从当前真实chunk文件取出：一大通过党纲、确定名称和纲领内容，并规定统一组织及纪律；直接支持两个必要组。该chunk未被本轮原问法三分支前5返回，加入固定评价池而非任何运行排名（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "programme_and_name",
             "organization_discipline"
@@ -1629,10 +1535,10 @@
         {
           "unit_id": "c2e15410e88027b4ae2d0c6e502942509a15ceb67e3278ece27beec87515d472",
           "relevance": 2,
-          "reason": "独立原文chunk明确集中领导工人运动、首先组织工会与教育工人；当前实际工作决议标题在页尾截断，不能额外补齐下一页独立政策。未被当前前5召回，仅扩充固定池。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "独立原文chunk明确集中领导工人运动、首先组织工会与教育工人；当前实际工作决议标题在页尾截断，不能额外补齐下一页独立政策。未被当前前5召回，仅扩充固定池（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "worker_movement_priority"
           ]
@@ -1640,10 +1546,10 @@
         {
           "unit_id": "538b129c4fe76b3a13924e62391084c46a1c29f06210136e916c8bc6f10d4dd1",
           "relevance": 2,
-          "reason": "独立原文chunk明确维护无产阶级利益的独立政策，并完整列暂设中央局、陈独秀/张国焘/李达及分工。未被当前前5召回，仅扩充固定池；不会冒充检索成果。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "独立原文chunk明确维护无产阶级利益的独立政策，并完整列暂设中央局、陈独秀/张国焘/李达及分工。未被当前前5召回，仅扩充固定池；不会冒充检索成果（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "independent_policy",
             "central_bureau_election"
@@ -1808,10 +1714,10 @@
         {
           "unit_id": "a47f017f9911e66593d2e4c1dbcd7f72bd607dde9599e0c933b5ef9dbbf7a8a1",
           "relevance": 2,
-          "reason": "直接要求一切从实际出发、无把握不发言或决策，并用老农、干部座谈会和群众议论取得材料；也安排亲自调查但未完整表达不能只靠报告，不补满亲身组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "直接要求一切从实际出发、无把握不发言或决策，并用老农、干部座谈会和群众议论取得材料；也安排亲自调查但未完整表达不能只靠报告，不补满亲身组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding",
             "learn_from_people_through_discussion"
@@ -1820,10 +1726,10 @@
         {
           "unit_id": "5e47478d2e7a94df870ba720e97bf789214b86fe9db7bee0fbc48a6205c791df",
           "relevance": 2,
-          "reason": "《大兴调查研究之风》直接要求先摸清情况、心中有底再行动，不能只凭想像估计；提到亲身查若干单位，但未讲不能单靠书面报告，其他组不满计。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "《大兴调查研究之风》直接要求先摸清情况、心中有底再行动，不能只凭想像估计；提到亲身查若干单位，但未讲不能单靠书面报告，其他组不满计（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding"
           ]
@@ -1831,10 +1737,10 @@
         {
           "unit_id": "7fcb910d1c8008783c0f61166cc4d2ff1267430aa9e225453ef2e5f18c554e9e",
           "relevance": 2,
-          "reason": "以调查解决作战难题的亲身经验说明先弄清情况再形成办法，并强调各阶段都需调查；没有理论联系实际或群众讨论等其他完整组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "以调查解决作战难题的亲身经验说明先弄清情况再形成办法，并强调各阶段都需调查；没有理论联系实际或群众讨论等其他完整组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding"
           ]
@@ -1842,10 +1748,10 @@
         {
           "unit_id": "40c91d4decc7a5bc634771ddc497b56dae5937793f7eb34883c6df442e9f22d6",
           "relevance": 2,
-          "reason": "原文明确领导者依靠亲身调查解决问题、书面报告与亲身调查不同，并要求住下来系统调查，完整支持亲身组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "原文明确领导者依靠亲身调查解决问题、书面报告与亲身调查不同，并要求住下来系统调查，完整支持亲身组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "personal_in_depth_investigation"
           ]
@@ -1853,10 +1759,10 @@
         {
           "unit_id": "fc770e42fdd145216cee285352c31d43f77b636f880373854af023070283086f",
           "relevance": 2,
-          "reason": "通过调查对方武器和意图确定应对办法，并明确没有调查研究没有发言权，支持先调查再判断；例子涉及1945年形势，不应用于替代其他观点。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "通过调查对方武器和意图确定应对办法，并明确没有调查研究没有发言权，支持先调查再判断；例子涉及1945年形势，不应用于替代其他观点（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding"
           ]
@@ -1864,10 +1770,10 @@
         {
           "unit_id": "7e43e67048b5ee8c16562371c59e9416749f98174f5b3f4931a44088ff29df9d",
           "relevance": 2,
-          "reason": "年谱记录毛泽东逐节解释《关于调查工作》，指出即使决议正确也要调查和具体措施，反对本本主义，支持理论/指示须落实实际。其余讨论集中方法背景，不满计群众调查会组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "年谱记录毛泽东逐节解释《关于调查工作》，指出即使决议正确也要调查和具体措施，反对本本主义，支持理论/指示须落实实际。其余讨论集中方法背景，不满计群众调查会组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "theory_with_actual_conditions"
           ]
@@ -1875,10 +1781,10 @@
         {
           "unit_id": "0dcfbb68970229f7ee5915e9e483c669cb36cf271f0b9f6a1ef7443f0adcff97",
           "relevance": 2,
-          "reason": "逐项要求讨论式调查、不同职业和经验的人参与、准备纲目及亲自出马不能单靠报告，完整支持亲身调查和调查会学习两组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "逐项要求讨论式调查、不同职业和经验的人参与、准备纲目及亲自出马不能单靠报告，完整支持亲身调查和调查会学习两组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "personal_in_depth_investigation",
             "learn_from_people_through_discussion"
@@ -1887,10 +1793,10 @@
         {
           "unit_id": "554b205650730fb1399b07f8ead2f2dda87ea1b1b321b01fa6f1c392e0d612aa",
           "relevance": 2,
-          "reason": "片段同时说明没有调查无发言权、正确策略来源实践且理论非有不可，并要求讨论式调查、平等向人学习；亲自出马虽有提及但缺不能依靠书面报告这一完整限制，未满计亲身组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "片段同时说明没有调查无发言权、正确策略来源实践且理论非有不可，并要求讨论式调查、平等向人学习；亲自出马虽有提及但缺不能依靠书面报告这一完整限制，未满计亲身组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding",
             "theory_with_actual_conditions",
@@ -1900,19 +1806,19 @@
         {
           "unit_id": "9ea114b3f9bb661ed2cf377624ea915d6f32b96091ea93bef69dd39cc3020b6e",
           "relevance": 1,
-          "reason": "仅一句'在实际中调查、在实践中认识客观事物'支持调查的实践性，缺少先调查再决定、理论结合、亲自调查或调查会等完整必要观点。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "仅一句'在实际中调查、在实践中认识客观事物'支持调查的实践性，缺少先调查再决定、理论结合、亲自调查或调查会等完整必要观点（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "76da934da34bd79e73cd5c2bcc47f9d56d43a8f425d43909be8314e00883735a",
           "relevance": 2,
-          "reason": "1941年调查研究决定明确无调查无发言权、周密调查是政策基础，并要求马列原理指导中国实际、理论与实际密切联系，支持两组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1941年调查研究决定明确无调查无发言权、周密调查是政策基础，并要求马列原理指导中国实际、理论与实际密切联系，支持两组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding",
             "theory_with_actual_conditions"
@@ -1921,19 +1827,19 @@
         {
           "unit_id": "53f54e737e5fe1b936b4a6ed27712a8deafc5702592dc2faa6d4579731387c51",
           "relevance": 1,
-          "reason": "讲话回顾民主革命及解放后调查研究多少和路线错误，说明调查重要的历史背景；未明确完整表述当前四项必要核心命题，不能因标题命中补齐组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "讲话回顾民主革命及解放后调查研究多少和路线错误，说明调查重要的历史背景；未明确完整表述当前四项必要核心命题，不能因标题命中补齐组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "ba1c19d621e7e04c3935671de4da3595acd29802a94704fca5ff15d0e5233cf4",
           "relevance": 2,
-          "reason": "要求各级领导组织调查，并明确情况明是一切工作的基础、情况不明无从着手，支持先了解情况再工作；段尾截断不允许补写其他观点。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "要求各级领导组织调查，并明确情况明是一切工作的基础、情况不明无从着手，支持先了解情况再工作；段尾截断不允许补写其他观点（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding"
           ]
@@ -1941,10 +1847,10 @@
         {
           "unit_id": "065e9e6d218341e2bf41ea15881efa5bfcc77fd34098ce64b9a97c9694d7328d",
           "relevance": 2,
-          "reason": "1961年批语明令禁止不调查、不与群众商量就关门作政策，直接支持调查先于决策；群众商量部分相关但未展开调查会学习方法，不补满调查会组。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "1961年批语明令禁止不调查、不与群众商量就关门作政策，直接支持调查先于决策；群众商量部分相关但未展开调查会学习方法，不补满调查会组（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding"
           ]
@@ -1952,10 +1858,10 @@
         {
           "unit_id": "c94452a756319bde7f3e0102458c3c7218e994a67a1eafeb81eb0b64d2d8207b",
           "relevance": 2,
-          "reason": "指出情况不明导致政策不正确、先诊断后处方，并强调调查为解决问题而非报表，支持先调查再判断；个人调查浮于报告的自省未完整给出对领导者的一般要求。",
-          "reviewer": "agent:eval_sources_semantic",
-          "reviewed_at": "2026-09-23T06:47:25.090053+00:00",
-          "basis": "agent_review",
+          "reason": "指出情况不明导致政策不正确、先诊断后处方，并强调调查为解决问题而非报表，支持先调查再判断；个人调查浮于报告的自省未完整给出对领导者的一般要求（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "investigate_before_concluding"
           ]
@@ -3656,93 +3562,93 @@
         {
           "unit_id": "5fd7cd48d59207846337a0500b4b2c34a57f73006aff87add225fcc3f8f914a1",
           "relevance": 0,
-          "reason": "主要事件是1953年1月，1954/1956脚注描述聂荣臻、黄克诚；不能当作周恩来1954至1956经历。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "主要事件是1953年1月，1954/1956脚注描述聂荣臻、黄克诚；不能当作周恩来1954至1956经历（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "26a5764e90e0596db339428f6012bf4aa3bf9576e1a605d605eb5666962c576c",
           "relevance": 0,
-          "reason": "主要事件为1953年5月会议，1954年只出现在张玺脚注，不支持周恩来题目时间范围。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "主要事件为1953年5月会议，1954年只出现在张玺脚注，不支持周恩来题目时间范围（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "82926238943c7aadf598e305dc0dd8840e70ea7d0d09c6644ae1e34b8366dbee",
           "relevance": 1,
-          "reason": "1954年4月周恩来报送日内瓦准备文件，为必要外交活动提供准备背景，未直接支持率团赴会的实际行动。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年4月周恩来报送日内瓦准备文件，为必要外交活动提供准备背景，未直接支持率团赴会的实际行动（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "599625d7add706d092eb5b00a3808f3d74e50153233ea7bbd29925da20a9696d",
           "relevance": 0,
-          "reason": "主要是1953年12月毛泽东的活动，1954年1月脚注是陈云返京；不能作为周恩来1954年工作经历。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "主要是1953年12月毛泽东的活动，1954年1月脚注是陈云返京；不能作为周恩来1954年工作经历（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "9acf2998aa4558853cb786001e41ebd2ce359ec52f5a9d70c5ae0d5969bb4e48",
           "relevance": 1,
-          "reason": "1954年3月周恩来致电关于苏联代印人民币，是时间内经济工作，非已定义主要主题的直接证据。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年3月周恩来致电关于苏联代印人民币，是时间内经济工作，非已定义主要主题的直接证据（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5bf0c6931fee84b873c2536b333c8be04a0c464da5b5f84f166b55f51b7b916f",
           "relevance": 1,
-          "reason": "1956年2月钱学森航空工业意见和周恩来转呈，支持科技工作背景，但不直接支持1月知识分子报告。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1956年2月钱学森航空工业意见和周恩来转呈，支持科技工作背景，但不直接支持1月知识分子报告（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5b9a22f086132feb8eecd5d3eee83ceb71ceed202439f1dde70850fa99a98e41",
           "relevance": 2,
-          "reason": "明确支持1954年12月当选全国政协主席和统战活动这一必要主题。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "明确支持1954年12月当选全国政协主席和统战活动这一必要主题（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "zhou_1954_cppcc"
           ]
         },
         {
           "unit_id": "e651091f2af80643c7cb8df4dcd23a1fe70c9ac4e7a34e63afdeab3967cdb3e2",
-          "relevance": 1,
-          "reason": "1958年会议回溯1956年反冒进，具有背景相关性；不可直接充作1956年提出削减支出与综合平衡的同期行动证据。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "relevance": 0,
+          "reason": "1958年会议回溯1956年反冒进，具有背景相关性；不可直接充作1956年提出削减支出与综合平衡的同期行动证据；人工改判为0：1958年会议回溯，不能充作1956年同期行动证据。",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "7a5106a2c000ba826c5b72095203b7aced59a5e927ef9debf7ff423fcc868cb5",
           "relevance": 1,
-          "reason": "1954年底至1955年初文化、科学和统战活动是真实背景，但未覆盖所标7组具体必要活动。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1954年底至1955年初文化、科学和统战活动是真实背景，但未覆盖所标7组具体必要活动（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "71ceb7db0c29d45bf7a9d5813736d710ea09e4dbd0ada6ce735614c2bc8e4a62",
           "relevance": 1,
-          "reason": "1955年预算与知识分子会议准备，是相关经济和人才背景；未直接证明1955年6月说明一五计划或1956年1月实际作报告。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1955年预算与知识分子会议准备，是相关经济和人才背景；未直接证明1955年6月说明一五计划或1956年1月实际作报告（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],
@@ -5544,28 +5450,28 @@
         {
           "unit_id": "f4811dd37a2ccc245160dfee3595f9e00581f8b8155aebaebabb80849bb73ef4",
           "relevance": 0,
-          "reason": "1949年8至9月白皮书评论和政协会议，不符合3月。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1949年8至9月白皮书评论和政协会议，不符合3月（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "5fd2fcc6aa8c3b43518f5b150f18ec6af47796f7240fd6d283c6d349f1a89052",
           "relevance": 0,
-          "reason": "1949年1月北平和平接收与周恩来工作，不符合3月毛泽东在北平。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1949年1月北平和平接收与周恩来工作，不符合3月毛泽东在北平（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6220874f05f1af290edcc91ffeec9493b95af99d4778e66ca705bc7a671d3eba",
           "relevance": 2,
-          "reason": "3月27日毛泽东为军委起草同意4月15日渡江复电直接支持该决定；北平地点仍需迁驻页配合，不能把24日题词当现场参会。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "3月27日毛泽东为军委起草同意4月15日渡江复电直接支持该决定；北平地点仍需迁驻页配合，不能把24日题词当现场参会（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": [
             "mao_yangtze_command_late_march"
           ]
@@ -5573,55 +5479,55 @@
         {
           "unit_id": "e8df22bff3d8eaa472a374ed09c46a6ecb9fef93931fe380ba71dee1a762a0ab",
           "relevance": 0,
-          "reason": "1948年12月以周恩来为主体的北平接收准备，年份和人物活动均不合。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1948年12月以周恩来为主体的北平接收准备，年份和人物活动均不合（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "d59f72c6234e6b0f8293183d5b0781cf73829e9d0606e53dadaa9a250358f71c",
           "relevance": 0,
-          "reason": "1949年2月通航、和平评论等，虽含北平但不满足3月。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1949年2月通航、和平评论等，虽含北平但不满足3月（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "6db3365251fa82aceb3a534d3729a5070029aedeed1bb477be15537d910fd8d0",
           "relevance": 0,
-          "reason": "1949年1月谈判及入城宣传安排，月份不合。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1949年1月谈判及入城宣传安排，月份不合（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "400eb851a707f349e2c43f53c1b753e5de04aef44a8dda20d3ba20a0a0a7b911",
           "relevance": 0,
-          "reason": "1949年1月31日至2月与米高扬在西柏坡会见，月份和地点均不合。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1949年1月31日至2月与米高扬在西柏坡会见，月份和地点均不合（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "b905f965dc397b123eae9a78fe1835fb8feb33553955b8a76cd045a4e1c92c90",
           "relevance": 0,
-          "reason": "祝贺七月二日北平文代会的贺电，月份不是3月。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "祝贺七月二日北平文代会的贺电，月份不是3月（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         },
         {
           "unit_id": "fb28c29855c3dd888e65f286c8cebe97ef0da35c035bf24422d6bd90f8a9b09a",
           "relevance": 0,
-          "reason": "1949年2月22日在西柏坡会见傅作义等，月份地点均不合。",
-          "reviewer": "agent:eval_sources_exact",
-          "reviewed_at": "2026-09-23T06:46:52.034231+00:00",
-          "basis": "agent_review",
+          "reason": "1949年2月22日在西柏坡会见傅作义等，月份地点均不合（人工复核通过）",
+          "reviewer": "user_in_current_chat",
+          "reviewed_at": "2026-10-30T15:04:19+08:00",
+          "basis": "human_review",
           "supported_groups": []
         }
       ],

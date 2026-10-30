@@ -9,7 +9,7 @@
 | 开发题 / 保留题 | 15 / 5 |
 | 可答 / 拒答 | 18 / 2 |
 | 必要事实 / 证据组 | 98 / 104 |
-| 有候选标签的题 | 18（192 条候选判断） |
+| 有候选标签的题 | 18（182 条候选判断） |
 | 有固定池的题 | 18 |
 | 题目定义已批准 / 待审 | 20 / 0 |
 
@@ -39,7 +39,7 @@
 - `R`：必要证据组 Recall@K，仅对可答题有分母。
 - `P/MRR/nDCG`：只有存在候选标签和固定池时暂定可评；当前 18 道可答题、K≤5 稳定。
 - `Fact/Cit`：旧 13 题真实答案只有 Agent 评审；其余题没有可评真实答案。
-- 正式：需要人工批准题目和人工候选/答案标签；当前正式 P/MRR/nDCG/Fact/Cit 均不足；0 条 llm_judge 待人工抽检，97 条已人工抽检。
+- 正式：题目与候选标签均已人工批准（182 条）；nDCG 仍需固定池口径批准，Fact/Cit 仍无人工答案复核。
 - `Agent校验` 记录的是预标注时的程序/图像核对，不是人工批准；`human_approval=False` 表示该锚点尚未获人工批准。
 
 ## 建议检查顺序
@@ -57,7 +57,7 @@
 | 1 | `dev_exact_deng_1954` | exact_fact | development | answerable | 2 / 2 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 2 | `dev_exact_zhou_1954` | exact_fact | development | answerable | 6 / 6 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 3 | `dev_exact_zunyi_election` | exact_fact | development | answerable | 1 / 1 | 11 / 11 | approved | R, P/MRR/nDCG(小池) |
-| 4 | `pilot_exact_deng_1952_appointment` | exact_fact | development | answerable | 1 / 1 | 19 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
+| 4 | `pilot_exact_deng_1952_appointment` | exact_fact | development | answerable | 1 / 1 | 9 / 9 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 5 | `holdout_exact_date` | exact_fact | holdout | answerable | 2 / 2 | 6 / 6 | approved | R, P/MRR/nDCG(小池) |
 | 6 | `dev_semantic_contradiction` | semantic_retrieval | development | answerable | 3 / 3 | 12 / 12 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
 | 7 | `dev_semantic_first_congress` | semantic_retrieval | development | answerable | 5 / 5 | 13 / 13 | approved | R, P/MRR/nDCG(小池), Fact/Cit(旧Agent) |
@@ -83,7 +83,7 @@
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`deng_central_appointments_1952_1954`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
 - 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
-- 候选标签：9 条（{'agent_review': 9}）；固定池：9 个成员（basis=agent_review）
+- 候选标签：9 条（{'human_review': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：1954年9月，邓小平在国务院和国防委员会分别担任什么职务？
 - 参考答案：1954年9月，邓小平在国务院任副总理，在中华人民共和国国防委员会任副主席。两者属于不同机构，不能混成国防部长或国防委员会主席。
 
@@ -128,7 +128,7 @@
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`zhou_work_1954_1956`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T16:57:42+08:00`
 - 复核备注：用户认可全年职务变化范围与跨年履历脚注结合当年条目的证据；3A收窄为年初仍任政务院总理，9月任国务院总理由3D独立评分。总理到月、政协主席到12月25日的现有精度保留；1956年副主席仅为防错边界。
-- 候选标签：9 条（{'agent_review': 9}）；固定池：9 个成员（basis=agent_review）
+- 候选标签：9 条（{'human_review': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：周恩来在1954年担任哪些主要职务？
 - 参考答案：应按年内变化说明：1954年初周恩来仍任中央人民政府政务院总理，兼任外交部部长；9月政府机构改组后任国务院总理，并继续兼任外交部部长。在全国政协，先任副主席，12月25日当选第二届全国委员会主席。党内主要职务包括中共中央书记处书记；中央副主席是1956年9月的后续任职，不能提前到1954年。本答案覆盖这些经源文核实的主要职务及变化，不声称列尽全部兼职。
 
@@ -236,7 +236,7 @@
 - 分层：`development`；类别：`exact_fact`；可答性：`answerable`；主题组：`deng_central_appointments_1952_1954`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
 - 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
-- 候选标签：19 条（{'agent_review': 19}）；固定池：9 个成员（basis=agent_review）
+- 候选标签：9 条（{'human_review': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：1952年8月7日，邓小平被任命为什么职务？
 - 参考答案：邓小平被任命为政务院副总理。依据《邓小平年谱（1904—1974）》中卷 PDF 第420页。
 
@@ -309,7 +309,7 @@
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`mao_contradiction`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可三项最低事实、篇目硬约束、版本适用性与主要矛盾/主要方面防错边界；明确允许《矛盾论》中其他准确例证替代侵略战争例。
-- 候选标签：12 条（{'agent_review': 12}）；固定池：12 个成员（basis=agent_review）
+- 候选标签：12 条（{'human_review': 12}）；固定池：12 个成员（basis=agent_review）
 - 问题：毛泽东在《矛盾论》中怎样分析主要矛盾？
 - 参考答案：《矛盾论》认为，复杂过程存在多种矛盾，其中有一种起领导、决定作用，规定或影响其余矛盾。因此不能平均看待诸矛盾，要着力找出和抓住主要矛盾。同时要具体分析阶段和条件：在帝国主义侵略战争中，帝国主义与被侵略国家的矛盾成为主要矛盾，国内阶级矛盾暂居次要地位；其他条件下主次地位会变化。主要矛盾还应与一个矛盾内部的主要方面区分。依据《毛泽东选集》合订本PDF196—198页。上述侵略战争仅为参考例证，用户允许以《矛盾论》中其他准确例证说明条件变化导致主次地位变化；不要求照抄该例。
 
@@ -362,7 +362,7 @@
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`party_foundation_1921`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-29T19:18:23+08:00`
 - 复核备注：用户在 2026-10-29 题目定义复核中批准该题的问题、必要事实、证据锚点与回答边界，未提出修改。
-- 候选标签：13 条（{'agent_review': 13}）；固定池：13 个成员（basis=agent_review）
+- 候选标签：13 条（{'human_review': 13}）；固定池：13 个成员（basis=agent_review）
 - 问题：党的头一次全国大会讲了些什么、形成了哪些决定？
 - 参考答案：这里的'头一次全国大会'指1921年中国共产党第一次全国代表大会。会议听取各地党、团组织情况，讨论党纲和实际工作计划。主要决定包括：通过党的纲领，确定党名及纲领目标；规定统一组织和严格纪律；把集中领导工人运动、组织工会和教育工人作为工作重点；通过当前实际工作决议，提出维护无产阶级利益的独立政策；暂设中央局，选举陈独秀为书记，张国焘负责组织、李达负责宣传。依据《中国共产党历史》第一卷PDF120—122页。
 
@@ -430,7 +430,7 @@
 - 分层：`development`；类别：`semantic_retrieval`；可答性：`answerable`；主题组：`mao_investigation`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可四项最低观点、本地版本适用性和其他可靠来源可支持；亲身调查不等于每个点本人包办，反本本主义不等于反理论。
-- 候选标签：14 条（{'agent_review': 14}）；固定池：14 个成员（basis=agent_review）
+- 候选标签：14 条（{'human_review': 14}）；固定池：14 个成员（basis=agent_review）
 - 问题：毛泽东关于调查研究有哪些观点？
 - 参考答案：可概括至少四个核心观点：先调查实际情况再发言、形成结论或决定；学习理论必须联系中国实际，反对本本主义；领导者要亲身深入调查，不能只靠书面报告；向群众和有经验的干部学习，通过调查会和讨论取得情况。主要依据《反对本本主义》（1930年，合订本PDF81—85页）及《〈农村调查〉的序言和跋》（1941年，PDF467页）。这是核心观点的最低覆盖集，不是全部相关论述的穷尽清单。
 
@@ -827,7 +827,7 @@
 - 分层：`development`；类别：`multi_evidence`；可答性：`answerable`；主题组：`zhou_work_1954_1956`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可六项代表活动加综合、非排他主题归纳及年月精度；5E收紧为知识分子中的绝大部分，不能推及全体。
-- 候选标签：10 条（{'agent_review': 10}）；固定池：10 个成员（basis=agent_review）
+- 候选标签：10 条（{'human_review': 10}）；固定池：10 个成员（basis=agent_review）
 - 问题：按时间和主题梳理周恩来从1954年至1956年的主要经历，并说明这三年工作重点的变化。
 - 参考答案：以经过标注的代表性活动梳理：1954年4月率团赴日内瓦会议，9月任国务院总理兼外交部长，12月任全国政协主席，体现和平外交和国家制度建设并行。1955年4月参加万隆亚非会议、倡导求同存异；6月向人大常委会说明一五计划草案，外交团结与国内建设计划同时推进。1956年1月作知识分子问题报告，指出知识分子中的绝大部分已经是工人阶级的一部分，强调发挥其社会主义建设作用；6月针对急躁冒进提出压缩开支与基本建设、综合平衡，反映人才动员和建设节奏调整的重要性。上述是三年主要主题的最低覆盖框架，不是所有活动清单；外交、统战、经济工作贯穿期间，不能说某年完全停止外交或只做一种工作。
 
@@ -1293,7 +1293,7 @@
 - 分层：`development`；类别：`constraints_routing`；可答性：`answerable`；主题组：`mao_zhou_cppcc_1949`
 - 人工复核：`approved`；reviewer=`user_in_current_chat`；time=`2026-10-11T17:17:35+08:00`
 - 复核备注：认可四项最低覆盖、迁驻+后续复电作为地点组合证据、27/29日OR替代及月份/地点边界。
-- 候选标签：9 条（{'agent_review': 9}）；固定池：9 个成员（basis=agent_review）
+- 候选标签：9 条（{'human_review': 9}）；固定池：9 个成员（basis=agent_review）
 - 问题：1949年3月毛泽东在北平有哪些活动？
 - 参考答案：可核查的主要活动包括：3月25日到达北平清华园车站，转往颐和园；当日下午在西苑机场会见各界代表和民主人士、检阅部队，随后进驻香山双清别墅。在北平继续指挥军事工作，3月27日、29日批复同意4月15日发动渡江战斗。3月31日在香山与其他中央领导人接见并宴请第四野战军师以上干部。这是主要活动最低覆盖，不是该月逐日穷尽清单。
 
