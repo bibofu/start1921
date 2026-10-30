@@ -7,6 +7,7 @@ filter catalog and never invents entities: unknown mentions stay unresolved.
 from __future__ import annotations
 
 import re
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Literal
 
@@ -98,41 +99,118 @@ def _alias_map(records: list[EntityRecord]) -> list[tuple[str, EntityRecord]]:
     return sorted(pairs, key=lambda item: (-len(item[0]), item[0], item[1].entity_id))
 
 
-def detect_mentions(query: str, records: list[EntityRecord]) -> list[DetectedMention]:
+def _mention_from(
+    alias: str, start: int, record: EntityRecord, by_id: dict[str, EntityRecord], score: float
+) -> DetectedMention:
+    members = (
+        [by_id[member] for member in record.members if member in by_id]
+        if record.type == "person_group"
+        else [record]
+    )
+    return DetectedMention(
+        text=alias,
+        start=start,
+        end=start + len(alias),
+        candidates=[
+            MentionCandidate(
+                entity_id=member.entity_id,
+                canonical=member.canonical,
+                type=member.type,
+                score=score,
+            )
+            for member in members
+        ],
+    )
+
+
+def _fuzzy_mentions(
+    query: str,
+    aliases: list[tuple[str, EntityRecord]],
+    by_id: dict[str, EntityRecord],
+    covered: list[tuple[int, int]],
+) -> list[DetectedMention]:
+    matches: list[DetectedMention] = []
+    for start in range(len(query)):
+        if any(left <= start < right for left, right in covered):
+            continue
+        best: tuple[float, str, EntityRecord] | None = None
+        for length in range(2, min(8, len(query) - start) + 1):
+            window = query[start : start + length]
+            if not re.fullmatch(r"[一-鿿A-Za-z0-9]+", window):
+                continue
+            for alias, record in aliases:
+                if abs(len(alias) - length) > 2:
+                    continue
+                ratio = SequenceMatcher(None, window, alias).ratio()
+                if ratio < 0.82:
+                    continue
+                if best is None or ratio > best[0]:
+                    best = (ratio, window, record)
+        if best is not None and not any(
+            left <= start < right for left, right in covered
+        ):
+            ratio, window, record = best
+            matches.append(_mention_from(window, start, record, by_id, round(ratio, 4)))
+            covered.append((start, start + len(window)))
+    return matches
+
+
+def detect_mentions(
+    query: str, records: list[EntityRecord], *, fuzzy: bool = False
+) -> list[DetectedMention]:
     aliases = _alias_map(records)
     by_id = {record.entity_id: record for record in records}
     mentions: list[DetectedMention] = []
+    covered: list[tuple[int, int]] = []
     index = 0
     while index < len(query):
         for alias, record in aliases:
             if not query.startswith(alias, index):
                 continue
-            members = (
-                [by_id[member] for member in record.members if member in by_id]
-                if record.type == "person_group"
-                else [record]
-            )
-            mentions.append(
-                DetectedMention(
-                    text=alias,
-                    start=index,
-                    end=index + len(alias),
-                    candidates=[
-                        MentionCandidate(
-                            entity_id=member.entity_id,
-                            canonical=member.canonical,
-                            type=member.type,
-                            score=1.0,
-                        )
-                        for member in members
-                    ],
-                )
-            )
+            mentions.append(_mention_from(alias, index, record, by_id, 1.0))
+            covered.append((index, index + len(alias)))
             index += len(alias)
             break
         else:
             index += 1
+    if fuzzy:
+        mentions.extend(_fuzzy_mentions(query, aliases, by_id, covered))
+    mentions.sort(key=lambda mention: mention.start)
     return mentions
+
+
+PRONOUNS = ("他", "她", "它", "其", "该人", "此人", "该同志")
+
+
+def resolve_followup(
+    question: str, history: list[str] | None, records: list[EntityRecord]
+) -> tuple[str, list[str]]:
+    """Resolve a pronoun or a terse year-only follow-up from recent history."""
+
+    if not history:
+        return question, []
+    inherited: list[str] = []
+    for text in reversed(history):
+        for mention in detect_mentions(text, records):
+            for candidate in mention.candidates:
+                if candidate.type == "person":
+                    inherited.append(candidate.canonical)
+        if inherited:
+            break
+    if not inherited:
+        return question, []
+    person = inherited[0]
+    resolved = question
+    if any(pronoun in question for pronoun in PRONOUNS):
+        for pronoun in PRONOUNS:
+            if pronoun in question:
+                resolved = question.replace(pronoun, person, 1)
+                break
+    elif len(question) <= 12 and re.search(r"(?:18|19|20)\d{2}", question):
+        resolved = f"{person} {question}"
+    if resolved == question:
+        return question, []
+    return resolved, inherited
 
 
 def query_time_range(question: str) -> tuple[int, int] | None:

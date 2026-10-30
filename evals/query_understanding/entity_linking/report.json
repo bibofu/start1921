@@ -1,26 +1,28 @@
 {
   "cases": 30,
   "detection": {
-    "true_positive": 60,
-    "predicted": 60,
+    "true_positive": 62,
+    "predicted": 62,
     "expected": 63,
     "precision": 1.0,
-    "recall": 0.9523809523809523,
-    "f1": 0.975609756097561
+    "recall": 0.9841269841269841,
+    "f1": 0.9919999999999999
   },
   "anchoring": {
-    "true_positive": 60,
-    "predicted": 60,
+    "true_positive": 62,
+    "predicted": 62,
     "expected": 63,
     "precision": 1.0,
-    "recall": 0.9523809523809523,
-    "f1": 0.975609756097561
+    "recall": 0.9841269841269841,
+    "f1": 0.9919999999999999
   },
   "unresolved_rate": 0.0,
   "rows": [
     {
       "id": "qu_dev_fact_deng_1954",
       "split": "development",
+      "resolved_question": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+      "inherited": [],
       "expected": [
         "国务院",
         "国防委员会",
@@ -59,6 +61,23 @@
           ]
         },
         {
+          "text": "在国务院",
+          "start": 11,
+          "end": 15,
+          "status": "anchored",
+          "canonicals": [
+            "国务院"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:state_council",
+              "canonical": "国务院",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "国务院",
           "start": 12,
           "end": 15,
@@ -70,6 +89,23 @@
             {
               "entity_id": "organization:state_council",
               "canonical": "国务院",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "和国防委员会",
+          "start": 15,
+          "end": 21,
+          "status": "anchored",
+          "canonicals": [
+            "国防委员会"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:ndc",
+              "canonical": "国防委员会",
               "type": "organization",
               "score": 0.8
             }
@@ -92,11 +128,59 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+          "locked": [
+            "邓小平",
+            "国务院",
+            "国务院",
+            "国防委员会",
+            "国防委员会"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "1954年9月，邓小平国务院国防委员会分别担任什么职务？",
+          "locked": [
+            "邓小平",
+            "国务院",
+            "国务院",
+            "国防委员会",
+            "国防委员会"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+          "locked": [
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "国务院 1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+          "locked": [
+            "国务院"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "国防委员会 1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+          "locked": [
+            "国防委员会"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_fact_deng_school_1926",
       "split": "development",
+      "resolved_question": "《邓小平年谱》记载邓小平1926年在哪些学校学习？",
+      "inherited": [],
       "expected": [
         "邓小平",
         "邓小平年谱"
@@ -132,6 +216,23 @@
           ]
         },
         {
+          "text": "载邓小平",
+          "start": 8,
+          "end": 12,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        },
+        {
           "text": "邓小平",
           "start": 9,
           "end": 12,
@@ -148,11 +249,48 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "《邓小平年谱》记载邓小平1926年在哪些学校学习？",
+          "locked": [
+            "邓小平年谱",
+            "邓小平",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "《邓小平年谱》记邓小平1926年在哪些学校学习？",
+          "locked": [
+            "邓小平年谱",
+            "邓小平",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平年谱 《邓小平年谱》记载邓小平1926年在哪些学校学习？",
+          "locked": [
+            "邓小平年谱"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 《邓小平年谱》记载邓小平1926年在哪些学校学习？",
+          "locked": [
+            "邓小平"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_congress_first",
       "split": "development",
+      "resolved_question": "中共一大在哪一年召开？",
+      "inherited": [],
       "expected": [
         "中共一大"
       ],
@@ -184,11 +322,30 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "中共一大在哪一年召开？",
+          "locked": [
+            "中共一大"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "中共一大 中共一大在哪一年召开？",
+          "locked": [
+            "中共一大"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_congress_short_seven",
       "split": "development",
+      "resolved_question": "七大在哪一年召开？",
+      "inherited": [],
       "expected": [
         "中共七大"
       ],
@@ -220,11 +377,37 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "七大在哪一年召开？",
+          "locked": [
+            "中共七大"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "中共七大在哪一年召开？",
+          "locked": [
+            "中共七大"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "中共七大 七大在哪一年召开？",
+          "locked": [
+            "中共七大"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_alias_mao_runzhi",
       "split": "development",
+      "resolved_question": "毛润之在1949年出席了哪些会议？",
+      "inherited": [],
       "expected": [
         "毛泽东"
       ],
@@ -256,11 +439,37 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛润之在1949年出席了哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛毛泽东在1949年出席了哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛润之在1949年出席了哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_group_liudeng",
       "split": "development",
+      "resolved_question": "刘邓在1947年共同指挥了哪些战役？",
+      "inherited": [],
       "expected": [
         "刘伯承",
         "邓小平"
@@ -302,11 +511,46 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "刘邓在1947年共同指挥了哪些战役？",
+          "locked": [
+            "刘伯承",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "刘伯承 邓小平在1947年共同指挥了哪些战役？",
+          "locked": [
+            "刘伯承",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "刘伯承 刘邓在1947年共同指挥了哪些战役？",
+          "locked": [
+            "刘伯承"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 刘邓在1947年共同指挥了哪些战役？",
+          "locked": [
+            "邓小平"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_keyword_dump",
       "split": "development",
+      "resolved_question": "解放战争期间  毛润之  七大  刘邓",
+      "inherited": [],
       "expected": [
         "中共七大",
         "刘伯承",
@@ -408,11 +652,66 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "解放战争期间  毛润之  七大  刘邓",
+          "locked": [
+            "解放战争",
+            "毛泽东",
+            "中共七大",
+            "刘伯承",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "解放战争  毛毛泽东  中共七大  刘伯承 邓小平",
+          "locked": [
+            "解放战争",
+            "毛泽东",
+            "中共七大",
+            "刘伯承",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "解放战争 解放战争期间  毛润之  七大  刘邓",
+          "locked": [
+            "解放战争"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 解放战争期间  毛润之  七大  刘邓",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "中共七大 解放战争期间  毛润之  七大  刘邓",
+          "locked": [
+            "中共七大"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "刘伯承 解放战争期间  毛润之  七大  刘邓",
+          "locked": [
+            "刘伯承"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_comparison_meetings",
       "split": "development",
+      "resolved_question": "比较遵义会议和庐山会议各自讨论的核心问题、会议进程和后续影响。",
+      "inherited": [],
       "expected": [
         "庐山会议",
         "遵义会议"
@@ -431,6 +730,23 @@
       "unresolved_mentions": [],
       "mentions": [
         {
+          "text": "较遵义会议",
+          "start": 1,
+          "end": 6,
+          "status": "anchored",
+          "canonicals": [
+            "遵义会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:zunyi_meeting",
+              "canonical": "遵义会议",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "遵义会议",
           "start": 2,
           "end": 6,
@@ -442,6 +758,23 @@
             {
               "entity_id": "event:zunyi_meeting",
               "canonical": "遵义会议",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "和庐山会议",
+          "start": 6,
+          "end": 11,
+          "status": "anchored",
+          "canonicals": [
+            "庐山会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:lushan_meeting",
+              "canonical": "庐山会议",
               "type": "event",
               "score": 0.8
             }
@@ -464,11 +797,50 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "比较遵义会议和庐山会议各自讨论的核心问题、会议进程和后续影响。",
+          "locked": [
+            "遵义会议",
+            "遵义会议",
+            "庐山会议",
+            "庐山会议"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "比遵义会议庐山会议各自讨论的核心问题、会议进程和后续影响。",
+          "locked": [
+            "遵义会议",
+            "遵义会议",
+            "庐山会议",
+            "庐山会议"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "遵义会议 比较遵义会议和庐山会议各自讨论的核心问题、会议进程和后续影响。",
+          "locked": [
+            "遵义会议"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "庐山会议 比较遵义会议和庐山会议各自讨论的核心问题、会议进程和后续影响。",
+          "locked": [
+            "庐山会议"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_multihop_zunyi",
       "split": "development",
+      "resolved_question": "毛泽东在遵义会议后如何取得军事领导权，又怎样在抗战初期巩固？",
+      "inherited": [],
       "expected": [
         "抗日战争",
         "毛泽东",
@@ -507,6 +879,23 @@
           ]
         },
         {
+          "text": "在遵义会议",
+          "start": 3,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "遵义会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:zunyi_meeting",
+              "canonical": "遵义会议",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "遵义会议",
           "start": 4,
           "end": 8,
@@ -519,6 +908,23 @@
               "entity_id": "event:zunyi_meeting",
               "canonical": "遵义会议",
               "type": "event",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "在抗战初期",
+          "start": 22,
+          "end": 27,
+          "status": "anchored",
+          "canonicals": [
+            "抗日战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:anti_japanese_war",
+              "canonical": "抗日战争",
+              "type": "period",
               "score": 0.8
             }
           ]
@@ -540,11 +946,59 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东在遵义会议后如何取得军事领导权，又怎样在抗战初期巩固？",
+          "locked": [
+            "毛泽东",
+            "遵义会议",
+            "遵义会议",
+            "抗日战争",
+            "抗日战争"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛泽东遵义会议后如何取得军事领导权，又怎样抗日战争巩固？",
+          "locked": [
+            "毛泽东",
+            "遵义会议",
+            "遵义会议",
+            "抗日战争",
+            "抗日战争"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东在遵义会议后如何取得军事领导权，又怎样在抗战初期巩固？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "遵义会议 毛泽东在遵义会议后如何取得军事领导权，又怎样在抗战初期巩固？",
+          "locked": [
+            "遵义会议"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "抗日战争 毛泽东在遵义会议后如何取得军事领导权，又怎样在抗战初期巩固？",
+          "locked": [
+            "抗日战争"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_observation_snow",
       "split": "development",
+      "resolved_question": "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+      "inherited": [],
       "expected": [
         "埃德加·斯诺",
         "红军大学",
@@ -600,6 +1054,23 @@
           ]
         },
         {
+          "text": "述红军学校",
+          "start": 13,
+          "end": 18,
+          "status": "anchored",
+          "canonicals": [
+            "红军大学"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:red_army_university",
+              "canonical": "红军大学",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "红军学校",
           "start": 14,
           "end": 18,
@@ -616,11 +1087,57 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+          "locked": [
+            "埃德加·斯诺",
+            "西行漫记",
+            "红军大学",
+            "红军大学"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "埃德加·斯诺在《西行漫记》中怎样描红军大学的学习和训练安排？",
+          "locked": [
+            "埃德加·斯诺",
+            "西行漫记",
+            "红军大学",
+            "红军大学"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "埃德加·斯诺 斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+          "locked": [
+            "埃德加·斯诺"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "西行漫记 斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+          "locked": [
+            "西行漫记"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "红军大学 斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+          "locked": [
+            "红军大学"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_viewpoint_persistent",
       "split": "development",
+      "resolved_question": "毛泽东在《论持久战》中提出了哪些抗战策略？",
+      "inherited": [],
       "expected": [
         "抗日战争",
         "毛泽东",
@@ -692,11 +1209,55 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东在《论持久战》中提出了哪些抗战策略？",
+          "locked": [
+            "毛泽东",
+            "论持久战",
+            "抗日战争"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛泽东在论持久战中提出了哪些抗日战争策略？",
+          "locked": [
+            "毛泽东",
+            "论持久战",
+            "抗日战争"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东在《论持久战》中提出了哪些抗战策略？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "论持久战 毛泽东在《论持久战》中提出了哪些抗战策略？",
+          "locked": [
+            "论持久战"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "抗日战争 毛泽东在《论持久战》中提出了哪些抗战策略？",
+          "locked": [
+            "抗日战争"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_timeline_zhou_1956",
       "split": "development",
+      "resolved_question": "周恩来在1956年有哪些主要经历？",
+      "inherited": [],
       "expected": [
         "周恩来"
       ],
@@ -728,11 +1289,30 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "周恩来在1956年有哪些主要经历？",
+          "locked": [
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来 周恩来在1956年有哪些主要经历？",
+          "locked": [
+            "周恩来"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_intersection_maozhou",
       "split": "development",
+      "resolved_question": "毛泽东与周恩来在1949年共同出席了哪些会议？",
+      "inherited": [],
       "expected": [
         "周恩来",
         "毛泽东"
@@ -762,6 +1342,23 @@
             {
               "entity_id": "person:mao_zedong",
               "canonical": "毛泽东",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "与周恩来",
+          "start": 3,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
               "type": "person",
               "score": 1.0
             }
@@ -784,11 +1381,48 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东与周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "毛泽东",
+            "周恩来",
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛泽东周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "毛泽东",
+            "周恩来",
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东与周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来 毛泽东与周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "周恩来"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_intersection_negative",
       "split": "development",
+      "resolved_question": "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？",
+      "inherited": [],
       "expected": [
         "中国人民政治协商会议",
         "周恩来",
@@ -827,6 +1461,23 @@
           ]
         },
         {
+          "text": "和周恩来",
+          "start": 3,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
           "text": "周恩来",
           "start": 4,
           "end": 7,
@@ -840,6 +1491,23 @@
               "canonical": "周恩来",
               "type": "person",
               "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "为全国政协",
+          "start": 24,
+          "end": 29,
+          "status": "anchored",
+          "canonicals": [
+            "中国人民政治协商会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:cppcc",
+              "canonical": "中国人民政治协商会议",
+              "type": "organization",
+              "score": 0.8
             }
           ]
         },
@@ -860,11 +1528,59 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？",
+          "locked": [
+            "毛泽东",
+            "周恩来",
+            "周恩来",
+            "中国人民政治协商会议",
+            "中国人民政治协商会议"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛泽东周恩来在1949年10月9日是否共同当选中国人民政治协商会议主席？",
+          "locked": [
+            "毛泽东",
+            "周恩来",
+            "周恩来",
+            "中国人民政治协商会议",
+            "中国人民政治协商会议"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来 毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？",
+          "locked": [
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "中国人民政治协商会议 毛泽东和周恩来在1949年10月9日是否共同当选为全国政协主席？",
+          "locked": [
+            "中国人民政治协商会议"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_source_deng_1973",
       "split": "development",
+      "resolved_question": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月邓小平恢复了什么职务？",
+      "inherited": [],
       "expected": [
         "邓小平",
         "邓小平年谱"
@@ -900,6 +1616,23 @@
           ]
         },
         {
+          "text": "月邓小平",
+          "start": 30,
+          "end": 34,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        },
+        {
           "text": "邓小平",
           "start": 31,
           "end": 34,
@@ -916,11 +1649,48 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "只依据《邓小平年谱（1904—1974）》下卷，1973年3月邓小平恢复了什么职务？",
+          "locked": [
+            "邓小平年谱",
+            "邓小平",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "只依据《邓小平年谱（1904—1974）》下卷，1973年3邓小平恢复了什么职务？",
+          "locked": [
+            "邓小平年谱",
+            "邓小平",
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平年谱 只依据《邓小平年谱（1904—1974）》下卷，1973年3月邓小平恢复了什么职务？",
+          "locked": [
+            "邓小平年谱"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 只依据《邓小平年谱（1904—1974）》下卷，1973年3月邓小平恢复了什么职务？",
+          "locked": [
+            "邓小平"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_month_place_deng_1949",
       "split": "development",
+      "resolved_question": "1949年4月，邓小平在哪些地方参加了哪些会议？",
+      "inherited": [],
       "expected": [
         "邓小平"
       ],
@@ -952,11 +1722,30 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "1949年4月，邓小平在哪些地方参加了哪些会议？",
+          "locked": [
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 1949年4月，邓小平在哪些地方参加了哪些会议？",
+          "locked": [
+            "邓小平"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_refusal_2024",
       "split": "development",
+      "resolved_question": "习近平在2024年考察了哪些地方？",
+      "inherited": [],
       "expected": [
         "习近平"
       ],
@@ -970,47 +1759,161 @@
       ],
       "extra_anchor": [],
       "unresolved_mentions": [],
-      "mentions": []
+      "mentions": [],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "习近平在2024年考察了哪些地方？",
+          "locked": []
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_followup_zhou_1957",
       "split": "development",
+      "resolved_question": "那周恩来在1957年呢？",
+      "inherited": [
+        "周恩来"
+      ],
       "expected": [
         "周恩来"
       ],
-      "detected": [],
-      "anchored": [],
-      "missing_detection": [
+      "detected": [
         "周恩来"
       ],
-      "missing_anchor": [
+      "anchored": [
         "周恩来"
       ],
+      "missing_detection": [],
+      "missing_anchor": [],
       "extra_anchor": [],
       "unresolved_mentions": [],
-      "mentions": []
+      "mentions": [
+        {
+          "text": "那周恩来",
+          "start": 0,
+          "end": 4,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "周恩来",
+          "start": 1,
+          "end": 4,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "那周恩来在1957年呢？",
+          "locked": [
+            "周恩来",
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "周恩来在1957年呢？",
+          "locked": [
+            "周恩来",
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来 那周恩来在1957年呢？",
+          "locked": [
+            "周恩来"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_followup_deng_1953",
       "split": "development",
+      "resolved_question": "邓小平 1953年呢？",
+      "inherited": [
+        "邓小平"
+      ],
       "expected": [
         "邓小平"
       ],
-      "detected": [],
-      "anchored": [],
-      "missing_detection": [
+      "detected": [
         "邓小平"
       ],
-      "missing_anchor": [
+      "anchored": [
         "邓小平"
       ],
+      "missing_detection": [],
+      "missing_anchor": [],
       "extra_anchor": [],
       "unresolved_mentions": [],
-      "mentions": []
+      "mentions": [
+        {
+          "text": "邓小平",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "邓小平 1953年呢？",
+          "locked": [
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 邓小平 1953年呢？",
+          "locked": [
+            "邓小平"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_alias_xiaoping",
       "split": "development",
+      "resolved_question": "小平在1975年做了什么？",
+      "inherited": [],
       "expected": [
         "邓小平"
       ],
@@ -1042,11 +1945,37 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "小平在1975年做了什么？",
+          "locked": [
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "邓小平在1975年做了什么？",
+          "locked": [
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 小平在1975年做了什么？",
+          "locked": [
+            "邓小平"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_yenan_rectification",
       "split": "development",
+      "resolved_question": "毛泽东在延安整风期间主要做了什么？",
+      "inherited": [],
       "expected": [
         "延安整风",
         "毛泽东"
@@ -1082,6 +2011,23 @@
           ]
         },
         {
+          "text": "在延安整风",
+          "start": 3,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "延安整风"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:yanan_rectification",
+              "canonical": "延安整风",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "延安整风",
           "start": 4,
           "end": 8,
@@ -1098,11 +2044,48 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东在延安整风期间主要做了什么？",
+          "locked": [
+            "毛泽东",
+            "延安整风",
+            "延安整风"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛泽东延安整风期间主要做了什么？",
+          "locked": [
+            "毛泽东",
+            "延安整风",
+            "延安整风"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东在延安整风期间主要做了什么？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "延安整风 毛泽东在延安整风期间主要做了什么？",
+          "locked": [
+            "延安整风"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_event_chongqing",
       "split": "development",
+      "resolved_question": "抗战胜利后毛泽东赴重庆谈判，达成了什么结果？",
+      "inherited": [],
       "expected": [
         "抗日战争",
         "毛泽东",
@@ -1141,6 +2124,23 @@
           ]
         },
         {
+          "text": "后毛泽东",
+          "start": 4,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "毛泽东",
           "start": 5,
           "end": 8,
@@ -1153,6 +2153,23 @@
               "entity_id": "person:mao_zedong",
               "canonical": "毛泽东",
               "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "赴重庆谈判",
+          "start": 8,
+          "end": 13,
+          "status": "anchored",
+          "canonicals": [
+            "重庆谈判"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:chongqing_talks",
+              "canonical": "重庆谈判",
+              "type": "event",
               "score": 0.8
             }
           ]
@@ -1174,11 +2191,59 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "抗战胜利后毛泽东赴重庆谈判，达成了什么结果？",
+          "locked": [
+            "抗日战争",
+            "毛泽东",
+            "毛泽东",
+            "重庆谈判",
+            "重庆谈判"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "抗日战争胜利毛泽东重庆谈判，达成了什么结果？",
+          "locked": [
+            "抗日战争",
+            "毛泽东",
+            "毛泽东",
+            "重庆谈判",
+            "重庆谈判"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "抗日战争 抗战胜利后毛泽东赴重庆谈判，达成了什么结果？",
+          "locked": [
+            "抗日战争"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 抗战胜利后毛泽东赴重庆谈判，达成了什么结果？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "重庆谈判 抗战胜利后毛泽东赴重庆谈判，达成了什么结果？",
+          "locked": [
+            "重庆谈判"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_place_taihang",
       "split": "development",
+      "resolved_question": "邓小平在太行山期间担任过哪些职务？",
+      "inherited": [],
       "expected": [
         "太行山",
         "邓小平"
@@ -1214,6 +2279,23 @@
           ]
         },
         {
+          "text": "在太行山",
+          "start": 3,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "太行山"
+          ],
+          "candidates": [
+            {
+              "entity_id": "place:taihang",
+              "canonical": "太行山",
+              "type": "place",
+              "score": 0.8
+            }
+          ]
+        },
+        {
           "text": "太行山",
           "start": 4,
           "end": 7,
@@ -1230,11 +2312,48 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "邓小平在太行山期间担任过哪些职务？",
+          "locked": [
+            "邓小平",
+            "太行山",
+            "太行山"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "邓小平太行山期间担任过哪些职务？",
+          "locked": [
+            "邓小平",
+            "太行山",
+            "太行山"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "邓小平 邓小平在太行山期间担任过哪些职务？",
+          "locked": [
+            "邓小平"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "太行山 邓小平在太行山期间担任过哪些职务？",
+          "locked": [
+            "太行山"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_dev_document_persistent",
       "split": "development",
+      "resolved_question": "《毛泽东选集》中《论持久战》的核心观点是什么？",
+      "inherited": [],
       "expected": [
         "毛泽东选集",
         "论持久战"
@@ -1286,11 +2405,46 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "《毛泽东选集》中《论持久战》的核心观点是什么？",
+          "locked": [
+            "毛泽东选集",
+            "论持久战"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "毛泽东选集中论持久战的核心观点是什么？",
+          "locked": [
+            "毛泽东选集",
+            "论持久战"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东选集 《毛泽东选集》中《论持久战》的核心观点是什么？",
+          "locked": [
+            "毛泽东选集"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "论持久战 《毛泽东选集》中《论持久战》的核心观点是什么？",
+          "locked": [
+            "论持久战"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_hold_multi3_mao_liu_zhou",
       "split": "holdout",
+      "resolved_question": "毛泽东、刘少奇、周恩来在1949年共同出席了哪些会议？",
+      "inherited": [],
       "expected": [
         "刘少奇",
         "周恩来",
@@ -1362,11 +2516,46 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东、刘少奇、周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "毛泽东",
+            "刘少奇",
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东、刘少奇、周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "刘少奇 毛泽东、刘少奇、周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "刘少奇"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来 毛泽东、刘少奇、周恩来在1949年共同出席了哪些会议？",
+          "locked": [
+            "周恩来"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_hold_keyword_dump_longmarch",
       "split": "holdout",
+      "resolved_question": "长征  遵义会议  毛泽东  林彪",
+      "inherited": [],
       "expected": [
         "林彪",
         "毛泽东",
@@ -1458,11 +2647,54 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "长征  遵义会议  毛泽东  林彪",
+          "locked": [
+            "长征",
+            "遵义会议",
+            "毛泽东",
+            "林彪"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "长征 长征  遵义会议  毛泽东  林彪",
+          "locked": [
+            "长征"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "遵义会议 长征  遵义会议  毛泽东  林彪",
+          "locked": [
+            "遵义会议"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 长征  遵义会议  毛泽东  林彪",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "林彪 长征  遵义会议  毛泽东  林彪",
+          "locked": [
+            "林彪"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_hold_out_of_range_xinhai",
       "split": "holdout",
+      "resolved_question": "辛亥革命的主要领导人是谁？",
+      "inherited": [],
       "expected": [
         "辛亥革命"
       ],
@@ -1494,11 +2726,30 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "辛亥革命的主要领导人是谁？",
+          "locked": [
+            "辛亥革命"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "辛亥革命 辛亥革命的主要领导人是谁？",
+          "locked": [
+            "辛亥革命"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_hold_comparison_parties",
       "split": "holdout",
+      "resolved_question": "比较抗战时期国共两党的军事策略。",
+      "inherited": [],
       "expected": [
         "中国共产党",
         "中国国民党",
@@ -1519,6 +2770,23 @@
       "extra_anchor": [],
       "unresolved_mentions": [],
       "mentions": [
+        {
+          "text": "较抗战时期",
+          "start": 1,
+          "end": 6,
+          "status": "anchored",
+          "canonicals": [
+            "抗日战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:anti_japanese_war",
+              "canonical": "抗日战争",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        },
         {
           "text": "抗战时期",
           "start": 2,
@@ -1560,11 +2828,57 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "比较抗战时期国共两党的军事策略。",
+          "locked": [
+            "抗日战争",
+            "抗日战争",
+            "中国共产党",
+            "中国国民党"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "比抗日战争中国共产党 中国国民党两党的军事策略。",
+          "locked": [
+            "抗日战争",
+            "抗日战争",
+            "中国共产党",
+            "中国国民党"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "抗日战争 比较抗战时期国共两党的军事策略。",
+          "locked": [
+            "抗日战争"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "中国共产党 比较抗战时期国共两党的军事策略。",
+          "locked": [
+            "中国共产党"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "中国国民党 比较抗战时期国共两党的军事策略。",
+          "locked": [
+            "中国国民党"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_hold_negation",
       "split": "holdout",
+      "resolved_question": "毛泽东在1949年没有参加哪些会议？",
+      "inherited": [],
       "expected": [
         "毛泽东"
       ],
@@ -1596,11 +2910,30 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "毛泽东在1949年没有参加哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "毛泽东 毛泽东在1949年没有参加哪些会议？",
+          "locked": [
+            "毛泽东"
+          ]
+        }
+      ],
+      "invalid_arms": []
     },
     {
       "id": "qu_hold_source_month",
       "split": "holdout",
+      "resolved_question": "只依据《周恩来年谱》，1950年1月周恩来在莫斯科做了什么？",
+      "inherited": [],
       "expected": [
         "周恩来",
         "周恩来年谱",
@@ -1639,6 +2972,23 @@
           ]
         },
         {
+          "text": "月周恩来",
+          "start": 17,
+          "end": 21,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        },
+        {
           "text": "周恩来",
           "start": 18,
           "end": 21,
@@ -1652,6 +3002,23 @@
               "canonical": "周恩来",
               "type": "person",
               "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "在莫斯科",
+          "start": 21,
+          "end": 25,
+          "status": "anchored",
+          "canonicals": [
+            "莫斯科"
+          ],
+          "candidates": [
+            {
+              "entity_id": "place:moscow",
+              "canonical": "莫斯科",
+              "type": "place",
+              "score": 0.8
             }
           ]
         },
@@ -1672,7 +3039,53 @@
             }
           ]
         }
-      ]
+      ],
+      "arms": [
+        {
+          "kind": "raw",
+          "text": "只依据《周恩来年谱》，1950年1月周恩来在莫斯科做了什么？",
+          "locked": [
+            "周恩来年谱",
+            "周恩来",
+            "周恩来",
+            "莫斯科",
+            "莫斯科"
+          ]
+        },
+        {
+          "kind": "canonical",
+          "text": "只依据《周恩来年谱》，1950年1周恩来莫斯科做了什么？",
+          "locked": [
+            "周恩来年谱",
+            "周恩来",
+            "周恩来",
+            "莫斯科",
+            "莫斯科"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来年谱 只依据《周恩来年谱》，1950年1月周恩来在莫斯科做了什么？",
+          "locked": [
+            "周恩来年谱"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "周恩来 只依据《周恩来年谱》，1950年1月周恩来在莫斯科做了什么？",
+          "locked": [
+            "周恩来"
+          ]
+        },
+        {
+          "kind": "per_entity",
+          "text": "莫斯科 只依据《周恩来年谱》，1950年1月周恩来在莫斯科做了什么？",
+          "locked": [
+            "莫斯科"
+          ]
+        }
+      ],
+      "invalid_arms": []
     }
   ]
 }

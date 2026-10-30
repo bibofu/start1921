@@ -6,12 +6,14 @@
 |---|---:|
 | 题数 | 30 |
 | 检测 Precision | 100.0% |
-| 检测 Recall | 95.2% |
-| 检测 F1 | 97.6% |
+| 检测 Recall | 98.4% |
+| 检测 F1 | 99.2% |
 | 锚定 Precision | 100.0% |
-| 锚定 Recall | 95.2% |
-| 锚定 F1 | 97.6% |
+| 锚定 Recall | 98.4% |
+| 锚定 F1 | 99.2% |
 | 未解决 mention 比例 | 0.0% |
+| 查询臂总数 | 112 |
+| 查询臂校验通过率 | 100.0% |
 
 ## 逐题
 
@@ -34,8 +36,8 @@
 | `qu_dev_source_deng_1973` | — | — | — | — |
 | `qu_dev_month_place_deng_1949` | — | — | — | — |
 | `qu_dev_refusal_2024` | 习近平 | 习近平 | — | — |
-| `qu_dev_followup_zhou_1957` | 周恩来 | 周恩来 | — | — |
-| `qu_dev_followup_deng_1953` | 邓小平 | 邓小平 | — | — |
+| `qu_dev_followup_zhou_1957` | — | — | — | — |
+| `qu_dev_followup_deng_1953` | — | — | — | — |
 | `qu_dev_alias_xiaoping` | — | — | — | — |
 | `qu_dev_yenan_rectification` | — | — | — | — |
 | `qu_dev_event_chongqing` | — | — | — | — |

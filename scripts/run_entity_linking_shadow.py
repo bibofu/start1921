@@ -11,7 +11,9 @@ from history_agent.answering.entity_linking import (
     detect_mentions,
     load_entities,
     query_time_range,
+    resolve_followup,
 )
+from history_agent.answering.query_rewrite import build_query_arms, validate_arm
 from history_agent.evaluation.query_understanding_eval import (
     canonical_keys,
     load_dataset,
@@ -49,6 +51,7 @@ def main() -> None:
     detect_tp = detect_pred = detect_expected = 0
     anchor_tp = anchor_pred = anchor_expected = 0
     unresolved = detected_total = 0
+    arms_total = arms_valid = 0
 
     for case in dataset.cases:
         expected = {
@@ -57,9 +60,18 @@ def main() -> None:
             for name in mention.canonical
             for key in canonical_keys(name)
         }
-        mentions = detect_mentions(case.question, records)
-        time_range = query_time_range(case.question)
+        resolved_question, inherited = resolve_followup(
+            case.question, [message.content for message in case.history], records
+        )
+        mentions = detect_mentions(resolved_question, records, fuzzy=True)
+        time_range = query_time_range(resolved_question)
         anchored = anchor_mentions(mentions, records, time_range)
+        arms = build_query_arms(resolved_question, anchored)
+        validations = [
+            validate_arm(arm, resolved_question, time_range, records) for arm in arms
+        ]
+        arms_total += len(arms)
+        arms_valid += sum(validation.valid for validation in validations)
         detected = {
             key
             for mention in mentions
@@ -85,6 +97,8 @@ def main() -> None:
             {
                 "id": case.id,
                 "split": case.split,
+                "resolved_question": resolved_question,
+                "inherited": inherited,
                 "expected": sorted(expected),
                 "detected": sorted(detected),
                 "anchored": sorted(anchored_set),
@@ -97,6 +111,12 @@ def main() -> None:
                     if mention.status == "unresolved"
                 ],
                 "mentions": [mention.model_dump() for mention in anchored],
+                "arms": [arm.model_dump() for arm in arms],
+                "invalid_arms": [
+                    {"text": arm.text, "issues": validation.issues}
+                    for arm, validation in zip(arms, validations, strict=True)
+                    if not validation.valid
+                ],
             }
         )
 
@@ -130,6 +150,8 @@ def main() -> None:
         f"| 锚定 Recall | {anchoring['recall']:.1%} |",
         f"| 锚定 F1 | {anchoring['f1']:.1%} |",
         f"| 未解决 mention 比例 | {result['unresolved_rate']:.1%} |",
+        f"| 查询臂总数 | {arms_total} |",
+        f"| 查询臂校验通过率 | {arms_valid / arms_total:.1%} |",
         "",
         "## 逐题",
         "",
