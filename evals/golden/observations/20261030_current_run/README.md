@@ -13,28 +13,30 @@
 
 | 指标 | 正式口径 |
 |---|---:|
-| Recall@20 | 61.5%（宏平均；微平均 50/104 组） |
+| Recall@10（主指标） | 59.2%（宏平均；微平均 48/104 组） |
+| Recall@12（线上对齐） | 59.6%（宏平均；微平均 49/104 组） |
+| Recall@20（诊断） | 61.5%（宏平均；微平均 50/104 组） |
 | Precision@5 | 58.9% |
-| MRR@5 | 0.917 |
+| MRR@10 | 0.917 |
 | 固定池 nDCG@5 | 0.678 |
 
-分类 Recall@20 均值：
+分类 Recall@10 均值：
 
 | 类别 | 均值 |
 |---|---:|
 | 精确事实/职务 | 0.900 |
 | 约束/路由 | 0.792 |
-| 人物交集 | 0.488 |
+| 人物交集 | 0.464 |
 | 语义检索 | 0.454 |
-| 多证据/跨期 | 0.425 |
+| 多证据/跨期 | 0.342 |
 
 ## 主要观察
 
-1. 精确事实题稳定：5 题里 4 题 R@20 为 1.0，`dev_exact_zhou_1954` 为 0.5。
+1. 精确事实题稳定：5 题里 4 题 R@10 为 1.0，`dev_exact_zhou_1954` 为 0.5。
 2. 多证据题是最大短板：`dev_multi_mao_hunan` 3/14 组、`dev_multi_meetings` 2/15 组、`dev_multi_zhou_periods` 1/7 组。
-3. `dev_semantic_first_congress` 虽然池内 5/5 有锚点，但最终 R@20 为 0，说明召回/排序阶段把 gold 页挤掉了，不是标注问题。
-4. `holdout_semantic_observation` 已从保留集移入开发集；R@20 0.4，PDF 143/146 仍未召回。
-5. 3 个池内零锚点：`dev_semantic_investigation`、`holdout_semantic_observation`、`holdout_intersection_negative`；池覆盖和最终 Top20 召回要分开看。
+3. `dev_semantic_first_congress` 虽然池内 5/5 有锚点，但最终 R@10 为 0，说明召回/排序阶段把 gold 页挤掉了，不是标注问题。
+4. `holdout_semantic_observation` 已从保留集移入开发集；R@10 0.4，PDF 143/146 仍未召回。
+5. 3 个池内零锚点：`dev_semantic_investigation`、`holdout_semantic_observation`、`holdout_intersection_negative`；池覆盖和最终 Top10 召回要分开看。
 6. 2 道拒答题只做了定义和拒绝依据，答案行为尚未人工复核；Fact/Cit/拒答正式指标仍为 0 题。
 
 ## 身份

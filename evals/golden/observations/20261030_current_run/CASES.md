@@ -16,46 +16,48 @@
 
 | 指标 | 宏平均 | 可评题数 |
 |---|---:|---:|
-| Recall@20 | 0.615 | 18 |
-| Precision@5 | 0.589 | 18 |
-| MRR@5 | 0.917 | 18 |
-| 固定池 nDCG@5 | 0.678 | 18 |
-| Recall@20 微平均 | 0.481（50/104 组） | 18 |
+| Recall@10（主指标） | 0.592 | 18 |
+| Precision@5（主指标） | 0.589 | 18 |
+| MRR@10（主指标） | 0.917 | 18 |
+| 固定池 nDCG@5（主指标） | 0.678 | 18 |
+| Recall@12（线上对齐） | 0.596 | 18 |
+| Recall@20（诊断，不作主指标） | 0.615 | 18 |
+| Recall@10 微平均 | 0.462（48/104 组） | 18 |
 
 ## 分类汇总
 
-| 类别 | 题数 | Recall@20 均值 |
+| 类别 | 题数 | Recall@10 均值 |
 |---|---:|---:|
 | `constraints_routing` | 2 | 0.792 |
 | `exact_fact` | 5 | 0.900 |
-| `intersection_hard_negative` | 3 | 0.488 |
-| `multi_evidence` | 4 | 0.425 |
+| `intersection_hard_negative` | 3 | 0.464 |
+| `multi_evidence` | 4 | 0.342 |
 | `semantic_retrieval` | 4 | 0.454 |
 
 ## 逐题结果
 
-| 题 | 分片 | 类别 | R@20 | P@5 | MRR@5 | nDCG@5 | 池内锚点 |
-|---|---|---|---:|---:|---:|---:|---:|
-| `dev_exact_deng_1954` | development | exact_fact | 1.000 | 0.600 | 1.000 | 0.563 | 2/2 |
-| `dev_exact_zhou_1954` | development | exact_fact | 0.500 | 1.000 | 1.000 | 0.921 | 3/6 |
-| `dev_exact_zunyi_election` | development | exact_fact | 1.000 | 0.400 | 1.000 | 0.348 | 1/1 |
-| `pilot_exact_deng_1952_appointment` | development | exact_fact | 1.000 | 0.600 | 1.000 | 0.633 | 1/1 |
-| `holdout_exact_date` | holdout | exact_fact | 1.000 | 0.400 | 0.500 | 0.659 | 2/2 |
-| `dev_semantic_contradiction` | development | semantic_retrieval | 0.667 | 0.800 | 1.000 | 0.922 | 2/3 |
-| `dev_semantic_first_congress` | development | semantic_retrieval | 0.000 | 0.000 | 0.000 | 0.000 | 5/5 |
-| `dev_semantic_investigation` | development | semantic_retrieval | 0.750 | 1.000 | 1.000 | 0.857 | 0/4 |
-| `holdout_semantic_observation` | development | semantic_retrieval | 0.400 | 0.200 | 1.000 | 0.613 | 0/5 |
-| `dev_multi_mao_hunan` | development | multi_evidence | 0.214 | 0.600 | 1.000 | 0.471 | 3/14 |
-| `dev_multi_meetings` | development | multi_evidence | 0.533 | 1.000 | 1.000 | 0.657 | 2/15 |
-| `dev_multi_zhou_periods` | development | multi_evidence | 0.286 | 0.800 | 1.000 | 0.750 | 1/7 |
-| `holdout_multi_period` | holdout | multi_evidence | 0.667 | 0.200 | 1.000 | 1.000 | 1/3 |
-| `dev_intersection_mao_zhou_1949` | development | intersection_hard_negative | 0.214 | 0.600 | 1.000 | 0.556 | 1/14 |
-| `holdout_intersection_negative` | holdout | intersection_hard_negative | 1.000 | 0.800 | 1.000 | 0.938 | 0/2 |
-| `holdout_intersection_positive` | holdout | intersection_hard_negative | 0.250 | 0.400 | 1.000 | 0.369 | 1/4 |
-| `dev_constraint_history_isolation` | development | constraints_routing | 0.833 | 1.000 | 1.000 | 0.940 | 5/12 |
-| `dev_constraint_month_place` | development | constraints_routing | 0.750 | 0.200 | 1.000 | 1.000 | 1/4 |
-| `dev_refusal_einstein` | development | refusal_boundary | N/A | N/A | N/A | N/A | 0/0 |
-| `pilot_refusal_out_of_scope_2024` | development | refusal_boundary | N/A | N/A | N/A | N/A | 0/0 |
+| 题 | 分片 | 类别 | R@10 | R@12 | R@20 | P@5 | MRR@10 | nDCG@5 | 池内锚点 |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `dev_exact_deng_1954` | development | exact_fact | 1.000 | 1.000 | 1.000 | 0.600 | 1.000 | 0.563 | 2/2 |
+| `dev_exact_zhou_1954` | development | exact_fact | 0.500 | 0.500 | 0.500 | 1.000 | 1.000 | 0.921 | 3/6 |
+| `dev_exact_zunyi_election` | development | exact_fact | 1.000 | 1.000 | 1.000 | 0.400 | 1.000 | 0.348 | 1/1 |
+| `pilot_exact_deng_1952_appointment` | development | exact_fact | 1.000 | 1.000 | 1.000 | 0.600 | 1.000 | 0.633 | 1/1 |
+| `holdout_exact_date` | holdout | exact_fact | 1.000 | 1.000 | 1.000 | 0.400 | 0.500 | 0.659 | 2/2 |
+| `dev_semantic_contradiction` | development | semantic_retrieval | 0.667 | 0.667 | 0.667 | 0.800 | 1.000 | 0.922 | 2/3 |
+| `dev_semantic_first_congress` | development | semantic_retrieval | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 5/5 |
+| `dev_semantic_investigation` | development | semantic_retrieval | 0.750 | 0.750 | 0.750 | 1.000 | 1.000 | 0.857 | 0/4 |
+| `holdout_semantic_observation` | development | semantic_retrieval | 0.400 | 0.400 | 0.400 | 0.200 | 1.000 | 0.613 | 0/5 |
+| `dev_multi_mao_hunan` | development | multi_evidence | 0.214 | 0.214 | 0.214 | 0.600 | 1.000 | 0.471 | 3/14 |
+| `dev_multi_meetings` | development | multi_evidence | 0.533 | 0.533 | 0.533 | 1.000 | 1.000 | 0.657 | 2/15 |
+| `dev_multi_zhou_periods` | development | multi_evidence | 0.286 | 0.286 | 0.286 | 0.800 | 1.000 | 0.750 | 1/7 |
+| `holdout_multi_period` | holdout | multi_evidence | 0.333 | 0.333 | 0.667 | 0.200 | 1.000 | 1.000 | 1/3 |
+| `dev_intersection_mao_zhou_1949` | development | intersection_hard_negative | 0.143 | 0.214 | 0.214 | 0.600 | 1.000 | 0.556 | 1/14 |
+| `holdout_intersection_negative` | holdout | intersection_hard_negative | 1.000 | 1.000 | 1.000 | 0.800 | 1.000 | 0.938 | 0/2 |
+| `holdout_intersection_positive` | holdout | intersection_hard_negative | 0.250 | 0.250 | 0.250 | 0.400 | 1.000 | 0.369 | 1/4 |
+| `dev_constraint_history_isolation` | development | constraints_routing | 0.833 | 0.833 | 0.833 | 1.000 | 1.000 | 0.940 | 5/12 |
+| `dev_constraint_month_place` | development | constraints_routing | 0.750 | 0.750 | 0.750 | 0.200 | 1.000 | 1.000 | 1/4 |
+| `dev_refusal_einstein` | development | refusal_boundary | N/A | N/A | N/A | N/A | N/A | N/A | 0/0 |
+| `pilot_refusal_out_of_scope_2024` | development | refusal_boundary | N/A | N/A | N/A | N/A | N/A | N/A | 0/0 |
 
 ## `dev_exact_deng_1954`
 
@@ -63,7 +65,7 @@
 
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 2 条；证据组 2 个；候选标签 9 条；池内锚点组 2/2
-- 指标：R@20 1.000；P@5 0.600；MRR@5 1.000；nDCG@5 0.563
+- 主指标：R@10 1.000；P@5 0.600；MRR@10 1.000；nDCG@5 0.563；线上对齐 R@12 1.000；诊断 R@20 1.000
 - 命中证据组：`deng_defense_vice_chair_1954`、`deng_vice_premier_1954`
 
 最终 Top 8：
@@ -85,7 +87,7 @@
 
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 6 条；证据组 6 个；候选标签 9 条；池内锚点组 3/6
-- 指标：R@20 0.500；P@5 1.000；MRR@5 1.000；nDCG@5 0.921
+- 主指标：R@10 0.500；P@5 1.000；MRR@10 1.000；nDCG@5 0.921；线上对齐 R@12 0.500；诊断 R@20 0.500
 - 命中证据组：`zhou_cppcc_1954`、`zhou_foreign_minister_1954`、`zhou_premier_1954`
 - 未命中证据组：
   - `zhou_roles_before_1954_changes`：职务沿革注列明周恩来原任书记处书记、政务院总理兼外长、全国政协副主席，并注明1956年9月/1954年12月任职变化。须结合当年条目，不把1953年页眉当1954年活动日期。（锚点：mao_zedong_chronology_volume_5 PDF 7）
@@ -109,7 +111,7 @@
 
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 1 条；证据组 1 个；候选标签 11 条；池内锚点组 1/1
-- 指标：R@20 1.000；P@5 0.400；MRR@5 1.000；nDCG@5 0.348
+- 主指标：R@10 1.000；P@5 0.400；MRR@10 1.000；nDCG@5 0.348；线上对齐 R@12 1.000；诊断 R@20 1.000
 - 命中证据组：`zunyi_election`
 
 最终 Top 8：
@@ -131,7 +133,7 @@
 
 - 分片：`development`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 1 条；证据组 1 个；候选标签 9 条；池内锚点组 1/1
-- 指标：R@20 1.000；P@5 0.600；MRR@5 1.000；nDCG@5 0.633
+- 主指标：R@10 1.000；P@5 0.600；MRR@10 1.000；nDCG@5 0.633；线上对齐 R@12 1.000；诊断 R@20 1.000
 - 命中证据组：`appointment`
 
 最终 Top 8：
@@ -153,7 +155,7 @@
 
 - 分片：`holdout`；类别：`exact_fact`；可答性：`answerable`；定义：`approved`
 - 必要事实 2 条；证据组 2 个；候选标签 6 条；池内锚点组 2/2
-- 指标：R@20 1.000；P@5 0.400；MRR@5 0.500；nDCG@5 0.659
+- 主指标：R@10 1.000；P@5 0.400；MRR@10 0.500；nDCG@5 0.659；线上对齐 R@12 1.000；诊断 R@20 1.000
 - 命中证据组：`oriental_university`、`sun_yat_sen_university`
 
 最终 Top 8：
@@ -175,7 +177,7 @@
 
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 3 条；证据组 3 个；候选标签 12 条；池内锚点组 2/3
-- 指标：R@20 0.667；P@5 0.800；MRR@5 1.000；nDCG@5 0.922
+- 主指标：R@10 0.667；P@5 0.800；MRR@10 1.000；nDCG@5 0.922；线上对齐 R@12 0.667；诊断 R@20 0.667
 - 命中证据组：`changing_conditions_change_priority`、`find_and_prioritize_principal`、`principal_role`
 
 最终 Top 8：
@@ -197,7 +199,7 @@
 
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 5 条；证据组 5 个；候选标签 13 条；池内锚点组 5/5
-- 指标：R@20 0.000；P@5 0.000；MRR@5 0.000；nDCG@5 0.000
+- 主指标：R@10 0.000；P@5 0.000；MRR@10 0.000；nDCG@5 0.000；线上对齐 R@12 0.000；诊断 R@20 0.000
 - 命中证据组：—
 - 未命中证据组：
   - `programme_and_name`：通过党的纲领、确定名称和根本目标（锚点：cpc_history_volume_1 PDF 121）
@@ -225,7 +227,7 @@
 
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 4 条；证据组 4 个；候选标签 14 条；池内锚点组 0/4
-- 指标：R@20 0.750；P@5 1.000；MRR@5 1.000；nDCG@5 0.857
+- 主指标：R@10 0.750；P@5 1.000；MRR@10 1.000；nDCG@5 0.857；线上对齐 R@12 0.750；诊断 R@20 0.750
 - 命中证据组：`investigate_before_concluding`、`learn_from_people_through_discussion`、`personal_in_depth_investigation`
 - 未命中证据组：
   - `theory_with_actual_conditions`：学习理论与中国实际结合，反对脱离实际的本本主义（锚点：mao_selected_works_combined PDF 82）
@@ -249,7 +251,7 @@
 
 - 分片：`development`；类别：`semantic_retrieval`；可答性：`answerable`；定义：`approved`
 - 必要事实 5 条；证据组 5 个；候选标签 11 条；池内锚点组 0/5
-- 指标：R@20 0.400；P@5 0.200；MRR@5 1.000；nDCG@5 0.613
+- 主指标：R@10 0.400；P@5 0.200；MRR@10 1.000；nDCG@5 0.613；线上对齐 R@12 0.400；诊断 R@20 0.400
 - 命中证据组：`first_division_training`、`other_divisions`
 - 未命中证据组：
   - `red_university_size`：红军大学的规模和分部（锚点：red_star_over_china PDF 143）
@@ -275,7 +277,7 @@
 
 - 分片：`development`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 14 条；证据组 14 个；候选标签 11 条；池内锚点组 3/14
-- 指标：R@20 0.214；P@5 0.600；MRR@5 1.000；nDCG@5 0.471
+- 主指标：R@10 0.214；P@5 0.600；MRR@10 1.000；nDCG@5 0.471；线上对齐 R@12 0.214；诊断 R@20 0.214
 - 命中证据组：`y1922_xiang_committee`、`y1926_hunan_peasant_congress`、`y1926_workers_peasants_welcome_speech`
 - 未命中证据组：
   - `y1921_self_study_university`：1921年8月中旬回到长沙，同何叔衡创办湖南自修大学，任指导主任并负实际领导责任。（锚点：mao_zedong_chronology_volume_1 PDF 95）
@@ -309,7 +311,7 @@
 
 - 分片：`development`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 12 条；证据组 15 个；候选标签 11 条；池内锚点组 2/15
-- 指标：R@20 0.533；P@5 1.000；MRR@5 1.000；nDCG@5 0.657
+- 主指标：R@10 0.533；P@5 1.000；MRR@10 1.000；nDCG@5 0.657；线上对齐 R@12 0.533；诊断 R@20 0.533
 - 命中证据组：`lushan_initial`、`lushan_letter_content`、`lushan_letter_discussion`、`lushan_plenum_date`、`lushan_plenum_decisions`、`lushan_turn`、`lushan_turn_date`、`zunyi_date`
 - 未命中证据组：
   - `zunyi_core`：核心议题及讨论边界（锚点：cpc_history_volume_1 PDF 484）
@@ -339,7 +341,7 @@
 
 - 分片：`development`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 7 条；证据组 7 个；候选标签 10 条；池内锚点组 1/7
-- 指标：R@20 0.286；P@5 0.800；MRR@5 1.000；nDCG@5 0.750
+- 主指标：R@10 0.286；P@5 0.800；MRR@10 1.000；nDCG@5 0.750；线上对齐 R@12 0.286；诊断 R@20 0.286
 - 命中证据组：`zhou_1954_cppcc`、`zhou_1954_government`
 - 未命中证据组：
   - `zhou_1954_geneva`：1954年4月以首席代表身份率中国代表团赴日内瓦会议。（锚点：zhou_enlai_chronology_1949_1976 PDF 604）
@@ -367,7 +369,7 @@
 
 - 分片：`holdout`；类别：`multi_evidence`；可答性：`answerable`；定义：`approved`
 - 必要事实 3 条；证据组 3 个；候选标签 9 条；池内锚点组 1/3
-- 指标：R@20 0.667；P@5 0.200；MRR@5 1.000；nDCG@5 1.000
+- 主指标：R@10 0.333；P@5 0.200；MRR@10 1.000；nDCG@5 1.000；线上对齐 R@12 0.333；诊断 R@20 0.667
 - 命中证据组：`d129_commissar`、`jinan_counter`
 - 未命中证据组：
   - `west_base`：1938年3月开辟冀西根据地（锚点：deng_xiaoping_chronology_1904_1974_upper PDF 191）
@@ -391,7 +393,7 @@
 
 - 分片：`development`；类别：`intersection_hard_negative`；可答性：`answerable`；定义：`approved`
 - 必要事实 14 条；证据组 14 个；候选标签 9 条；池内锚点组 1/14
-- 指标：R@20 0.214；P@5 0.600；MRR@5 1.000；nDCG@5 0.556
+- 主指标：R@10 0.143；P@5 0.600；MRR@10 1.000；nDCG@5 0.556；线上对齐 R@12 0.214；诊断 R@20 0.214
 - 命中证据组：`joint_consultation_0925`、`joint_meeting_0701`、`politburo_19491125`
 - 未命中证据组：
   - `joint_meeting_0607`：1949年6月7日会见陈嘉庚，周恩来参加（锚点：mao_zedong_chronology_volume_3 PDF 521）
@@ -425,7 +427,7 @@
 
 - 分片：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；定义：`approved`
 - 必要事实 2 条；证据组 2 个；候选标签 11 条；池内锚点组 0/2
-- 指标：R@20 1.000；P@5 0.800；MRR@5 1.000；nDCG@5 0.938
+- 主指标：R@10 1.000；P@5 0.800；MRR@10 1.000；nDCG@5 0.938；线上对齐 R@12 1.000；诊断 R@20 1.000
 - 命中证据组：`deng_commissar`、`liu_commander`
 
 最终 Top 8：
@@ -446,7 +448,7 @@
 
 - 分片：`holdout`；类别：`intersection_hard_negative`；可答性：`answerable`；定义：`approved`
 - 必要事实 3 条；证据组 4 个；候选标签 10 条；池内锚点组 1/4
-- 指标：R@20 0.250；P@5 0.400；MRR@5 1.000；nDCG@5 0.369
+- 主指标：R@10 0.250；P@5 0.400；MRR@10 1.000；nDCG@5 0.369；线上对齐 R@12 0.250；诊断 R@20 0.250
 - 命中证据组：`huaihai_1948`
 - 未命中证据组：
   - `yangtze_planning_1949`：总前委讨论渡江作战，邓小平与刘伯承等联名报告（锚点：deng_xiaoping_chronology_1904_1974_middle PDF 155）
@@ -472,7 +474,7 @@
 
 - 分片：`development`；类别：`constraints_routing`；可答性：`answerable`；定义：`approved`
 - 必要事实 10 条；证据组 12 个；候选标签 8 条；池内锚点组 5/12
-- 指标：R@20 0.833；P@5 1.000；MRR@5 1.000；nDCG@5 0.940
+- 主指标：R@10 0.833；P@5 1.000；MRR@10 1.000；nDCG@5 0.940；线上对齐 R@12 0.833；诊断 R@20 0.833
 - 命中证据组：`battle_command`、`battle_forces_end`、`battle_forces_start`、`battle_geography`、`battle_impact`、`battle_planning`、`battle_result`、`battle_stage_one`、`battle_stage_three_result`、`battle_stage_three_time`、`battle_stage_two`
 - 未命中证据组：
   - `battle_civilian_support`：群众支前的作用（锚点：cpc_history_volume_1 PDF 969）
@@ -496,7 +498,7 @@
 
 - 分片：`development`；类别：`constraints_routing`；可答性：`answerable`；定义：`approved`
 - 必要事实 4 条；证据组 4 个；候选标签 9 条；池内锚点组 1/4
-- 指标：R@20 0.750；P@5 0.200；MRR@5 1.000；nDCG@5 1.000
+- 主指标：R@10 0.750；P@5 0.200；MRR@10 1.000；nDCG@5 1.000；线上对齐 R@12 0.750；诊断 R@20 0.750
 - 命中证据组：`mao_arrive_beiping_march25`、`mao_xiyuan_march25`、`mao_yangtze_command_late_march`
 - 未命中证据组：
   - `mao_xiangshan_march31`：3月31日在香山接见并宴请第四野战军师以上干部。（锚点：mao_zedong_chronology_volume_3 PDF 477）
