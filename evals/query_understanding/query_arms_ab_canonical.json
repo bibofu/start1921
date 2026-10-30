@@ -1,0 +1,275 @@
+{
+  "arms": "canonical",
+  "cases": [
+    {
+      "case_id": "dev_exact_deng_1954",
+      "resolved": "1954年9月，邓小平在国务院和国防委员会分别担任什么职务？",
+      "arms": [
+        "1954年9月，邓小平国务院国防委员会分别担任什么职务？"
+      ],
+      "baseline": {
+        "recall@20": 1.0,
+        "precision@5": null,
+        "mrr@5": 1.0,
+        "ndcg@5": null
+      },
+      "rewrite": {
+        "recall@20": 1.0,
+        "precision@5": null,
+        "mrr@5": 1.0,
+        "ndcg@5": null
+      }
+    },
+    {
+      "case_id": "dev_exact_zhou_1954",
+      "resolved": "周恩来在1954年担任哪些主要职务？",
+      "arms": [],
+      "baseline": {
+        "recall@20": 0.5,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.9213963208540731
+      },
+      "rewrite": {
+        "recall@20": 0.5,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.9213963208540731
+      }
+    },
+    {
+      "case_id": "dev_exact_zunyi_election",
+      "resolved": "遵义会议选举毛泽东担任什么党内职务？",
+      "arms": [
+        "遵义会议选毛泽东担任什么党内职务？"
+      ],
+      "baseline": {
+        "recall@20": 1.0,
+        "precision@5": 0.4,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.34789815979014543
+      },
+      "rewrite": {
+        "recall@20": 1.0,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.4648477769140749
+      }
+    },
+    {
+      "case_id": "pilot_exact_deng_1952_appointment",
+      "resolved": "1952年8月7日，邓小平被任命为什么职务？",
+      "arms": [],
+      "baseline": {
+        "recall@20": 1.0,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.6258701109067025
+      },
+      "rewrite": {
+        "recall@20": 1.0,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.6258701109067025
+      }
+    },
+    {
+      "case_id": "dev_semantic_contradiction",
+      "resolved": "毛泽东在《矛盾论》中怎样分析主要矛盾？",
+      "arms": [],
+      "baseline": {
+        "recall@20": 0.6666666666666666,
+        "precision@5": 0.8,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.9218235822624828
+      },
+      "rewrite": {
+        "recall@20": 0.6666666666666666,
+        "precision@5": 0.8,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.9218235822624828
+      }
+    },
+    {
+      "case_id": "dev_semantic_first_congress",
+      "resolved": "党的头一次全国大会讲了些什么、形成了哪些决定？",
+      "arms": [],
+      "baseline": {
+        "recall@20": 0.0,
+        "precision@5": 0.0,
+        "mrr@5": 0.0,
+        "ndcg@5": 0.0
+      },
+      "rewrite": {
+        "recall@20": 0.0,
+        "precision@5": 0.0,
+        "mrr@5": 0.0,
+        "ndcg@5": 0.0
+      }
+    },
+    {
+      "case_id": "dev_semantic_investigation",
+      "resolved": "毛泽东关于调查研究有哪些观点？",
+      "arms": [],
+      "baseline": {
+        "recall@20": 0.75,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.8573424901769817
+      },
+      "rewrite": {
+        "recall@20": 0.75,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.8573424901769817
+      }
+    },
+    {
+      "case_id": "holdout_semantic_observation",
+      "resolved": "斯诺在《西行漫记》中怎样描述红军学校的学习和训练安排？",
+      "arms": [
+        "埃德加·斯诺在《西行漫记》中怎样描红军大学的学习和训练安排？"
+      ],
+      "baseline": {
+        "recall@20": 0.4,
+        "precision@5": 0.2,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.6131471927654584
+      },
+      "rewrite": {
+        "recall@20": 0.4,
+        "precision@5": 0.2,
+        "mrr@5": 0.3333333333333333,
+        "ndcg@5": 0.3065735963827292
+      }
+    },
+    {
+      "case_id": "dev_multi_mao_hunan",
+      "resolved": "逐年梳理毛泽东1921—1926年在湖南的活动。",
+      "arms": [
+        "逐年梳毛泽东1921—1926年在湖南的活动。"
+      ],
+      "baseline": {
+        "recall@20": 0.21428571428571427,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.47054637065131494
+      },
+      "rewrite": {
+        "recall@20": 0.21428571428571427,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.47054637065131494
+      }
+    },
+    {
+      "case_id": "dev_multi_meetings",
+      "resolved": "比较遵义会议和1959年庐山会议各自讨论的核心问题、会议进程和后续影响。",
+      "arms": [
+        "比较遵义会议和1959庐山会议各自讨论的核心问题、会议进程和后续影响。"
+      ],
+      "baseline": {
+        "recall@20": 0.5333333333333333,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.6724935386069495
+      },
+      "rewrite": {
+        "recall@20": 0.5333333333333333,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.5890442449142238
+      }
+    },
+    {
+      "case_id": "dev_multi_zhou_periods",
+      "resolved": "按时间和主题梳理周恩来从1954年至1956年的主要经历，并说明这三年工作重点的变化。",
+      "arms": [
+        "按时间和主题梳周恩来从1954年至1956年的主要经历，并说明这三年工作重点的变化。"
+      ],
+      "baseline": {
+        "recall@20": 0.2857142857142857,
+        "precision@5": 0.8,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.749792720701011
+      },
+      "rewrite": {
+        "recall@20": 0.2857142857142857,
+        "precision@5": 0.8,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.8989584458539029
+      }
+    },
+    {
+      "case_id": "dev_intersection_mao_zhou_1949",
+      "resolved": "毛泽东与周恩来在1949年有哪些有共同出席的会议？",
+      "arms": [
+        "毛泽东周恩来在1949年有哪些有共同出席的会议？"
+      ],
+      "baseline": {
+        "recall@20": 0.21428571428571427,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.5557336659882117
+      },
+      "rewrite": {
+        "recall@20": 0.21428571428571427,
+        "precision@5": 0.6,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.5557336659882117
+      }
+    },
+    {
+      "case_id": "dev_constraint_history_isolation",
+      "resolved": "详细介绍淮海战役。",
+      "arms": [
+        "详细介淮海战役。"
+      ],
+      "baseline": {
+        "recall@20": 0.8333333333333334,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.9395225786842207
+      },
+      "rewrite": {
+        "recall@20": 0.8333333333333334,
+        "precision@5": 1.0,
+        "mrr@5": 1.0,
+        "ndcg@5": 0.9395225786842207
+      }
+    },
+    {
+      "case_id": "dev_constraint_month_place",
+      "resolved": "1949年3月毛泽东在北平有哪些活动？",
+      "arms": [
+        "1949年3毛泽东在北京有哪些活动？"
+      ],
+      "baseline": {
+        "recall@20": 0.75,
+        "precision@5": 0.2,
+        "mrr@5": 1.0,
+        "ndcg@5": 1.0
+      },
+      "rewrite": {
+        "recall@20": 0.75,
+        "precision@5": null,
+        "mrr@5": 1.0,
+        "ndcg@5": null
+      }
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "recall@20": 0.5819727891156462,
+      "precision@5": 0.6307692307692307,
+      "mrr@5": 0.9285714285714286,
+      "ndcg@5": 0.6673512870298117
+    },
+    "rewrite": {
+      "recall@20": 0.5819727891156462,
+      "precision@5": 0.6833333333333333,
+      "mrr@5": 0.8809523809523809,
+      "ndcg@5": 0.6293049319657432
+    }
+  }
+}

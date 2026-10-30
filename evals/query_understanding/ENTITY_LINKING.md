@@ -55,7 +55,7 @@
 | 查询臂总数 | 112 |
 | 查询臂校验通过率 | 100.0% |
 
-逐题结果在 [entity_linking/report.md](entity_linking/report.md)。
+逐题结果在 [entity_linking/report.md](entity_linking/report.md)。查询臂 A/B 结论见 [QUERY_ARMS_AB.md](QUERY_ARMS_AB.md)：目前不接入生产。
 
 ## 剩余缺口
 
