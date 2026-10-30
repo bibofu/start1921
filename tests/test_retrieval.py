@@ -81,6 +81,8 @@ def test_query_routing_extracts_intent_and_period() -> None:
     assert "毛泽" in tokenize_query("毛泽东关于调查研究的观点")
     assert hard_filter_people(["毛泽东"], "viewpoint") == []
     assert hard_filter_people(["埃德加·斯诺", "毛泽东"], "observation") == []
+    assert hard_filter_people(["毛泽东", "周恩来"], "general") == []
+    assert hard_filter_people(["毛泽东"], "general") == ["毛泽东"]
     assert hard_filter_people(["毛泽东", "周恩来"], "intersection") == [
         "毛泽东",
         "周恩来",
@@ -114,6 +116,27 @@ def test_query_aliases_are_normalized_from_config(work_path) -> None:
     assert normalize_query("红军学校怎样训练", aliases) == "红军大学怎样训练"
     assert normalize_query("红大的课程", aliases) == "红军大学的课程"
     assert normalize_query("无关问题", aliases) == "无关问题"
+
+
+def test_shorthand_aliases_expand_people_and_congress(work_path) -> None:
+    (work_path / "query_aliases.json").write_text(
+        json.dumps(
+            {
+                "entries": [
+                    {"canonical": "毛泽东", "aliases": ["毛润之"]},
+                    {"canonical": "刘伯承 邓小平", "aliases": ["刘邓"]},
+                    {"canonical": "中共七大", "aliases": ["党的七大", "七大"]},
+                ]
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    aliases = work_path / "person_aliases.json"
+
+    assert normalize_query("毛润之与刘邓在七大", aliases) == (
+        "毛泽东与刘伯承 邓小平在中共七大"
+    )
 
 
 def test_career_query_removes_person_mentions_without_a_role_change() -> None:

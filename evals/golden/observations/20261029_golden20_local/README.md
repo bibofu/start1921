@@ -1,4 +1,4 @@
-# Golden 20 题本地组件基线（2026-10-30，r5，查询改写 v1）
+# Golden 20 题本地组件基线（2026-10-30，r6，查询改写 v2）
 
 按用户 2026-10-29 裁定删除 9 题、两次改写交集题并清理历史资产后，对当前 `golden_dataset.json` 的本地采集：20 题、18 可答/2 拒答、0 次生成模型调用。候选池已按新题面重建，19 条新增模型预标；当前共 182 条候选标签，全部人工复核。
 
@@ -8,7 +8,7 @@
 |---|---|
 | 数据集 | `evals/golden/golden_dataset.json` |
 | 数据集指纹 | `c8d0cc4adfa4988426c94970f9f3bf267c113503e49564f1c66d20fd3a5da807` |
-| 采集指纹 | `84e82397cb488a04629a0c8c3e5896bfe3090a99a9788cc6b0f2ca8771c2f98c` |
+| 采集指纹 | `7c35b0b6ca895097515163364aaa600cbc5c12a4a503b47541119ee14e97b2d7` |
 | 源码指纹 | `b85671ca3caf6c9e51e284d84bd7c52d5444fd53cb3d6c2f52e83eead7ff0f8e` |
 | 语料指纹 | `a9225af6a1996d1721f34963cea1bdfcd5409a4a2edef73f8fbfed347dee430d` |
 | 配置 | `candidate_k=30`、`top_k=20`、`answer_top_k=10`、`with_llm=false` |

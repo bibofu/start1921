@@ -133,6 +133,12 @@ def hard_filter_people(query_people: list[str], query_intent: str) -> list[str]:
     # Viewpoint queries therefore use creator/source ranking bonuses instead.
     if query_intent in {"viewpoint", "observation"}:
         return []
+    # A generic query that names several people is a multi-constraint search,
+    # not a claim that every chunk must mention all of them; requiring that
+    # would exclude pages about one of the people. Only explicit intersection
+    # queries keep the co-occurrence filter.
+    if query_intent == "general" and len(query_people) > 1:
+        return []
     return query_people
 
 
