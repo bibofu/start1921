@@ -9,6 +9,11 @@ from pathlib import Path
 from time import perf_counter
 from typing import Literal
 
+from history_agent.answering.entity_linking import (
+    EntityRecord,
+    load_entities,
+    normalize_entities,
+)
 from history_agent.errors import RetrievalError
 from history_agent.processing.chunks import load_person_aliases
 from history_agent.retrieval.keyword import YEAR, has_explicit_year_range, search_keyword_index
@@ -209,6 +214,11 @@ def expand_query(query: str, person_names: list[str] | None = None) -> str:
     """Apply congress normalization and, only for people, observation hints."""
 
     return expand_observation(expand_congress(query), person_names)
+
+
+@lru_cache(maxsize=2)
+def _entity_records(path: Path) -> list[EntityRecord]:
+    return load_entities(path) if path.exists() else []
 
 
 @lru_cache(maxsize=2)
@@ -962,11 +972,15 @@ def search_hybrid_index(
     ):
         raise RetrievalError("candidate_k must be an integer in 1..100 and >= top_k.")
     person_names = _person_names(aliases_path)
-    congress_normalized = normalize_congress_phrases(query)
+    entity_records = _entity_records(aliases_path.parent / "entities/entities.jsonl")
+    entity_normalized = (
+        normalize_entities(query, entity_records) if entity_records else query
+    )
+    congress_normalized = normalize_congress_phrases(entity_normalized)
     normalized = normalize_query(congress_normalized, aliases_path)
-    if congress_normalized != query:
-        # A high-confidence natural-language congress description is replaced
-        # by its canonical form; the raw phrase is not useful for retrieval.
+    if entity_normalized != query or congress_normalized != query:
+        # Exact entity aliases and natural congress descriptions are
+        # high-confidence rewrites: use the canonical query as the single arm.
         canonical_query = expand_congress(normalized)
         variants = [canonical_query]
         observed = expand_observation(canonical_query, person_names)

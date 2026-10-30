@@ -232,6 +232,58 @@ def resolve_followup(
     return resolved, inherited
 
 
+def entity_normalization_pairs(
+    records: list[EntityRecord],
+) -> list[tuple[str, str]]:
+    """Alias -> query text, with canonical self-mappings to block substrings."""
+
+    pairs: list[tuple[str, str]] = []
+    seen: dict[str, str] = {}
+    for record in records:
+        if record.type == "person_group":
+            members = [member for member in record.members]
+            by_id = {item.entity_id: item for item in records}
+            text = " ".join(
+                by_id[member].canonical for member in members if member in by_id
+            )
+            if not text:
+                continue
+        else:
+            text = record.canonical
+        for alias in {record.canonical, *record.aliases}:
+            if not alias:
+                continue
+            if record.type in {"person", "place"} and len(alias) < 3:
+                continue
+            if record.type == "place":
+                # Historical place names are time-specific (北平 vs 北京);
+                # keep them for mention linking, not deterministic rewriting.
+                continue
+            if alias in seen:
+                continue
+            seen[alias] = text
+            pairs.append((alias, text))
+    return sorted(pairs, key=lambda item: (-len(item[0]), item[0]))
+
+
+def normalize_entities(query: str, records: list[EntityRecord]) -> str:
+    """Replace exact aliases with their canonical text using longest match."""
+
+    pairs = entity_normalization_pairs(records)
+    output: list[str] = []
+    index = 0
+    while index < len(query):
+        for alias, canonical in pairs:
+            if query.startswith(alias, index):
+                output.append(canonical)
+                index += len(alias)
+                break
+        else:
+            output.append(query[index])
+            index += 1
+    return "".join(output)
+
+
 def query_time_range(question: str) -> tuple[int, int] | None:
     text = QUOTED.sub("", question)
     years = sorted({int(match.group()) for match in YEAR.finditer(text)})

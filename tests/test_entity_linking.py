@@ -100,3 +100,23 @@ def test_query_arms_lock_canonical_entities_and_validate() -> None:
     assert validate_arm(canonical, question, (1947, 1947), records).valid
     bad = canonical.model_copy(update={"text": canonical.text + " 1950年"})
     assert not validate_arm(bad, question, (1947, 1947), records).valid
+
+
+def test_entity_normalization_uses_canonical_text() -> None:
+    from history_agent.answering.entity_linking import normalize_entities
+
+    records = load_entities(INDEX)
+
+    assert normalize_entities("刘邓在1947年共同指挥了哪些战役？", records) == (
+        "刘伯承 邓小平在1947年共同指挥了哪些战役？"
+    )
+    # Historical place names stay as written; 1949 sources say 北平.
+    assert normalize_entities("毛泽东在北平会见了谁？", records) == (
+        "毛泽东在北平会见了谁？"
+    )
+    assert normalize_entities("毛选和党史", records) == "毛泽东选集和中国共产党历史"
+    assert normalize_entities("邓小平", records) == "邓小平"
+    # Short person names are not expanded to longer canonical names.
+    assert normalize_entities("斯诺在西行漫记中怎样描述红军学校？", records) == (
+        "斯诺在西行漫记中怎样描述红军大学？"
+    )
