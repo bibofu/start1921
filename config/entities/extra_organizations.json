@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "description": "Seed organizations and military units for the entity index.",
+  "organizations": [
+    {
+      "organization_id": "cpc",
+      "canonical_name": "中国共产党",
+      "aliases": [
+        "中共",
+        "共产党"
+      ]
+    },
+    {
+      "organization_id": "kmt",
+      "canonical_name": "中国国民党",
+      "aliases": [
+        "国民党"
+      ]
+    },
+    {
+      "organization_id": "red_army_university",
+      "canonical_name": "红军大学",
+      "aliases": [
+        "红军学校",
+        "红大",
+        "抗大"
+      ]
+    },
+    {
+      "organization_id": "eighth_route_army",
+      "canonical_name": "八路军",
+      "aliases": [
+        "国民革命军第八路军"
+      ]
+    },
+    {
+      "organization_id": "new_fourth_army",
+      "canonical_name": "新四军",
+      "aliases": [
+        "国民革命军新编第四军"
+      ]
+    },
+    {
+      "organization_id": "pla",
+      "canonical_name": "中国人民解放军",
+      "aliases": [
+        "解放军"
+      ]
+    },
+    {
+      "organization_id": "second_field_army",
+      "canonical_name": "第二野战军",
+      "aliases": [
+        "二野"
+      ]
+    },
+    {
+      "organization_id": "third_field_army",
+      "canonical_name": "第三野战军",
+      "aliases": [
+        "三野"
+      ]
+    },
+    {
+      "organization_id": "state_council",
+      "canonical_name": "国务院",
+      "aliases": [
+        "政务院",
+        "中华人民共和国国务院"
+      ]
+    },
+    {
+      "organization_id": "cppcc",
+      "canonical_name": "中国人民政治协商会议",
+      "aliases": [
+        "全国政协",
+        "政协"
+      ]
+    },
+    {
+      "organization_id": "ndc",
+      "canonical_name": "国防委员会",
+      "aliases": [
+        "中华人民共和国国防委员会"
+      ]
+    }
+  ]
+}

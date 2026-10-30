@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "description": "Additional persons for the entity index. These do not change the runtime person filter catalog until the index is rebuilt.",
+  "people": [
+    {"person_id": "liu_bocheng", "canonical_name": "刘伯承", "aliases": ["刘帅"]},
+    {"person_id": "chen_yi", "canonical_name": "陈毅", "aliases": ["陈老总"]},
+    {"person_id": "tan_zhenlin", "canonical_name": "谭震林", "aliases": []},
+    {"person_id": "chen_geng", "canonical_name": "陈赓", "aliases": []},
+    {"person_id": "xie_fuzhi", "canonical_name": "谢富治", "aliases": []},
+    {"person_id": "wang_zhen", "canonical_name": "王震", "aliases": []},
+    {"person_id": "xi_zhongxun", "canonical_name": "习仲勋", "aliases": []},
+    {"person_id": "gao_gang", "canonical_name": "高岗", "aliases": []},
+    {"person_id": "zhang_wentian", "canonical_name": "张闻天", "aliases": ["洛甫"]},
+    {"person_id": "wang_jiaxiang", "canonical_name": "王稼祥", "aliases": []},
+    {"person_id": "li_lisan", "canonical_name": "李立三", "aliases": []},
+    {"person_id": "deng_yingchao", "canonical_name": "邓颖超", "aliases": []},
+    {"person_id": "song_qingling", "canonical_name": "宋庆龄", "aliases": []},
+    {"person_id": "li_jishen", "canonical_name": "李济深", "aliases": []},
+    {"person_id": "shen_junru", "canonical_name": "沈钧儒", "aliases": []},
+    {"person_id": "guo_moruo", "canonical_name": "郭沫若", "aliases": []},
+    {"person_id": "huang_yanpei", "canonical_name": "黄炎培", "aliases": []},
+    {"person_id": "fu_zuoyi", "canonical_name": "傅作义", "aliases": []},
+    {"person_id": "cheng_qian", "canonical_name": "程潜", "aliases": ["程颂云"]},
+    {"person_id": "bai_chongxi", "canonical_name": "白崇禧", "aliases": []},
+    {"person_id": "li_zongren", "canonical_name": "李宗仁", "aliases": []},
+    {"person_id": "yan_xishan", "canonical_name": "阎锡山", "aliases": []},
+    {"person_id": "zhang_xueliang", "canonical_name": "张学良", "aliases": []},
+    {"person_id": "yang_hucheng", "canonical_name": "杨虎城", "aliases": []}
+  ]
+}

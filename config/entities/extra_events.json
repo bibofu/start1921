@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "description": "Seed events and periods for the entity index. Ranges are only filled where the period catalog already defines them.",
+  "events": [
+    {
+      "event_id": "anti_japanese_war",
+      "canonical_name": "抗日战争",
+      "type": "period",
+      "aliases": [
+        "抗战",
+        "八年抗战",
+        "全面抗战",
+        "抗战时期",
+        "抗战初期"
+      ],
+      "start": 1937,
+      "end": 1945
+    },
+    {
+      "event_id": "liberation_war",
+      "canonical_name": "解放战争",
+      "type": "period",
+      "aliases": [
+        "解放战争期间",
+        "第三次国内革命战争",
+        "国共内战"
+      ],
+      "start": 1945,
+      "end": 1949
+    },
+    {
+      "event_id": "long_march",
+      "canonical_name": "长征",
+      "type": "period",
+      "aliases": [
+        "红军长征",
+        "二万五千里长征"
+      ],
+      "start": 1934,
+      "end": 1936
+    },
+    {
+      "event_id": "yanan_rectification",
+      "canonical_name": "延安整风",
+      "type": "period",
+      "aliases": [
+        "延安整风运动"
+      ],
+      "start": 1942,
+      "end": 1945
+    },
+    {
+      "event_id": "korean_war",
+      "canonical_name": "抗美援朝",
+      "type": "period",
+      "aliases": [
+        "抗美援朝战争",
+        "朝鲜战争"
+      ],
+      "start": 1950,
+      "end": 1953
+    },
+    {
+      "event_id": "land_reform",
+      "canonical_name": "土地改革",
+      "type": "period",
+      "aliases": [
+        "土改",
+        "土地改革运动"
+      ],
+      "start": 1947,
+      "end": 1952
+    },
+    {
+      "event_id": "cultural_revolution",
+      "canonical_name": "文化大革命",
+      "type": "period",
+      "aliases": [
+        "文革",
+        "十年浩劫"
+      ],
+      "start": 1966,
+      "end": 1976
+    },
+    {
+      "event_id": "zunyi_meeting",
+      "canonical_name": "遵义会议",
+      "type": "event",
+      "aliases": [
+        "遵义政治局扩大会议"
+      ],
+      "start": 1935,
+      "end": 1935
+    },
+    {
+      "event_id": "lushan_meeting",
+      "canonical_name": "庐山会议",
+      "type": "event",
+      "aliases": [],
+      "start": 1959,
+      "end": 1959
+    },
+    {
+      "event_id": "chongqing_talks",
+      "canonical_name": "重庆谈判",
+      "type": "event",
+      "aliases": [],
+      "start": 1945,
+      "end": 1945
+    },
+    {
+      "event_id": "gutian_meeting",
+      "canonical_name": "古田会议",
+      "type": "event",
+      "aliases": [
+        "红四军第九次党代表大会"
+      ],
+      "start": 1929,
+      "end": 1929
+    },
+    {
+      "event_id": "wayaobu_meeting",
+      "canonical_name": "瓦窑堡会议",
+      "type": "event",
+      "aliases": [
+        "瓦窑堡政治局会议"
+      ],
+      "start": 1935,
+      "end": 1935
+    },
+    {
+      "event_id": "nanchang_uprising",
+      "canonical_name": "南昌起义",
+      "type": "event",
+      "aliases": [
+        "八一起义"
+      ],
+      "start": 1927,
+      "end": 1927
+    },
+    {
+      "event_id": "autumn_harvest_uprising",
+      "canonical_name": "秋收起义",
+      "type": "event",
+      "aliases": [
+        "湘赣边界秋收起义"
+      ],
+      "start": 1927,
+      "end": 1927
+    },
+    {
+      "event_id": "pingxingguan",
+      "canonical_name": "平型关大捷",
+      "aliases": [
+        "平型关战斗"
+      ],
+      "start": 1937,
+      "end": 1937
+    },
+    {
+      "event_id": "hundred_regiments",
+      "canonical_name": "百团大战",
+      "aliases": [],
+      "start": 1940,
+      "end": 1940
+    },
+    {
+      "event_id": "huaihai_campaign",
+      "canonical_name": "淮海战役",
+      "aliases": [
+        "徐蚌会战"
+      ],
+      "start": 1948,
+      "end": 1949
+    },
+    {
+      "event_id": "yangtze_crossing",
+      "canonical_name": "渡江战役",
+      "aliases": [
+        "京沪杭战役"
+      ],
+      "start": 1949,
+      "end": 1949
+    },
+    {
+      "event_id": "shangdang_campaign",
+      "canonical_name": "上党战役",
+      "aliases": [],
+      "start": 1945,
+      "end": 1945
+    },
+    {
+      "event_id": "dabie_mountains",
+      "canonical_name": "挺进大别山",
+      "aliases": [
+        "刘邓大军挺进大别山"
+      ],
+      "start": 1947,
+      "end": 1947
+    },
+    {
+      "event_id": "southwest_advance",
+      "canonical_name": "进军西南",
+      "aliases": [],
+      "start": 1949,
+      "end": 1949
+    },
+    {
+      "event_id": "xinhai_revolution",
+      "canonical_name": "辛亥革命",
+      "type": "event",
+      "aliases": [],
+      "start": 1911,
+      "end": 1911
+    }
+  ]
+}

@@ -8,6 +8,7 @@
 - [baselines/rules.md](baselines/rules.md)：确定性规则基线
 - [baselines/llm.md](baselines/llm.md)：现有 LLM 规划器基线
 - [BASELINE.md](BASELINE.md)：两套基线对比与问题清单
+- [ENTITY_LINKING.md](ENTITY_LINKING.md)：实体索引 v1 与 shadow 结果
 
 ## 标注字段
 
@@ -32,6 +33,12 @@
 ```
 
 输出在 `baselines/{mode}.json`、`baselines/{mode}.md` 和 `summary.json`。
+
+实体链接 shadow：
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts/run_entity_linking_shadow.py
+```
 
 ## 指标
 

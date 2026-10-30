@@ -20,6 +20,20 @@
           "canonical": [
             "邓小平"
           ]
+        },
+        {
+          "text": "国务院",
+          "type": "organization",
+          "canonical": [
+            "国务院"
+          ]
+        },
+        {
+          "text": "国防委员会",
+          "type": "organization",
+          "canonical": [
+            "国防委员会"
+          ]
         }
       ],
       "time": {
@@ -459,6 +473,13 @@
           "type": "person",
           "canonical": [
             "周恩来"
+          ]
+        },
+        {
+          "text": "全国政协",
+          "type": "organization",
+          "canonical": [
+            "中国人民政治协商会议"
           ]
         }
       ],

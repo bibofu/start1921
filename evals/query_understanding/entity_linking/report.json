@@ -1,0 +1,1678 @@
+{
+  "cases": 30,
+  "detection": {
+    "true_positive": 60,
+    "predicted": 60,
+    "expected": 63,
+    "precision": 1.0,
+    "recall": 0.9523809523809523,
+    "f1": 0.975609756097561
+  },
+  "anchoring": {
+    "true_positive": 60,
+    "predicted": 60,
+    "expected": 63,
+    "precision": 1.0,
+    "recall": 0.9523809523809523,
+    "f1": 0.975609756097561
+  },
+  "unresolved_rate": 0.0,
+  "rows": [
+    {
+      "id": "qu_dev_fact_deng_1954",
+      "split": "development",
+      "expected": [
+        "国务院",
+        "国防委员会",
+        "邓小平"
+      ],
+      "detected": [
+        "国务院",
+        "国防委员会",
+        "邓小平"
+      ],
+      "anchored": [
+        "国务院",
+        "国防委员会",
+        "邓小平"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "start": 8,
+          "end": 11,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "国务院",
+          "start": 12,
+          "end": 15,
+          "status": "anchored",
+          "canonicals": [
+            "国务院"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:state_council",
+              "canonical": "国务院",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "国防委员会",
+          "start": 16,
+          "end": 21,
+          "status": "anchored",
+          "canonicals": [
+            "国防委员会"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:ndc",
+              "canonical": "国防委员会",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_fact_deng_school_1926",
+      "split": "development",
+      "expected": [
+        "邓小平",
+        "邓小平年谱"
+      ],
+      "detected": [
+        "邓小平",
+        "邓小平年谱"
+      ],
+      "anchored": [
+        "邓小平",
+        "邓小平年谱"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "邓小平年谱",
+          "start": 1,
+          "end": 6,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平年谱"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:deng_xiaoping_chronology_1904_1974_lower",
+              "canonical": "邓小平年谱",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "邓小平",
+          "start": 9,
+          "end": 12,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_congress_first",
+      "split": "development",
+      "expected": [
+        "中共一大"
+      ],
+      "detected": [
+        "中共一大"
+      ],
+      "anchored": [
+        "中共一大"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "中共一大",
+          "start": 0,
+          "end": 4,
+          "status": "anchored",
+          "canonicals": [
+            "中共一大"
+          ],
+          "candidates": [
+            {
+              "entity_id": "congress:cpc_1",
+              "canonical": "中共一大",
+              "type": "congress",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_congress_short_seven",
+      "split": "development",
+      "expected": [
+        "中共七大"
+      ],
+      "detected": [
+        "中共七大"
+      ],
+      "anchored": [
+        "中共七大"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "七大",
+          "start": 0,
+          "end": 2,
+          "status": "anchored",
+          "canonicals": [
+            "中共七大"
+          ],
+          "candidates": [
+            {
+              "entity_id": "congress:cpc_7",
+              "canonical": "中共七大",
+              "type": "congress",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_alias_mao_runzhi",
+      "split": "development",
+      "expected": [
+        "毛泽东"
+      ],
+      "detected": [
+        "毛泽东"
+      ],
+      "anchored": [
+        "毛泽东"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "润之",
+          "start": 1,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_group_liudeng",
+      "split": "development",
+      "expected": [
+        "刘伯承",
+        "邓小平"
+      ],
+      "detected": [
+        "刘伯承",
+        "邓小平"
+      ],
+      "anchored": [
+        "刘伯承",
+        "邓小平"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "刘邓",
+          "start": 0,
+          "end": 2,
+          "status": "anchored",
+          "canonicals": [
+            "刘伯承",
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:liu_bocheng",
+              "canonical": "刘伯承",
+              "type": "person",
+              "score": 1.0
+            },
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_keyword_dump",
+      "split": "development",
+      "expected": [
+        "中共七大",
+        "刘伯承",
+        "毛泽东",
+        "解放战争",
+        "邓小平"
+      ],
+      "detected": [
+        "中共七大",
+        "刘伯承",
+        "毛泽东",
+        "解放战争",
+        "邓小平"
+      ],
+      "anchored": [
+        "中共七大",
+        "刘伯承",
+        "毛泽东",
+        "解放战争",
+        "邓小平"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "解放战争期间",
+          "start": 0,
+          "end": 6,
+          "status": "anchored",
+          "canonicals": [
+            "解放战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:liberation_war",
+              "canonical": "解放战争",
+              "type": "period",
+              "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "润之",
+          "start": 9,
+          "end": 11,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "七大",
+          "start": 13,
+          "end": 15,
+          "status": "anchored",
+          "canonicals": [
+            "中共七大"
+          ],
+          "candidates": [
+            {
+              "entity_id": "congress:cpc_7",
+              "canonical": "中共七大",
+              "type": "congress",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "刘邓",
+          "start": 17,
+          "end": 19,
+          "status": "anchored",
+          "canonicals": [
+            "刘伯承",
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:liu_bocheng",
+              "canonical": "刘伯承",
+              "type": "person",
+              "score": 1.0
+            },
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_comparison_meetings",
+      "split": "development",
+      "expected": [
+        "庐山会议",
+        "遵义会议"
+      ],
+      "detected": [
+        "庐山会议",
+        "遵义会议"
+      ],
+      "anchored": [
+        "庐山会议",
+        "遵义会议"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "遵义会议",
+          "start": 2,
+          "end": 6,
+          "status": "anchored",
+          "canonicals": [
+            "遵义会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:zunyi_meeting",
+              "canonical": "遵义会议",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "庐山会议",
+          "start": 7,
+          "end": 11,
+          "status": "anchored",
+          "canonicals": [
+            "庐山会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:lushan_meeting",
+              "canonical": "庐山会议",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_multihop_zunyi",
+      "split": "development",
+      "expected": [
+        "抗日战争",
+        "毛泽东",
+        "遵义会议"
+      ],
+      "detected": [
+        "抗日战争",
+        "毛泽东",
+        "遵义会议"
+      ],
+      "anchored": [
+        "抗日战争",
+        "毛泽东",
+        "遵义会议"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "遵义会议",
+          "start": 4,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "遵义会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:zunyi_meeting",
+              "canonical": "遵义会议",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "抗战初期",
+          "start": 23,
+          "end": 27,
+          "status": "anchored",
+          "canonicals": [
+            "抗日战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:anti_japanese_war",
+              "canonical": "抗日战争",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_observation_snow",
+      "split": "development",
+      "expected": [
+        "埃德加·斯诺",
+        "红军大学",
+        "西行漫记"
+      ],
+      "detected": [
+        "埃德加·斯诺",
+        "红军大学",
+        "西行漫记"
+      ],
+      "anchored": [
+        "埃德加·斯诺",
+        "红军大学",
+        "西行漫记"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "斯诺",
+          "start": 0,
+          "end": 2,
+          "status": "anchored",
+          "canonicals": [
+            "埃德加·斯诺"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:edgar_snow",
+              "canonical": "埃德加·斯诺",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "西行漫记",
+          "start": 4,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "西行漫记"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:red_star_over_china",
+              "canonical": "西行漫记",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "红军学校",
+          "start": 14,
+          "end": 18,
+          "status": "anchored",
+          "canonicals": [
+            "红军大学"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:red_army_university",
+              "canonical": "红军大学",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_viewpoint_persistent",
+      "split": "development",
+      "expected": [
+        "抗日战争",
+        "毛泽东",
+        "论持久战"
+      ],
+      "detected": [
+        "抗日战争",
+        "毛泽东",
+        "论持久战"
+      ],
+      "anchored": [
+        "抗日战争",
+        "毛泽东",
+        "论持久战"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "《论持久战》",
+          "start": 4,
+          "end": 10,
+          "status": "anchored",
+          "canonicals": [
+            "论持久战"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:on_protracted_war",
+              "canonical": "论持久战",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "抗战",
+          "start": 16,
+          "end": 18,
+          "status": "anchored",
+          "canonicals": [
+            "抗日战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:anti_japanese_war",
+              "canonical": "抗日战争",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_timeline_zhou_1956",
+      "split": "development",
+      "expected": [
+        "周恩来"
+      ],
+      "detected": [
+        "周恩来"
+      ],
+      "anchored": [
+        "周恩来"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "周恩来",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_intersection_maozhou",
+      "split": "development",
+      "expected": [
+        "周恩来",
+        "毛泽东"
+      ],
+      "detected": [
+        "周恩来",
+        "毛泽东"
+      ],
+      "anchored": [
+        "周恩来",
+        "毛泽东"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "周恩来",
+          "start": 4,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_intersection_negative",
+      "split": "development",
+      "expected": [
+        "中国人民政治协商会议",
+        "周恩来",
+        "毛泽东"
+      ],
+      "detected": [
+        "中国人民政治协商会议",
+        "周恩来",
+        "毛泽东"
+      ],
+      "anchored": [
+        "中国人民政治协商会议",
+        "周恩来",
+        "毛泽东"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "周恩来",
+          "start": 4,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "全国政协",
+          "start": 25,
+          "end": 29,
+          "status": "anchored",
+          "canonicals": [
+            "中国人民政治协商会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:cppcc",
+              "canonical": "中国人民政治协商会议",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_source_deng_1973",
+      "split": "development",
+      "expected": [
+        "邓小平",
+        "邓小平年谱"
+      ],
+      "detected": [
+        "邓小平",
+        "邓小平年谱"
+      ],
+      "anchored": [
+        "邓小平",
+        "邓小平年谱"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "邓小平年谱",
+          "start": 4,
+          "end": 9,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平年谱"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:deng_xiaoping_chronology_1904_1974_lower",
+              "canonical": "邓小平年谱",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "邓小平",
+          "start": 31,
+          "end": 34,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_month_place_deng_1949",
+      "split": "development",
+      "expected": [
+        "邓小平"
+      ],
+      "detected": [
+        "邓小平"
+      ],
+      "anchored": [
+        "邓小平"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "start": 8,
+          "end": 11,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_refusal_2024",
+      "split": "development",
+      "expected": [
+        "习近平"
+      ],
+      "detected": [],
+      "anchored": [],
+      "missing_detection": [
+        "习近平"
+      ],
+      "missing_anchor": [
+        "习近平"
+      ],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": []
+    },
+    {
+      "id": "qu_dev_followup_zhou_1957",
+      "split": "development",
+      "expected": [
+        "周恩来"
+      ],
+      "detected": [],
+      "anchored": [],
+      "missing_detection": [
+        "周恩来"
+      ],
+      "missing_anchor": [
+        "周恩来"
+      ],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": []
+    },
+    {
+      "id": "qu_dev_followup_deng_1953",
+      "split": "development",
+      "expected": [
+        "邓小平"
+      ],
+      "detected": [],
+      "anchored": [],
+      "missing_detection": [
+        "邓小平"
+      ],
+      "missing_anchor": [
+        "邓小平"
+      ],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": []
+    },
+    {
+      "id": "qu_dev_alias_xiaoping",
+      "split": "development",
+      "expected": [
+        "邓小平"
+      ],
+      "detected": [
+        "邓小平"
+      ],
+      "anchored": [
+        "邓小平"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "小平",
+          "start": 0,
+          "end": 2,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_yenan_rectification",
+      "split": "development",
+      "expected": [
+        "延安整风",
+        "毛泽东"
+      ],
+      "detected": [
+        "延安整风",
+        "毛泽东"
+      ],
+      "anchored": [
+        "延安整风",
+        "毛泽东"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "延安整风",
+          "start": 4,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "延安整风"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:yanan_rectification",
+              "canonical": "延安整风",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_event_chongqing",
+      "split": "development",
+      "expected": [
+        "抗日战争",
+        "毛泽东",
+        "重庆谈判"
+      ],
+      "detected": [
+        "抗日战争",
+        "毛泽东",
+        "重庆谈判"
+      ],
+      "anchored": [
+        "抗日战争",
+        "毛泽东",
+        "重庆谈判"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "抗战",
+          "start": 0,
+          "end": 2,
+          "status": "anchored",
+          "canonicals": [
+            "抗日战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:anti_japanese_war",
+              "canonical": "抗日战争",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "毛泽东",
+          "start": 5,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "重庆谈判",
+          "start": 9,
+          "end": 13,
+          "status": "anchored",
+          "canonicals": [
+            "重庆谈判"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:chongqing_talks",
+              "canonical": "重庆谈判",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_place_taihang",
+      "split": "development",
+      "expected": [
+        "太行山",
+        "邓小平"
+      ],
+      "detected": [
+        "太行山",
+        "邓小平"
+      ],
+      "anchored": [
+        "太行山",
+        "邓小平"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "邓小平",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "邓小平"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:deng_xiaoping",
+              "canonical": "邓小平",
+              "type": "person",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "太行山",
+          "start": 4,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "太行山"
+          ],
+          "candidates": [
+            {
+              "entity_id": "place:taihang",
+              "canonical": "太行山",
+              "type": "place",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_dev_document_persistent",
+      "split": "development",
+      "expected": [
+        "毛泽东选集",
+        "论持久战"
+      ],
+      "detected": [
+        "毛泽东选集",
+        "论持久战"
+      ],
+      "anchored": [
+        "毛泽东选集",
+        "论持久战"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "《毛泽东选集》",
+          "start": 0,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东选集"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:mao_selected_works_combined",
+              "canonical": "毛泽东选集",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "《论持久战》",
+          "start": 8,
+          "end": 14,
+          "status": "anchored",
+          "canonicals": [
+            "论持久战"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:on_protracted_war",
+              "canonical": "论持久战",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_hold_multi3_mao_liu_zhou",
+      "split": "holdout",
+      "expected": [
+        "刘少奇",
+        "周恩来",
+        "毛泽东"
+      ],
+      "detected": [
+        "刘少奇",
+        "周恩来",
+        "毛泽东"
+      ],
+      "anchored": [
+        "刘少奇",
+        "周恩来",
+        "毛泽东"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "刘少奇",
+          "start": 4,
+          "end": 7,
+          "status": "anchored",
+          "canonicals": [
+            "刘少奇"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:liu_shaoqi",
+              "canonical": "刘少奇",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "周恩来",
+          "start": 8,
+          "end": 11,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_hold_keyword_dump_longmarch",
+      "split": "holdout",
+      "expected": [
+        "林彪",
+        "毛泽东",
+        "遵义会议",
+        "长征"
+      ],
+      "detected": [
+        "林彪",
+        "毛泽东",
+        "遵义会议",
+        "长征"
+      ],
+      "anchored": [
+        "林彪",
+        "毛泽东",
+        "遵义会议",
+        "长征"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "长征",
+          "start": 0,
+          "end": 2,
+          "status": "anchored",
+          "canonicals": [
+            "长征"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:long_march",
+              "canonical": "长征",
+              "type": "period",
+              "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "遵义会议",
+          "start": 4,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "遵义会议"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:zunyi_meeting",
+              "canonical": "遵义会议",
+              "type": "event",
+              "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "毛泽东",
+          "start": 10,
+          "end": 13,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        },
+        {
+          "text": "林彪",
+          "start": 15,
+          "end": 17,
+          "status": "anchored",
+          "canonicals": [
+            "林彪"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:lin_biao",
+              "canonical": "林彪",
+              "type": "person",
+              "score": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_hold_out_of_range_xinhai",
+      "split": "holdout",
+      "expected": [
+        "辛亥革命"
+      ],
+      "detected": [
+        "辛亥革命"
+      ],
+      "anchored": [
+        "辛亥革命"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "辛亥革命",
+          "start": 0,
+          "end": 4,
+          "status": "anchored",
+          "canonicals": [
+            "辛亥革命"
+          ],
+          "candidates": [
+            {
+              "entity_id": "event:xinhai_revolution",
+              "canonical": "辛亥革命",
+              "type": "event",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_hold_comparison_parties",
+      "split": "holdout",
+      "expected": [
+        "中国共产党",
+        "中国国民党",
+        "抗日战争"
+      ],
+      "detected": [
+        "中国共产党",
+        "中国国民党",
+        "抗日战争"
+      ],
+      "anchored": [
+        "中国共产党",
+        "中国国民党",
+        "抗日战争"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "抗战时期",
+          "start": 2,
+          "end": 6,
+          "status": "anchored",
+          "canonicals": [
+            "抗日战争"
+          ],
+          "candidates": [
+            {
+              "entity_id": "period:anti_japanese_war",
+              "canonical": "抗日战争",
+              "type": "period",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "国共",
+          "start": 6,
+          "end": 8,
+          "status": "anchored",
+          "canonicals": [
+            "中国共产党",
+            "中国国民党"
+          ],
+          "candidates": [
+            {
+              "entity_id": "organization:cpc",
+              "canonical": "中国共产党",
+              "type": "organization",
+              "score": 0.8
+            },
+            {
+              "entity_id": "organization:kmt",
+              "canonical": "中国国民党",
+              "type": "organization",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_hold_negation",
+      "split": "holdout",
+      "expected": [
+        "毛泽东"
+      ],
+      "detected": [
+        "毛泽东"
+      ],
+      "anchored": [
+        "毛泽东"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "毛泽东",
+          "start": 0,
+          "end": 3,
+          "status": "anchored",
+          "canonicals": [
+            "毛泽东"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:mao_zedong",
+              "canonical": "毛泽东",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qu_hold_source_month",
+      "split": "holdout",
+      "expected": [
+        "周恩来",
+        "周恩来年谱",
+        "莫斯科"
+      ],
+      "detected": [
+        "周恩来",
+        "周恩来年谱",
+        "莫斯科"
+      ],
+      "anchored": [
+        "周恩来",
+        "周恩来年谱",
+        "莫斯科"
+      ],
+      "missing_detection": [],
+      "missing_anchor": [],
+      "extra_anchor": [],
+      "unresolved_mentions": [],
+      "mentions": [
+        {
+          "text": "周恩来年谱",
+          "start": 4,
+          "end": 9,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来年谱"
+          ],
+          "candidates": [
+            {
+              "entity_id": "document:zhou_enlai_chronology_1949_1976",
+              "canonical": "周恩来年谱",
+              "type": "document",
+              "score": 0.8
+            }
+          ]
+        },
+        {
+          "text": "周恩来",
+          "start": 18,
+          "end": 21,
+          "status": "anchored",
+          "canonicals": [
+            "周恩来"
+          ],
+          "candidates": [
+            {
+              "entity_id": "person:zhou_enlai",
+              "canonical": "周恩来",
+              "type": "person",
+              "score": 0.9
+            }
+          ]
+        },
+        {
+          "text": "莫斯科",
+          "start": 22,
+          "end": 25,
+          "status": "anchored",
+          "canonicals": [
+            "莫斯科"
+          ],
+          "candidates": [
+            {
+              "entity_id": "place:moscow",
+              "canonical": "莫斯科",
+              "type": "place",
+              "score": 0.8
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

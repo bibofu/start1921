@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "description": "One mention maps to several person entity ids. Applied only by the entity linker, not as a string replacement.",
+  "groups": [
+    {
+      "text": "刘邓",
+      "entity_ids": [
+        "person:liu_bocheng",
+        "person:deng_xiaoping"
+      ]
+    },
+    {
+      "text": "毛周",
+      "entity_ids": [
+        "person:mao_zedong",
+        "person:zhou_enlai"
+      ]
+    },
+    {
+      "text": "朱毛",
+      "entity_ids": [
+        "person:zhu_de",
+        "person:mao_zedong"
+      ]
+    },
+    {
+      "text": "陈粟",
+      "entity_ids": [
+        "person:chen_yi",
+        "person:su_yu"
+      ]
+    },
+    {
+      "text": "林罗",
+      "entity_ids": [
+        "person:lin_biao",
+        "person:luo_ronghuan"
+      ]
+    },
+    {
+      "text": "刘陈邓",
+      "entity_ids": [
+        "person:liu_bocheng",
+        "person:chen_yi",
+        "person:deng_xiaoping"
+      ]
+    },
+    {
+      "text": "陈谢",
+      "entity_ids": [
+        "person:chen_geng",
+        "person:xie_fuzhi"
+      ]
+    },
+    {
+      "text": "彭习",
+      "entity_ids": [
+        "person:peng_dehuai",
+        "person:xi_zhongxun"
+      ]
+    },
+    {
+      "text": "粟谭",
+      "entity_ids": [
+        "person:su_yu",
+        "person:tan_zhenlin"
+      ]
+    },
+    {
+      "text": "国共",
+      "entity_ids": [
+        "organization:cpc",
+        "organization:kmt"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "description": "Documents referenced in questions but not present as standalone corpus files.",
+  "documents": [
+    {"document_id": "on_protracted_war", "title": "论持久战", "aliases": ["《论持久战》"]}
+  ]
+}

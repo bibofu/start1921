@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "description": "Seed place names for the entity index. No geographic hierarchy yet.",
+  "places": [
+    {"place_id": "taihang", "canonical_name": "太行山", "aliases": ["太行"]},
+    {"place_id": "dabie", "canonical_name": "大别山", "aliases": []},
+    {"place_id": "yanan", "canonical_name": "延安", "aliases": []},
+    {"place_id": "jinggangshan", "canonical_name": "井冈山", "aliases": []},
+    {"place_id": "ruijin", "canonical_name": "瑞金", "aliases": []},
+    {"place_id": "zunyi", "canonical_name": "遵义", "aliases": []},
+    {"place_id": "chongqing", "canonical_name": "重庆", "aliases": []},
+    {"place_id": "moscow", "canonical_name": "莫斯科", "aliases": []},
+    {"place_id": "beijing", "canonical_name": "北京", "aliases": ["北平"]},
+    {"place_id": "nanjing", "canonical_name": "南京", "aliases": []},
+    {"place_id": "shanghai", "canonical_name": "上海", "aliases": []},
+    {"place_id": "xibaipo", "canonical_name": "西柏坡", "aliases": []},
+    {"place_id": "baoan", "canonical_name": "保安", "aliases": []}
+  ]
+}

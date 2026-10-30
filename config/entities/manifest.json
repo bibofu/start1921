@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "index_version": "entity-index-v1-20261030",
+  "records": 145,
+  "persons": 49,
+  "documents": 20,
+  "congresses": 20,
+  "events": 22,
+  "places": 13,
+  "organizations": 11,
+  "groups": 10
+}
