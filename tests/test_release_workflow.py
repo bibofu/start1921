@@ -24,7 +24,9 @@ remote = load_helper("remote_release")
 def run_git(path: Path, *args: str) -> str:
     return subprocess.check_output(
         ["git", "-c", "user.name=Release Test", "-c", "user.email=test@example.invalid", *args],
-        cwd=path, text=True, stderr=subprocess.DEVNULL,
+        cwd=path,
+        text=True,
+        stderr=subprocess.DEVNULL,
     ).strip()
 
 
@@ -48,8 +50,27 @@ def release_repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple
 def test_tag_on_main_resolves_annotated_tag(release_repository: tuple[Path, str]) -> None:
     checkout, commit = release_repository
     tag_object = run_git(checkout, "rev-parse", "v1.0.0")
-    assert resolver.resolve("v1.0.0", event="push", ref="refs/tags/v1.0.0",
-                            event_sha=tag_object) == commit
+    assert (
+        resolver.resolve("v1.0.0", event="push", ref="refs/tags/v1.0.0", event_sha=tag_object)
+        == commit
+    )
+
+
+def test_checkout_lightweight_tag_refreshes_remote_annotated_tag(
+    release_repository: tuple[Path, str],
+) -> None:
+    checkout, commit = release_repository
+    remote_tag_object = run_git(checkout, "rev-parse", "refs/tags/v1.0.0")
+    # Match checkout's event ref: same commit, but a lightweight tag locally.
+    run_git(checkout, "tag", "-f", "v1.0.0", commit)
+    assert run_git(checkout, "cat-file", "-t", "refs/tags/v1.0.0") == "commit"
+
+    assert (
+        resolver.resolve("v1.0.0", event="push", ref="refs/tags/v1.0.0", event_sha=commit) == commit
+    )
+
+    assert run_git(checkout, "rev-parse", "refs/tags/v1.0.0") == remote_tag_object
+    assert run_git(checkout, "cat-file", "-t", "refs/tags/v1.0.0") == "tag"
 
 
 def test_unmerged_branch_tag_cannot_deploy(release_repository: tuple[Path, str]) -> None:
@@ -59,8 +80,12 @@ def test_unmerged_branch_tag_cannot_deploy(release_repository: tuple[Path, str])
     run_git(checkout, "tag", "v2.0.0")
     run_git(checkout, "push", "origin", "v2.0.0")
     with pytest.raises(ValueError, match="contained in origin/main"):
-        resolver.resolve("v2.0.0", event="workflow_dispatch", ref="refs/heads/main",
-                         event_sha=run_git(checkout, "rev-parse", "HEAD"))
+        resolver.resolve(
+            "v2.0.0",
+            event="workflow_dispatch",
+            ref="refs/heads/main",
+            event_sha=run_git(checkout, "rev-parse", "HEAD"),
+        )
 
 
 def test_manual_release_can_choose_previous_main_tag(
@@ -69,17 +94,36 @@ def test_manual_release_can_choose_previous_main_tag(
     checkout, commit = release_repository
     run_git(checkout, "commit", "--allow-empty", "-m", "later main")
     run_git(checkout, "push", "origin", "main")
-    assert resolver.resolve("v1.0.0", event="workflow_dispatch", ref="refs/heads/main",
-                            event_sha=run_git(checkout, "rev-parse", "HEAD")) == commit
+    assert (
+        resolver.resolve(
+            "v1.0.0",
+            event="workflow_dispatch",
+            ref="refs/heads/main",
+            event_sha=run_git(checkout, "rev-parse", "HEAD"),
+        )
+        == commit
+    )
 
 
-def test_changed_tag_event_is_rejected(release_repository: tuple[Path, str]) -> None:
+@pytest.mark.parametrize("event_uses_tag_object", [False, True])
+def test_changed_tag_event_is_rejected_after_forced_local_refresh(
+    release_repository: tuple[Path, str],
+    event_uses_tag_object: bool,
+) -> None:
     checkout, commit = release_repository
+    original_tag_object = run_git(checkout, "rev-parse", "refs/tags/v1.0.0")
     run_git(checkout, "commit", "--allow-empty", "-m", "new")
-    run_git(checkout, "tag", "v1.1.0")
-    run_git(checkout, "push", "origin", "main", "v1.1.0")
+    moved_commit = run_git(checkout, "rev-parse", "HEAD")
+    run_git(checkout, "tag", "-f", "-a", "v1.0.0", "-m", "moved release")
+    moved_tag_object = run_git(checkout, "rev-parse", "refs/tags/v1.0.0")
+    run_git(checkout, "push", "--force", "origin", "main", "refs/tags/v1.0.0")
+    # The runner still has the original push's commit as its local event tag.
+    run_git(checkout, "tag", "-f", "v1.0.0", commit)
+    event_sha = original_tag_object if event_uses_tag_object else commit
     with pytest.raises(ValueError, match="changed after"):
-        resolver.resolve("v1.1.0", event="push", ref="refs/tags/v1.1.0", event_sha=commit)
+        resolver.resolve("v1.0.0", event="push", ref="refs/tags/v1.0.0", event_sha=event_sha)
+    assert run_git(checkout, "rev-parse", "refs/tags/v1.0.0") == moved_tag_object
+    assert run_git(checkout, "rev-parse", "refs/tags/v1.0.0^{commit}") == moved_commit
 
 
 @pytest.mark.parametrize("tag", ["main", "v1.0.0;id", "--help", "v1.0.0\ncommit=evil"])
@@ -95,8 +139,10 @@ def test_manual_run_from_other_branch_rejected() -> None:
 
 def test_remote_rollout_uses_temporary_auth_and_fixed_paths() -> None:
     command = remote.remote_command(
-        "/tmp/start1921-release.A1B2", "ghcr.io/bibofu/start1921@sha256:" + "a" * 64,
-        "b" * 40, "bibofu",
+        "/tmp/start1921-release.A1B2",
+        "ghcr.io/bibofu/start1921@sha256:" + "a" * 64,
+        "b" * 40,
+        "bibofu",
     )
     assert "--password-stdin" in command
     assert "DOCKER_CONFIG=/tmp/start1921-release.A1B2/docker-auth" in command
@@ -105,13 +151,18 @@ def test_remote_rollout_uses_temporary_auth_and_fixed_paths() -> None:
     assert "--revision " + "b" * 40 in command
 
 
-@pytest.mark.parametrize("directory,image,revision", [
-    ("/tmp/../../etc", "ghcr.io/bibofu/start1921@sha256:" + "a" * 64, "b" * 40),
-    ("/tmp/start1921-release.A1", "ghcr.io/other/app:latest", "b" * 40),
-    ("/tmp/start1921-release.A1", "ghcr.io/bibofu/start1921@sha256:" + "a" * 64, "$(id)"),
-])
+@pytest.mark.parametrize(
+    "directory,image,revision",
+    [
+        ("/tmp/../../etc", "ghcr.io/bibofu/start1921@sha256:" + "a" * 64, "b" * 40),
+        ("/tmp/start1921-release.A1", "ghcr.io/other/app:latest", "b" * 40),
+        ("/tmp/start1921-release.A1", "ghcr.io/bibofu/start1921@sha256:" + "a" * 64, "$(id)"),
+    ],
+)
 def test_remote_command_rejects_untrusted_release_values(
-    directory: str, image: str, revision: str,
+    directory: str,
+    image: str,
+    revision: str,
 ) -> None:
     with pytest.raises(ValueError):
         remote.remote_command(directory, image, revision, "bibofu")
