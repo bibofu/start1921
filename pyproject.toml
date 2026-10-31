@@ -77,3 +77,9 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 packages = ["history_agent"]
+
+[[tool.mypy.overrides]]
+# PaddleOCR belongs to the optional ocr extra; web CI installs only app/vector.
+# Keep all application modules checked and all other missing imports as errors.
+module = ["paddleocr.*"]
+ignore_missing_imports = true
