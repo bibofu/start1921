@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Start 1921">
+  <rect x="6" y="6" width="52" height="52" rx="9" fill="#fffdf8" stroke="#9d2f26" stroke-width="4.2"/>
+  <path d="M39 8.1h10v18l-5-4.2-5 4.2z" fill="#9d2f26"/>
+  <rect x="16" y="36" width="15" height="4" rx="2" fill="#b38b4d"/>
+  <rect x="16" y="43.6" width="23" height="4" rx="2" fill="#b38b4d"/>
+</svg>

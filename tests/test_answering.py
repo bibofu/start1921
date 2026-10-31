@@ -393,12 +393,19 @@ def test_api_health_and_question_contract(monkeypatch: Any) -> None:
     health = client.get("/api/health")
     index = client.get("/")
     javascript = client.get("/app.js")
+    svg_icon = client.get("/assets/favicon.svg")
+    png_icon = client.get("/assets/favicon-32.png")
     response = client.post("/api/questions", json={"question": expected.question})
 
     assert health.status_code == 200
     assert health.json()["indexes"] == {"keyword": False, "vector": False}
     assert index.headers["cache-control"] == "no-store"
     assert "app.js?v=multi-session-v14" in index.text
+    assert 'rel="icon"' in index.text
+    assert svg_icon.status_code == 200
+    assert svg_icon.headers["content-type"].startswith("image/svg+xml")
+    assert png_icon.status_code == 200
+    assert png_icon.headers["content-type"] == "image/png"
     assert javascript.headers["cache-control"] == "no-store"
     assert "/api/questions/stream" in javascript.text
     assert response.status_code == 200
