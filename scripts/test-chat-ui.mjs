@@ -211,7 +211,9 @@ try {
   await page.screenshot({path: fileURLToPath(new URL("../data/reports/multisession-mobile.png", import.meta.url)), fullPage: true});
   await page.setViewportSize({width: 1200, height: 1000});
 
-  await page.getByRole("button", {name: "删除会话"}).click();
+  const activeItem = page.locator(".session-item.active");
+  await activeItem.locator(".session-more summary").click();
+  await activeItem.locator("button[data-action='delete']").click();
   await page.locator(".message.welcome").waitFor();
   assert.equal(await page.locator(".session-item").count(), 1);
   assert.equal(dialogs, 0);

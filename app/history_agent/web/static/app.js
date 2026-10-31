@@ -12,8 +12,6 @@ const newSessionButton = document.querySelector("#new-session");
 const sessionList = document.querySelector("#session-list");
 const loadMoreSessions = document.querySelector("#load-more-sessions");
 const currentTitle = document.querySelector("#current-title");
-const renameSessionButton = document.querySelector("#rename-session");
-const deleteSessionButton = document.querySelector("#delete-session");
 const quotaLabel = document.querySelector("#quota");
 const cookieWarning = document.querySelector("#cookie-warning");
 const toast = document.querySelector("#toast");
@@ -230,8 +228,6 @@ function updateHeader() {
   currentTitle.textContent = session?.title || "新会话";
   // Keep the browser tab on the product name; the session title lives in the header.
   document.title = "Start 1921";
-  if (renameSessionButton) renameSessionButton.hidden = !session;
-  if (deleteSessionButton) deleteSessionButton.hidden = !session;
 }
 
 function sessionItemHtml(session) {
@@ -648,10 +644,6 @@ function bindEvents() {
   newSessionButton?.addEventListener("click", newSession);
   sidebarToggle?.addEventListener("click", openSidebar);
   sidebarOverlay?.addEventListener("click", closeSidebar);
-  renameSessionButton?.addEventListener("click", renameCurrentSession);
-  deleteSessionButton?.addEventListener("click", () => {
-    if (state.currentSessionId) deleteSession(state.currentSessionId);
-  });
   loadMoreSessions?.addEventListener("click", () => loadSessions({append: true}));
   sessionList?.addEventListener("click", async event => {
     const actionButton = event.target.closest("button[data-action]");
