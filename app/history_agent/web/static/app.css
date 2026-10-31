@@ -187,9 +187,14 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
   height: 34px;
   padding: 0;
   border-radius: 10px;
-  font-size: 22px;
-  font-weight: 400;
-  line-height: 1;
+}
+.new-session-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
 }
 .brand { color: var(--ink); font-family: "Noto Serif SC", SimSun, serif; font-size: 22px; font-weight: 700; text-decoration: none; letter-spacing: .03em; }
 .session-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding-right: 2px; }
