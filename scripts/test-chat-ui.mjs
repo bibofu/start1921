@@ -174,7 +174,7 @@ try {
     return route.continue();
   });
   await page.goto(base);
-  await page.getByRole("button", {name: "新建会话"}).waitFor();
+  await page.locator("#new-session").waitFor();
   assert.equal(await page.locator(".message.welcome").count(), 1);
 
   async function ask(text) {
@@ -191,7 +191,7 @@ try {
   assert.equal(await page.locator(".message.user .bubble").last().textContent(), "第一问");
   assert.equal(await page.locator(".evidence summary").count(), 1);
 
-  await page.getByRole("button", {name: "新建会话"}).click();
+  await page.locator("#new-session").click();
   assert.equal(await page.locator(".message.welcome").count(), 1);
   await ask("第二问");
   assert.equal(await page.locator(".session-item").count(), 2);

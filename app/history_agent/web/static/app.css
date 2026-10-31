@@ -196,7 +196,8 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
   stroke-width: 1.8;
   stroke-linecap: round;
 }
-.brand { color: var(--ink); font-family: "Noto Serif SC", SimSun, serif; font-size: 22px; font-weight: 700; text-decoration: none; letter-spacing: .03em; }
+.new-session-label { border: 0; background: none; padding: 0; color: var(--ink); font-family: "Noto Serif SC", SimSun, serif; font-size: 20px; font-weight: 700; letter-spacing: .03em; }
+.new-session-label:hover { color: var(--red); }
 .session-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding-right: 2px; }
 .sidebar-empty { color: var(--muted); font-size: 13px; padding: 12px 6px; }
 .session-item {
