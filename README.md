@@ -47,7 +47,7 @@ HISTORY_AGENT_QDRANT_URL=http://127.0.0.1:6333
 DEEPSEEK_API_KEY=你的密钥
 ```
 
-主库、会话库、关键词索引仅支持 PostgreSQL，向量索引仅支持 Qdrant 服务。原 SQLite 库与迁移备份已于 2026-10-21 清理，只保留 PostgreSQL dump 与 Qdrant snapshot 作为可恢复归档，运行路径不会回退到本地文件，详见 [清理记录](POSTGRESQL.md#2026-10-21-sqlite-资产清理)。新机器需先按服务文档准备数据库；本工作区的 Windows 本机后台进程可用以下脚本启动：
+主库、会话库、关键词索引仅支持 PostgreSQL，向量索引仅支持 Qdrant 服务。运行路径不会回退到本地文件，连接与备份说明见 [PostgreSQL](POSTGRESQL.md) 和 [Qdrant](QDRANT_SERVICE.md)。新机器需先按服务文档准备数据库；本工作区的 Windows 本机后台进程可用以下脚本启动：
 
 ```powershell
 .\scripts\postgres.ps1 start
@@ -158,7 +158,7 @@ HTTP 接口与命令行共用业务实现：
 
 当前评测集为 **20 题**（16 开发 + 4 保留，18 可答 + 2 拒答）：98 个必要事实、104 个证据组；20 题定义均已人工批准；18 道可答题都有固定池，182 条候选标签全部人工复核（178 通过、4 改判）。正式 Recall@10 覆盖 18 道可答题：62.6%、Precision@5 65.0%、MRR@10 0.971、nDCG@5 0.724（P/nDCG 16 题、MRR 17 题，Top5 含未标注页）；线上对齐 Recall@12 62.9%，Recall@20 67.0% 仅作诊断，Fact/Cit 仍为 0 题。总索引、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，逐题原文与状态见 [CASE_INVENTORY.md](evals/golden/CASE_INVENTORY.md)，当前重跑与逐题结果见 [2026-10-30 当前评测](evals/golden/observations/20261030_current_run/CASES.md)。 查询理解另有一层独立评测：30 条种子用例与规则/LLM 基线见 [查询理解基线](evals/query_understanding/BASELINE.md) 与 [实体索引 shadow](evals/query_understanding/ENTITY_LINKING.md)。
 
-> 2026-10-31 关键词 tokenizer 已从 bigram 切换为 jieba search mode。上面的 62.6% 等正式成绩对应切换前的 bigram 索引；同一 18 题、同一向量/RRF 管线的离线复跑为 Recall@10 55.1%、Recall@20 63.5%、P@5 67.3%（11 题）、MRR@10 0.971、nDCG@5 0.779（11 题）。固定池按 bigram 时代候选采集，P/nDCG 的可评题数下降，不能直接与旧数比较；详见 [关键词分词 A/B](evals/KEYWORD_TOKENIZER_AB_20261031.md)。
+> 2026-10-31 关键词 tokenizer 已切换为 jieba search mode。上面的 62.6% 等正式成绩对应切换前的索引；同一 18 题、同一向量/RRF 管线的离线复跑为 Recall@10 55.1%、Recall@20 63.5%、P@5 67.3%（11 题）、MRR@10 0.971、nDCG@5 0.779（11 题）。固定池按切换前候选采集，P/nDCG 的可评题数下降，不能直接与旧数比较；详见 [关键词 jieba 基线](evals/KEYWORD_JIEBA_BASELINE_20261031.md)。
 
 2026-10-29 的 [v6 真实模型观察](evals/golden/observations/20261029_v6_live/README.md) 仅作历史对照：其 v6 标注/协议文件已清理，答案未人工复核，不代表当前 20 题的正式成绩。仍待完成：20 题答案复核。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。
 

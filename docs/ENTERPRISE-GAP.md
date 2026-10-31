@@ -197,7 +197,7 @@ mypy `disallow_untyped_defs`、Ruff（E/F/I/UP/B/SIM）、Pydantic 数据契约�
 
 | 组件 | 现状 | 风险 |
 | --- | --- | --- |
-| PostgreSQL 内手写倒排 | `keyword_postings(generation_id, rowid, term, positions[])` + 应用层 BM25 + 复刻 FTS5 `unicode61` 词法 | 22k chunk 可行；百万级就是自研搜索引擎，正确性与性能都要自己扛 |
+| PostgreSQL 内手写倒排 | `keyword_postings(generation_id, rowid, term, positions[])` + 应用层 BM25 + jieba 预分词后的词位索引 | 22k chunk 可行；百万级就是自研搜索引擎，正确性与性能都要自己扛 |
 | Qdrant 精确检索 | `search_params={"exact": True}` 暴力检索 | 线性扫描，规模上不去 |
 | SQL 方言层 | `qmark_to_pyformat` 手写 SQL 词法器处理注释/引号/`E''`/dollar-quote/`%` | 历史迁移产物，属"能跑但别碰"的代码，安全与正确性双重风险 |
 | schema 迁移 | 代码内幂等 DDL（`db.py`、`context.py`、`keyword_postgres.py` 各自 CREATE/ALTER） | 无 Alembic、无 downgrade、无迁移测试；测试是新建 schema，**老库升级路径未验证** |

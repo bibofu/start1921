@@ -1,5 +1,5 @@
 # Start from the project root, using scripts/qdrant.ps1.
-# Qdrant server stores vectors independently of the Python local SQLite backend.
+# Qdrant stores vectors; PostgreSQL stores metadata and the keyword index.
 log_level: INFO
 telemetry_disabled: true
 storage:

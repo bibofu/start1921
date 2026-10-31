@@ -13,8 +13,7 @@ from history_agent.errors import IndexBuildError
 from history_agent.retrieval import keyword_postgres as pg
 from history_agent.retrieval.keyword import build_keyword_index, search_keyword_index
 
-# The fixture pinned the retired FTS5 bigram contract; the jieba lexer now has
-# its own behavioral tests below.
+# The jieba lexer has its own behavioral tests below.
 
 
 @pytest.mark.parametrize(
@@ -25,15 +24,15 @@ from history_agent.retrieval.keyword import build_keyword_index, search_keyword_
         ("1934-1936 1956年", ["1934", "1936", "1956年"]),
     ],
 )
-def test_unicode61_lexer_keeps_application_terms(
+def test_lexer_keeps_application_terms(
     prepared: str, expected: list[str],
 ) -> None:
-    assert pg.unicode61_tokens(prepared) == expected
+    assert pg.lex_terms(prepared) == expected
 
 
-def test_invalid_utf8_at_fts5_token_limit_is_rejected_explicitly() -> None:
+def test_invalid_utf8_at_term_limit_is_rejected_explicitly() -> None:
     with pytest.raises(IndexBuildError, match="invalid UTF-8 boundary"):
-        pg.unicode61_tokens("１" * 20000)
+        pg.lex_terms("１" * 20000)
 
 
 def _record(number: int, text: str, **overrides: Any) -> dict[str, Any]:
@@ -183,7 +182,7 @@ def test_long_ascii_token_exceeding_btree_limit_is_searchable(indexes: dict[str,
         index_path=indexes["postgres"], aliases_path=indexes["aliases"], query=token
     )
     assert [hit.chunk_id for hit in response.hits] == ["c13"]
-    assert len(pg.unicode61_tokens(token)[0]) == 32768
+    assert len(pg.lex_terms(token)[0]) == 32768
 
 
 def test_index_upgrade_preserves_published_content(indexes: dict[str, Any]) -> None:

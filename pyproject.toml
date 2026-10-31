@@ -61,7 +61,7 @@ testpaths = ["tests"]
 
 [tool.uv]
 # LlamaIndex declares this for SQL stores that this PostgreSQL-backed app never uses.
-# Keep uv sync/run as the supported installation path; pip ignores this exclusion.
+# Keep the exclusion so SQLite is not installed; uv sync/run is the supported path.
 exclude-dependencies = ["aiosqlite"]
 
 [tool.ruff]
@@ -72,7 +72,6 @@ target-version = "py311"
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.mypy]
-sqlite_cache = false
 python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true

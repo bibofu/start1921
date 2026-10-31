@@ -42,12 +42,8 @@ METADATA_COLUMNS = (
     "people_json", "extraction_methods_json",
 )
 FILTER_INDICES = (1, 5, 13, 10, 12, 14, 7)
-# Exhaustively checked against unicode61 remove_diacritics=2 using SQLite
-# 3.53.1 fts5vocab(instance): every character in these CJK ranges is retained.
-# The public tokenizer also emits Unicode decimal digits via its \d pattern.
-# All 680 decimal digits known to this Python build were checked with the same
-# oracle. No SQLite tokenizer is consulted at runtime.
-UNICODE61_TERMS = re.compile(r"[a-z\d\u3400-\u4dbf\u4e00-\u9fff]+")
+# The application tokenizer emits CJK runs plus ASCII letters and decimal digits.
+TERM_CHARS = re.compile(r"[a-z\d\u3400-\u4dbf\u4e00-\u9fff]+")
 ASCII_FOLD = str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")
 Posting: TypeAlias = tuple[str, int, Sequence[int]]
 
@@ -84,10 +80,10 @@ CREATE TABLE IF NOT EXISTS keyword_postings (
 );
 """
 
-# FTS5 allows 32 KiB terms, larger than PostgreSQL btree keys. unicode61 terms
-# cannot contain backslashes, so the immutable text-to-bytea cast has no escape
-# ambiguity. Hash collisions fail the unique constraint rather than lose data;
-# searches also compare the original term. Keep terms themselves for validation.
+# Terms can reach 32 KiB, larger than PostgreSQL btree keys. Terms cannot contain
+# backslashes, so the immutable text-to-bytea cast has no escape ambiguity. Hash
+# collisions fail the unique constraint rather than lose data; searches also
+# compare the original term. Keep terms themselves for validation.
 KEYWORD_INDEX_UPGRADE = """
 ALTER TABLE keyword_postings DROP CONSTRAINT IF EXISTS keyword_postings_pkey;
 DROP INDEX IF EXISTS keyword_postings_document;
@@ -115,24 +111,24 @@ def _filter_payload(metadata: tuple[Any, ...]) -> bytes:
     return _json_bytes([metadata[index] for index in FILTER_INDICES])
 
 
-def unicode61_tokens(pretokenized: str) -> list[str]:
-    """Tokenize only the alphabet of the existing public tokenizer's output."""
+def lex_terms(pretokenized: str) -> list[str]:
+    """Lex the application tokenizer's space-separated terms for storage/query."""
 
-    # FTS5 truncates terms at 32768 UTF-8 bytes, including numeric Unicode runs.
+    # Terms are capped at 32768 UTF-8 bytes; an invalid cut point is a build error.
     try:
         return [
             match.group().encode("utf-8")[:32768].decode("utf-8")
-            for match in UNICODE61_TERMS.finditer(pretokenized.casefold())
+            for match in TERM_CHARS.finditer(pretokenized.casefold())
         ]
     except UnicodeDecodeError:
         raise IndexBuildError(
-            "A keyword token exceeds the FTS5 byte limit at an invalid UTF-8 boundary"
+            "A keyword token exceeds the 32768-byte term limit at an invalid UTF-8 boundary"
         ) from None
 
 
 def positions_for_terms(terms: str) -> dict[str, list[int]]:
     result: dict[str, list[int]] = defaultdict(list)
-    for position, term in enumerate(unicode61_tokens(terms)):
+    for position, term in enumerate(lex_terms(terms)):
         result[term].append(position)
     return dict(result)
 
@@ -450,7 +446,7 @@ def _indexed_records(records: Sequence[Any]) -> Iterator[IndexedChunk]:
             json.dumps(record.people, ensure_ascii=False), json.dumps(record.extraction_methods),
         )
         terms = " ".join(common.tokenize_for_index(record.search_text))
-        yield IndexedChunk(rowid, rowid, metadata, terms, len(unicode61_tokens(terms)))
+        yield IndexedChunk(rowid, rowid, metadata, terms, len(lex_terms(terms)))
 
 
 def build_keyword_index(
@@ -528,7 +524,7 @@ def search_keyword_index(
         )
     )
     filter_people = common.hard_filter_people(query_people, query_intent)
-    phrases = [unicode61_tokens(term) for term in terms]
+    phrases = [lex_terms(term) for term in terms]
     unique_terms = sorted({term for phrase in phrases for term in phrase})
     response = SearchResponse(
         query=query, query_intent=query_intent, query_terms=terms, query_years=query_years,
