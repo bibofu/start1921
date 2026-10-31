@@ -25,8 +25,13 @@ HISTORY_AGENT_KEYWORD_DATABASE_URL=postgresql://用户名:密码@127.0.0.1:55432
 被、从、对”等虚词开头或结尾的中文 token，并去重。没有剩余可检索 token 时报检索
 错误。查询词之间是 OR；人物、年份、文献、章节和资料范围由元数据过滤补充约束。
 
+查询端还会删除文档频率过高的泛词（默认 `df/N > 0.12`），但保留
+`config/jieba_userdict.txt` 中的实体专名。少于 500 个 chunk 的测试语料不启用该过滤。
+精确实词加权由 `HISTORY_AGENT_KEYWORD_WORD_BOOST` 控制，默认 `1.0` 关闭。
+
 需要补充领域词时，可通过 `HISTORY_AGENT_JIEBA_DICT` 或 `config/jieba_userdict.txt`
-加载用户词典，每行格式为 `词语 [词频] [词性]`。
+加载用户词典，每行格式为 `词语 [词频] [词性]`。项目词典由
+`scripts/build_jieba_userdict.py` 从人物别名、实体目录、文献目录和会议名生成。
 
 ## 索引结构
 

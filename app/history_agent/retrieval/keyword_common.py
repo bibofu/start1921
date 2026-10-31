@@ -73,17 +73,23 @@ _USER_DICT = Path(
 )
 if _USER_DICT.is_file():
     jieba.load_userdict(str(_USER_DICT))
+    USER_DICTIONARY_TERMS: frozenset[str] = frozenset(
+        line.split()[0]
+        for line in _USER_DICT.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    )
+else:
+    USER_DICTIONARY_TERMS = frozenset()
 
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def tokenize_for_index(text: str) -> list[str]:
-    """Segment with jieba and normalize Latin/numeric tokens like the old lexer."""
-
+def _segment(text: str, *, search: bool) -> list[str]:
     tokens: list[str] = []
-    for raw in jieba.lcut_for_search(text):
+    segmenter = jieba.lcut_for_search if search else jieba.lcut
+    for raw in segmenter(text):
         if not raw.strip():
             continue
         for match in TOKEN_PIECE.finditer(raw):
@@ -94,8 +100,13 @@ def tokenize_for_index(text: str) -> list[str]:
     return tokens
 
 
-def tokenize_query(query: str) -> list[str]:
-    tokens = tokenize_for_index(query)
+def tokenize_for_index(text: str) -> list[str]:
+    """Segment with jieba and normalize Latin/numeric tokens for storage."""
+
+    return _segment(text, search=True)
+
+
+def _filter_query_tokens(tokens: list[str]) -> list[str]:
     filtered: list[str] = []
     seen: set[str] = set()
     for token in tokens:
@@ -114,11 +125,22 @@ def tokenize_query(query: str) -> list[str]:
             continue
         seen.add(token)
         filtered.append(token)
+    return filtered
+
+
+def tokenize_query(query: str) -> list[str]:
+    filtered = _filter_query_tokens(tokenize_for_index(query))
     if not filtered:
         raise RetrievalError(
             "The query does not contain searchable Chinese, Latin, or numeric terms."
         )
     return filtered
+
+
+def query_word_tokens(query: str) -> list[str]:
+    """Precise (non-search-mode) query words, used for term weighting."""
+
+    return _filter_query_tokens(_segment(query, search=False))
 
 
 def infer_query_intent(query: str) -> str:

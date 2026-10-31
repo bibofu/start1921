@@ -248,6 +248,14 @@ def test_generic_question_words_do_not_pollute_keyword_query() -> None:
     assert tokenize_query("中共一大的情况") == ["中共", "一大", "中共一大"]
 
 
+def test_domain_dictionary_keeps_historical_terms() -> None:
+    from history_agent.retrieval import keyword_common
+
+    assert "西行漫记" in keyword_common.USER_DICTIONARY_TERMS
+    assert "第一二九师" in keyword_common.USER_DICTIONARY_TERMS
+    assert "伍豪" in tokenize_query("伍豪在重庆谈判期间做了什么")
+
+
 def test_rrf_rewards_results_found_by_both_retrievers() -> None:
     keyword = _response([_hit("a", 1, page=1), _hit("shared", 2, page=2)])
     vector = _response([_hit("shared", 1, page=2), _hit("b", 2, page=3)])

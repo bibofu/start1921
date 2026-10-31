@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, Sequence
@@ -35,6 +36,13 @@ from history_agent.retrieval.models import (
 )
 
 INDEX_VERSION = "postgresql-bm25-jieba-v1"
+# Query-side BM25 controls. The corpus has ~22k chunks; 0.12 suppresses terms
+# appearing in more than ~2,700 chunks while curated entity names bypass the
+# cutoff. Precise-word boosting is available but off by default: it reduced
+# evidence recall on the 18-case development set.
+QUERY_MAX_DF_RATIO = float(os.environ.get("HISTORY_AGENT_KEYWORD_MAX_DF_RATIO", "0.12"))
+QUERY_WORD_BOOST = float(os.environ.get("HISTORY_AGENT_KEYWORD_WORD_BOOST", "1.0"))
+QUERY_DF_FILTER_MIN_CHUNKS = 500
 METADATA_COLUMNS = (
     "chunk_id", "document_id", "title", "filename", "volume", "source_type",
     "verification_status", "creators_json", "pdf_page_start", "pdf_page_end",
@@ -507,6 +515,8 @@ def search_keyword_index(
     section_path_contains: str | None = None, plan: RetrievalPlan | None = None,
 ) -> SearchResponse:
     terms = common.tokenize_query(query)
+    query_terms = list(terms)
+    query_word_terms = set(common.query_word_tokens(query))
     query_intent = plan.query_intent if plan is not None else common.infer_query_intent(query)
     query_years = (
         plan.query_years if plan is not None
@@ -527,7 +537,7 @@ def search_keyword_index(
     phrases = [lex_terms(term) for term in terms]
     unique_terms = sorted({term for phrase in phrases for term in phrase})
     response = SearchResponse(
-        query=query, query_intent=query_intent, query_terms=terms, query_years=query_years,
+        query=query, query_intent=query_intent, query_terms=query_terms, query_years=query_years,
         query_year_range=query_year_range, query_people=query_people,
         document_filters=document_ids or [], include_out_of_scope=include_out_of_scope, hits=[],
     )
@@ -565,6 +575,22 @@ def search_keyword_index(
                 term_frequencies.get(phrase[0], {}) if len(phrase) == 1
                 else _phrase_frequencies(phrase, postings)
                 for phrase in phrases
+            ]
+            selected_indices = list(range(len(terms)))
+            if n >= QUERY_DF_FILTER_MIN_CHUNKS and QUERY_MAX_DF_RATIO > 0.0:
+                kept = [
+                    index
+                    for index, frequency in enumerate(frequencies)
+                    if len(frequency) / n <= QUERY_MAX_DF_RATIO
+                    or terms[index] in common.USER_DICTIONARY_TERMS
+                ]
+                if kept:
+                    selected_indices = kept
+            selected_terms = [terms[index] for index in selected_indices]
+            frequencies = [frequencies[index] for index in selected_indices]
+            weights = [
+                QUERY_WORD_BOOST if term in query_word_terms else 1.0
+                for term in selected_terms
             ]
             candidates = sorted({rowid for frequency in frequencies for rowid in frequency})
             if not candidates:
@@ -611,9 +637,11 @@ def search_keyword_index(
                     if any(person not in people for person in filter_people):
                         continue
                 score = 0.0
-                for idf, frequency in zip(idfs, frequencies, strict=True):
+                for idf, frequency, weight in zip(
+                    idfs, frequencies, weights, strict=True
+                ):
                     tf = float(frequency.get(rowid, 0))
-                    score += idf * (
+                    score += weight * idf * (
                         (tf * (1.2 + 1.0)) /
                         (tf + 1.2 * (1 - 0.75 + 0.75 * doc_length / avgdl))
                     )
@@ -654,7 +682,7 @@ def search_keyword_index(
                         year_mentions=json.loads(item["year_mentions_json"]),
                         people=json.loads(item["people_json"]),
                         extraction_methods=json.loads(item["extraction_methods_json"]),
-                        score=round(-float(raw_score), 6), matched_terms=terms,
+                        score=round(-float(raw_score), 6), matched_terms=query_terms,
                     )
                 )
             return response
