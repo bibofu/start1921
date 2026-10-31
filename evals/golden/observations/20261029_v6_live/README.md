@@ -16,7 +16,7 @@
 | 模型 | 规划/反思 `deepseek-v4-flash`，生成 `deepseek-v4-pro`，提示词 `grounded-answer-v15` |
 | 配置 | `candidate_k=30`、`top_k=20`、`answer_top_k=10`、`with_llm=true` |
 
-完整 capture、评分报告和复核工作台保留在本地忽略目录，路径与哈希见 [manifest.json](manifest.json)。下表来自 [report.md](report.md)。
+完整 capture、评分报告和复核工作台曾保存在本地忽略目录；原始文件已随 2026-10-31 清理删除，路径与哈希保留在 [manifest.json](manifest.json)。下表来自 [report.md](report.md)。
 
 ## 调用与结果
 
@@ -63,13 +63,7 @@
 
 ## 复核工作台
 
-本地工作台已生成（不进入 Git）：
-
-```text
-data/reports/eval_development20_v6_live_20261029/reviews/index.html
-```
-
-打开后按题查看交付答案、引用、必要事实和过程轨迹。复核导出后用 `pilot import-reviews` 导入新目录，再用 `pilot score --reviews-dir` 重算答案维度；未完成判断保持 `unknown`。
+本地复核工作台曾位于 `data/reports/eval_development20_v6_live_20261029/reviews/index.html`，已随 2026-10-31 清理删除。本次没有完成人工答案复核，结论保持不变。
 
 ## 复现（历史命令，v6 文件已清理）
 
