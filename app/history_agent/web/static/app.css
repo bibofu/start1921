@@ -2,7 +2,7 @@
   color-scheme: light;
   --ink: #211e1a;
   --muted: #736b61;
-  --paper: #f7f1e7;
+  --paper: #f8f7f3;
   --surface: rgba(255, 253, 248, 0.92);
   --line: #ded4c5;
   --red: #9d2f26;
@@ -19,17 +19,7 @@ body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background:
-    radial-gradient(circle at 12% 12%, rgba(179,139,77,.14), transparent 32rem),
-    linear-gradient(135deg, #efe6d8 0%, var(--paper) 48%, #eee5d7 100%);
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: .2;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.13'/%3E%3C/svg%3E");
+  background: var(--paper);
 }
 
 button, textarea { font: inherit; }
@@ -135,7 +125,7 @@ h1 { margin: 0; font-family: var(--font-sans); font-size: clamp(28px, 5vw, 40px)
   grid-template-columns: 1fr auto;
   gap: 10px;
   padding: 16px 18px 12px;
-  background: rgba(249,245,237,.92);
+  background: rgba(248,247,243,.94);
   border: 1px solid var(--line);
   border-radius: 20px;
   box-shadow: 0 12px 36px rgba(55,43,27,.12);
@@ -190,7 +180,7 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
   flex-direction: column;
   gap: 12px;
   padding: 22px 14px 16px;
-  background: rgba(249,245,237,.88);
+  background: #f3f1ec;
   border-right: 1px solid var(--line);
   backdrop-filter: blur(12px);
   z-index: 5;
