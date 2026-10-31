@@ -9,7 +9,6 @@ const sidebar = document.querySelector("#sidebar");
 const sidebarOverlay = document.querySelector("#sidebar-overlay");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
 const newSessionButton = document.querySelector("#new-session");
-const newSessionLabel = document.querySelector("#new-session-label");
 const sessionList = document.querySelector("#session-list");
 const loadMoreSessions = document.querySelector("#load-more-sessions");
 const currentTitle = document.querySelector("#current-title");
@@ -647,7 +646,6 @@ function bindEvents() {
     if (button && !state.activeRun) ask(button.textContent);
   });
   newSessionButton?.addEventListener("click", newSession);
-  newSessionLabel?.addEventListener("click", newSession);
   sidebarToggle?.addEventListener("click", openSidebar);
   sidebarOverlay?.addEventListener("click", closeSidebar);
   renameSessionButton?.addEventListener("click", renameCurrentSession);
