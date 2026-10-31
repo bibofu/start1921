@@ -35,7 +35,7 @@ from history_agent.retrieval.models import (
     SearchResponse,
 )
 
-INDEX_VERSION = "postgresql-bm25-jieba-v1"
+INDEX_VERSION = "postgresql-bm25-jieba-v2"
 # Query-side BM25 controls. The corpus has ~22k chunks; 0.12 suppresses terms
 # appearing in more than ~2,700 chunks while curated entity names bypass the
 # cutoff. Precise-word boosting is available but off by default: it reduced
@@ -453,7 +453,7 @@ def _indexed_records(records: Sequence[Any]) -> Iterator[IndexedChunk]:
             json.dumps(record.year_mentions), record.scope_status,
             json.dumps(record.people, ensure_ascii=False), json.dumps(record.extraction_methods),
         )
-        terms = " ".join(common.tokenize_for_index(record.search_text))
+        terms = " ".join(common.tokenize_for_index(record.search_text, drop_single_cjk=True))
         yield IndexedChunk(rowid, rowid, metadata, terms, len(lex_terms(terms)))
 
 

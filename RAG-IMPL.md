@@ -299,7 +299,7 @@ chunk正文 + 文献标题 + section_path + 规范人物名 + “YYYY年”
 
 ### 5.1 索引结构
 
-关键词索引仅使用 PostgreSQL，当前索引版本为 `postgresql-bm25-jieba-v1`。
+关键词索引仅使用 PostgreSQL，当前索引版本为 `postgresql-bm25-jieba-v2`。
 `keyword_chunks` 保存完整元数据、原预分词文本、长度和原始行号；
 `keyword_postings` 保存倒排词项及词位。`keyword_generations` 与 `keyword_active`
 管理索引版本，完整数据校验通过后在同一事务中切换活动版本。
@@ -307,7 +307,8 @@ chunk正文 + 文献标题 + section_path + 规范人物名 + “YYYY年”
 
 2026-10-31 起，中文切词由 jieba `lcut_for_search` 在应用层完成；PostgreSQL 后端
 继续以纯 Python 保留预分词结果的大小写折叠、连字符/下划线/点号拆词和词位语义。
-当前基线与切换记录见 [关键词 jieba 基线](evals/KEYWORD_JIEBA_BASELINE_20261031.md)。
+索引构建跳过中文单字（ASCII 数字/字母单字保留，避免破坏小数短语），文档长度和词位
+按过滤后的结果计算。当前基线与切换记录见 [关键词 jieba 基线](evals/KEYWORD_JIEBA_BASELINE_20261031.md)。
 
 PostgreSQL 后端构建新版本并核对全部元数据和词位摘要，失败时保留原活动版本。
 

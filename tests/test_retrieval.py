@@ -256,6 +256,15 @@ def test_domain_dictionary_keeps_historical_terms() -> None:
     assert "伍豪" in tokenize_query("伍豪在重庆谈判期间做了什么")
 
 
+def test_storage_tokenization_drops_single_cjk_but_keeps_digits() -> None:
+    from history_agent.retrieval.keyword_common import tokenize_for_index
+
+    tokens = tokenize_for_index("的 1.25 毛泽东", drop_single_cjk=True)
+    assert "的" not in tokens
+    assert "1.25" in tokens
+    assert "毛泽东" in tokens
+
+
 def test_rrf_rewards_results_found_by_both_retrievers() -> None:
     keyword = _response([_hit("a", 1, page=1), _hit("shared", 2, page=2)])
     vector = _response([_hit("shared", 1, page=2), _hit("b", 2, page=3)])

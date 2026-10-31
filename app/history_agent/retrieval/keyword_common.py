@@ -86,7 +86,7 @@ def utc_now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def _segment(text: str, *, search: bool) -> list[str]:
+def _segment(text: str, *, search: bool, drop_single_cjk: bool = False) -> list[str]:
     tokens: list[str] = []
     segmenter = jieba.lcut_for_search if search else jieba.lcut
     for raw in segmenter(text):
@@ -94,16 +94,18 @@ def _segment(text: str, *, search: bool) -> list[str]:
             continue
         for match in TOKEN_PIECE.finditer(raw):
             piece = match.group()
+            if drop_single_cjk and len(piece) == 1 and CJK_RUN.fullmatch(piece):
+                continue
             tokens.append(piece if CJK_RUN.fullmatch(piece) else piece.casefold())
     for match in YEAR.finditer(text):
         tokens.extend([match.group(1), f"{match.group(1)}年"])
     return tokens
 
 
-def tokenize_for_index(text: str) -> list[str]:
+def tokenize_for_index(text: str, *, drop_single_cjk: bool = False) -> list[str]:
     """Segment with jieba and normalize Latin/numeric tokens for storage."""
 
-    return _segment(text, search=True)
+    return _segment(text, search=True, drop_single_cjk=drop_single_cjk)
 
 
 def _filter_query_tokens(tokens: list[str]) -> list[str]:

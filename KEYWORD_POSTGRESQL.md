@@ -16,9 +16,11 @@ HISTORY_AGENT_KEYWORD_DATABASE_URL=postgresql://用户名:密码@127.0.0.1:55432
 
 ## 切词与查询
 
-索引版本为 `postgresql-bm25-jieba-v1`。中文使用 jieba search mode
+索引版本为 `postgresql-bm25-jieba-v2`。中文使用 jieba search mode
 （`lcut_for_search`）切词，同时产出词和词典内子词；英文、数字及含连字符或下划线的
 标识转为小写后按词位规则拆词；四位年份额外加入 `YYYY` 和 `YYYY年`。
+索引构建跳过中文单字，ASCII 数字/字母单字保留（小数和编号短语需要）；
+文档长度和词位数按过滤后的词项计算。
 
 查询端使用同一 tokenizer，然后删除“哪些、什么、怎么、如何、主要、请问、经历、
 观点、交集、期间”等停用词，删除以“的、了、在、和、与、及、是、有、为、于、把、
