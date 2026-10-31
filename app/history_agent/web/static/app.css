@@ -183,8 +183,8 @@ textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   border-radius: 10px;
 }
