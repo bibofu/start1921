@@ -34,7 +34,7 @@ from history_agent.retrieval.models import (
     SearchResponse,
 )
 
-INDEX_VERSION = "postgresql-fts5-bm25-compatible-v1"
+INDEX_VERSION = "postgresql-bm25-jieba-v1"
 METADATA_COLUMNS = (
     "chunk_id", "document_id", "title", "filename", "volume", "source_type",
     "verification_status", "creators_json", "pdf_page_start", "pdf_page_end",
@@ -271,13 +271,14 @@ def _fingerprint_generation(
         for row in cursor:
             result.add_posting((row[0], row[1], row[2]))
     mismatched = connection.execute(
-        "SELECT c.rowid FROM keyword_chunks c LEFT JOIN ("
-        "SELECT rowid, SUM(cardinality(positions)) AS n, "
-        "MAX(positions[cardinality(positions)]) AS p "
-        "FROM keyword_postings WHERE generation_id = ? GROUP BY rowid"
-        ") p ON p.rowid = c.rowid WHERE c.generation_id = ? "
-        "AND (c.doc_length != COALESCE(p.n, 0) OR p.p >= c.doc_length) LIMIT 1",
-        (generation_id, generation_id),
+        "SELECT c.rowid FROM keyword_chunks c WHERE c.generation_id = ? AND ("
+        "c.doc_length != (SELECT COALESCE(SUM(cardinality(p.positions)), 0) "
+        "FROM keyword_postings p WHERE p.generation_id = c.generation_id "
+        "AND p.rowid = c.rowid) OR EXISTS ("
+        "SELECT 1 FROM keyword_postings p WHERE p.generation_id = c.generation_id "
+        "AND p.rowid = c.rowid AND p.positions[cardinality(p.positions)] >= c.doc_length)"
+        ") LIMIT 1",
+        (generation_id,),
     ).fetchone()
     if mismatched is not None:
         raise IndexBuildError("Keyword document lengths do not match their token positions")

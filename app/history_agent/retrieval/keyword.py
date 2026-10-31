@@ -22,9 +22,6 @@ from history_agent.retrieval.keyword_common import (
     YEAR_RANGE as YEAR_RANGE,
 )
 from history_agent.retrieval.keyword_common import (
-    cjk_bigrams as cjk_bigrams,
-)
-from history_agent.retrieval.keyword_common import (
     hard_filter_people as hard_filter_people,
 )
 from history_agent.retrieval.keyword_common import (

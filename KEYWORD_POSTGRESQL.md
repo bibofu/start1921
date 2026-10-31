@@ -1,5 +1,11 @@
 # PostgreSQL 关键词索引
 
+> 2026-10-31 更新：生产关键词 tokenizer 已从 CJK 二元字 bigram 切换为 jieba search mode，
+> 索引版本改为 `postgresql-bm25-jieba-v1`。本文以下内容记录 2026-10-20 从 SQLite FTS5
+> 迁移到 PostgreSQL 时的历史契约，不再代表当前切词口径；当前实现见
+> [RAG 实现说明 §5](RAG-IMPL.md#5-关键词索引postgresql--bm25) 和
+> [关键词分词 A/B](evals/KEYWORD_TOKENIZER_AB_20261031.md)。
+
 关键词索引现在只支持 PostgreSQL，可以与主库共用，也可以使用独立数据库。
 原 SQLite 兼容实现和一次性迁移命令已移除，旧数据与迁移备份已于 2026-10-21 清理
 （见 [PostgreSQL 清理记录](POSTGRESQL.md#2026-10-21-sqlite-资产清理)）。

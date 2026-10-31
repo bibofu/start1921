@@ -99,7 +99,7 @@ def test_chunk_split_respects_maximum_size() -> None:
 def test_keyword_query_tokenization_keeps_names_and_years() -> None:
     terms = tokenize_query("周恩来在1956年主要有哪些经历")
 
-    assert "周恩" in terms
+    assert "周恩来" in terms
     assert "恩来" in terms
     assert "1956" in terms
     assert "1956年" in terms

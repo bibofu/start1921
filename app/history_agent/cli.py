@@ -1254,7 +1254,7 @@ def process_chunks(
 def index_build_keyword(
     json_output: bool = typer.Option(False, "--json", help="Emit JSON."),
 ) -> None:
-    """Build an atomic Chinese bigram BM25 index on the configured storage backend."""
+    """Build an atomic jieba BM25 index on the configured storage backend."""
 
     settings = get_settings()
     settings.ensure_runtime_dirs()

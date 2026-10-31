@@ -79,7 +79,7 @@ def test_query_routing_extracts_intent_and_period() -> None:
     assert has_explicit_year_range("1921年至1926年")
     assert has_explicit_year_range("1921～1926")
     assert not has_explicit_year_range("比较毛泽东在1921年和1926年的活动")
-    assert "毛泽" in tokenize_query("毛泽东关于调查研究的观点")
+    assert "毛泽东" in tokenize_query("毛泽东关于调查研究的观点")
     assert hard_filter_people(["毛泽东"], "viewpoint") == []
     assert hard_filter_people(["埃德加·斯诺", "毛泽东"], "observation") == []
     assert hard_filter_people(["毛泽东", "周恩来"], "general") == []
@@ -245,7 +245,7 @@ def test_cpc_congress_range_expands_every_congress() -> None:
 
 
 def test_generic_question_words_do_not_pollute_keyword_query() -> None:
-    assert tokenize_query("中共一大的情况") == ["中共", "共一", "一大"]
+    assert tokenize_query("中共一大的情况") == ["中共", "一大", "中共一大"]
 
 
 def test_rrf_rewards_results_found_by_both_retrievers() -> None:

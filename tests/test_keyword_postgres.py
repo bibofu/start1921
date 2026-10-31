@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import random
 import string
@@ -13,43 +12,23 @@ from history_agent.db_backend import database_connection
 from history_agent.errors import IndexBuildError
 from history_agent.retrieval import keyword_postgres as pg
 from history_agent.retrieval.keyword import build_keyword_index, search_keyword_index
-from history_agent.retrieval.keyword_common import tokenize_for_index
-from history_agent.retrieval.models import RetrievalPlan
 
-CONTRACT = json.loads(
-    (Path(__file__).parent / "fixtures/keyword_search_contract.json").read_text(encoding="utf-8")
-)
-
-
-def _digest(value: Any) -> str:
-    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+# The fixture pinned the retired FTS5 bigram contract; the jieba lexer now has
+# its own behavioral tests below.
 
 
 @pytest.mark.parametrize(
-    ("case_number", "text"),
-    list(enumerate([
-        "毛泽东在1949年作出决策。ANTI-imperialism foo_bar 1.25",
-        "alpha alpha-beta alpha_beta βé🙂 1921年至1926年",
-        " ".join(chr(i) for a, b in [(0x3400, 0x4DBF), (0x4E00, 0x9FFF)]
-                 for i in range(a, b + 1)),
-        "A" * 40000,
-        "1934-1936 1956年 毛泽东",
-        "１２３４５ ١٢٣٤٥ 𝟙𝟚𝟛𝟜𝟝",
-        " ".join(chr(i) for i in range(0x110000) if chr(i).isdecimal()),
-        "١" * 20000,
-    ])),
-    ids=[
-        "mixed", "punctuation", "all-cjk-characters", "token-byte-limit", "years",
-        "unicode-numbers", "all-unicode-decimals", "unicode-token-byte-limit",
+    ("prepared", "expected"),
+    [
+        ("alpha beta 毛泽东 1949年", ["alpha", "beta", "毛泽东", "1949年"]),
+        ("anti-imperialism foo_bar", ["anti", "imperialism", "foo", "bar"]),
+        ("1934-1936 1956年", ["1934", "1936", "1956年"]),
     ],
 )
-def test_prepared_unicode61_tokens_preserve_frozen_contract(case_number: int, text: str) -> None:
-    prepared = " ".join(tokenize_for_index(text))
-    tokens = pg.unicode61_tokens(prepared)
-    expected = CONTRACT["tokens"][case_number]
-    assert len(tokens) == expected["tokens_count"]
-    assert _digest(tokens) == expected["tokens_sha256"]
+def test_unicode61_lexer_keeps_application_terms(
+    prepared: str, expected: list[str],
+) -> None:
+    assert pg.unicode61_tokens(prepared) == expected
 
 
 def test_invalid_utf8_at_fts5_token_limit_is_rejected_explicitly() -> None:
@@ -112,19 +91,22 @@ def indexes(work_path: Path, postgres_target: str) -> dict[str, Any]:
     }
 
 
-@pytest.mark.parametrize("case", CONTRACT["responses"], ids=lambda case: case["query"])
-def test_postgres_search_preserves_frozen_response(
-    indexes: dict[str, Any], case: dict[str, Any],
+@pytest.mark.parametrize(
+    "query",
+    ["毛泽东关于调查研究的观点", "党中央1949年的重要决策", "alpha-beta"],
+)
+def test_postgres_search_returns_ranked_hits(
+    indexes: dict[str, Any], query: str,
 ) -> None:
-    options = dict(case["options"])
-    if "plan" in options:
-        options["plan"] = RetrievalPlan.model_validate(options["plan"])
     response = search_keyword_index(
-        index_path=indexes["postgres"], aliases_path=indexes["aliases"],
-        query=case["query"], **options,
+        index_path=indexes["postgres"], aliases_path=indexes["aliases"], query=query,
     )
-    assert [[hit.chunk_id, hit.score] for hit in response.hits] == case["hits"]
-    assert _digest(response.model_dump()) == case["response_sha256"]
+    assert response.hits
+    assert [hit.rank for hit in response.hits] == list(range(1, len(response.hits) + 1))
+    assert all(
+        left.score >= right.score
+        for left, right in zip(response.hits, response.hits[1:], strict=False)
+    )
 
 
 def test_postgres_runtime_build_search_and_metadata(indexes: dict[str, Any]) -> None:

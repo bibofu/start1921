@@ -109,7 +109,7 @@ uv run start1921 health --json
 ## 当前行为与边界
 
 - 所有问答共用 LlamaIndex `HistoryResearchWorkflow` 的 Plan-and-Execute 流程：简单问题通常一个取证任务；复杂研究通过有依赖关系的检索、原文读取及分析任务完成。同步 API 与 SSE 仅交付方式不同，结构化和全文读取也是同一计划中的工具。
-- 保留中文分词、PostgreSQL BM25、Qdrant embedding 与检索、RRF、人物及时间过滤和历史研究规则。人物明确、完整年份或年份区间的时间线/两人交集可使用结构化工具；月份、地点、否定、指定来源等细约束使用混合检索。组织任职的结构化入口仍为 CLI/API。
+- 保留 jieba 中文分词、PostgreSQL BM25、Qdrant embedding 与检索、RRF、人物及时间过滤和历史研究规则。人物明确、完整年份或年份区间的时间线/两人交集可使用结构化工具；月份、地点、否定、指定来源等细约束使用混合检索。组织任职的结构化入口仍为 CLI/API。
 - 规划不可用时在同一流程内编译保守计划。研究计划总计最多 8 个任务、最多 2 次依据证据缺口的计划增补，同时执行最多 2 个就绪任务，共享请求时限和模型调用预算；预算结束后报告已有证据及缺口。组件边界与诊断字段见 [RAG 实现说明](RAG-IMPL.md)。
 - 生产回答交付前执行引用存在性检查：移除不在本轮证据包内的 `[E#]` 引用标记；丢弃引文片段在所引 chunk 全文中找不到的引用；修正或移除与所引证据冲突的页码表述。改动在 `limitations` 说明，不因检查失败降级为摘录，也不校验日期或事实蕴含。检查只做本地字符串匹配、不调用模型，异常时放行原答案；关闭时用 `HISTORY_AGENT_CITATION_CHECK=off`。模型没写引用则引用列表为空。日期与未引用事实校验仅保留给离线评测。网页 SSE 转发模型增量：页面边生成边渲染正文，收到 `done` 后再补上引用、限制和会话元数据。停止生成、删除会话及 Markdown 渲染见 [流式问答说明](evals/STREAMING_CHAT.md)。
 - 不做账号登录：服务端为每个浏览器签发 HttpOnly 匿名 workspace cookie，所有会话、消息和配额按 `visitor_id` 隔离；跨访客访问统一返回 404。清 Cookie、换浏览器或换设备会丢失历史，页面提供首次使用提示。
@@ -157,6 +157,8 @@ HTTP 接口与命令行共用业务实现：
 ## 评测与开发检查
 
 当前评测集为 **20 题**（16 开发 + 4 保留，18 可答 + 2 拒答）：98 个必要事实、104 个证据组；20 题定义均已人工批准；18 道可答题都有固定池，182 条候选标签全部人工复核（178 通过、4 改判）。正式 Recall@10 覆盖 18 道可答题：62.6%、Precision@5 65.0%、MRR@10 0.971、nDCG@5 0.724（P/nDCG 16 题、MRR 17 题，Top5 含未标注页）；线上对齐 Recall@12 62.9%，Recall@20 67.0% 仅作诊断，Fact/Cit 仍为 0 题。总索引、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，逐题原文与状态见 [CASE_INVENTORY.md](evals/golden/CASE_INVENTORY.md)，当前重跑与逐题结果见 [2026-10-30 当前评测](evals/golden/observations/20261030_current_run/CASES.md)。 查询理解另有一层独立评测：30 条种子用例与规则/LLM 基线见 [查询理解基线](evals/query_understanding/BASELINE.md) 与 [实体索引 shadow](evals/query_understanding/ENTITY_LINKING.md)。
+
+> 2026-10-31 关键词 tokenizer 已从 bigram 切换为 jieba search mode。上面的 62.6% 等正式成绩对应切换前的 bigram 索引；同一 18 题、同一向量/RRF 管线的离线复跑为 Recall@10 55.1%、Recall@20 63.5%、P@5 67.3%（11 题）、MRR@10 0.971、nDCG@5 0.779（11 题）。固定池按 bigram 时代候选采集，P/nDCG 的可评题数下降，不能直接与旧数比较；详见 [关键词分词 A/B](evals/KEYWORD_TOKENIZER_AB_20261031.md)。
 
 2026-10-29 的 [v6 真实模型观察](evals/golden/observations/20261029_v6_live/README.md) 仅作历史对照：其 v6 标注/协议文件已清理，答案未人工复核，不代表当前 20 题的正式成绩。仍待完成：20 题答案复核。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。
 

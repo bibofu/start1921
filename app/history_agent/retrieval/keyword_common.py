@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
+import logging
+import os
 import re
 from datetime import UTC, datetime
 from pathlib import Path
 
+import jieba
+
 from history_agent.errors import IndexBuildError, RetrievalError
 from history_agent.processing.models import ChunkRecord
 
-CJK_RUN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]+")
+CJK_RUN = re.compile(r"[㐀-䶿一-鿿]+")
 LATIN_OR_NUMBER = re.compile(r"[A-Za-z]+(?:[-_][A-Za-z0-9]+)*|\d+(?:\.\d+)?")
+TOKEN_PIECE = re.compile(
+    r"[A-Za-z]+(?:[-_][A-Za-z0-9]+)*|\d+(?:\.\d+)?|[㐀-䶿一-鿿]+"
+)
 YEAR = re.compile(r"(?<!\d)((?:18|19|20)\d{2})(?!\d)")
 YEAR_RANGE = re.compile(
     r"(?<!\d)(?:18|19|20)\d{2}年?\s*(?:至|到|—|–|-|~|～)\s*"
@@ -49,22 +56,39 @@ PERIOD_RANGES = {
     "文革": (1966, 1976),
 }
 
+# Keep jieba's prefix-dict cache out of the working tree and out of the
+# read-only package directory. The environment may point data elsewhere.
+_DATA_DIR = Path(os.environ.get("HISTORY_AGENT_DATA_DIR", "data"))
+_JIEBA_CACHE_DIR = (_DATA_DIR / "models" / "jieba").resolve()
+try:
+    _JIEBA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    jieba.dt.tmp_dir = str(_JIEBA_CACHE_DIR)
+    jieba.dt.cache_file = str(_JIEBA_CACHE_DIR / "jieba.cache")
+except OSError:
+    pass
+jieba.setLogLevel(logging.WARNING)
+
+_USER_DICT = Path(
+    os.environ.get("HISTORY_AGENT_JIEBA_DICT", "config/jieba_userdict.txt")
+)
+if _USER_DICT.is_file():
+    jieba.load_userdict(str(_USER_DICT))
+
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def cjk_bigrams(value: str) -> list[str]:
-    if len(value) <= 2:
-        return [value]
-    return [value[index : index + 2] for index in range(len(value) - 1)]
-
-
 def tokenize_for_index(text: str) -> list[str]:
+    """Segment with jieba and normalize Latin/numeric tokens like the old lexer."""
+
     tokens: list[str] = []
-    for match in CJK_RUN.finditer(text):
-        tokens.extend(cjk_bigrams(match.group()))
-    tokens.extend(match.group().casefold() for match in LATIN_OR_NUMBER.finditer(text))
+    for raw in jieba.lcut_for_search(text):
+        if not raw.strip():
+            continue
+        for match in TOKEN_PIECE.finditer(raw):
+            piece = match.group()
+            tokens.append(piece if CJK_RUN.fullmatch(piece) else piece.casefold())
     for match in YEAR.finditer(text):
         tokens.extend([match.group(1), f"{match.group(1)}年"])
     return tokens
