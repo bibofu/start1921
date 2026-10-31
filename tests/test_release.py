@@ -54,6 +54,13 @@ if arguments[0] == 'compose':
         finish('app-container' if state['current_id'] else '')
     if command == ['config', '--quiet']:
         finish(code=1 if state.get('config_fail') else 0)
+    if command[0] == 'run':
+        assert command[:10] == ['run', '--rm', '--no-deps', '-T', '--pull', 'never',
+                                '--entrypoint', 'python', 'app', '-c']
+        assert command[10] == 'from history_agent.config import get_settings; get_settings()'
+        assert image == state['candidate']
+        assert state['current_id'] == state['old_id']
+        finish(code=1 if state.get('settings_fail') else 0)
     assert command == ['up', '-d', '--no-deps', '--no-build', '--pull', 'never', 'app']
     if image == state['candidate']:
         state['current_id'] = state['old_id'] if state.get('wrong_image') else state['new_id']
@@ -126,6 +133,17 @@ def deployment(work_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[dic
             server.requests.append(self.path)
             state = server.data()
             vector = not (state["current_id"] == NEW_ID and state.get("vector_unready"))
+            if (
+                self.path == "/api/ready"
+                and state["current_id"] == NEW_ID
+                and state.get("truncated_body")
+            ):
+                self.send_response(200)
+                self.send_header("Transfer-Encoding", "chunked")
+                self.end_headers()
+                self.wfile.write(b"5\r\nab")
+                self.close_connection = True
+                return
             if self.path == "/api/health":
                 payload = {
                     "status": "ok",
@@ -200,7 +218,7 @@ def test_release_persists_immutable_image_after_real_readiness(deployment: dict[
     )
 
 
-@pytest.mark.parametrize("failure", ["pull_fail", "config_fail", "asset_fail"])
+@pytest.mark.parametrize("failure", ["pull_fail", "config_fail", "asset_fail", "settings_fail"])
 def test_preflight_failure_keeps_running_app_and_env(
     deployment: dict[str, Any],
     failure: str,
@@ -219,7 +237,7 @@ def test_mismatched_revision_is_rejected_before_switch(deployment: dict[str, Any
     assert deployment["server"].ups() == []
 
 
-@pytest.mark.parametrize("failure", ["vector_unready", "up_fail", "wrong_image"])
+@pytest.mark.parametrize("failure", ["vector_unready", "up_fail", "wrong_image", "truncated_body"])
 def test_failed_rollout_restores_exact_previous_image(
     deployment: dict[str, Any],
     failure: str,
@@ -309,6 +327,23 @@ def test_signal_during_readiness_is_not_swallowed(
         return api_ready(path, timeout)  # type: ignore[no-any-return]
 
     monkeypatch.setattr(release, "api_ready", interrupt_once)
+    assert release.main(deployment["args"]) == 1
+    assert deployment["server"].data()["current_id"] == OLD_ID
+    assert json.loads(deployment["state"].read_text())["status"] == "rolled_back"
+
+
+def test_unexpected_health_reader_exception_cannot_bypass_rollback(
+    deployment: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    api_ready = release.api_ready
+
+    def broken_reader(path: str, timeout: float) -> dict[str, Any]:
+        if deployment["server"].data()["current_id"] == NEW_ID:
+            raise RuntimeError("unexpected HTTP reader failure")
+        return api_ready(path, timeout)  # type: ignore[no-any-return]
+
+    monkeypatch.setattr(release, "api_ready", broken_reader)
     assert release.main(deployment["args"]) == 1
     assert deployment["server"].data()["current_id"] == OLD_ID
     assert json.loads(deployment["state"].read_text())["status"] == "rolled_back"

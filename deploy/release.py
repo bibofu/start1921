@@ -18,6 +18,7 @@ import sys
 import tempfile
 import time
 from collections.abc import Iterator, Sequence
+from http.client import HTTPException
 from pathlib import Path
 from typing import Any
 from urllib.request import urlopen
@@ -35,6 +36,7 @@ assert load_entities(root / 'entities/entities.jsonl'), 'entity index is empty'
 for name in ('corpus_catalog.json', 'person_aliases.json', 'query_aliases.json'):
     assert json.loads((root / name).read_text(encoding='utf-8'))
 """
+SETTINGS_CHECK = "from history_agent.config import get_settings; get_settings()"
 
 
 class ReleaseError(Exception):
@@ -71,6 +73,7 @@ class Docker:
                 [*DOCKER_COMMAND, *arguments],
                 env=environment,
                 capture_output=True,
+                stdin=subprocess.DEVNULL,
                 text=True,
                 timeout=timeout,
                 check=False,
@@ -240,7 +243,7 @@ def wait_healthy(docker: Docker, image: str, image_id: str, timeout: float) -> N
                         return
         except DeploymentInterrupted:
             raise
-        except (ReleaseError, OSError, ValueError):
+        except (ReleaseError, OSError, ValueError, HTTPException):
             pass
         time.sleep(max(0, min(3, deadline - time.monotonic())))
     raise ReleaseError(
@@ -312,6 +315,22 @@ def deploy(args: argparse.Namespace) -> int:
             ]
         )
         docker.dc("config", "--quiet", image=args.image)
+        # Validate the candidate against actual production env/mounts without
+        # starting the app, publishing ports, starting dependencies or building.
+        docker.dc(
+            "run",
+            "--rm",
+            "--no-deps",
+            "-T",
+            "--pull",
+            "never",
+            "--entrypoint",
+            "python",
+            "app",
+            "-c",
+            SETTINGS_CHECK,
+            image=args.image,
+        )
         record("deploying")
         try:
             # Flag the rollout before this command: Compose can fail after stopping app.
@@ -321,7 +340,7 @@ def deploy(args: argparse.Namespace) -> int:
             wait_healthy(docker, args.image, new_id, args.health_timeout)
             atomic_write(env_file, env_content)
             record("healthy")
-        except (ReleaseError, OSError, ValueError) as exc:
+        except Exception as exc:
             print(f"Release failed ({type(exc).__name__}); restoring {rollback_image}", flush=True)
             with protect_rollback():
                 try:
@@ -338,7 +357,7 @@ def deploy(args: argparse.Namespace) -> int:
                     wait_healthy(docker, rollback_image, old_id, args.health_timeout)
                     atomic_write(env_file, image_environment(original_env, rollback_image))
                     record("rolled_back")
-                except (ReleaseError, OSError, ValueError) as rollback_error:
+                except Exception as rollback_error:
                     print(
                         f"ROLLBACK FAILED ({type(rollback_error).__name__}). "
                         f"Recover app using retained image {rollback_image}; "
