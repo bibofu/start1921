@@ -24,7 +24,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY app ./app
 COPY config/*.json ./config/
+COPY config/entities ./config/entities/
 COPY deploy/healthcheck.py ./deploy/healthcheck.py
+COPY deploy/check_image.py ./deploy/check_image.py
 # Keep the editable package at /app/app/history_agent. Settings also explicitly
 # points at /app so config, data and docs retain the repository layout.
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -33,5 +35,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     && chown start1921:start1921 /app/data /app/docs
 
 USER 10001:10001
+RUN python /app/deploy/check_image.py
 EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "history_agent.web.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--proxy-headers", "--forwarded-allow-ips", "172.16.0.0/12,10.0.0.0/8,192.168.0.0/16"]
