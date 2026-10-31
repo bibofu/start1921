@@ -443,9 +443,9 @@ class QuestionStart:
 class QuotaLimits:
     enabled: bool = True
     visitor_daily_questions: int = 20
-    visitor_daily_tokens: int = 200_000
+    visitor_daily_tokens: int = 800_000
     ip_daily_questions: int = 60
-    ip_daily_tokens: int = 600_000
+    ip_daily_tokens: int = 2_400_000
     global_daily_tokens: int = 5_000_000
 
 
