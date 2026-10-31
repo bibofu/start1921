@@ -1,0 +1,128 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag on main, e.g. v0.1.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: start1921-production-release
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    if: github.repository == 'bibofu/start1921' && !github.event.deleted
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.version.outputs.commit }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate tag and main ancestry
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: python3 deploy/resolve_release.py
+
+  checks:
+    needs: resolve
+    uses: ./.github/workflows/eval-gate.yml
+    with:
+      ref: ${{ needs.resolve.outputs.commit }}
+
+  image:
+    needs: [resolve, checks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve.outputs.commit }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build, validate bundled assets, and publish
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/bibofu/start1921:${{ needs.resolve.outputs.tag }}
+            ghcr.io/bibofu/start1921:sha-${{ needs.resolve.outputs.commit }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/bibofu/start1921
+            org.opencontainers.image.revision=${{ needs.resolve.outputs.commit }}
+            org.opencontainers.image.version=${{ needs.resolve.outputs.tag }}
+          cache-from: type=gha,scope=start1921-release
+          cache-to: type=gha,mode=max,scope=start1921-release
+
+  deploy:
+    needs: [resolve, image]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: production
+      url: https://start1921.chat
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recheck tag has not moved before deployment
+        env:
+          RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
+          EXPECTED_COMMIT: ${{ needs.resolve.outputs.commit }}
+        run: |
+          python3 deploy/resolve_release.py
+          test "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")" = "$EXPECTED_COMMIT"
+      - name: Deploy digest and automatically roll back on failure
+        env:
+          DEPLOY_HOST: ${{ vars.START1921_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.START1921_DEPLOY_USER }}
+          DEPLOY_PORT: ${{ vars.START1921_DEPLOY_PORT || '22' }}
+          DEPLOY_SSH_KEY: ${{ secrets.START1921_DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.START1921_DEPLOY_KNOWN_HOSTS }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_IMAGE: ghcr.io/bibofu/start1921@${{ needs.image.outputs.digest }}
+          RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
+        run: python3 deploy/remote_release.py --image "$RELEASE_IMAGE" --revision "$RELEASE_COMMIT"
+      - name: Release summary
+        if: always()
+        env:
+          RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
+          RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
+          RELEASE_DIGEST: ${{ needs.image.outputs.digest }}
+          DEPLOY_RESULT: ${{ job.status }}
+        run: |
+          {
+            echo "Tag: $RELEASE_TAG"
+            echo "Commit: $RELEASE_COMMIT"
+            echo "Image: ghcr.io/bibofu/start1921@$RELEASE_DIGEST"
+            echo "Deployment: $DEPLOY_RESULT (see rollout logs for rollback result)"
+          } >> "$GITHUB_STEP_SUMMARY"

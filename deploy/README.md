@@ -142,6 +142,69 @@ HSTS/CSP；生产建议在 `http{}` 定义 `limit_req_zone`/`limit_conn_zone`，
 
 ## 运维与升级
 
+### GitHub Actions 发布
+
+仓库的 `eval-gate` 在分支 push、PR 时执行完整检查，也供 `release` 工作流复用。
+发布工作流由 `v*` tag push 或手动 `workflow_dispatch` 触发；接受的版本名称例如
+`v0.1.0`、`v0.1.0-rc.1`。Git tag 不属于某个分支，因此工作流会检查 tag 指向的提交
+是远程 `main` 的祖先，并在部署前再次核对 tag 没有移动。手动运行工作流必须选择
+`main` 分支，输入一个已存在的版本 tag。CI 失败时不构建、部署镜像。
+
+流程为：校验 tag → 同一提交的 CI → 构建并发布 GHCR 镜像 → SSH 更新 app →
+健康检查。应用镜像使用 `ghcr.io/bibofu/start1921`，发布 tag 和完整 SHA tag 用于查询，
+服务器实际部署的是不可变 `@sha256:...` 摘要，并核对镜像的 Git revision label。
+Docker 构建包含 `config/entities/`，以运行用户执行 `check_image.py` 检查实体索引、
+别名、manifest 和页面资源，缺少文件会直接构建失败。
+
+在仓库的 `production` Environment 配置以下项（或使用同名仓库级配置）：
+
+| 类型 | 名称 | 内容 |
+| --- | --- | --- |
+| Variable | `START1921_DEPLOY_HOST` | 部署主机，例如 `118.193.34.72` |
+| Variable | `START1921_DEPLOY_USER` | SSH 部署账号，例如 `ubuntu`，需有非交互 sudo 权限 |
+| Variable | `START1921_DEPLOY_PORT` | SSH 端口，缺省 `22` |
+| Secret | `START1921_DEPLOY_SSH_KEY` | 专用 SSH 部署私钥，对应公钥已安装于部署账号 |
+| Secret | `START1921_DEPLOY_KNOWN_HOSTS` | 经现有可信连接核对的服务器 SSH host key 记录 |
+
+SSH 始终启用严格 host key 检查，不通过临时 `ssh-keyscan` 自动信任未知主机。
+发布 job 使用 `packages:write`，部署 job 仅使用 `packages:read`。部署时通过 SSH stdin
+将该 job 的短期 `GITHUB_TOKEN` 传给 GHCR 登录；服务器使用单独临时 Docker 配置目录，
+完成后删除。即使 GHCR 包初始为 private，也不需要在服务器保存长期 PAT。
+
+发布前将代码提交并推送 main，再推送新 tag：
+
+```bash
+git push origin main
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+手动发布：GitHub → Actions → release → Run workflow，分支选 `main`，填入已存在的
+版本 tag。也可用 `gh workflow run release.yml --ref main -f tag=v0.1.0`。
+每次选择新版本号；不要移动已发布 tag。手动选择旧 tag 会重新验证并构建该源版本；
+失败自动回滚则使用部署前正在运行的确切镜像 ID，不依赖可变 tag。
+
+### 发布失败与回滚
+
+`deploy/release.py` 是服务器发布入口，由 Actions 临时上传执行。它要求已有运行的
+`start1921` app；首次数据库初始化和数据导入仍按前文操作。工作流串行发布、不取消
+正在执行的发布，服务器再通过文件锁防止两个发布同时操作应用。
+
+脚本在停止旧应用前完成镜像拉取、revision 与资产检查、Compose 和生产 Settings 校验，并将旧容器
+真实镜像 ID 保留为本地回滚 tag。只替换 app，不更新 PostgreSQL/Qdrant，不删除卷，
+也不自动替换服务器现有 Compose 文件。`/api/health` 和 `/api/ready` 的数据库、
+关键词和向量三项都必须为 true 才视为成功；仅 HTTP 200 不足以通过发布验证。
+成功后原子更新 `/etc/start1921/start1921.env` 中的 `START1921_APP_IMAGE`，让以后
+普通 Compose 启动保持该版本，并保留发布状态和旧镜像记录。
+
+新容器启动、健康检查或配置持久化失败时，脚本恢复旧镜像并验证旧服务，工作流仍
+显示失败。回滚本身失败会另报错误并保留旧镜像供人工恢复。可处理的终止信号也会
+触发回滚，但机器断电、进程被强杀或网络中断后的结果需要运维核查。镜像回滚不
+回滚数据库内容：上线前应保留备份，涉及不兼容 schema 变化时须另行设计迁移方案。
+
+所有实际发布以 Actions 的 tag、commit、digest 和服务器发布日志为准；仅推送 main
+只运行 CI，不会更新生产服务器。
+
 ```bash
 dc ps
 dc logs --tail 100 app
@@ -154,17 +217,13 @@ sudo docker stats --no-stream
 
 每次升级先备份主库、Qdrant 快照及 alias、`runtime/data` 中需保留的产物、
 PDF 和受保护的环境配置。把应用镜像标为代码 commit，记录实际镜像 digest。
-依赖或数据 schema 变化需要单独验证恢复路径。普通应用升级：
+依赖或数据 schema 变化需要单独验证恢复路径。接入 CD 后，普通应用升级使用上述
+版本 tag 或手动 Actions 流程；服务器不需要源码，也不需要执行 `dc build app`。
 
-```bash
-dc build app
-dc up -d --no-deps app
-curl --fail http://127.0.0.1:18021/api/health
-curl --fail http://127.0.0.1:18021/api/ready
-```
-
-失败时将 `START1921_APP_IMAGE` 改回已保留的旧镜像 tag，再运行
-`dc up -d --no-deps --no-build app`。数据格式已改变时，先恢复兼容的数据备份。
+若自动回滚未能完成，先查看 `/etc/start1921/release-state.json` 的 `previous_image`，
+将 `START1921_APP_IMAGE` 改回该保留的旧镜像 tag，再运行
+`dc up -d --no-deps --no-build --pull never app`，并复核上述两个健康接口。
+数据格式已改变时，先恢复兼容的数据备份。
 不要运行 `docker compose down -v`；它会删除本项目数据库与向量卷。
 
 ## 2026-10-20 部署记录
