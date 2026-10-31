@@ -611,6 +611,18 @@ async function bootstrap() {
   refreshVisitorInfo();
 }
 
+function resizeQuestionInput() {
+  input.style.overflowY = "hidden";
+  input.style.height = "auto";
+  const styles = getComputedStyle(input);
+  // scrollHeight includes padding but not the border in our border-box layout.
+  const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
+  const contentHeight = Math.ceil(input.scrollHeight + borderHeight);
+  const maxHeight = parseFloat(styles.maxHeight) || Infinity;
+  input.style.height = `${Math.min(contentHeight, maxHeight)}px`;
+  input.style.overflowY = input.scrollHeight > input.clientHeight ? "auto" : "hidden";
+}
+
 function bindEvents() {
   form.addEventListener("submit", event => {
     event.preventDefault();
@@ -618,7 +630,7 @@ function bindEvents() {
     const question = input.value.trim();
     if (!question) return;
     input.value = "";
-    input.style.height = "auto";
+    resizeQuestionInput();
     ask(question);
   });
   send.addEventListener("click", event => {
@@ -633,10 +645,9 @@ function bindEvents() {
       form.requestSubmit();
     }
   });
-  input.addEventListener("input", () => {
-    input.style.height = "auto";
-    input.style.height = `${Math.min(input.scrollHeight, 150)}px`;
-  });
+  input.addEventListener("input", resizeQuestionInput);
+  window.addEventListener("resize", resizeQuestionInput);
+  resizeQuestionInput();
   messagesEl.addEventListener("click", event => {
     const button = event.target.closest(".suggestions button");
     if (button && !state.activeRun) ask(button.textContent);

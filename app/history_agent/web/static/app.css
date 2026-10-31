@@ -132,7 +132,8 @@ h1 { margin: 0; font-family: var(--font-sans); font-size: clamp(28px, 5vw, 40px)
   box-shadow: 0 12px 36px rgba(55,43,27,.12);
   backdrop-filter: blur(16px);
 }
-textarea { resize: none; min-height: 48px; max-height: 150px; padding: 12px 14px; border: 1px solid #cfc3b2; border-radius: 12px; background: #fffdf8; color: var(--ink); outline: none; line-height: 1.5; }
+textarea { resize: none; min-width: 0; min-height: 48px; max-height: 150px; overflow: hidden; scrollbar-width: none; padding: 12px 14px; border: 1px solid #cfc3b2; border-radius: 12px; background: #fffdf8; color: var(--ink); outline: none; line-height: 1.5; }
+textarea::-webkit-scrollbar { display: none; }
 textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,47,38,.08); }
 #send { min-width: 76px; border: 0; border-radius: 12px; background: var(--red); color: white; font-weight: 700; }
 #send:hover { background: var(--red-dark); }

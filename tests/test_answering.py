@@ -400,7 +400,7 @@ def test_api_health_and_question_contract(monkeypatch: Any) -> None:
     assert health.status_code == 200
     assert health.json()["indexes"] == {"keyword": False, "vector": False}
     assert index.headers["cache-control"] == "no-store"
-    assert "app.js?v=multi-session-v15" in index.text
+    assert "app.js?v=multi-session-v16" in index.text
     assert 'rel="icon"' in index.text
     assert svg_icon.status_code == 200
     assert svg_icon.headers["content-type"].startswith("image/svg+xml")
