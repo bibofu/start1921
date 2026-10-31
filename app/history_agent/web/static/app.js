@@ -229,7 +229,7 @@ function updateHeader() {
   const session = currentSession();
   currentTitle.textContent = session?.title || "新会话";
   // Keep the browser tab on the product name; the session title lives in the header.
-  document.title = "start1921 · 近现代史研究 Agent";
+  document.title = "Start 1921";
   if (renameSessionButton) renameSessionButton.hidden = !session;
   if (deleteSessionButton) deleteSessionButton.hidden = !session;
 }
