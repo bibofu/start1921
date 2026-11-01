@@ -437,6 +437,10 @@ def test_adjacent_evidence_is_source_local_single_page_and_chat_complete(
     proof = result.events[0].joint_evidence[0]
     assert proof.match_method == "adjacent_attendance"
     assert proof.supporting_text == text
+    # Exercise the scripted structured route, independently of planner gating.
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.should_plan_query", lambda *args: True,
+    )
     settings = Settings(
         _env_file=None,
         project_root=work_path,

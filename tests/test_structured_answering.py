@@ -47,6 +47,8 @@ def _settings(work_path: Path) -> Settings:
         project_root=work_path,
         data_dir=work_path / "data",
         person_aliases_path=Path(__file__).parents[1] / "config" / "person_aliases.json",
+        # These tests supply an explicit audited planner route.
+        llm_query_planning_gate=False,
         llm_retrieval_reflection=False,
     )
 

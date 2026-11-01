@@ -118,6 +118,9 @@ def _client(work_path: Path) -> TestClient:
         person_aliases_path=Path.cwd() / "config/person_aliases.json",
         quota_enabled=False,
         llm_api_key="test-only-key",
+        # Scripted replies assume one planner call per turn; gate behavior has
+        # separate workflow tests, while this fixture checks session context.
+        llm_query_planning_gate=False,
         llm_retrieval_reflection=False,
     )
     return TestClient(create_app(settings))
