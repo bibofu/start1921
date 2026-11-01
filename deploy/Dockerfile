@@ -24,9 +24,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY app ./app
 COPY config/*.json ./config/
+COPY config/jieba_userdict.txt ./config/jieba_userdict.txt
 COPY config/entities ./config/entities/
 COPY deploy/healthcheck.py ./deploy/healthcheck.py
 COPY deploy/check_image.py ./deploy/check_image.py
+COPY deploy/keyword_upgrade.py ./deploy/keyword_upgrade.py
 # Keep the editable package at /app/app/history_agent. Settings also explicitly
 # points at /app so config, data and docs retain the repository layout.
 RUN --mount=type=cache,target=/root/.cache/uv \

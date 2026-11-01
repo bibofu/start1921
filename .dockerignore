@@ -8,6 +8,7 @@
 !app/**
 !config/
 !config/*.json
+!config/jieba_userdict.txt
 !config/entities/
 !config/entities/*.json
 !config/entities/*.jsonl
@@ -15,6 +16,7 @@
 !deploy/Dockerfile
 !deploy/healthcheck.py
 !deploy/check_image.py
+!deploy/keyword_upgrade.py
 **/__pycache__/
 **/*.py[cod]
 **/*.egg-info/

@@ -2,7 +2,8 @@
 """Replace only the existing app container, or restore its exact previous image.
 
 Run on the Linux deployment host with access to Docker and the protected env file.
-This script deliberately does not initialize services or migrate application data.
+This script does not initialize services or migrate business data. It rebuilds
+incompatible keyword indexes and restores their generation on image rollback.
 """
 
 from __future__ import annotations
@@ -331,8 +332,27 @@ def deploy(args: argparse.Namespace) -> int:
             SETTINGS_CHECK,
             image=args.image,
         )
+
+        def keyword_action(action: str, *options: str) -> dict[str, Any]:
+            name = ["--name", "start1921-keyword-upgrade"] if action == "upgrade" else []
+            result = docker.dc(
+                "run", "--rm", "--no-deps", "-T", "--pull", "never", *name,
+                "--entrypoint", "python", "app", "/app/deploy/keyword_upgrade.py",
+                action, *options, image=args.image, timeout=1200,
+            )
+            return dict(json.loads(result))
+
+        keyword_before = keyword_action("status")
+        previous_generation = int(keyword_before["generation_id"])
+        migrate_keyword = keyword_before["needs_upgrade"] is True
+        state["previous_keyword_generation"] = previous_generation
         record("deploying")
         try:
+            if migrate_keyword:
+                print("Rebuilding incompatible keyword index; retaining previous generation",
+                      flush=True)
+                state["keyword_generation"] = keyword_action("upgrade")["generation_id"]
+                record("deploying")
             # Flag the rollout before this command: Compose can fail after stopping app.
             docker.dc(
                 "up", "-d", "--no-deps", "--no-build", "--pull", "never", "app", image=args.image
@@ -344,6 +364,15 @@ def deploy(args: argparse.Namespace) -> int:
             print(f"Release failed ({type(exc).__name__}); restoring {rollback_image}", flush=True)
             with protect_rollback():
                 try:
+                    if migrate_keyword:
+                        # A timed-out Docker client can leave its one-off container
+                        # running. Stop it before restoring the active generation.
+                        pending = docker.run(
+                            ["ps", "-aq", "--filter", "name=^/start1921-keyword-upgrade$"]
+                        )
+                        if pending:
+                            docker.run(["rm", "--force", "start1921-keyword-upgrade"])
+                        keyword_action("restore", "--generation", str(previous_generation))
                     docker.dc(
                         "up",
                         "-d",

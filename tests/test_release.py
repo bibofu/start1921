@@ -55,6 +55,24 @@ if arguments[0] == 'compose':
     if command == ['config', '--quiet']:
         finish(code=1 if state.get('config_fail') else 0)
     if command[0] == 'run':
+        if '--name' in command:
+            offset = command.index('--name')
+            assert command[offset + 1] == 'start1921-keyword-upgrade'
+            command = command[:offset] + command[offset + 2:]
+        if command[9] == '/app/deploy/keyword_upgrade.py':
+            action = command[10]
+            state.setdefault('keyword_generation', 1)
+            if action == 'upgrade':
+                if state.get('keyword_upgrade_fail'):
+                    finish(code=1)
+                state['keyword_generation'] = 2
+            elif action == 'restore':
+                state['keyword_generation'] = int(command[12])
+            finish(json.dumps({
+                'generation_id': state['keyword_generation'],
+                'needs_upgrade': bool(state.get('keyword_upgrade'))
+                    and state['keyword_generation'] == 1,
+            }))
         assert command[:10] == ['run', '--rm', '--no-deps', '-T', '--pull', 'never',
                                 '--entrypoint', 'python', 'app', '-c']
         assert command[10] == 'from history_agent.config import get_settings; get_settings()'
@@ -83,6 +101,11 @@ if arguments[:2] == ['image', 'inspect']:
 if arguments[0] == 'run':
     assert arguments[1:6] == ['--rm', '--network', 'none', '--entrypoint', 'python']
     finish(code=1 if state.get('asset_fail') else 0)
+if arguments[0] == 'ps':
+    finish('pending-upgrade' if state.get('keyword_pending') else '')
+if arguments[:2] == ['rm', '--force']:
+    state['keyword_pending'] = False
+    finish()
 raise AssertionError(arguments)
 """
 
@@ -216,6 +239,33 @@ def test_release_persists_immutable_image_after_real_readiness(deployment: dict[
         item["docker_config"] == "temporary-registry-credentials"
         for item in server.data()["commands"]
     )
+
+
+def test_release_upgrades_keyword_index_before_replacing_app(deployment: dict[str, Any]) -> None:
+    server = deployment["server"]
+    server.update(keyword_upgrade=True)
+    assert release.main(deployment["args"]) == 0
+    assert server.data()["keyword_generation"] == 2
+    commands = server.data()["commands"]
+    upgrade = next(i for i, c in enumerate(commands) if "upgrade" in c["args"])
+    replace = next(i for i, c in enumerate(commands) if "up" in c["args"])
+    assert upgrade < replace
+    state = json.loads(deployment["state"].read_text())
+    assert state["previous_keyword_generation"] == 1
+    assert state["keyword_generation"] == 2
+
+
+@pytest.mark.parametrize("failure", ["vector_unready", "keyword_upgrade_fail"])
+def test_migration_failure_restores_keyword_generation_and_image(
+    deployment: dict[str, Any], failure: str,
+) -> None:
+    server = deployment["server"]
+    server.update(keyword_upgrade=True, keyword_pending=True, **{failure: True})
+    assert release.main(deployment["args"]) == 1
+    assert server.data()["keyword_generation"] == 1
+    assert server.data()["keyword_pending"] is False
+    assert server.data()["current_id"] == OLD_ID
+    assert json.loads(deployment["state"].read_text())["status"] == "rolled_back"
 
 
 @pytest.mark.parametrize("failure", ["pull_fail", "config_fail", "asset_fail", "settings_fail"])

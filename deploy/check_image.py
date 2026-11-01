@@ -28,6 +28,9 @@ def check_image(root: Path) -> None:
     if normalize_entities("毛选和党史", entities) != "毛泽东选集和中国共产党历史":
         raise ValueError("The packaged entity aliases cannot be resolved")
 
+    if not (config / "jieba_userdict.txt").read_text(encoding="utf-8").strip():
+        raise ValueError("The packaged jieba domain dictionary is empty")
+
     static = root / "app" / "history_agent" / "web" / "static"
     for filename in ("index.html", "app.css", "app.js", "markdown.js", "stream.js"):
         if not (static / filename).read_bytes():

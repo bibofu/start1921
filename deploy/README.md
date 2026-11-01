@@ -194,6 +194,12 @@ git push origin v0.1.0
 真实镜像 ID 保留为本地回滚 tag。只替换 app，不更新 PostgreSQL/Qdrant，不删除卷，
 也不自动替换服务器现有 Compose 文件。`/api/health` 和 `/api/ready` 的数据库、
 关键词和向量三项都必须为 true 才视为成功；仅 HTTP 200 不足以通过发布验证。
+部署前会核对候选镜像要求的关键词索引版本；版本不匹配时，从服务器已有分片事务式
+构建并校验新索引，保留旧 generation。发布状态记录旧、新 generation；应用回滚时先
+恢复旧关键词 generation，再恢复旧镜像。构建期间旧索引继续可用，索引发布至应用切换
+之间可能短暂出现关键词不可用。该流程不迁移业务表或重建向量索引；相同版本的
+分词配置变化仍需单独安排重建。镜像同时打包并检查 jieba 领域词典，避免线上缺词典。
+
 成功后原子更新 `/etc/start1921/start1921.env` 中的 `START1921_APP_IMAGE`，让以后
 普通 Compose 启动保持该版本，并保留发布状态和旧镜像记录。
 
@@ -223,7 +229,8 @@ PDF 和受保护的环境配置。把应用镜像标为代码 commit，记录实
 若自动回滚未能完成，先查看 `/etc/start1921/release-state.json` 的 `previous_image`，
 将 `START1921_APP_IMAGE` 改回该保留的旧镜像 tag，再运行
 `dc up -d --no-deps --no-build --pull never app`，并复核上述两个健康接口。
-数据格式已改变时，先恢复兼容的数据备份。
+关键词版本已改变时，还须恢复发布记录的 `previous_keyword_generation`；其他数据格式
+已改变时，先恢复兼容的数据备份。
 不要运行 `docker compose down -v`；它会删除本项目数据库与向量卷。
 
 ## 2026-10-20 部署记录

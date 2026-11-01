@@ -15,6 +15,13 @@ def test_runtime_assets_pass_packaging_check() -> None:
     check_image(ROOT)
 
 
+def test_missing_domain_dictionary_fails_packaging_check(work_path: Path) -> None:
+    shutil.copytree(ROOT / "config", work_path / "config")
+    (work_path / "config" / "jieba_userdict.txt").unlink()
+    with pytest.raises(FileNotFoundError, match="jieba_userdict.txt"):
+        check_image(work_path)
+
+
 def test_top_level_only_configuration_fails_packaging_check(work_path: Path) -> None:
     # Reproduce the old Docker COPY: all top-level JSON files, no entity subtree.
     destination = work_path / "config"

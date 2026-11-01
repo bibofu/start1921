@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import json
 import random
+import runpy
 import string
+import sys
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -121,6 +124,36 @@ def test_postgres_runtime_build_search_and_metadata(indexes: dict[str, Any]) -> 
     metadata = pg.load_keyword_index_metadata(indexes["postgres"])
     assert metadata["artifact_verified"]
     assert indexes["postgres"] not in json.dumps(metadata)
+
+
+def test_release_keyword_upgrade_and_restore(
+    indexes: dict[str, Any], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    helper = runpy.run_path(str(Path(__file__).resolve().parents[1] / "deploy/keyword_upgrade.py"))
+    main = helper["main"]
+    settings = SimpleNamespace(
+        keyword_index_target=indexes["postgres"], chunks_dir=indexes["chunks"],
+        reports_dir=indexes["work"] / "release", project_root=indexes["work"],
+    )
+    monkeypatch.setitem(main.__globals__, "get_settings", lambda: settings)
+    previous = pg.load_keyword_index_metadata(indexes["postgres"])["generation_id"]
+    with database_connection(indexes["postgres"]) as connection:
+        connection.execute(
+            "UPDATE keyword_generations SET index_version=? WHERE generation_id=?",
+            ("postgresql-fts5-bm25-compatible-v1", previous),
+        )
+    monkeypatch.setattr(sys, "argv", ["keyword_upgrade.py", "upgrade"])
+    main()
+    metadata = pg.load_keyword_index_metadata(indexes["postgres"])
+    assert metadata["artifact_verified"]
+    assert metadata["generation_id"] != previous
+    monkeypatch.setattr(
+        sys, "argv", ["keyword_upgrade.py", "restore", "--generation", str(previous)],
+    )
+    main()
+    state = helper["index_state"]()
+    assert state["generation_id"] == previous
+    assert state["needs_upgrade"] is True
 
 
 def test_failed_publication_keeps_previous_generation_and_content(
