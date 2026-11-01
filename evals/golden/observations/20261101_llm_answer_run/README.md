@@ -34,22 +34,18 @@
 - 全部 12 题 `uncited_claims=0`
 - 所有回答都带 citations；拒答题也给出了纠正性回答，不是空白拒答
 
-## 仍未完成
+## 复核完成（2026-11-01）
 
-- `answer_reviews.json` / `process_reviews.json` 仍是 `unknown`
-- `approved_answer_aggregate` 仍为空
-- 需要人工复核：
-  - Fact 覆盖（covered / partial / missing / contradicted）
-  - Citation support
-  - Source / time constraint
-  - Routing
-  - safe_refusal / scope_explanation
-  - Query understanding / retrieval plan
+- `answer_reviews.json` / `process_reviews.json` 已按 A01–A12 复核并导入
+- `approved_answer_aggregate` 已生成：
+  - required_fact_recall 0.5333（24/45）
+  - citation_support 1.0；routing 1.0；safe_refusal 1.0；scope_explanation 1.0
+  - time_constraint 0.9091；answer_pass 0.4167（5/12）
+- 过程复核：10 pass / 2 fail（A05、A07）
+- 详见 [REVIEWED.md](REVIEWED.md)
 
 ## 下一步
 
-1. 打开 `data/reports/golden12_llm_20261101/reviews/index.html`
-2. 逐题填写 `answer_reviews.json` 和 `process_reviews.json`
-3. `pilot import-reviews` 导入
-4. `pilot score --reviews-dir ...` 跑 `approved_answer_aggregate`
-5. 通过后再合并 Golden v1.2
+1. 合并 Golden v1.2：更新 `golden_dataset.json` 和 `ranking_pools.json`
+2. 同步更新 `DATASET.md`、`README.md` 和 `test_golden_dataset.py` 的 20 题硬编码
+3. 重新跑全量指标并冻结 v1.2
