@@ -128,6 +128,10 @@ def _context(
             ],
         )
         monkeypatch.setattr(
+            "history_agent.answering.llamaindex_workflow.should_plan_query",
+            lambda *a: True,
+        )
+        monkeypatch.setattr(
             "history_agent.answering.llamaindex_workflow.plan_question",
             lambda *a: QueryPlanningResult(plan, "used"),
         )
@@ -267,6 +271,9 @@ def test_stream_uses_semantic_plan_before_retrieval(monkeypatch: pytest.MonkeyPa
     )
     received = _context(monkeypatch, citations=[], retrieval=_response([]))
     monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.should_plan_query", lambda *a: True
+    )
+    monkeypatch.setattr(
         "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning
     )
     events = _events(_settings().model_copy(update={"llm_query_planning": True}))
@@ -318,6 +325,10 @@ def test_disabled_planner_uses_rag_without_generic_clarification(
 
 def test_stream_out_of_scope_stops_before_retrieval(monkeypatch: pytest.MonkeyPatch) -> None:
     plan = QueryPlan(intent="out_of_scope", normalized_question="介绍辛亥革命的情况")
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.should_plan_query",
+        lambda *a: True,
+    )
     monkeypatch.setattr(
         "history_agent.answering.llamaindex_workflow.plan_question",
         lambda *a: QueryPlanningResult(plan, "used"),

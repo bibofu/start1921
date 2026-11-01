@@ -23,6 +23,10 @@ from history_agent.answering.models import (
     TaskResult,
 )
 from history_agent.answering.planning import compile_research_plan, extend_research_plan
+from history_agent.answering.query_triggers import (
+    should_plan_query,
+    should_rewrite_after_retrieval,
+)
 from history_agent.answering.query_understanding import (
     QueryPlanningResult,
     fallback_planning_result,
@@ -94,6 +98,7 @@ class HistoryResearchWorkflow(Workflow):
         ] = "completed"
         self.llm_result = LLMResult(answer=None)
         self.selected_ids: list[str] = []
+        self.late_rewrite_attempted = False
         self.request: QuestionRequest
         self.execution_request: QuestionRequest
         self.plan: ResearchPlan
@@ -128,22 +133,32 @@ class HistoryResearchWorkflow(Workflow):
             max_chars=self.settings.context_max_chars,
             max_tokens=self.settings.context_max_tokens,
         )})
-        self.progress(ctx, "正在理解问题并安排研究任务…")
-        try:
-            self.planning = await self.bounded(
-                asyncio.to_thread(
-                    plan_question,
-                    self.settings,
-                    self.request,
-                    self._llm_runtime,
-                    self.budget,
+        planner_available = self.settings.llm_query_planning and self.settings.llm_enabled
+        if should_plan_query(self.settings, self.request):
+            self.progress(ctx, "正在理解问题并安排研究任务…")
+            try:
+                self.planning = await self.bounded(
+                    asyncio.to_thread(
+                        plan_question,
+                        self.settings,
+                        self.request,
+                        self._llm_runtime,
+                        self.budget,
+                    )
                 )
-            )
-        except (TimeoutError, httpx.TimeoutException):
+            except (TimeoutError, httpx.TimeoutException):
+                self.planning = fallback_planning_result(
+                    self.settings, self.request, error_code="request_timeout",
+                )
+                self.stop_reason = "budget_exhausted"
+        else:
+            # Simple self-contained questions go straight to the deterministic
+            # plan. A low-recall first pass can still trigger one late rewrite.
             self.planning = fallback_planning_result(
-                self.settings, self.request, error_code="request_timeout",
+                self.settings,
+                self.request,
+                status="skipped" if planner_available else "disabled",
             )
-            self.stop_reason = "budget_exhausted"
         self.record_usage("planning", self.planning.usage)
         self.plan = self.planning.research_plan or compile_research_plan(
             self.request.question,
@@ -277,6 +292,55 @@ class HistoryResearchWorkflow(Workflow):
         self.supplements.update(supplements)
         return True
 
+    async def _late_rewrite(self) -> str | None:
+        """Spend one planner call after a skipped first pass found too little."""
+
+        self.late_rewrite_attempted = True
+        try:
+            late = await self.bounded(
+                asyncio.to_thread(
+                    plan_question,
+                    self.settings,
+                    self.request,
+                    self._llm_runtime,
+                    self.budget,
+                )
+            )
+        except (TimeoutError, httpx.TimeoutException):
+            self.stop_reason = "budget_exhausted"
+            return None
+        self.record_usage("late_rewrite", late.usage)
+        if late.status != "used" or late.plan is None:
+            return None
+        if late.plan.intent == "out_of_scope" or late.plan.needs_clarification:
+            self.plan = late.research_plan or compile_research_plan(
+                self.request.question, late.plan, self.settings.person_aliases_path,
+            )
+            self.planning = QueryPlanningResult(
+                late.plan, "used_late", late.model_name, late.usage, late.error_code,
+                late.research_plan,
+            )
+            self.stop_reason = (
+                "out_of_scope" if late.plan.intent == "out_of_scope" else "clarification"
+            )
+            return None
+        parts: list[str] = []
+        for value in (
+            *late.plan.search_queries,
+            late.plan.normalized_question,
+            *(entity.canonical for entity in late.plan.entities),
+        ):
+            compact = " ".join(value.split()).strip()
+            if compact and compact != self.request.question and compact not in parts:
+                parts.append(compact)
+        if not parts:
+            return None
+        self.planning = QueryPlanningResult(
+            late.plan, "used_late", late.model_name, late.usage, late.error_code,
+            late.research_plan,
+        )
+        return "；".join(parts)[:1000]
+
     @step
     async def review(self, ctx: Context, ev: ReviewEvent) -> DispatchEvent | SynthesisEvent:
         additions: list[tuple[ResearchTask, ResearchTask]] = []
@@ -297,41 +361,58 @@ class HistoryResearchWorkflow(Workflow):
             elif task.tool == "analyze" and result.status in {"completed", "empty"} and missing:
                 query = task.query + "；待核查：" + "；".join(missing)
             elif task.tool == "search" and result.retrieval is not None:
-                interpretation = self.plan.interpretation.model_copy(
-                    update={
-                        "normalized_question": task.query[:500],
-                        "coverage": task.coverage,
-                        "start_year": task.start_year,
-                        "end_year": task.end_year,
-                    }
+                rewrite_late = should_rewrite_after_retrieval(
+                    self.settings,
+                    self.request,
+                    planner_skipped=(
+                        self.planning.status == "skipped"
+                        and not self.late_rewrite_attempted
+                    ),
+                    retrieval=result.retrieval,
+                    task_status=result.status,
                 )
-                try:
-                    assessment = await self.bounded(
-                        asyncio.to_thread(
-                            assess_retrieval,
-                            self.settings,
-                            self.execution_request.model_copy(
-                                update={"question": task.query[:500]},
-                            ),
-                            interpretation,
-                            result.retrieval,
-                            self._llm_runtime,
-                            self.budget,
-                        )
+                if rewrite_late:
+                    query = await self._late_rewrite()
+                    if self.stop_reason in {"out_of_scope", "clarification"}:
+                        return SynthesisEvent()
+                if query is not None:
+                    missing = missing or [task.objective[:120]]
+                else:
+                    interpretation = self.plan.interpretation.model_copy(
+                        update={
+                            "normalized_question": task.query[:500],
+                            "coverage": task.coverage,
+                            "start_year": task.start_year,
+                            "end_year": task.end_year,
+                        }
                     )
-                    self.record_usage("assessment", assessment.usage)
-                    if assessment.assessment is not None:
-                        missing = (
-                            []
-                            if assessment.assessment.sufficient
-                            else list(assessment.assessment.missing_aspects)
+                    try:
+                        assessment = await self.bounded(
+                            asyncio.to_thread(
+                                assess_retrieval,
+                                self.settings,
+                                self.execution_request.model_copy(
+                                    update={"question": task.query[:500]},
+                                ),
+                                interpretation,
+                                result.retrieval,
+                                self._llm_runtime,
+                                self.budget,
+                            )
                         )
-                    if assessment.status == "retry":
-                        query = "；".join(assessment.followup_queries)
-                    elif assessment.status == "fallback":
-                        result.limitations.append("部分证据覆盖未能完成模型核查。")
-                except (TimeoutError, httpx.TimeoutException):
-                    self.stop_reason = "budget_exhausted"
+                        self.record_usage("assessment", assessment.usage)
+                        if assessment.assessment is not None:
+                            missing = (
+                                []
+                                if assessment.assessment.sufficient
+                                else list(assessment.assessment.missing_aspects)
+                            )
+                        if assessment.status == "retry":
+                            query = "；".join(assessment.followup_queries)
+                        elif assessment.status == "fallback":
+                            result.limitations.append("部分证据覆盖未能完成模型核查。")
+                    except (TimeoutError, httpx.TimeoutException):
+                        self.stop_reason = "budget_exhausted"
                 result.missing_aspects = missing
             if query and self.budget.remaining > 1:
                 supplement = task.model_copy(

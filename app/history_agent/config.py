@@ -71,6 +71,7 @@ class Settings(BaseSettings):
     request_timeout_seconds: float = Field(default=90.0, ge=10.0, le=600.0)
     llm_max_concurrency: int = Field(default=4, ge=1, le=64)
     llm_query_planning: bool = True
+    llm_query_planning_gate: bool = True
     llm_query_planner_model: Literal["deepseek-v4-pro", "deepseek-v4-flash"] = "deepseek-v4-flash"
     llm_query_planner_max_tokens: int = Field(default=2000, ge=256, le=2000)
     llm_query_planner_timeout_seconds: float = Field(default=20.0, ge=5.0, le=120.0)
@@ -281,6 +282,7 @@ class Settings(BaseSettings):
             "request_timeout_seconds": self.request_timeout_seconds,
             "llm_max_concurrency": self.llm_max_concurrency,
             "llm_query_planning": self.llm_query_planning,
+            "llm_query_planning_gate": self.llm_query_planning_gate,
             "llm_query_planner_model": self.llm_query_planner_model,
             "llm_query_planner_max_tokens": self.llm_query_planner_max_tokens,
             "llm_query_planner_timeout_seconds": self.llm_query_planner_timeout_seconds,

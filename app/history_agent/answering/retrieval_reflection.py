@@ -16,16 +16,13 @@ from history_agent.answering.llamaindex_llm import (
     response_usage,
 )
 from history_agent.answering.models import QueryPlan, QuestionRequest
+from history_agent.answering.query_triggers import is_complex_question
 from history_agent.answering.runtime import LLMRuntime, RequestBudget
 from history_agent.config import Settings
 from history_agent.errors import llm_http_error_code
 from history_agent.retrieval.models import SearchResponse
 
 PROMPT_VERSION = "retrieval-reflection-v1"
-COMPLEX_QUESTION = re.compile(
-    r"详细|全面|系统|完整|经过|过程|前后|各阶段|主要经历|梳理|演变|变化|"
-    r"原因|影响|意义|比较|异同"
-)
 YEAR = re.compile(r"(?<!\d)(?P<year>(?:18|19|20)\d{2})(?!\d)\s*年?")
 VAGUE_ASPECTS = {"更多", "更多证据", "其他", "其余", "全部", "完整资料", "相关资料"}
 Aspect = Annotated[str, Field(min_length=2, max_length=40)]
@@ -68,7 +65,7 @@ def should_reflect(
     return (
         plan.coverage != "relevance"
         or plan.intent in {"event_overview", "comparison", "causal_analysis"}
-        or COMPLEX_QUESTION.search(request.question) is not None
+        or is_complex_question(request.question)
     )
 
 

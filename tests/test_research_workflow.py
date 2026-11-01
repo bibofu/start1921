@@ -19,9 +19,11 @@ from history_agent.answering.retrieval_reflection import EvidenceAssessment, Ref
 from history_agent.answering.runtime import RequestBudget
 from history_agent.answering.service import answer_question
 from history_agent.answering.streaming import stream_answer_question
+from history_agent.answering.synthesis import LLMResult
 from history_agent.config import Settings
 from history_agent.errors import RetrievalError
 from history_agent.retrieval.models import SearchResponse
+from test_retrieval import _hit, _response
 
 
 def citation(page: int = 1) -> Citation:
@@ -50,6 +52,8 @@ def task(key: str, tool: str = "search", depends: list[str] | None = None) -> Re
 
 
 def install(monkeypatch, plan: QueryPlan, execute) -> None:
+    # These tests exercise the plan-execute lifecycle, not the planner gate.
+    monkeypatch.setattr(workflow, "should_plan_query", lambda *args: True)
     monkeypatch.setattr(workflow, "plan_question", lambda *args: QueryPlanningResult(plan, "used"))
     monkeypatch.setattr(workflow.HistoryTaskExecutor, "execute", execute)
     monkeypatch.setattr(workflow, "assess_retrieval", lambda *args: ReflectionResult("skipped"))
@@ -63,6 +67,17 @@ def collect(executor, item: ResearchTask, page: int) -> TaskResult:
         status="completed",
         evidence_ids=[evidence.evidence_id],
     )
+
+
+def disable_synthesis(monkeypatch) -> None:
+    async def synthesize(self, *args, **kwargs) -> None:
+        self.last_result = LLMResult(answer=None, error_code="test")
+
+    monkeypatch.setattr(workflow.HistoryResponseSynthesizer, "asynthesize", synthesize)
+
+
+def evidence_response(count: int) -> SearchResponse:
+    return _response([_hit(str(index), index, page=index) for index in range(1, count + 1)])
 
 
 def test_simple_question_has_one_task_and_one_shared_delivery(monkeypatch, work_path) -> None:
@@ -379,3 +394,144 @@ def test_exhausted_model_budget_is_visible_even_when_planner_falls_back(monkeypa
     assert result.execution_summary.stopped_reason == "budget_exhausted"
     assert result.evidence_status == "partial"
     assert result.citations
+
+
+def test_simple_question_skips_the_planner_when_first_pass_has_evidence(monkeypatch, work_path):
+    async def execute(executor, item, prior):
+        result = collect(executor, item, 1)
+        result.retrieval = evidence_response(3)
+        return result
+
+    monkeypatch.setattr(workflow.HistoryTaskExecutor, "execute", execute)
+    disable_synthesis(monkeypatch)
+    monkeypatch.setattr(
+        workflow,
+        "plan_question",
+        lambda *args: (_ for _ in ()).throw(AssertionError("planner must be skipped")),
+    )
+    result = answer_question(
+        Settings(
+            _env_file=None,
+            project_root=work_path,
+            llm_api_key="sk-test",
+            llm_retrieval_reflection=False,
+        ),
+        QuestionRequest(question="介绍一下开国大典"),
+    )
+
+    assert result.query_planner_status == "skipped"
+    assert result.execution_summary.replan_count == 0
+    assert result.citations
+
+
+def test_complex_question_still_calls_the_planner(monkeypatch, work_path):
+    calls: list[str] = []
+
+    async def execute(executor, item, prior):
+        result = collect(executor, item, 1)
+        result.retrieval = evidence_response(3)
+        return result
+
+    def planning(*args):
+        calls.append("plan")
+        return QueryPlanningResult(
+            QueryPlan(normalized_question="详细介绍会议经过"), "used"
+        )
+
+    monkeypatch.setattr(workflow.HistoryTaskExecutor, "execute", execute)
+    disable_synthesis(monkeypatch)
+    monkeypatch.setattr(workflow, "plan_question", planning)
+    result = answer_question(
+        Settings(_env_file=None, project_root=work_path, llm_api_key="sk-test"),
+        QuestionRequest(question="详细介绍会议经过"),
+    )
+
+    assert calls == ["plan"]
+    assert result.query_planner_status == "used"
+
+
+def test_empty_first_pass_triggers_one_late_planner_rewrite(monkeypatch, work_path):
+    calls: list[str] = []
+    late_plan = QueryPlan(
+        normalized_question="介绍一下开国大典的筹备情况",
+        search_queries=["开国大典 筹备 经过"],
+        entities=[QueryEntity(type="event", text="开国大典", canonical="开国大典")],
+    )
+
+    def planning(*args):
+        calls.append("plan")
+        return QueryPlanningResult(
+            late_plan,
+            "used",
+            model_name="deepseek-v4-flash",
+            usage={"total_tokens": 42},
+        )
+
+    async def execute(executor, item, prior):
+        if item.task_id == "task_1":
+            return TaskResult(
+                task_id=item.task_id,
+                tool=item.tool,
+                status="empty",
+                missing_aspects=["活动"],
+                retrieval=_response([]),
+            )
+        return collect(executor, item, 1)
+
+    monkeypatch.setattr(workflow.HistoryTaskExecutor, "execute", execute)
+    disable_synthesis(monkeypatch)
+    monkeypatch.setattr(workflow, "plan_question", planning)
+    result = answer_question(
+        Settings(
+            _env_file=None,
+            project_root=work_path,
+            llm_api_key="sk-test",
+            llm_retrieval_reflection=False,
+        ),
+        QuestionRequest(question="介绍一下开国大典的筹备情况"),
+    )
+
+    assert calls == ["plan"]
+    assert result.query_planner_status == "used_late"
+    assert result.execution_summary.replan_count == 1
+    assert result.execution_summary.retrieval_calls == 2
+    assert result.execution_summary.usage_by_stage["late_rewrite"] == {"total_tokens": 42}
+    assert result.citations
+
+
+def test_late_planner_rewrite_can_still_refuse_out_of_scope(monkeypatch, work_path):
+    late_plan = QueryPlan(
+        intent="out_of_scope",
+        normalized_question="介绍开国大典",
+    )
+
+    async def execute(executor, item, prior):
+        return TaskResult(
+            task_id=item.task_id,
+            tool=item.tool,
+            status="empty",
+            retrieval=_response([]),
+        )
+
+    monkeypatch.setattr(workflow.HistoryTaskExecutor, "execute", execute)
+    disable_synthesis(monkeypatch)
+    monkeypatch.setattr(
+        workflow,
+        "plan_question",
+        lambda *args: QueryPlanningResult(late_plan, "used", model_name="deepseek-v4-flash"),
+    )
+    result = answer_question(
+        Settings(
+            _env_file=None,
+            project_root=work_path,
+            llm_api_key="sk-test",
+            llm_retrieval_reflection=False,
+        ),
+        QuestionRequest(question="介绍一下开国大典"),
+    )
+
+    assert result.query_planner_status == "used_late"
+    assert result.execution_summary.stopped_reason == "out_of_scope"
+    assert result.execution_summary.retrieval_calls == 1
+    assert result.citations == []
+    assert "1921—1978" in result.answer

@@ -47,7 +47,7 @@ CURRENT_QUESTION_YEAR = re.compile(r"(?<!\d)(?:18|19|20)\d{2}(?!\d)")
 @dataclass(frozen=True)
 class QueryPlanningResult:
     plan: QueryPlan | None
-    status: Literal["used", "disabled", "fallback", "not_applicable"]
+    status: Literal["used", "used_late", "skipped", "disabled", "fallback", "not_applicable"]
     model_name: str | None = None
     usage: dict[str, int] | None = None
     error_code: str | None = None
@@ -359,7 +359,7 @@ def fallback_planning_result(
     settings: Settings,
     request: QuestionRequest,
     *,
-    status: Literal["disabled", "fallback"] = "fallback",
+    status: Literal["disabled", "fallback", "skipped"] = "fallback",
     usage: dict[str, int] | None = None,
     error_code: str | None = None,
 ) -> QueryPlanningResult:

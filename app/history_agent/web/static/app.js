@@ -134,8 +134,9 @@ function renderAnswer(data) {
   const mode = data.generator_mode === "llm"
     ? `DeepSeek ${escapeHtml(data.model_name || "V4")} · 模型生成`
     : structured ? "结构化研究 · 候选原文" : "本地证据摘录";
-  const planner = data.query_planner_status === "used"
-    ? ` · ${escapeHtml(data.query_planner_model || "DeepSeek")} 查询理解`
+  const plannerUsed = data.query_planner_status === "used" || data.query_planner_status === "used_late";
+  const planner = plannerUsed
+    ? ` · ${escapeHtml(data.query_planner_model || "DeepSeek")} 查询理解${data.query_planner_status === "used_late" ? "（低召回补查）" : ""}`
     : data.query_planner_status === "fallback" ? " · 原问题降级检索" : "";
   const execution = data.execution_summary;
   const research = execution

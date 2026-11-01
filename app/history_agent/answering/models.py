@@ -222,9 +222,9 @@ class AnswerResponse(BaseModel):
     query_plan: QueryPlan | None = None
     research_plan: ResearchPlan | None = None
     execution_summary: ExecutionSummary | None = None
-    query_planner_status: Literal["used", "disabled", "fallback", "not_applicable"] = (
-        "not_applicable"
-    )
+    query_planner_status: Literal[
+        "used", "used_late", "skipped", "disabled", "fallback", "not_applicable"
+    ] = "not_applicable"
     query_planner_model: str | None = None
     query_planner_usage: dict[str, int] | None = None
     query_planner_error_code: str | None = None

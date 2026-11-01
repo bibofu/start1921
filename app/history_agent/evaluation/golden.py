@@ -1361,7 +1361,9 @@ def _run_metadata(
     attribution = _index_attribution(reports, actual_branches)
     answers = [item["answer"] for item in results if isinstance(item.get("answer"), dict)]
     llm_used = any(item.get("generator_mode") == "llm" for item in answers)
-    planner_used = any(item.get("query_planner_status") == "used" for item in answers)
+    planner_used = any(
+        item.get("query_planner_status") in {"used", "used_late"} for item in answers
+    )
     reflection_used = any(
         item.get("retrieval_reflection_status") in {"sufficient", "retried"} for item in answers
     )
@@ -1446,7 +1448,7 @@ def _run_metadata(
                 (
                     item.get("query_planner_model")
                     for item in answers
-                    if item.get("query_planner_status") == "used"
+                    if item.get("query_planner_status") in {"used", "used_late"}
                 ),
                 None,
             ),

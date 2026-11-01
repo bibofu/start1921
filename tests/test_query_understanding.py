@@ -406,6 +406,9 @@ def test_answer_question_uses_semantic_plan_for_hybrid_retrieval(monkeypatch: An
         )
 
     monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.should_plan_query", lambda *a: True,
+    )
+    monkeypatch.setattr(
         "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning,
     )
     monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", search)
@@ -479,6 +482,9 @@ def test_out_of_scope_answer_skips_retrieval(monkeypatch: Any) -> None:
         raise AssertionError("out-of-scope question must not start retrieval")
 
     monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.should_plan_query", lambda *a: True,
+    )
+    monkeypatch.setattr(
         "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning,
     )
     monkeypatch.setattr("history_agent.answering.task_executor.search_hybrid_index", unexpected)
@@ -514,6 +520,9 @@ def test_answer_question_returns_planner_clarification_without_retrieval(
         }
     )
     planning = QueryPlanningResult(QueryPlan.model_validate(payload), "used")
+    monkeypatch.setattr(
+        "history_agent.answering.llamaindex_workflow.should_plan_query", lambda *a: True,
+    )
     monkeypatch.setattr(
         "history_agent.answering.llamaindex_workflow.plan_question", lambda *a: planning,
     )

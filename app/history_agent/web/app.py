@@ -789,6 +789,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "llm_model": active_settings.llm_model,
             "llm_thinking": active_settings.llm_thinking,
             "llm_query_planning": active_settings.llm_query_planning,
+            "llm_query_planning_gate": active_settings.llm_query_planning_gate,
             "llm_query_planner_model": active_settings.llm_query_planner_model,
             "llm_retrieval_reflection": active_settings.llm_retrieval_reflection,
             "answer_workflow": "plan_and_execute",
