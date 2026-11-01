@@ -1,55 +1,72 @@
-# Golden Dataset（selected20，2026-10-29）
+# Golden Dataset（selected32，2026-11-01，v1.2）
 
-当前评测集是 **20 题**：16 道开发题 + 4 道保留题，18 可答 + 2 拒答，98 个必要事实、104 个证据组。它是按用户 2026-10-29 裁定从原 29 题中删除 9 题并两次改写交集题后的唯一工作集；旧的 v3–v6 标注、协议、29 题集、旧复核队列和旧观测已清理。
+当前评测集是 **32 题**：22 道开发题 + 10 道保留题，28 可答 + 4 拒答，143 个必要事实、143 个证据组、301 条候选标签。它在 v1.1 的 20 题基础上新增 12 题，未删除或改写旧题。
 
 ## 入口
 
 | 文件 | 内容 |
 |---|---|
-| [golden_dataset.json](golden_dataset.json) | 20 题数据集（PilotCase schema） |
-| [RELEASE_v1.1.md](RELEASE_v1.1.md) | Golden v1.1 冻结记录（当前版本） |
-| [RELEASE_v1.0.md](RELEASE_v1.0.md) | Golden v1.0 历史记录 |
-| [diagnostics/20261030_holdout_semantic_observation.md](diagnostics/20261030_holdout_semantic_observation.md) | 零召回诊断：意图扩展、512 截断、词面不匹配 |
+| [golden_dataset.json](golden_dataset.json) | 32 题数据集（PilotCase schema） |
+| [RELEASE_v1.2.md](RELEASE_v1.2.md) | Golden v1.2 冻结记录（当前版本） |
+| [RELEASE_v1.1.md](RELEASE_v1.1.md) | Golden v1.1 历史记录 |
 | [DATASET.md](DATASET.md) | 总量、题型覆盖、指标可计算性、缺口 |
-| [CASE_INVENTORY.md](CASE_INVENTORY.md) | 逐题原文、锚点、事实、拒答依据、状态 |
+| [CASE_INVENTORY_v1.2.md](CASE_INVENTORY_v1.2.md) | 新增 12 题的逐题清单 |
+| [CASE_INVENTORY.md](CASE_INVENTORY.md) | v1.1 旧 20 题的逐题清单 |
+| [ranking_pools.json](ranking_pools.json) | 28 道可答题的固定池 |
+| [POOL_REVIEW.md](POOL_REVIEW.md) | 18 个旧池 + 10 个新增池的口径确认单 |
 | [REPEATABLE_WORKFLOW.md](REPEATABLE_WORKFLOW.md) | 采集、复核、评分、比较命令 |
-| [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md) | 答案逐事实/维度复核口径 |
-| [ranking_pools.json](ranking_pools.json) | 18 道可答题的固定池 |
-| [POOL_REVIEW.md](POOL_REVIEW.md) | 18 个固定池的一页口径确认单 |
-| [label_reviews/20261030_llm63_reviewed.md](label_reviews/20261030_llm63_reviewed.md) | 63 条 LLM 标签复核记录（全部通过） |
-| [label_reviews/20261030_agent95_reviewed.md](label_reviews/20261030_agent95_reviewed.md) | 95 条 Agent 标签复核记录（84 通过、1 改判、10 删除） |
-| [observations/20261030_current_run/](observations/20261030_current_run/README.md) | 2026-10-30 当前重跑（逐题报告 [CASES.md](observations/20261030_current_run/CASES.md)） |
-| [observations/20261029_golden20_local/](observations/20261029_golden20_local/README.md) | 当前本地组件基线 |
-| [observations/20261029_v6_live/](observations/20261029_v6_live/README.md) | 保留的历史真实模型观察（v6 数据已清理） |
+| [label_reviews/20261101_llm119_reviewed.md](label_reviews/20261101_llm119_reviewed.md) | 119 条新增候选标签人工复核记录 |
+| [observations/20261101_llm_answer_run/README.md](observations/20261101_llm_answer_run/README.md) | 新增 12 题 LLM 正式回答采集 |
+| [observations/20261101_llm_answer_run/REVIEWED.md](observations/20261101_llm_answer_run/REVIEWED.md) | 新增 12 题答案/过程复核结果 |
+| [observations/20261030_current_run/README.md](observations/20261030_current_run/README.md) | v1.1 的 20 题当前重跑 |
 
 ## 当前状态
 
 | 项目 | 数值 |
 |---|---:|
-| 开发题 / 保留题 | 16 / 4 |
-| 可答 / 拒答 | 18 / 2 |
-| 必要事实 / 证据组 | 98 / 104 |
-| 有候选标签的题 | 18（182 条，全部人工复核） |
-| 有固定池的题 | 18 |
-| 题目定义已批准 / 待审 | 20 / 0 |
+| 开发题 / 保留题 | 22 / 10 |
+| 可答 / 拒答 | 28 / 4 |
+| 必要事实 / 证据组 | 143 / 143 |
+| 候选标签 | 301 / 301 人工复核 |
+| 固定池 | 28 / 28 人工批准 |
+| 题目定义已批准 / 待审 | 32 / 0 |
 
-- 正式 R@10 覆盖 18 道可答题（62.6%）；P@5 65.0%、MRR@10 0.971、nDCG@5 0.724（P/nDCG 16 题、MRR 17 题，Top5 含未标注页）；线上对齐 R@12 62.9%，R@20 67.0% 仅诊断。Fact/Cit 仍为 0 题。
-- 暂定 Recall 覆盖 18 道可答题；暂定 Precision/MRR/nDCG 也覆盖 18 道，K≤5 稳定。
-- 全部 182 条候选标签均已人工复核；`agent_review` 与 `llm_judge` 均为 0。
-- 20 题定义全部已批准；保留集目前没有约束题和拒答题。
-- 逐题状态和每一条原文见 [CASE_INVENTORY.md](CASE_INVENTORY.md)。
+- 新增 12 题：6 开发 + 6 保留，其中 10 可答 + 2 拒答。
+- 新增 119 条候选标签全部 `human_review`；新增 10 个池全部 `basis=human_review`。
+- 新增 10 道可答题已完成 LLM 正式回答、逐事实/引用/来源/时间/拒答复核；原有 18 道可答题仍无完整答案基准。
+
+## 指标摘要
+
+> v1.1 的 20 题与 v1.2 新增的 12 题使用两份 capture，目前没有统一的 32 题全量运行，不能把两组数字直接合成一个宏平均。
+
+### v1.1 的 20 题
+
+Recall@10 62.6%、Precision@5 65.0%、MRR@10 0.971、固定池 nDCG@5 0.724；R@12 62.9%，R@20 67.0% 仅诊断。
+
+### v1.2 新增 12 题（LLM 正式回答）
+
+| 指标 | 结果 |
+|---|---:|
+| Required group recall@1 / @5 / @10 | 0.385 / 0.715 / 0.797 |
+| Precision@1 / @5 | 0.700 / 0.620 |
+| MRR@1 / @5 / @10 | 0.700 / 0.850 / 0.850 |
+| nDCG@1 / @5 | 0.567 / 0.669 |
+| Required fact recall | 0.5333（24/45） |
+| Citation support / routing / safe refusal / scope explanation | 1.000 / 1.000 / 1.000 / 1.000 |
+| Time constraint | 0.9091 |
+| Answer pass | 0.4167（5/12） |
+| Process review | 10 pass / 2 fail（A05、A07） |
 
 ## 重要边界
 
-- `approved` 只批准题目定义、来源、必要事实和回答边界，不批准候选标签、排序池或历史答案。
+- `approved` 只批准题目定义、来源、必要事实和回答边界，不批准候选标签、排序池和历史答案。
 - 未标注候选是 unknown，不是 0 分；不可评指标保持 N/A。
 - 固定池 nDCG 只在该池内成立，不是全语料理想排序。
-- 当前 `golden_dataset.json` 是单轮 PilotCase schema，不含 v6 的多臂执行协议；`dev_constraint_history_isolation` 在本数据集中只作为单轮问题存在。
+- `dev_multi_long_march_meetings` 的池覆盖 10/15 个证据组；扎西、芦花、沙窝、阿西、俄界 5 组不在 capture 命中里，不能补回池外召回。
+- 当前 `golden_dataset.json` 是单轮 PilotCase schema，不含多臂执行协议。
 - Qdrant 服务没有独立可验证的 artifact manifest，`attribution_safe=false`；embedding/切分/rerank 的单变量归因仍需补 manifest。
 
 ## 历史
 
-2026-10-29 清理后只保留：
-
-- 当前 20 题数据集及其索引、逐题清单、固定池、当前本地基线；
-- 一次历史真实模型观察 [20261029_v6_live](observations/20261029_v6_live/README.md)，用于对照；其原始 v6 标注/协议文件已不在仓库。
+- v1.0/v1.1：20 题（16 开发 + 4 保留）；v1.1 只改了查询改写和观察题归属。
+- v1.2（2026-11-01）：在 20 题上新增 12 题，形成 32 题；新增题覆盖精确事实、语义、多证据、交集/负例、约束和拒答，并补齐保留集的约束题与拒答题。

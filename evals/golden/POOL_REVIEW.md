@@ -1,8 +1,8 @@
-# 固定池口径确认单（18 个池）
+# 固定池口径确认单（v1.1 18 个 + v1.2 新增 10 个）
 
-> 2026-10-30 用户确认：批准全部 18 个池。池的 `basis` 已改为 `human_review`，SHA 已重签。
+> v1.1（2026-10-30）用户确认：批准全部 18 个池。池的 `basis` 已改为 `human_review`，SHA 已重签。
 
-本单只确认 **nDCG 的评分池**：18 道可答题各有一个固定候选池，池内成员和构造规则一经批准，就成为正式 nDCG 的分母。它不批准检索质量、不批准候选标签、也不批准答案。
+v1.1 部分只确认 **nDCG 的评分池**：18 道可答题各有一个固定候选池，池内成员和构造规则一经批准，就成为正式 nDCG 的分母。它不批准检索质量、不批准候选标签、也不批准答案。
 
 ## 构造规则
 
@@ -12,7 +12,7 @@
 4. 池内每条候选都已有一个人工相关性判断（0/1/2）；
 5. nDCG 只在池内计算，gain = 2^rel−1，discount = log2(rank+1)，重复片段只计第一次。
 
-## 18 个池
+## v1.1 的 18 个池
 
 | 题 | 分片 | 候选 | 已标 | 缺标 | 证据组 | 池内锚点组 | rel 2/1/0 | 池 SHA |
 |---|---|---:|---:|---:|---:|---:|---|---|
@@ -42,10 +42,30 @@
 - 池只覆盖三路前 5 的并集，规模 6–14 条，因此 **K=10/20 的 Precision/nDCG 不稳定**；当前只用 K≤5 的排序指标。
 - 3 个池内没有任何锚点组（`dev_semantic_investigation`、`holdout_semantic_observation`、`holdout_intersection_negative`）。这是检索召回缺口，不是池构造错误；批准池不会把这些缺口补上。
 - 池是在 r2 采集上建立的；r3 与 r2 的候选指纹逐题一致，所以池对当前 r3 仍然有效。
-- 批准后正式 nDCG 的分母是 18 道可答题；拒答题不参与排序指标。
+- v1.1 时正式 nDCG 的分母是 18 道可答题；v1.2 新增 10 个池后为 28 道。拒答题不参与排序指标。
 
 ## 确认
 
-- [x] 批准全部 18 个池，正式 nDCG 按上述规则计算
+- [x] v1.1 批准全部 18 个池，正式 nDCG 按上述规则计算
 - [ ] 只批准部分池（请写题 ID）
 - [ ] 不批准，池构造规则需要改（请写改法）
+
+## Golden v1.2 新增 10 个池（2026-11-01）
+
+> 2026-11-01 用户复核 L01–L119 全部通过；10 个新增池的 `basis` 均为 `human_review`，SHA 已重签。`dev_multi_long_march_meetings` 因 15 条长清单单独扩到三路各取前 20（37 个候选）；其余 9 题仍为三路各取前 5。
+
+| 题 | 分层 | 候选 | 已标 | 缺标 | 证据组 | 池内锚点组 | rel 2/1/0 | 池 SHA |
+|---|---|---:|---:|---:|---:|---:|---|---|
+| `dev_exact_mao_thought_party_constitution` | development | 10 | 10 | 0 | 2 | 2 | 3/0/7 | `360acbdf1e95` |
+| `holdout_exact_founding_ceremony` | holdout | 10 | 10 | 0 | 1 | 1 | 2/1/7 | `8d02a72fd595` |
+| `dev_semantic_double_hundred` | development | 7 | 7 | 0 | 3 | 2 | 3/4/0 | `eef94d8a80c9` |
+| `holdout_semantic_angang_constitution` | holdout | 10 | 10 | 0 | 1 | 1 | 4/1/5 | `7b6638c89d3b` |
+| `dev_multi_long_march_meetings` | development | 37 | 37 | 0 | 15 | 10 | 11/4/22 | `02e2e488bbd3` |
+| `holdout_multi_two_bombs_satellite` | holdout | 9 | 9 | 0 | 6 | 4 | 3/2/4 | `07a7156723f3` |
+| `dev_intersection_zhu_peng_command` | development | 9 | 9 | 0 | 1 | 1 | 4/0/5 | `7db32ea901d9` |
+| `holdout_intersection_mao_zhu_jinggangshan` | holdout | 10 | 10 | 0 | 1 | 1 | 3/3/4 | `8cc4ea41bfb9` |
+| `dev_constraint_korean_war_decision` | development | 9 | 9 | 0 | 4 | 4 | 5/3/1 | `790d138052e1` |
+| `holdout_constraint_nanchang_uprising_background` | holdout | 8 | 8 | 0 | 5 | 5 | 2/1/5 | `ef9b83237c09` |
+| **合计** |  | **119** | **119** | **0** | — | **31** | — | — |
+
+新增池合计：10 个池、119 个候选、119 条人工标签、缺标 0；所有池只用于池内 nDCG，不是全语料理想排序。

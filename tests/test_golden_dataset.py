@@ -24,22 +24,22 @@ def _load() -> dict:
     return json.loads(DATASET.read_text(encoding="utf8"))
 
 
-def test_golden20_has_expected_counts_and_no_deleted_cases() -> None:
+def test_golden_v1_2_has_expected_counts_and_no_deleted_cases() -> None:
     dataset = PilotDataset.model_validate(_load())
-    assert len(dataset.cases) == 20
-    assert sum(case.split == "development" for case in dataset.cases) == 16
-    assert sum(case.split == "holdout" for case in dataset.cases) == 4
-    assert sum(case.answerability == "answerable" for case in dataset.cases) == 18
-    assert sum(case.answerability == "unanswerable" for case in dataset.cases) == 2
-    assert sum(len(case.facts) for case in dataset.cases) == 98
-    assert sum(len(case.evidence_groups) for case in dataset.cases) == 104
-    assert sum(len(case.judgments) for case in dataset.cases) == 182
-    assert sum(case.human_review.status == "approved" for case in dataset.cases) == 20
+    assert len(dataset.cases) == 32
+    assert sum(case.split == "development" for case in dataset.cases) == 22
+    assert sum(case.split == "holdout" for case in dataset.cases) == 10
+    assert sum(case.answerability == "answerable" for case in dataset.cases) == 28
+    assert sum(case.answerability == "unanswerable" for case in dataset.cases) == 4
+    assert sum(len(case.facts) for case in dataset.cases) == 143
+    assert sum(len(case.evidence_groups) for case in dataset.cases) == 143
+    assert sum(len(case.judgments) for case in dataset.cases) == 301
+    assert sum(case.human_review.status == "approved" for case in dataset.cases) == 32
     assert all(case.human_review.status == "approved" for case in dataset.cases)
     assert not {case.id for case in dataset.cases} & DELETED
 
 
-def test_golden20_rewritten_questions_and_evidence_shapes() -> None:
+def test_golden_v1_2_rewritten_questions_and_evidence_shapes() -> None:
     dataset = PilotDataset.model_validate(_load())
     by_id = {case.id: case for case in dataset.cases}
 
@@ -77,11 +77,11 @@ def test_golden20_rewritten_questions_and_evidence_shapes() -> None:
     assert len(liu_deng.evidence_groups) == 4
 
 
-def test_golden20_candidate_labels_cover_all_answerable_cases() -> None:
+def test_golden_v1_2_candidate_labels_cover_all_answerable_cases() -> None:
     dataset = PilotDataset.model_validate(_load())
     labelled = {case.id for case in dataset.cases if case.judgments}
-    assert len(labelled) == 18
-    assert sum(len(case.judgments) for case in dataset.cases) == 182
+    assert len(labelled) == 28
+    assert sum(len(case.judgments) for case in dataset.cases) == 301
     assert sum(
         judgment.basis == "llm_judge"
         for case in dataset.cases
@@ -91,7 +91,7 @@ def test_golden20_candidate_labels_cover_all_answerable_cases() -> None:
         judgment.basis == "human_review"
         for case in dataset.cases
         for judgment in case.judgments
-    ) == 182
+    ) == 301
     assert sum(
         judgment.basis == "agent_review"
         for case in dataset.cases

@@ -1,6 +1,8 @@
 # LLM 答案与过程人工复核队列（A01–A12）
 
 > 2026-11-01 生成。数据来自 `data/reports/golden12_llm_20261101/capture.json`（12 题，LLM 正式回答）。候选标签和固定池已人工批准；本队列用于答案与过程复核。
+>
+> 本文件是复核工作稿；A01/A02 的勾选为工作笔记，最终事实判断以 [REVIEWED.md](REVIEWED.md) 和 `data/reports/golden12_llm_20261101/reviewed/answer_reviews.json` 为准。
 
 回复格式：
 
@@ -113,25 +115,25 @@ A12 refusal safe_refusal pass scope_explanation pass
 事实：
 
 - `seven_congress_dates`：中共七大于1945年4月23日至6月11日召开
-  - 事实状态：[ ] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
-  - 引用支持：[ ] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
+  - 事实状态：[covered ] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
+  - 引用支持：[ supported ] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
   - 答案摘录/引用：______
 - `mao_thought_written_into_charter`：七大通过的党章把毛泽东思想确立为党的指导思想并写入党章
-  - 事实状态：[ ] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
-  - 引用支持：[ ] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
+  - 事实状态：[ covered] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
+  - 引用支持：[supported ] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
   - 答案摘录/引用：______
 
 维度：
 
-- citation_support：[ ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
-- source_constraint：[ ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
-- time_constraint：[ ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
-- routing：[ ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
+- citation_support：[ pass] pass　[ ] fail　[ ] unknown　[ ] not_applicable
+- source_constraint：[ pass] pass　[ ] fail　[ ] unknown　[ ] not_applicable
+- time_constraint：[ pass] pass　[ ] fail　[ ] unknown　[ ] not_applicable
+- routing：[pass ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
 - safe_refusal / scope_explanation：可答题目通常为 `not_applicable`，除非回答涉及拒答或范围说明
 
 过程：
 
-- query understanding：[ ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
+- query understanding：[pass ] pass　[ ] fail　[ ] unknown　[ ] not_applicable
 - 理由：______
 
 ---
@@ -185,12 +187,12 @@ A12 refusal safe_refusal pass scope_explanation pass
 事实：
 
 - `founding_time_place`：开国大典于1949年10月1日下午3时在北京天安门广场举行
-  - 事实状态：[ ] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
-  - 引用支持：[ ] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
+  - 事实状态：[ covered] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
+  - 引用支持：[ supported] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
   - 答案摘录/引用：______
 - `founding_declaration`：毛泽东在天安门城楼上宣告中华人民共和国中央人民政府成立
-  - 事实状态：[ ] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
-  - 引用支持：[ ] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
+  - 事实状态：[ covered] covered　[ ] partial　[ ] missing　[ ] contradicted　[ ] unknown
+  - 引用支持：[ supported] supported　[ ] partial　[ ] unsupported　[ ] unknown　[ ] not_applicable
   - 答案摘录/引用：______
 
 维度：

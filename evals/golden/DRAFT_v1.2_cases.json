@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "version": "v1.2-draft-20261101",
-  "description": "Golden v1.2 draft: 12 proposed cases (6 development, 6 holdout). Evidence quotes are extracted from processed pages; judgments and ranking pools are intentionally not built yet, and human review is pending.",
-  "annotation_status": "draft_pending_human_review",
+  "version": "v1.2-merged-20261101",
+  "description": "Golden v1.2 source draft: 12 cases merged into golden_dataset.json on 2026-11-01. Kept as the source record; the authoritative dataset is golden_dataset.json.",
+  "annotation_status": "merged_into_golden_v1_2",
   "evidence_group_semantics": {
     "facts_to_groups": "AND：一条事实列出的 evidence_group_ids 需全部命中。",
     "group_alternatives": "OR：同一 evidence group 的任一 alternative 命中即可，一条只算一次。",

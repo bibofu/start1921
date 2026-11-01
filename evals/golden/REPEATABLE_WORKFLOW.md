@@ -1,6 +1,6 @@
-# Golden 20 题评测流程
+# Golden 32 题评测流程
 
-当前数据集：[golden_dataset.json](golden_dataset.json)。它是单轮 PilotCase schema，16 开发 + 4 保留，18 可答 + 2 拒答。没有多臂执行协议；`dev_constraint_history_isolation` 在本数据集中只作为单轮问题。
+当前数据集：[golden_dataset.json](golden_dataset.json)。它是单轮 PilotCase schema，22 开发 + 10 保留，28 可答 + 4 拒答。没有多臂执行协议；`dev_constraint_history_isolation` 在本数据集中只作为单轮问题。
 
 ## 1. 采集
 
@@ -19,7 +19,7 @@
 
 ## 1.1 候选池与 LLM 预标
 
-当前 `ranking_pools.json` 有 18 个池，覆盖全部可答题；182 条候选标签全部为 `human_review`；`agent_review` 与 `llm_judge` 均为 0。
+当前 `ranking_pools.json` 有 28 个池，覆盖全部可答题；301 条候选标签全部为 `human_review`；`agent_review` 与 `llm_judge` 均为 0。
 
 复现/扩展命令：
 
@@ -64,7 +64,7 @@ LLM 与 Agent 标签的复核记录见 [label_reviews/](label_reviews/)。复核
 
 - 暂定分数允许 Agent 标签；正式分数只接受人工批准题目和人工标签/答案。
 - 未标注候选是 unknown，不是 0 分；不可评指标保持 N/A。
-- 18 道可答题都有候选标签/固定池，但 K=10/20 受池大小限制，Precision/nDCG 只在 K≤5 稳定。
+- 28 道可答题都有候选标签/固定池，但 K=10/20 受池大小限制，Precision/nDCG 只在 K≤5 稳定；K=10 目前只有长征题池可评。
 
 ## 5. 比较
 
