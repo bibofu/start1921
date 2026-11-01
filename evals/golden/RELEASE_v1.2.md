@@ -68,17 +68,21 @@
 - 运行：90 次 HTTP 调用全部成功，0 degraded，285,890 Token；27 题 LLM 回答，5 题 `not_applicable`。
 - 详见 [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md)。
 
-### 新增 12 题答案复核（另一份 capture）
+### v1.2 统一 32 题答案/过程复核
 
 | 指标 | 结果 |
 |---|---:|
-| Required fact recall | 0.5333（24/45） |
-| Citation support / routing / safe refusal / scope explanation | 1.000 / 1.000 / 1.000 / 1.000 |
-| Time constraint | 0.9091（10/11 适用题） |
-| Answer pass | 0.4167（5/12） |
-| Process review | 10 pass / 2 fail（A05、A07） |
+| Required fact recall | **0.4085**（58/143 covered；报告分母 142） |
+| Citation support | **0.7667**（23/30 适用题） |
+| Source constraint | **1.0000** |
+| Time constraint | **0.9583**（23/24 适用题） |
+| Routing | **1.0000** |
+| Safe refusal | **1.0000** |
+| Scope explanation | **0.7500**（3/4 拒答题） |
+| Answer pass | **0.3438**（11/32） |
+| Process review | **28 pass / 4 fail** |
 
-统一 32 题 capture 的 answer/process 复核尚未完成，因此 `approved_answer_aggregate` 为空。
+详见 [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。本轮使用 LLM fact/citation judge 预标 + 规则归类，用户授权继续；高风险题建议抽检。
 
 ## 使用规则
 
@@ -90,8 +94,9 @@
 
 ## 已知缺口
 
-- 统一 32 题 capture 的 answer/process 复核尚未完成；Fact/Cit 只有新增 10 题有分母，统一 capture 的 `approved_answer_aggregate` 为空。
-- 原有 18 道可答题仍没有完整答案/引用/来源/时间复核。
+- 7 题 `citation_support` fail：2 题无引用，5 题存在未获引用支持的主张；建议优先抽检。
+- 4 题过程 fail：`holdout_intersection_negative`、`holdout_intersection_positive`、`dev_intersection_zhu_peng_command` 为 planner 回退；`dev_multi_long_march_meetings` 为时间窗过宽。
+- `dev_refusal_einstein` 的 `scope_explanation` 错误地说 1925 年超出 1921—1978 范围；应按缺乏可核实任职证据拒答。
 - `dev_multi_long_march_meetings` 的 5 个证据组不在 capture 命中里：扎西、芦花、沙窝、阿西、俄界。
 - P@5/nDCG@5 只有 17 题可评；生产 final 命中含池外未标注页。
 - K=10/20 的 P/nDCG 受池大小限制；除长征题外，池只有 7–10 个候选。

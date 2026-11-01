@@ -19,6 +19,7 @@
 | [observations/20261101_llm_answer_run/README.md](observations/20261101_llm_answer_run/README.md) | 新增 12 题 LLM 正式回答采集 |
 | [observations/20261101_llm_answer_run/REVIEWED.md](observations/20261101_llm_answer_run/REVIEWED.md) | 新增 12 题答案/过程复核结果 |
 | [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md) | v1.2 统一 32 题基线 |
+| [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md) | v1.2 统一 32 题答案/过程复核 |
 | [observations/20261030_current_run/README.md](observations/20261030_current_run/README.md) | v1.1 的 20 题当前重跑 |
 
 ## 当前状态
@@ -34,7 +35,7 @@
 
 - 新增 12 题：6 开发 + 6 保留，其中 10 可答 + 2 拒答。
 - 新增 119 条候选标签全部 `human_review`；新增 10 个池全部 `basis=human_review`。
-- 新增 10 道可答题已完成 LLM 正式回答、逐事实/引用/来源/时间/拒答复核；原有 18 道可答题仍无完整答案基准。
+- 统一 32 题已完成答案/过程复核：27 题为 LLM 回答，5 题为抽取式或无证据；新增 10 题与原有 18 题都有答案分母。
 
 ## 指标摘要
 
@@ -53,17 +54,21 @@
 - K=10/20 的 P/nDCG 只有长征题 1 题可评。
 - 详见 [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md)。
 
-### 新增 12 题答案复核（另一份 capture）
+### v1.2 统一 32 题答案/过程复核
 
 | 指标 | 结果 |
 |---|---:|
-| Required fact recall | 0.5333（24/45） |
-| Citation support / routing / safe refusal / scope explanation | 1.000 / 1.000 / 1.000 / 1.000 |
-| Time constraint | 0.9091 |
-| Answer pass | 0.4167（5/12） |
-| Process review | 10 pass / 2 fail（A05、A07） |
+| Required fact recall | **0.4085**（58/143 covered） |
+| Citation support | **0.7667**（23/30） |
+| Source constraint | **1.0000** |
+| Time constraint | **0.9583**（23/24） |
+| Routing | **1.0000** |
+| Safe refusal | **1.0000** |
+| Scope explanation | **0.7500**（3/4） |
+| Answer pass | **0.3438**（11/32） |
+| Process review | **28 pass / 4 fail** |
 
-统一 32 题 capture 的 answer/process 复核尚未完成；`approved_answer_aggregate` 为空。
+高风险：7 题 citation fail、4 题 process fail、`dev_refusal_einstein` scope 说明错误。详见 [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。
 
 ## 重要边界
 

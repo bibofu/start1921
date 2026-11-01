@@ -58,7 +58,8 @@
 - 线上对齐 Recall@12：0.6849（28 题）。
 - P@5/nDCG@5 只有 17 题可评，因为生产 final 命中里有多条候选不在固定池内，按 unknown 处理，不按 0 分。
 - K=10/20 的 Precision/nDCG 只有长征题 1 题可评，池大小不足。
-- `approved_answer_aggregate` 为空：这份统一 capture 还没有 answer/process 复核；新增 12 题的答案指标来自另一份 12 题 capture，见 [20261101_llm_answer_run/REVIEWED.md](../20261101_llm_answer_run/REVIEWED.md)。
+- 正式答案/过程复核已完成：`required_fact_recall=0.4085`（58/143）、`citation_support=0.7667`、`time_constraint=0.9583`、`scope_explanation=0.7500`、`answer_pass=0.3438`；过程 28 pass / 4 fail。
+- 复核记录：[REVIEWED.md](REVIEWED.md)。本轮使用 LLM fact/citation judge 预标 + 规则归类，用户授权继续；高风险题已单列，建议抽检。
 
 ## 身份与注意
 
