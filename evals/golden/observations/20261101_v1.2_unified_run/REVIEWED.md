@@ -1,12 +1,13 @@
-# 2026-11-01 Golden v1.2 统一 32 题答案/过程复核
+# 2026-11-01 Golden v1.2 统一 32 题答案/过程复核（LLM judge provisional）
 
-- 复核人：`user_in_current_chat`
-- 复核方式：LLM fact/citation judge 预标 + 规则归类；用户授权继续。高风险题已单列，建议后续人工抽检。
-- 复核包：`data/reports/golden32_v1.2_20261101/reviews/`
-- 导入结果：`data/reports/golden32_v1.2_20261101/reviewed/`
-- 正式评分：`data/reports/golden32_v1.2_20261101/report_approved.json`
+- 复核方式：`fact-coverage-v1` + `citation-entailment-v1` LLM judge 预标 + 规则归类，写入 `basis=agent_review`；**不是 human_review**。
+- 复核包：`data/reports/golden32_v1.2_20261101/reviews_llm/`
+- 导入结果：`data/reports/golden32_v1.2_20261101/reviewed_llm/`
+- 评分报告：`data/reports/golden32_v1.2_20261101/report_llm_judge.json`
+- 人工校准队列：[CALIBRATION_QUEUE.md](CALIBRATION_QUEUE.md)（C01–C12）
+- 注意：`approved_answer_aggregate` 为 `null`；下表是 `provisional_answer_aggregate`，不能当作人工批准的 Golden 答案结果。
 
-## 正式答案指标
+## LLM judge provisional 答案指标
 
 | 指标 | 结果 |
 |---|---:|
@@ -87,6 +88,6 @@
 
 ## 结论
 
-- 统一 32 题的检索/排序和答案/过程指标现在都有正式分母。
+- 统一 32 题的检索/排序指标是正式分母；答案/过程指标目前是 **LLM judge provisional**，`approved_answer_aggregate` 为空。
 - 答案层的主要问题是**事实完整性**（covered 58/143）和 **5 题引用支持失败**，不是拒答安全。
-- 建议优先人工抽检：7 个 citation fail 题、4 个 process fail 题、`dev_refusal_einstein` 的 scope 理由。
+- 建议先按 [CALIBRATION_QUEUE.md](CALIBRATION_QUEUE.md) 人工校准 C01–C12，再决定 judge 是否可用于全量回归。

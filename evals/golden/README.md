@@ -19,7 +19,8 @@
 | [observations/20261101_llm_answer_run/README.md](observations/20261101_llm_answer_run/README.md) | 新增 12 题 LLM 正式回答采集 |
 | [observations/20261101_llm_answer_run/REVIEWED.md](observations/20261101_llm_answer_run/REVIEWED.md) | 新增 12 题答案/过程复核结果 |
 | [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md) | v1.2 统一 32 题基线 |
-| [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md) | v1.2 统一 32 题答案/过程复核 |
+| [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md) | v1.2 统一 32 题答案/过程复核（LLM judge provisional） |
+| [observations/20261101_v1.2_unified_run/CALIBRATION_QUEUE.md](observations/20261101_v1.2_unified_run/CALIBRATION_QUEUE.md) | LLM judge 人工校准队列 C01–C12 |
 | [observations/20261030_current_run/README.md](observations/20261030_current_run/README.md) | v1.1 的 20 题当前重跑 |
 
 ## 当前状态
@@ -54,7 +55,7 @@
 - K=10/20 的 P/nDCG 只有长征题 1 题可评。
 - 详见 [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md)。
 
-### v1.2 统一 32 题答案/过程复核
+### v1.2 统一 32 题答案/过程复核（LLM judge provisional）
 
 | 指标 | 结果 |
 |---|---:|
@@ -68,7 +69,8 @@
 | Answer pass | **0.3438**（11/32） |
 | Process review | **28 pass / 4 fail** |
 
-高风险：7 题 citation fail、4 题 process fail、`dev_refusal_einstein` scope 说明错误。详见 [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。
+高风险：7 题 citation fail、4 题 process fail、`dev_refusal_einstein` scope 说明错误。  
+`approved_answer_aggregate` 为空；需按 [CALIBRATION_QUEUE.md](observations/20261101_v1.2_unified_run/CALIBRATION_QUEUE.md) 人工校准 C01–C12 后再升级。详见 [REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。
 
 ## 重要边界
 

@@ -68,7 +68,7 @@
 - 运行：90 次 HTTP 调用全部成功，0 degraded，285,890 Token；27 题 LLM 回答，5 题 `not_applicable`。
 - 详见 [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md)。
 
-### v1.2 统一 32 题答案/过程复核
+### v1.2 统一 32 题答案/过程复核（LLM judge provisional）
 
 | 指标 | 结果 |
 |---|---:|
@@ -82,7 +82,7 @@
 | Answer pass | **0.3438**（11/32） |
 | Process review | **28 pass / 4 fail** |
 
-详见 [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。本轮使用 LLM fact/citation judge 预标 + 规则归类，用户授权继续；高风险题建议抽检。
+详见 [observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。本轮使用 `fact-coverage-v1` + `citation-entailment-v1` LLM judge 预标，写入 `basis=agent_review`；`approved_answer_aggregate` 为空。需先按 [CALIBRATION_QUEUE.md](observations/20261101_v1.2_unified_run/CALIBRATION_QUEUE.md) 人工校准 C01–C12。
 
 ## 使用规则
 

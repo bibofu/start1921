@@ -50,10 +50,10 @@
 | Precision@K | **28 道可答题** | 28 个池全部人工批准；统一 32 题运行中 P@5 可评 17 题，K=10 仅 1 题；生产 final 命中含池外未知页，按 unknown 处理 |
 | MRR@K | **28 道可答题** | 统一运行中 MRR@10 可评 26 题 |
 | 固定池 nDCG@K | **28 道可答题** | 统一运行中 nDCG@5 可评 17 题；K=10 仅长征题池（37 个候选）可评 |
-| Fact/Cit | **28 道可答题 + 4 道拒答题** | 统一 32 题已完成逐事实/引用/来源/时间/拒答复核；拒答题不参与 Fact 分母，但参与 safe_refusal/scope_explanation |
+| Fact/Cit | **28 道可答题 + 4 道拒答题（LLM judge provisional）** | 统一 32 题已有 fact/citation judge 预标；`approved_answer_aggregate` 仍为空，需人工校准 C01–C12 |
 | 正式 R | **28 道可答题** | 32 道批准题去掉 4 道拒答 |
 | 正式 P@5 / MRR@10 / nDCG@5 | **17 / 26 / 17 题** | 受生产 final 池外未标注页影响；不可评题不按 0 分 |
-| 正式 Fact / Cit | **28 题** | 28 道可答题都有答案复核；拒答题单独评 safe_refusal/scope_explanation |
+| 正式 Fact / Cit | **28 题（provisional）** | 当前是 LLM judge `agent_review`；人工校准后才有 approved 口径 |
 
 301 条候选标签全部为 `human_review`；`agent_review` 与 `llm_judge` 均已清零。28 个固定池全部 `basis=human_review`。
 
@@ -85,7 +85,7 @@ Report：`data/reports/golden32_v1.2_20261101/report.json`
 - K=10/20 的 Precision/nDCG 只有长征题 1 题可评，池大小不足。
 - 运行：90 次 HTTP 调用全部成功，0 degraded，285,890 Token；27 题 LLM 回答，5 题 `not_applicable`（2 拒答 + 2 无证据 + `dev_semantic_contradiction` 抽取式超长回答）。
 
-### v1.2 统一 32 题答案/过程复核
+### v1.2 统一 32 题答案/过程复核（LLM judge provisional）
 
 | 指标 | 结果 |
 |---|---:|
@@ -99,14 +99,15 @@ Report：`data/reports/golden32_v1.2_20261101/report.json`
 | Answer pass | **0.3438**（11/32） |
 | Process review | **28 pass / 4 fail** |
 
-详细记录：[observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。本轮使用 LLM fact/citation judge 预标 + 规则归类，用户授权继续；高风险题已单列，建议抽检。
+详细记录：[observations/20261101_v1.2_unified_run/REVIEWED.md](observations/20261101_v1.2_unified_run/REVIEWED.md)。本轮使用 LLM fact/citation judge 预标 + 规则归类，写入 `basis=agent_review`；`approved_answer_aggregate` 为空。人工校准队列：[CALIBRATION_QUEUE.md](observations/20261101_v1.2_unified_run/CALIBRATION_QUEUE.md)。
 
 ## 当前缺口
 
-1. `dev_multi_long_march_meetings` 仍有 5 个证据组不在 capture 命中里（扎西、芦花、沙窝、阿西、俄界）；池内覆盖 10/15，池外召回缺失不能补回。
-2. 7 题 citation_support fail（2 题无引用、5 题存在未获引用支持的主张）；建议优先人工抽检。
-3. 4 题过程 fail（3 题 query planner 回退 + 长征题时间窗过宽）。
-4. `dev_refusal_einstein` 的 `scope_explanation` 错误地说 1925 超出 1921—1978 范围；应按缺乏可核实任职证据拒答。
-5. K=10/20 的 P/nDCG 受池大小限制；除长征题外，池只有 7–10 个候选。
-6. `dev_semantic_contradiction` 在统一采集中走了 26,827 字符的抽取式回答，建议单独排查。
-7. Qdrant 服务仍没有独立可验证的 artifact manifest，`attribution_safe=false`；embedding/切分/rerank 的单变量归因仍需补 manifest。
+1. 答案/过程 review 当前是 `agent_review`（LLM judge 预标 + 规则归类），`approved_answer_aggregate` 为空；需按 C01–C12 人工校准后再升级为 approved。
+2. `dev_multi_long_march_meetings` 仍有 5 个证据组不在 capture 命中里（扎西、芦花、沙窝、阿西、俄界）；池内覆盖 10/15，池外召回缺失不能补回。
+3. 7 题 citation_support fail（2 题无引用、5 题存在未获引用支持的主张）；建议优先人工抽检。
+4. 4 题过程 fail（3 题 query planner 回退 + 长征题时间窗过宽）。
+5. `dev_refusal_einstein` 的 `scope_explanation` 错误地说 1925 超出 1921—1978 范围；应按缺乏可核实任职证据拒答。
+6. K=10/20 的 P/nDCG 受池大小限制；除长征题外，池只有 7–10 个候选。
+7. `dev_semantic_contradiction` 在统一采集中走了 26,827 字符的抽取式回答，建议单独排查。
+8. Qdrant 服务仍没有独立可验证的 artifact manifest，`attribution_safe=false`；embedding/切分/rerank 的单变量归因仍需补 manifest。
