@@ -100,17 +100,16 @@
       "reference_answer": "1945年，中共七大（1945年4月23日至6月11日）通过的《中国共产党党章》把毛泽东思想确立为党的指导思想并写入党章。",
       "review_notes": [
         "语料只明确到七大/七大党章，未单列党章通过的具体日；答案写到七大和1945年，不硬写6月11日。",
-        "页码和引文需PDF视觉复核。",
-        "当前候选池未覆盖以下证据组的页级锚点：seven_congress_1945。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
+        "页码和引文需PDF视觉复核。"
       ],
       "judgments": [
         {
           "unit_id": "d522ec1b5e0298421f667661194f484aea3d9a7ccb4ada7491c9e2591851782a",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确提到七大确立毛泽东思想为党的指导思想并写入党章，直接支持mao_thought_in_charter_1945。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "mao_thought_in_charter_1945"
           ]
@@ -118,83 +117,88 @@
         {
           "unit_id": "49caabc168124d0cdc9625146a266a4a2d0551e524cf51b9f4f18eff4f8593e6",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及九大准备和修改党章，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "f55ec618edefcd1f08448268582312405977aae08e0ff0f659d63cb59b510ea6",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确提到七大召开日期和党章规定毛泽东思想为一切工作的指针，直接支持两个证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "seven_congress_1945",
+            "mao_thought_in_charter_1945"
+          ]
         },
         {
           "unit_id": "5830271726b75e9814a9ed8374083844c42a807ac6a41ed45ed062b643c13964",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及1954年关于毛泽东思想提法的通知，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "75276ac37ca2e0f8b21ae2ae21b6875abd403f7e36c2fd2dcf451f464781ead7",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及九大筹备和革委会，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "f7f1876093cd2d16bd5776c5c2227a1349317e42cd8e14b035868ddcecea1f3b",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及1967年教育革命和韶山活动，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "8840844d440cd829c6c5a30c2667b7062e6497db937fa1d390571d081b049c37",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及1943年整风等，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "6817d1ca518f575e8267cc094efa8386d2b2fc1813785ac2b67b6ac91b959816",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及1924年国民党一大，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "5b32ea04b63138518933da1cf51520a86b9834327209839d4c8868633fecc13f",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及八大预备会议，与七大无关，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "0fcd4fa8d5ccd9101d4a9c63d1b85a5053d73ff4c8bd0ed25fb82e13d72456fb",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确提到七大修改党章报告确定毛泽东思想为一切工作的指针，直接支持mao_thought_in_charter_1945。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:40.591851+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "mao_thought_in_charter_1945"
+          ]
         }
       ]
     },
@@ -289,93 +293,95 @@
         {
           "unit_id": "fba5a03bc0a33a42b4e8aee1b83d2679b97d988e945b22d7eb1eec69b36264c8",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确写出1949年10月1日下午3时在天安门广场举行开国大典，并提及毛泽东宣告，直接支持必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "founding_ceremony_1949"
           ]
         },
         {
           "unit_id": "647408cdddf35b5e3efa1825921663f95071b896ca5f669946c01956cda98999",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提到开国大典筹备委员会及议程，但未给出具体时间和地点，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "169f47d90de971ba6a01dc098a20389e22aa12dda3fca10f4d41254388c9aff5",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1950年事务，仅注释提及丁张秀清参加开国大典游行，无时间地点细节，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "f9bb6e786c038c370ed9087cfc997088c12eb7e867e78fca85b525764f309755",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1971年讲话，仅提及袁文才儿子和王佐儿子被邀请参加开国大典，无时间地点细节，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "d44e2b000ce79d70d97851ba887830727c61fe542170b945d374799f51c06a0c",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确写出10月1日出席在天安门广场举行的开国大典，支持地点和事件。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "founding_ceremony_1949"
+          ]
         },
         {
           "unit_id": "c19f34b4cfbb7ae7a60d82955a02ebb18df7c788dbd098cb51982035d925d9b5",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为外交接见，与开国大典无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "2f1a785d8983367173352c4e698aa6bb67fc27002ad59ad95e0a37f4c6b67bd6",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1958年事务，与开国大典无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "f088575d3ee745a506799c46f9374f1a288db65b76febd6e2a2ee2de3292038a",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1959年国庆十周年庆典，非1949年开国大典，时间不符。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "fff1bf1205054ed28fe34b1ec2b057161adaf68bebd2cd0b837d63404cbb43f2",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1946年国大相关，与开国大典无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "488191b1994fadddf8eab39f076f63ea8deb7cd280442f5ef16ad929985f2bd5",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1960年事务，与开国大典无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:49.629587+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -509,74 +515,77 @@
       "reference_answer": "新中国成立后头几年，科学文化领域受苏联学术批评中粗暴作风和教条主义影响，存在推崇一个学派、压制另一个学派、乱贴政治标签等问题。为繁荣和发展社会主义科学文化事业，党中央提出“百花齐放、百家争鸣”：艺术问题上的百花齐放，学术问题上的百家争鸣。1956年4月28日毛泽东在中央政治局扩大会议总结讲话中提出，5月2日最高国务会议正式提出。",
       "review_notes": [
         "题目只问为什么，评分主点放在原因；艺术/学术领域作为政策内容，不作为唯一得分点。",
-        "当前候选池未覆盖以下证据组的页级锚点：double_hundred_background、double_hundred_purpose。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
+        "LLM 预标后，候选池仍未覆盖以下证据组的页级锚点：double_hundred_purpose。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
       ],
       "judgments": [
         {
           "unit_id": "8f6da2ebde258656118110c27556acb6fef67b371c8863907bc74f16b638a05f",
+          "relevance": 1,
+          "reason": "涉及双百方针的阐述，但未直接说明提出背景或目的，也未提及1956年4月28日或5月2日的提出细节。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "1e6a703308f36d64881dc9ff77a299220ceccb3808fee46a70194b0b1a99f4ea",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确记载1956年5月2日最高国务会议上毛泽东正式提出双百方针，直接支持提案事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "double_hundred_proposal_1956"
           ]
         },
         {
-          "unit_id": "1e6a703308f36d64881dc9ff77a299220ceccb3808fee46a70194b0b1a99f4ea",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
           "unit_id": "663bddcc8c4551c1cc9f8ce037d0de443917ee95f6cf568e1a767a68d1f7977c",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "包含毛泽东在1956年4月28日中央政治局扩大会议总结讲话中提出双百方针的内容，直接支持提案事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "double_hundred_proposal_1956"
+          ]
         },
         {
           "unit_id": "50424481c7c652b556780b9f2b37d8d4a469f01878243b8dc08fb3fdfed5ae7c",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确提到科学文化领域受教条主义影响，以及1956年4月28日和5月2日提出双百方针，直接支持背景和提案事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
+            "double_hundred_background",
             "double_hundred_proposal_1956"
           ]
         },
         {
           "unit_id": "0e8ccf91921210dd0456c4af5f33667638bfa1f89e0be1957231341f063d9c5e",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提及双百方针的提出，但未说明具体背景、目的或提出细节，仅作为历史背景提及。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "c25d8f119b35a5c03421e1ee4fe4ea977b2d3193754f954605ab74a2361467fa",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提到双百口号的目的，但时间是1957年，且未涉及1956年提出背景或具体提案事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "e5e10796ef515f5314c480dd2fa2f57b35ba7d249178e0f372413d5e74ff6726",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "涉及双百方针提出后的反应，但未直接说明提出背景、目的或1956年提案细节。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:02:57.743684+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -673,95 +682,99 @@
         {
           "unit_id": "7e616293a4f1ef410f1b98da2a8856be9a2ef7070fb784ddfebc81a27f642ad7",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确写出两参一改三结合的具体内容：工人参加管理，干部参加劳动，改革不合理的规章制度，实行工人群众、技术人员、领导干部三结合。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "angang_constitution_1960"
           ]
         },
         {
           "unit_id": "f7b5a039630ebaa7169edfed2570e8dde87bbaf3628a37ec8567e83398593dfc",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "8389997dc267c1aaff62157f11449d0d995e78b606e2c1d9678647500e99bd2c",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "0d5788cb51b9d454d3afbff49f7cde9fcab69018a038a38830075a3a49ed795d",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "93162e33a13451b0d35e8e3214886eb2e06fdf8adf2a12b7f4683f1d9daf0cec",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "a72b8a2d36fad5f3ad5ae6296724a99f803d8b538bb11cbceb56cdf4c951eaf1",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "99981e76dd127b4b457ef81549ffbce0029d3b19db5830727e420a8816e15002",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "44be8f994463b2af745035f1b399028ca3ec995c85e7ee1202f85821deeb9330",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
-        },
-        {
-          "unit_id": "eed3fe5c804ada5c306d106f0f75f23408e68424c2ac2e42782496ca240bbc5a",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "提到两参一改三结合，并说明工人参加行政管理、改革不合理的规章制度、工人技术人员和职员结合。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "angang_constitution_1960"
           ]
         },
         {
+          "unit_id": "8389997dc267c1aaff62157f11449d0d995e78b606e2c1d9678647500e99bd2c",
+          "relevance": 2,
+          "reason": "注释中明确列出两参一改三结合的内容：干部参加劳动，工人参加管理，改革不合理的规章制度，领导干部、技术人员和工人群众三结合。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "angang_constitution_1960"
+          ]
+        },
+        {
+          "unit_id": "0d5788cb51b9d454d3afbff49f7cde9fcab69018a038a38830075a3a49ed795d",
+          "relevance": 2,
+          "reason": "明确写出两参一改三结合的内容：干部参加劳动，工人参加管理，改革不合理的规章制度；领导干部、技术管理人员和工人相结合。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "angang_constitution_1960"
+          ]
+        },
+        {
+          "unit_id": "93162e33a13451b0d35e8e3214886eb2e06fdf8adf2a12b7f4683f1d9daf0cec",
+          "relevance": 1,
+          "reason": "仅提及两参一改三结合，未展开具体内容，不足以直接支持必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a72b8a2d36fad5f3ad5ae6296724a99f803d8b538bb11cbceb56cdf4c951eaf1",
+          "relevance": 0,
+          "reason": "内容关于三五计划和三线建设，与两参一改三结合无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "99981e76dd127b4b457ef81549ffbce0029d3b19db5830727e420a8816e15002",
+          "relevance": 0,
+          "reason": "内容关于备战备荒为人民和大寨红旗渠，与两参一改三结合无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "44be8f994463b2af745035f1b399028ca3ec995c85e7ee1202f85821deeb9330",
+          "relevance": 0,
+          "reason": "内容关于国民经济调整和比例关系，与两参一改三结合无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "eed3fe5c804ada5c306d106f0f75f23408e68424c2ac2e42782496ca240bbc5a",
+          "relevance": 0,
+          "reason": "内容关于劳动模范技术革新，未提及两参一改三结合。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
           "unit_id": "b73a5c29f6fda1dd959762e3d1daa474b5ce495b5a0918175381a6c494721104",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容关于工业布局，与两参一改三结合无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:05.934193+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -1228,115 +1241,123 @@
         "15个必要事实，标注量较大；如需控制成本可改为‘战略转折会议’并缩到7个。",
         "通道、猴场、扎西、吴起镇等为常用名，语料原文多用‘中央负责人紧急会议/中央政治局会议/中央负责人会议’等表述。",
         "鸡鸣三省常委分工（1935年2月5日）可作为扎西会议簇的补充事实，当前未单列。",
-        "当前候选池未覆盖以下证据组的页级锚点：long_march_axi、long_march_bangluozhen、long_march_ejie、long_march_houchang、long_march_huili、long_march_lianghekou、long_march_liping、long_march_luhua、long_march_maoergai、long_march_shawu、long_march_shawu_standing、long_march_tongdao、long_march_wuqi、long_march_zhaxi、long_march_zunyi。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
+        "LLM 预标后，候选池仍未覆盖以下证据组的页级锚点：long_march_axi、long_march_bangluozhen、long_march_ejie、long_march_houchang、long_march_huili、long_march_lianghekou、long_march_liping、long_march_luhua、long_march_shawu、long_march_shawu_standing、long_march_tongdao、long_march_zhaxi。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
       ],
       "judgments": [
         {
           "unit_id": "17144e03f4fef7aa31439c9d991f6de3f7e6f5566037d1725564e801e11b6370",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "仅泛述长征，未提及任何具体会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "838dc7e05353ad8ef41697d1e205124a230dea9527c102ea336fa2cf4aa1981b",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1936年8月征稿《长征记》等，未提及长征期间会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "5dfccec64300bb52907c4ea08ab76ad0360d479adcffe461c4646a05fb8e073b",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确提到1935年1月在遵义召开扩大的中央政治局会议，即遵义会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_zunyi"
+          ]
         },
         {
           "unit_id": "3ea3f866cdf2c7bf09c5e29bd10358d77af88fb9e89d777352badea2988bb008",
-          "relevance": 1,
-          "reason": "Draft heuristic: same document near a required evidence page, but no exact page match.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确记载1935年1月15日至17日中央政治局在遵义召开扩大会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_zunyi"
+          ]
         },
         {
           "unit_id": "5f60f511c143053431705c817c4485bfd92affb8cb3c0225638a0a7b47faa2ad",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1936年三大主力会师，未提及长征期间会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "9b49fac829a9db9a60bc142d3cdd3a12b813b7e1cfd5955993570dd7d981d5a3",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1935年12月瓦窑堡会议相关，非长征期间会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "a907723f3ff9c21debc6d6c155f2745f74a182b7d76212a7112bc7ebbb619ec0",
-          "relevance": 1,
-          "reason": "Draft heuristic: same document near a required evidence page, but no exact page match.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "提到毛儿盖会议及中央政治局通过补充决定，明确支持毛儿盖会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_maoergai"
+          ]
         },
         {
           "unit_id": "124a8fcf757c4cc9fa5b31aab9a3034f093c9f7f6505d9d9f15eee33067ef2ef",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1936年10月三大主力会师，未提及长征期间会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "3376cf733589035f7bfcd1cd51b6bcbda2b6073c4993cdb59615f7eca24fa634",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "提到吴起镇会议批准榜罗镇会议决策，宣告长征结束，直接支持吴起镇会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_wuqi"
+          ]
         },
         {
           "unit_id": "5f950251d3ca2c822cddb51dfecf1e4533054c7bda40628f831f3bf6a49f6adc",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1935年12月瓦窑堡会议后事项，未提及长征期间会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "ff87700fdd5a56f360bf7892fb50b47b9a4be93969635c43345fe8dd73fc90b7",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为长征胜利后宁夏战役部署，未提及长征期间会议",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "f3967474ff7802b29537e2414b98ab13f1633a963b406d6e4d17d0405bef131b",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1942年整风学习等，与长征期间会议无关",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -1558,34 +1579,34 @@
       "reference_answer": "1956年制定1956—1967年科学技术发展远景规划，把原子能列为重点，并部署原子弹和导弹；1960年第一枚探空火箭和近程导弹发射成功；1964年10月16日第一颗原子弹爆炸成功；1965年中国科学家突破氢弹研制中的关键技术；1967年6月第一颗氢弹爆炸成功；1970年4月24日第一颗人造地球卫星“东方红一号”发射成功。",
       "review_notes": [
         "1967年6月17日的具体日来自《毛泽东选集》相关注释；如只用语料页 p919，可写到1967年6月。",
-        "当前候选池未覆盖以下证据组的页级锚点：two_bombs_hydrogen_1967、two_bombs_satellite_1970。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
+        "LLM 预标后，候选池仍未覆盖以下证据组的页级锚点：two_bombs_hydrogen_1967、two_bombs_satellite_1970。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
       ],
       "judgments": [
         {
           "unit_id": "cd6e0a032cb0a51c0abc73d9e5792c8fab436f8c7f5a18c57dced5ad69bf3d70",
           "relevance": 1,
-          "reason": "Draft heuristic: same document near a required evidence page, but no exact page match.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "提到东方红一号卫星和两弹一星成就，但未明确给出1970年4月24日发射日期，不足以直接支持卫星事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "3ed5b667b0d6953614aa1ed99a22450f88ab52ff6bd36c2b558f7dab9ce08307",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为注释和表彰名单，无具体事件节点，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "0a1580ed4bc0ff569f97524b765941846219c60e707607e8f4ce769a75e49cd8",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确写出1956年制定远景规划，部署原子弹和导弹，直接支持two_bombs_plan_1956。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "two_bombs_plan_1956"
           ]
@@ -1593,65 +1614,60 @@
         {
           "unit_id": "522d9fb57365fff28bccd7932e8df5e3877379a19620c8abe8fae55c601e2d72",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "仅提及钱学森个人贡献，无具体事件节点，不相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "674d9adabba4cb36f80939c88809b27204d53c1933141c68dd248b4ef5fb8465",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容与两弹一星无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "0994edc6950e7ccadebde73eccecaadc57cb963ebc5809178eeb02f4e5decf3e",
-          "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": [
-            "two_bombs_plan_1956"
-          ]
+          "relevance": 1,
+          "reason": "提到1958年提出研制人造卫星，但未涉及1970年发射成功，仅背景信息。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
         },
         {
           "unit_id": "4f46007a3a6f889b32aa5e1658ad9709082a796e25bff839ada7f5f1dd47592a",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确写出1964年10月16日第一颗原子弹爆炸成功，以及1965年突破氢弹关键技术，直接支持两个事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "two_bombs_atomic_1964",
-            "two_bombs_hydrogen_theory_1965",
-            "two_bombs_missile_1960"
+            "two_bombs_hydrogen_theory_1965"
           ]
         },
         {
           "unit_id": "049f685a99735367a2f3ac8bf07071ae8dbcecf9aca686acf7af5c58edc4fee1",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确写出1960年第一枚探空火箭和近程导弹发射成功，直接支持two_bombs_missile_1960。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
-            "two_bombs_atomic_1964",
-            "two_bombs_hydrogen_theory_1965",
             "two_bombs_missile_1960"
           ]
         },
         {
           "unit_id": "1fbcdc552a629e320a4b143bb7d40d6e968ad6839b56b2b091aa77308ee19691",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为苏联援助工业项目，与两弹一星无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:24.831952+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -1745,85 +1761,91 @@
       "judgments": [
         {
           "unit_id": "dbcc4127417d1e9fabf978b280e973251906e0bfa24b8fa3bd996cc02bcb87b1",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确记载1937年8月25日朱德任总指挥、彭德怀任副总指挥，直接支持证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "zhu_peng_eighth_route_1937"
+          ]
         },
         {
           "unit_id": "e0c334b931051b38fb74c579518947cb1f12f95de272f0beb041bd995d2923dc",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确记载1937年8月22日国民政府任命朱德为总指挥、彭德怀为副总指挥，直接支持证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "zhu_peng_eighth_route_1937"
           ]
         },
         {
           "unit_id": "7176100baa498df2eace24443aa18240345ac0a3d9addd34935f910d63c4135b",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确记载1937年8月25日朱德为总指挥、彭德怀为副总指挥，直接支持证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "zhu_peng_eighth_route_1937"
+          ]
         },
         {
           "unit_id": "29fb7a62e694a633f66cf6656cf2d54dbeb01c6c927a25afe4bae4afb5a49405",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确记载1937年8月25日朱德为总指挥、彭德怀为副总指挥，直接支持证据组。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "zhu_peng_eighth_route_1937"
+          ]
         },
         {
           "unit_id": "3b532f6bd35b317416592bab3265168ab0a3f644fb1bf363e4546e907c38464f",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1939年朱德、彭德怀等致电通报，与1937年八路军总指挥任命无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "12ce320fb5a70513f9a82c10dff380022267a4a7ad3adb77c64fbaa80262f6bf",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为彭德怀早期经历，未涉及八路军总指挥任命。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "84c5c62e37e146572ada4caef98cee36715fdf18c62739bd455e8d2861fd91db",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为彭德怀早期经历，未涉及八路军总指挥任命。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "1399c640774c67886a814e43bcd1f2093c9b23ba9e874e0c7df80d5761b52e87",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1938年军事部署，未涉及1937年八路军总指挥任命。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "5023907b72aaef5afc2f224e5c928ce7fcc5ca977643870682808c1e8e215b8b",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为抗美援朝时期彭德怀任志愿军司令员，与八路军总指挥无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:33.979885+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -1912,93 +1934,97 @@
         {
           "unit_id": "6b467d273015ea7f51c03b560b7b44cc4d830cf59f02ec1bf7025f21216e09e4",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确写出1928年4月会师、合编为工农革命军第四军、朱德任军长、毛泽东任党代表，直接支持所有必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "jinggangshan_meeting_1928"
           ]
         },
         {
           "unit_id": "cd41be32f6a79fad83380d1b1e20e0f23f973a69a01e84358fa8153936272047",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提到朱德、陈毅率部与毛泽东会师，但未提及合编部队名称和职务，仅部分支持会师事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "86c9b55f8bd09b4c022f1f2e0007c4642f795953409bd265a60f362793deb0b8",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1928年8月事件，与4月会师无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "53b0436762ce936200c9a101adf441b5912b259b477af119ef0959e34a524087",
-          "relevance": 1,
-          "reason": "Draft heuristic: same document near a required evidence page, but no exact page match.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 0,
+          "reason": "内容为1928年10月及以后事件，未涉及4月会师。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "4c03d5ddc82af5427c4e5106ee1297885fb8628c7e804b67f229aff9c0327b5f",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1928年6月事件，与4月会师无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "ceb369c522e7043d884c9dd1f2675b9362409b1efed588855bdedbe0fc2e1b2b",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确写出1928年4月会师、编为工农革命军第四军、朱德任军长、毛泽东任党代表，直接支持所有必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "jinggangshan_meeting_1928"
+          ]
         },
         {
           "unit_id": "82d4cbe46c2585b807fa1b698096dc492468ca5dc84492e307ee21539693619c",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确写出1928年5月4日宣布工农革命军第四军成立，朱德任军长，毛泽东任党代表，直接支持合编和职务事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "jinggangshan_meeting_1928"
+          ]
         },
         {
           "unit_id": "2ad285874711e3274591248f1fbef6d786c4bc2fdff75d636d8946c261c2d7a7",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "描述会师过程，但未提及合编部队名称和职务，仅部分支持会师事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "56283e988f2377f5f033e4f7b158f28246e529bff645643a215a85e85079af08",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为1928年8月事件，与4月会师无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "44016ae623c93fbce9700c0c4b710b6dd8424d70ebf1100a6eac16313d7563d0",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提到会师和成立工农革命军第四军，但未明确职务，部分支持合编事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:43.520455+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -2149,17 +2175,16 @@
       ],
       "reference_answer": "10月2日，毛泽东起草决定派遣志愿军入朝作战的长电，但当天书记处会议未取得一致意见，电稿被搁置；10月4日至5日，中央政治局扩大会议讨论并作出派遣中国人民志愿军入朝作战的决定；10月8日，毛泽东发布命令，将东北边防军组成中国人民志愿军，任命彭德怀为司令员兼政治委员；10月19日，志愿军从安东、长甸河口、集安跨过鸭绿江入朝。",
       "review_notes": [
-        "评分主点是时间顺序；不能把10月19日入朝当成决策日。",
-        "当前候选池未覆盖以下证据组的页级锚点：korean_war_order_oct8。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
+        "评分主点是时间顺序；不能把10月19日入朝当成决策日。"
       ],
       "judgments": [
         {
           "unit_id": "7cbf2160f257b0a1c796185fe6bf3768f7bf0dc1a36d1a82f0a2f700b948c55b",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确记载10月2日毛泽东起草长电及书记处会议未一致、电稿搁置；10月4-5日政治局扩大会议作出派遣志愿军决定。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "korean_war_decision_oct2",
             "korean_war_decision_oct4_5"
@@ -2167,76 +2192,82 @@
         },
         {
           "unit_id": "e72684a29a242bdebdb63ccaa5bdf81bebddd61ed38d3239ff54306ced649cdc",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "记载10月5日政治局扩大会议继续讨论并作出抗美援朝战略决策，决定彭德怀率志愿军入朝。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "korean_war_decision_oct4_5"
+          ]
         },
         {
           "unit_id": "18b8092be41323f7336c207721f553f9458a2c05c5afe453084da1bb74d0fc45",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "明确记载10月19日志愿军从安东、长甸河口、集安跨过鸭绿江入朝。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "korean_war_entry_oct19"
           ]
         },
         {
           "unit_id": "7a027bc9d0711bf3e0dc323859c2119d8796bf6715933501b43953b7c116568a",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提及10月8日中共中央作出抗美援朝保家卫国战略决策，但未说明具体命令或组成志愿军，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "b9318add384da593c4ce22591770c171728680cb9764eab0c51e0af008e3f4b5",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "明确记载10月8日毛泽东发布组成中国人民志愿军的命令，任命彭德怀为司令员兼政治委员。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "korean_war_order_oct8"
+          ]
         },
         {
           "unit_id": "e9cb8e6361028647ed5b3d36dd1aeb13ba5d4cfcd7738a63388f90b8df1dab3a",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "提及10月8日派周恩来、林彪赴苏商谈，但未直接记载组成志愿军命令或彭德怀任命，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "5ace0f5916f639b6e07704718b2c83a5d6c867aa045803e9fa9fd75512fdeab9",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
-          "supported_groups": []
+          "relevance": 2,
+          "reason": "记载10月2日毛泽东起草致斯大林电报决定派志愿军，并说明因书记处会议多数不赞成而搁置。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "korean_war_decision_oct2"
+          ]
         },
         {
           "unit_id": "e2d4eb1c0dcf06198182bd6af24b1e9484b80b741a252f1cd3c38edb886d6162",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容为8月会议讨论对策，时间不符，与10月决策无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "9cc8fdc409a0634afe33d1fa9c546be8f67b397236ea3ec2bddcf27d59fc0085",
-          "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "relevance": 1,
+          "reason": "记载10月5日周恩来出席政治局会议支持出兵，但未明确会议作出决定，仅部分相关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:03:53.301725+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
@@ -2415,80 +2446,80 @@
         {
           "unit_id": "75b9a9245071fdfd28e5da7a934dca35f3a005b90ee52dc207b0eab6b3b8e0ea",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "直接支持三个证据组：明确写出大革命失败后的严峻形势和要不要坚持革命的问题；7月中旬派李立三等赴九江准备起义；7月20日发现张发奎站在汪精卫一边，李立三等提议独立发动南昌起义。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
             "nanchang_background_failure_1927",
-            "nanchang_background_independent_1927",
-            "nanchang_background_jiujiang_1927"
+            "nanchang_background_jiujiang_1927",
+            "nanchang_background_independent_1927"
           ]
         },
         {
           "unit_id": "c2150657fdde61df5d50deb062c26f300b2b1707664cfb852f6a23153239fc05",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及广州起义和其他武装起义，与南昌起义背景无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "b32d675a530bcf8904110cebe37c7ccb547bb674a6a2f809cf960dc4c37a63b0",
           "relevance": 2,
-          "reason": "Draft heuristic: candidate page range covers a required evidence page.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "直接支持两个证据组：明确写出7月27日周恩来到南昌成立前委并决定7月30日起义；7月31日前委决定8月1日起义。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": [
-            "nanchang_background_aug1_1927",
-            "nanchang_background_front_committee_1927"
+            "nanchang_background_front_committee_1927",
+            "nanchang_background_aug1_1927"
           ]
         },
         {
           "unit_id": "b0f264934441f89c31b6a95f374926b95e0839868d73d55b5bf72c6d02a79391",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及八七会议前后的方针和秋收起义，与南昌起义背景无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "3b83c201004793e3d58e9e030c6b048fffe45f2050518a9ab062f34bd39b8627",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及社会民主党问题和人物注释，与南昌起义背景无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "637b1b98062cdd7ec219e5f53fbae040e128c80d70263d7c1aa19b921eca484f",
           "relevance": 1,
-          "reason": "Draft heuristic: same document near a required evidence page, but no exact page match.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及南昌起义后的行动和意义，与背景部分相关，但不直接支持任何必要事实。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "34086c02179ae1b752c342debab6e81c7cfca7588c9f486868c1326e9f9b920e",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及其他地区的武装起义，与南昌起义背景无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "bb3d16c8481ff0aed43eeae658f0f92bd1009622a505c1b8047128f7e3b18543",
           "relevance": 0,
-          "reason": "Draft heuristic: no required evidence page in this candidate; human review may override.",
-          "reviewer": "agent:claude_code_page_overlap_20261101",
-          "reviewed_at": "2026-11-01T00:00:00+00:00",
-          "basis": "agent_review",
+          "reason": "内容涉及其他地区的武装起义，与南昌起义背景无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:04:01.166929+00:00",
+          "basis": "llm_judge",
           "supported_groups": []
         }
       ]
