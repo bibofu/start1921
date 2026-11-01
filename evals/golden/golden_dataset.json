@@ -5578,14 +5578,15 @@
       "review_notes": [
         "题库沿用原题；将‘错误前提’保守操作化为‘当前资料无法支持所问任职’，没有使用无来源常识断言其从未加入任何党派。",
         "已实际校验17份PDF哈希，检索15112条effective page记录，并查看两个姓名命中原页；无需用这两页充当正向事实金标。",
-        "人工需裁定安全拒答+党派澄清的可接受表述。只要求澄清而不说明证据不足，不能直接视为完整通过。"
+        "人工需裁定安全拒答+党派澄清的可接受表述。只要求澄清而不说明证据不足，不能直接视为完整通过。",
+        "2026-11-01 更新 REQUIREMENTS.md 文件 SHA；三条引用仍在原行，拒答口径未改。"
       ],
       "judgments": [],
       "refusal_basis": {
         "type": "unsupported_premise_in_current_corpus",
         "project_basis": {
           "path": "REQUIREMENTS.md",
-          "file_sha256": "2b6fe88b1ef7fcf66fcc8797c2aaa0c054fa7f5c965f6053a97a03f1b20cde60",
+          "file_sha256": "00b2ec604853c3d9b509eeaa7073d45cf8329f44cef930aeb8f1a38c0e7efd23",
           "rules": [
             {
               "line": 55,

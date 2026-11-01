@@ -18,6 +18,7 @@
 | [label_reviews/20261101_llm119_reviewed.md](label_reviews/20261101_llm119_reviewed.md) | 119 条新增候选标签人工复核记录 |
 | [observations/20261101_llm_answer_run/README.md](observations/20261101_llm_answer_run/README.md) | 新增 12 题 LLM 正式回答采集 |
 | [observations/20261101_llm_answer_run/REVIEWED.md](observations/20261101_llm_answer_run/REVIEWED.md) | 新增 12 题答案/过程复核结果 |
+| [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md) | v1.2 统一 32 题基线 |
 | [observations/20261030_current_run/README.md](observations/20261030_current_run/README.md) | v1.1 的 20 题当前重跑 |
 
 ## 当前状态
@@ -37,25 +38,32 @@
 
 ## 指标摘要
 
-> v1.1 的 20 题与 v1.2 新增的 12 题使用两份 capture，目前没有统一的 32 题全量运行，不能把两组数字直接合成一个宏平均。
+### v1.2 统一 32 题基线（2026-11-01，LLM 生产管线）
 
-### v1.1 的 20 题
+| 指标 | K=1 | K=3 | K=5 | K=10 | K=20 |
+|---|---:|---:|---:|---:|---:|
+| Required group recall | 0.3116 | 0.5122 | 0.5980 | 0.6825 | 0.7600 |
+| Precision | 0.8148 | 0.7121 | 0.6471 | 0.4000 | 0.5000 |
+| MRR | 0.8148 | 0.8889 | 0.9231 | 0.9231 | 0.9231 |
+| 固定池 nDCG | 0.6667 | 0.6432 | 0.7037 | 0.3007 | 0.5168 |
 
-Recall@10 62.6%、Precision@5 65.0%、MRR@10 0.971、固定池 nDCG@5 0.724；R@12 62.9%，R@20 67.0% 仅诊断。
+- 28 道可答题参与 Recall/Precision/MRR/nDCG；4 道拒答题 N/A。
+- 线上对齐 Recall@12：0.6849（28 题）。
+- P@5/nDCG@5 可评 17 题，MRR@10 可评 26 题；池外命中按 unknown，不按 0 分。
+- K=10/20 的 P/nDCG 只有长征题 1 题可评。
+- 详见 [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md)。
 
-### v1.2 新增 12 题（LLM 正式回答）
+### 新增 12 题答案复核（另一份 capture）
 
 | 指标 | 结果 |
 |---|---:|
-| Required group recall@1 / @5 / @10 | 0.385 / 0.715 / 0.797 |
-| Precision@1 / @5 | 0.700 / 0.620 |
-| MRR@1 / @5 / @10 | 0.700 / 0.850 / 0.850 |
-| nDCG@1 / @5 | 0.567 / 0.669 |
 | Required fact recall | 0.5333（24/45） |
 | Citation support / routing / safe refusal / scope explanation | 1.000 / 1.000 / 1.000 / 1.000 |
 | Time constraint | 0.9091 |
 | Answer pass | 0.4167（5/12） |
 | Process review | 10 pass / 2 fail（A05、A07） |
+
+统一 32 题 capture 的 answer/process 复核尚未完成；`approved_answer_aggregate` 为空。
 
 ## 重要边界
 

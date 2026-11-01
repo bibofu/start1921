@@ -30,14 +30,15 @@
 | 项目 | 值 |
 |---|---|
 | 版本 | `golden-v1.2-selected-32-20261101` |
-| 数据集语义指纹 | `0a9fdcaa4e88d395378277d9e225f4dd52d7099ee33ebefbde58e7b5a796db45` |
-| 数据集文件 SHA-256 | `f58134c4e81035c3c12419d6a9ea916c7bf7e062c2b6e566d7e9c5c2c5ba2b26` |
+| 数据集语义指纹 | `5df0d4a42b41bdc4ac55d461443ce6eea24971a82c519656f707b4cb94cbec22` |
+| 数据集文件 SHA-256 | `14498c961972c01646789268b145ccac65ec511b78759dd659e6ac53fd557bf5` |
 | 固定池文件 SHA-256 | `2a50e98e879ad2313e9eaf502b8ca0307ce4de29097d4e7da51e4a2f4a13a431` |
 | 新增 12 题答案采集指纹 | `6606e314c8f156d2279fb32d834cf249ae981847a27b0cbdc9b02789633ce897` |
-| 源码指纹（答案采集时） | `ec05ca59dc895feaa9a977bf3c07c934ca8e1fd4e4173640b5e754ea989b5bf6` |
+| 统一 32 题采集指纹 | `2c0d48f3bb9e968a57a6ec06177a34b0ca045529019213d304b491bbf6168f3d` |
+| 源码指纹 | `ec05ca59dc895feaa9a977bf3c07c934ca8e1fd4e4173640b5e754ea989b5bf6` |
 | 语料指纹 | `a9225af6a1996d1721f34963cea1bdfcd5409a4a2edef73f8fbfed347dee430d` |
-| 代码基线（答案采集时） | `386fc42` |
-| 配置 | `candidate_k=30`、`top_k=20`、`answer_top_k=10`、新增题 `with_llm=true` |
+| 代码基线 | `87c105f`（统一 32 题采集时，`dirty=true`）；新增 12 题答案采集时为 `386fc42` |
+| 配置 | `candidate_k=30`、`top_k=20`、`answer_top_k=10`、`with_llm=true` |
 
 ## 规模
 
@@ -51,32 +52,33 @@
 
 ## 指标
 
-> v1.1 的 20 题与 v1.2 新增的 12 题使用两份 capture，没有统一的 32 题全量运行；以下数字不能直接合并成宏平均。
+### v1.2 统一 32 题基线（2026-11-01，LLM 生产管线）
 
-### v1.1 的 20 题
+| 指标 | K=1 | K=3 | K=5 | K=10 | K=20 |
+|---|---:|---:|---:|---:|---:|
+| Required group recall | 0.3116 | 0.5122 | 0.5980 | 0.6825 | 0.7600 |
+| Precision | 0.8148 | 0.7121 | 0.6471 | 0.4000 | 0.5000 |
+| MRR | 0.8148 | 0.8889 | 0.9231 | 0.9231 | 0.9231 |
+| 固定池 nDCG | 0.6667 | 0.6432 | 0.7037 | 0.3007 | 0.5168 |
+
+- 28 个可答题参与排序指标；4 个拒答题 N/A。
+- 线上对齐 Recall@12：0.6849（28 题）。
+- P@5/nDCG@5 可评 17 题，MRR@10 可评 26 题；生产 final 命中里的池外候选按 unknown，不按 0 分。
+- K=10/20 的 P/nDCG 只有长征题 1 题可评。
+- 运行：90 次 HTTP 调用全部成功，0 degraded，285,890 Token；27 题 LLM 回答，5 题 `not_applicable`。
+- 详见 [observations/20261101_v1.2_unified_run/README.md](observations/20261101_v1.2_unified_run/README.md)。
+
+### 新增 12 题答案复核（另一份 capture）
 
 | 指标 | 结果 |
 |---|---:|
-| Recall@10 | 62.6% |
-| Precision@5 | 65.0% |
-| MRR@10 | 0.971 |
-| 固定池 nDCG@5 | 0.724 |
-| Recall@12 / @20 | 62.9% / 67.0%（@20 仅诊断） |
-
-### v1.2 新增 12 题
-
-| 指标 | 结果 |
-|---|---:|
-| Required group recall@1 / @3 / @5 / @10 | 0.385 / 0.682 / 0.715 / 0.797 |
-| Precision@1 / @3 / @5 | 0.700 / 0.733 / 0.620 |
-| MRR@1 / @3 / @5 / @10 | 0.700 / 0.850 / 0.850 / 0.850 |
-| nDCG@1 / @3 / @5 | 0.567 / 0.648 / 0.669 |
-| P@10 / nDCG@10 | 0.400 / 0.301（仅长征题 1 题可评） |
 | Required fact recall | 0.5333（24/45） |
 | Citation support / routing / safe refusal / scope explanation | 1.000 / 1.000 / 1.000 / 1.000 |
 | Time constraint | 0.9091（10/11 适用题） |
 | Answer pass | 0.4167（5/12） |
 | Process review | 10 pass / 2 fail（A05、A07） |
+
+统一 32 题 capture 的 answer/process 复核尚未完成，因此 `approved_answer_aggregate` 为空。
 
 ## 使用规则
 
@@ -88,8 +90,10 @@
 
 ## 已知缺口
 
-- 没有统一的 32 题 capture/report；当前分两次运行。
-- 原有 18 道可答题仍没有完整答案/引用/来源/时间复核；Fact/Cit 只有新增 10 题有分母。
+- 统一 32 题 capture 的 answer/process 复核尚未完成；Fact/Cit 只有新增 10 题有分母，统一 capture 的 `approved_answer_aggregate` 为空。
+- 原有 18 道可答题仍没有完整答案/引用/来源/时间复核。
 - `dev_multi_long_march_meetings` 的 5 个证据组不在 capture 命中里：扎西、芦花、沙窝、阿西、俄界。
+- P@5/nDCG@5 只有 17 题可评；生产 final 命中含池外未标注页。
 - K=10/20 的 P/nDCG 受池大小限制；除长征题外，池只有 7–10 个候选。
+- `dev_semantic_contradiction` 在统一采集中走了 26,827 字符的抽取式回答，建议单独排查。
 - Qdrant 服务没有独立 artifact manifest。

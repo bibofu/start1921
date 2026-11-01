@@ -47,52 +47,60 @@
 | 指标 | 当前可评范围 | 说明 |
 |---|---|---|
 | 必要证据组 Recall@K | **28 道可答题** | 主指标 K=10；线上对齐 K=12；K=20 仅诊断；拒答 4 题无正向分母 |
-| Precision@K | **28 道可答题，K≤5 稳定** | 28 个池全部人工批准；按现有池与标签，P@5 可评 26 题（2 题 Top5 含未标注页，按 unknown） |
-| MRR@K | **28 道可答题** | 按现有池与标签，MRR@10 可评 27 题 |
-| 固定池 nDCG@K | **28 道可答题，K≤5 稳定** | 按现有池与标签，nDCG@5 可评 26 题；K=10 仅长征题池（37 个候选）可评 |
+| Precision@K | **28 道可答题** | 28 个池全部人工批准；统一 32 题运行中 P@5 可评 17 题，K=10 仅 1 题；生产 final 命中含池外未知页，按 unknown 处理 |
+| MRR@K | **28 道可答题** | 统一运行中 MRR@10 可评 26 题 |
+| 固定池 nDCG@K | **28 道可答题** | 统一运行中 nDCG@5 可评 17 题；K=10 仅长征题池（37 个候选）可评 |
 | Fact/Cit | **新增 10 道可答题** | 新增题有逐事实/引用/来源/时间/拒答复核；原有 18 道可答题仍无完整答案基准 |
 | 正式 R | **28 道可答题** | 32 道批准题去掉 4 道拒答 |
-| 正式 P@5 / MRR@10 / nDCG@5 | **26 / 27 / 26 题** | 受 Top5 未标注页影响；不可评题不按 0 分 |
+| 正式 P@5 / MRR@10 / nDCG@5 | **17 / 26 / 17 题** | 受生产 final 池外未标注页影响；不可评题不按 0 分 |
 | 正式 Fact / Cit | **10 题** | 仅新增 10 道可答题；原有 18 道仍 N/A |
 
 301 条候选标签全部为 `human_review`；`agent_review` 与 `llm_judge` 均已清零。28 个固定池全部 `basis=human_review`。
 
 ## 当前运行
 
-> v1.1 的 20 题与 v1.2 新增的 12 题使用了两份 capture，**目前还没有统一的 32 题全量运行**；下表分开列，不能直接合并成一个宏平均。
+### v1.2 统一 32 题（2026-11-01，LLM 生产管线）
 
-### v1.1 的 20 题（2026-10-30，本地组件）
+Capture：`data/reports/golden32_v1.2_20261101/capture.json`  
+Report：`data/reports/golden32_v1.2_20261101/report.json`  
+复核包：`data/reports/golden32_v1.2_20261101/reviews/index.html`
+
+| 指标 | K=1 | K=3 | K=5 | K=10 | K=20 |
+|---|---:|---:|---:|---:|---:|
+| Required group recall | 0.3116 | 0.5122 | 0.5980 | 0.6825 | 0.7600 |
+| Precision | 0.8148 | 0.7121 | 0.6471 | 0.4000 | 0.5000 |
+| MRR | 0.8148 | 0.8889 | 0.9231 | 0.9231 | 0.9231 |
+| 固定池 nDCG | 0.6667 | 0.6432 | 0.7037 | 0.3007 | 0.5168 |
+
+| 可评题数 | K=1 | K=3 | K=5 | K=10 | K=20 |
+|---|---:|---:|---:|---:|---:|
+| Required group recall | 28 | 28 | 28 | 28 | 28 |
+| Precision | 27 | 22 | 17 | 1 | 1 |
+| MRR | 27 | 27 | 26 | 26 | 26 |
+| 固定池 nDCG | 27 | 22 | 17 | 1 | 1 |
+
+- 28 个可答题都有正向证据组分母；4 个拒答题不参与排序指标。
+- 线上对齐 Recall@12：0.6849（28 题）。
+- P@5/nDCG@5 只有 17 题可评：生产 final 命中里有多条候选不在固定池内，按 unknown 处理，不按 0 分。
+- K=10/20 的 Precision/nDCG 只有长征题 1 题可评，池大小不足。
+- 运行：90 次 HTTP 调用全部成功，0 degraded，285,890 Token；27 题 LLM 回答，5 题 `not_applicable`（2 拒答 + 2 无证据 + `dev_semantic_contradiction` 抽取式超长回答）。
+
+### 新增 12 题答案复核（另一份 capture）
 
 | 指标 | 结果 |
 |---|---:|
-| 正式 Recall@10 | 62.6%（18 题宏平均；微平均 51/104 组） |
-| 正式 Recall@12 | 62.9% |
-| 正式 Recall@20 | 67.0% |
-| 正式 Precision@5 | 65.0% |
-| 正式 MRR@10 | 0.971 |
-| 正式固定池 nDCG@5 | 0.724 |
-
-### v1.2 新增 12 题（2026-11-01，LLM 正式回答）
-
-| 指标 | 结果 |
-|---|---:|
-| Required group recall@1 / @3 / @5 / @10 | 0.385 / 0.682 / 0.715 / 0.797 |
-| Precision@1 / @3 / @5 | 0.700 / 0.733 / 0.620 |
-| MRR@1 / @3 / @5 / @10 | 0.700 / 0.850 / 0.850 / 0.850 |
-| nDCG@1 / @3 / @5 | 0.567 / 0.648 / 0.669 |
-| P@10 / nDCG@10 | 0.400 / 0.301（仅长征题 1 题可评） |
 | Required fact recall | 0.5333（24/45） |
 | Citation support / routing / safe refusal / scope explanation | 1.000 / 1.000 / 1.000 / 1.000 |
 | Time constraint | 0.9091（10/11 适用题） |
 | Answer pass | 0.4167（5/12） |
 | Process review | 10 pass / 2 fail（A05、A07） |
 
-详细记录：[observations/20261101_llm_answer_run/REVIEWED.md](observations/20261101_llm_answer_run/REVIEWED.md)。
+详细记录：[observations/20261101_llm_answer_run/REVIEWED.md](observations/20261101_llm_answer_run/REVIEWED.md)。统一 32 题 capture 的 answer/process 复核尚未完成，因此它的 `approved_answer_aggregate` 仍为空。
 
-## 距离正式 v1.2 完整评测还差什么
+## 当前缺口
 
-1. 统一一次 32 题 capture/report；当前两份运行不能直接做同口径合并。
-2. 原有 18 道可答题的逐事实/引用/来源/时间复核；当前 Fact/Cit 只有新增 10 题有分母。
-3. `dev_multi_long_march_meetings` 仍有 5 个证据组不在 capture 命中里（扎西、芦花、沙窝、阿西、俄界）；池内覆盖 10/15，池外召回缺失不能补回。
-4. K=10/20 的 P/nDCG 受池大小限制；除长征题外，池只有 7–10 个候选。
-5. Qdrant 服务仍没有独立可验证的 artifact manifest，`attribution_safe=false`；embedding/切分/rerank 的单变量归因仍需补 manifest。
+1. 统一 32 题 capture 的 answer/process 复核尚未完成；当前 Fact/Cit 只有新增 10 题有分母，`approved_answer_aggregate` 为空。
+2. `dev_multi_long_march_meetings` 仍有 5 个证据组不在 capture 命中里（扎西、芦花、沙窝、阿西、俄界）；池内覆盖 10/15，池外召回缺失不能补回。
+3. K=10/20 的 P/nDCG 受池大小限制；除长征题外，池只有 7–10 个候选。
+4. Qdrant 服务仍没有独立可验证的 artifact manifest，`attribution_safe=false`；embedding/切分/rerank 的单变量归因仍需补 manifest。
+5. `dev_semantic_contradiction` 在统一采集中走了 26,827 字符的抽取式回答，建议单独排查。
