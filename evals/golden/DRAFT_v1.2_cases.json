@@ -1241,33 +1241,33 @@
         "15个必要事实，标注量较大；如需控制成本可改为‘战略转折会议’并缩到7个。",
         "通道、猴场、扎西、吴起镇等为常用名，语料原文多用‘中央负责人紧急会议/中央政治局会议/中央负责人会议’等表述。",
         "鸡鸣三省常委分工（1935年2月5日）可作为扎西会议簇的补充事实，当前未单列。",
-        "LLM 预标后，候选池仍未覆盖以下证据组的页级锚点：long_march_axi、long_march_bangluozhen、long_march_ejie、long_march_houchang、long_march_huili、long_march_lianghekou、long_march_liping、long_march_luhua、long_march_shawu、long_march_shawu_standing、long_march_tongdao、long_march_zhaxi。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
+        "LLM 预标后，候选池仍未覆盖以下证据组的页级锚点：long_march_axi、long_march_ejie、long_march_luhua、long_march_shawu、long_march_zhaxi。P/nDCG 只在该池内成立，受召回缺口影响；需人工复核或扩池，不能把未覆盖组当作 0 分。"
       ],
       "judgments": [
         {
           "unit_id": "17144e03f4fef7aa31439c9d991f6de3f7e6f5566037d1725564e801e11b6370",
-          "relevance": 0,
-          "reason": "仅泛述长征，未提及任何具体会议",
+          "relevance": 1,
+          "reason": "描述长征总体情况，未提及具体会议。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "838dc7e05353ad8ef41697d1e205124a230dea9527c102ea336fa2cf4aa1981b",
           "relevance": 0,
-          "reason": "内容为1936年8月征稿《长征记》等，未提及长征期间会议",
+          "reason": "内容为1936年8月关于《长征记》征稿和与二、四方面军北上，与长征期间会议无关。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "5dfccec64300bb52907c4ea08ab76ad0360d479adcffe461c4646a05fb8e073b",
           "relevance": 2,
-          "reason": "明确提到1935年1月在遵义召开扩大的中央政治局会议，即遵义会议",
+          "reason": "明确提到1935年1月在贵州遵义召开扩大的中央政治局会议，即遵义会议。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": [
             "long_march_zunyi"
@@ -1276,9 +1276,9 @@
         {
           "unit_id": "3ea3f866cdf2c7bf09c5e29bd10358d77af88fb9e89d777352badea2988bb008",
           "relevance": 2,
-          "reason": "明确记载1935年1月15日至17日中央政治局在遵义召开扩大会议",
+          "reason": "详细描述遵义会议背景、时间和参会人员，直接支持遵义会议。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": [
             "long_march_zunyi"
@@ -1287,27 +1287,168 @@
         {
           "unit_id": "5f60f511c143053431705c817c4485bfd92affb8cb3c0225638a0a7b47faa2ad",
           "relevance": 0,
-          "reason": "内容为1936年三大主力会师，未提及长征期间会议",
+          "reason": "内容为1936年三大主力红军会师，与长征期间会议无关。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "ff87700fdd5a56f360bf7892fb50b47b9a4be93969635c43345fe8dd73fc90b7",
+          "relevance": 0,
+          "reason": "内容为1936年宁夏战役部署，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "42ae7af01eb8447982b213cc92a79de7756bf23edc06b32450849f0f9b23c908",
+          "relevance": 0,
+          "reason": "描述长征行军过程，未提及具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "7753e123d4d806306617cd6a83088d63a73cc48b6a8176779ba1d074e1204526",
+          "relevance": 1,
+          "reason": "章节标题提及遵义会议，但内容为长征背景，未直接描述会议本身。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "55de4b195f3d4b98b477bc2531119d0ea37f33caeb22004e0935103db68eadce",
+          "relevance": 0,
+          "reason": "描述长征开始和第五次围剿，未提及具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8ee75969505cbc01c268a976156b3595ce426cc1967ce688696e678de00ae362",
+          "relevance": 2,
+          "reason": "明确提到1935年9月27日在榜罗镇出席中共中央政治局常委会议，并说明会议改变俄界会议决定。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_bangluozhen"
+          ]
+        },
+        {
+          "unit_id": "cada40f5a06b1bc132ac6208574c324996dbde5bde4d45bfdf78a79cb2ef6614",
+          "relevance": 0,
+          "reason": "描述长征到达陕北和统计数字，未提及具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "8c71a7869a2f18f042397d372a50067465be8f86f29140aaad94762f27050f51",
+          "relevance": 1,
+          "reason": "提及遵义会议纠正王明路线，但未详细描述会议本身。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "5f950251d3ca2c822cddb51dfecf1e4533054c7bda40628f831f3bf6a49f6adc",
+          "relevance": 0,
+          "reason": "内容为1935年12月会议和部队组建，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "42d22a5b8421a23f6bf953ab2b9547e5d1bbfc633edefc0139c316b9b6764a1e",
+          "relevance": 2,
+          "reason": "明确提到通道紧急会议、黎平会议和猴场会议，并给出时间和内容。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_tongdao",
+            "long_march_liping",
+            "long_march_houchang"
+          ]
+        },
+        {
+          "unit_id": "8f5b5b20549625f335944f67746db5819e097647bf4839c3e0582ba6ffd16139",
+          "relevance": 0,
+          "reason": "内容为南方红军三年游击战争，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "4bd08790edd532e30676de45c2390ea7a746bafa75ce33b8f88bf30d0904cb7f",
+          "relevance": 0,
+          "reason": "描述长征开始和红二十五军转移，未提及具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "0edf4afda6a26580f76d9b3cd097494c5578f5d2ea1467e8da25fa227bca5c15",
+          "relevance": 0,
+          "reason": "概述长征过程，未提及具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "f6ec1f4804e6043a6efb227489d8e799af292777658e070266e453afb7c6171e",
+          "relevance": 0,
+          "reason": "仅为长征路线示意图，无会议信息。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "a98b4c58662fd4e828b55e917c662c8ec8813dbaa409972b881f6ce3c60eb876",
+          "relevance": 1,
+          "reason": "注释提及遵义会议，但仅简要说明，未详细描述。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "37dacf9623aae997099b641362b02da17aa9d83bc3ca8b6de18b2cf107846fff",
+          "relevance": 0,
+          "reason": "内容为贺龙和红二方面军长征，未提及具体会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "9b49fac829a9db9a60bc142d3cdd3a12b813b7e1cfd5955993570dd7d981d5a3",
           "relevance": 0,
-          "reason": "内容为1935年12月瓦窑堡会议相关，非长征期间会议",
+          "reason": "内容为1935年12月瓦窑堡会议，与长征期间会议无关。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "a907723f3ff9c21debc6d6c155f2745f74a182b7d76212a7112bc7ebbb619ec0",
           "relevance": 2,
-          "reason": "提到毛儿盖会议及中央政治局通过补充决定，明确支持毛儿盖会议",
+          "reason": "提到毛儿盖会议，并说明会议精神和决定。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": [
             "long_march_maoergai"
@@ -1316,47 +1457,148 @@
         {
           "unit_id": "124a8fcf757c4cc9fa5b31aab9a3034f093c9f7f6505d9d9f15eee33067ef2ef",
           "relevance": 0,
-          "reason": "内容为1936年10月三大主力会师，未提及长征期间会议",
+          "reason": "内容为1936年三大主力会师，与长征期间会议无关。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "3376cf733589035f7bfcd1cd51b6bcbda2b6073c4993cdb59615f7eca24fa634",
           "relevance": 2,
-          "reason": "提到吴起镇会议批准榜罗镇会议决策，宣告长征结束，直接支持吴起镇会议",
+          "reason": "提到吴起镇会议，并说明会议批准榜罗镇会议决策，宣告长征结束。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": [
             "long_march_wuqi"
           ]
         },
         {
-          "unit_id": "5f950251d3ca2c822cddb51dfecf1e4533054c7bda40628f831f3bf6a49f6adc",
+          "unit_id": "395e5a9ba563961ac6aa70294f7b427ab44bd100c2e09cf03cd62a451d321d8e",
           "relevance": 0,
-          "reason": "内容为1935年12月瓦窑堡会议后事项，未提及长征期间会议",
+          "reason": "内容为1937年会议，与长征期间会议无关。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
-          "unit_id": "ff87700fdd5a56f360bf7892fb50b47b9a4be93969635c43345fe8dd73fc90b7",
-          "relevance": 0,
-          "reason": "内容为长征胜利后宁夏战役部署，未提及长征期间会议",
+          "unit_id": "20227d17575e843eade862f77691a61a125a50cf57cfd05c7fb3e0feb081233a",
+          "relevance": 2,
+          "reason": "明确提到会理会议，并说明会议内容和决定。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_huili"
+          ]
+        },
+        {
+          "unit_id": "6ef4725316353f403272b12332e1d4d99c98ab430cd8b5e5776c3a810d9b22f1",
+          "relevance": 2,
+          "reason": "提到沙窝中央政治局常委会议和毛儿盖中央政治局会议，并给出具体内容。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_shawu_standing",
+            "long_march_maoergai"
+          ]
+        },
+        {
+          "unit_id": "25db3ea5166741c49d06091e307c72d770322dc00e592bf7cbc869de0f3d6032",
+          "relevance": 2,
+          "reason": "明确提到猴场会议，并说明会议内容和决定。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_houchang"
+          ]
+        },
+        {
+          "unit_id": "165c3b758bf57d6461459bd43435385a16ffe69e06318af057ceb4aa1322ded5",
+          "relevance": 2,
+          "reason": "提到两河口会议，并说明会议精神和决定。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_lianghekou"
+          ]
+        },
+        {
+          "unit_id": "53f54e737e5fe1b936b4a6ed27712a8deafc5702592dc2faa6d4579731387c51",
+          "relevance": 0,
+          "reason": "内容为1961年会议讲话，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "79bc2224268679007b05c79cf602f6255385b6e58999f5d9d938fb39782b14d6",
+          "relevance": 0,
+          "reason": "注释提及张国焘分裂，但未涉及长征期间会议。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "5a057b4b5158e8b0bad8d67a9afa3f9c014e9962d499a546a14233ba9b857ad0",
+          "relevance": 2,
+          "reason": "提到沙窝中央政治局常委会议，并说明会议内容。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": [
+            "long_march_shawu_standing"
+          ]
+        },
+        {
+          "unit_id": "04d16b8159c0fb5ada0c0302eb2c6258c85a55b04b4470346c970c6f822e3704",
+          "relevance": 0,
+          "reason": "内容为哈达铺会议，但未在必要事实列表中。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "d7b25ef780b0eb2096b3dc78f72da9e310ea79a70636376d7569ac402c0d2331",
+          "relevance": 0,
+          "reason": "内容为1936年东征和晋西会议，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         },
         {
           "unit_id": "f3967474ff7802b29537e2414b98ab13f1633a963b406d6e4d17d0405bef131b",
           "relevance": 0,
-          "reason": "内容为1942年整风学习等，与长征期间会议无关",
+          "reason": "内容为1942年整风会议，与长征期间会议无关。",
           "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
-          "reviewed_at": "2026-11-01T01:03:15.917717+00:00",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "00b783d2c96a3903291e578297f3fd227fcd125ce2de0f618b8a8f7d0252fca7",
+          "relevance": 0,
+          "reason": "内容为1961年会议，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
+          "basis": "llm_judge",
+          "supported_groups": []
+        },
+        {
+          "unit_id": "85d23308a362a83b58a36753e2e37e1f1cc29db91a603964a3fffca1cf979178",
+          "relevance": 0,
+          "reason": "内容为1936年10月会议，与长征期间会议无关。",
+          "reviewer": "llm:deepseek-v4-pro:candidate-relevance-v1",
+          "reviewed_at": "2026-11-01T01:09:37.665980+00:00",
           "basis": "llm_judge",
           "supported_groups": []
         }
