@@ -1,0 +1,1734 @@
+{
+  "schema_version": 1,
+  "version": "v1.2-draft-20261101",
+  "description": "Golden v1.2 draft: 12 proposed cases (6 development, 6 holdout). Evidence quotes are extracted from processed pages; judgments and ranking pools are intentionally not built yet, and human review is pending.",
+  "annotation_status": "draft_pending_human_review",
+  "evidence_group_semantics": {
+    "facts_to_groups": "AND：一条事实列出的 evidence_group_ids 需全部命中。",
+    "group_alternatives": "OR：同一 evidence group 的任一 alternative 命中即可，一条只算一次。",
+    "quotes": "只删除空白后匹配；PDF 页码、文件 SHA 需与当前语料一致。"
+  },
+  "cases": [
+    {
+      "id": "dev_exact_mao_thought_party_constitution",
+      "question": "毛泽东思想什么时候写入党章？",
+      "category": "exact_fact",
+      "answerability": "answerable",
+      "split": "development",
+      "topic_group": "mao_thought_party_constitution_1945",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "seven_congress_1945",
+          "description": "中共七大于1945年4月23日至6月11日在延安举行",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 809,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "的工作方针是：团结一致，争取胜利。他指出，大会的眼睛要 向前看，而不是向后看。我们现在还没有胜利，前面还有困难，必须 谨慎谦虚，不要骄傲急躁，全党要加强团结。 4月23日至6月11日，党的七大在延安杨家岭中央大礼堂隆重举 行。出席大会的正式代表共547人，候补代表208人，合计755人(13)， 代表着全党121万名党员。代表中，1921年至1927年入党的党员约占 28％，1928年至1936年入党的党员占59％，1937年至1941年入党的党 员占13％。代表的平均年龄是",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "mao_thought_in_charter_1945",
+          "description": "七大党章把毛泽东思想确立为党的指导思想并写入党章",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 814,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "国 的胜利，奠定了政治上、思想上、组织上的基础。 确立毛泽东思想为党的指导思想 确立毛泽东思想为党的指导思想并写入党章，是七大的历史性贡 献。七大党章提出：“毛泽东思想，就是马克思列宁主义的理论与中国 革命的实践之统一的思想，就是中国的共产主义，中国的马克思主 义。”“毛泽东思想，就是马克思主义在目前时代的殖民地、半殖民 地、半封建国家民族民主革命中的继续发展，就是马克思主义民族化 的优秀典型。”(19) 毛泽东思想系统地回答了中国革命的社会历史环境、经济文化基 础，以及革命性质、基本动力、斗争形式、发展道路、奋斗目标和领 导力量等一系列基本问题。七大概括了毛泽东思想的主要内容，这就 是：“毛泽东同志关于现代世界情况及中国国情的分析，关于新民主主 义的理论与政策，关于解放农民的理论与政策，关于革命统一战线的",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "seven_congress_dates",
+          "claim": "中共七大于1945年4月23日至6月11日召开",
+          "required": true,
+          "evidence_group_ids": [
+            "seven_congress_1945"
+          ]
+        },
+        {
+          "id": "mao_thought_written_into_charter",
+          "claim": "七大通过的党章把毛泽东思想确立为党的指导思想并写入党章",
+          "required": true,
+          "evidence_group_ids": [
+            "mao_thought_in_charter_1945"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "毛泽东思想在1942年延安整风时写入党章",
+          "reason": "语料明确写入党章是七大的历史性贡献，不是1942年整风。"
+        },
+        {
+          "claim": "毛泽东思想在1956年中共八大写入党章",
+          "reason": "八大不是首次写入党章；语料明确为七大党章。"
+        },
+        {
+          "claim": "毛泽东思想在1949年《共同纲领》中写入党章",
+          "reason": "《共同纲领》不是党章，语料明确为七大党章。"
+        }
+      ],
+      "reference_answer": "1945年，中共七大（1945年4月23日至6月11日）通过的《中国共产党党章》把毛泽东思想确立为党的指导思想并写入党章。",
+      "review_notes": [
+        "语料只明确到七大/七大党章，未单列党章通过的具体日；答案写到七大和1945年，不硬写6月11日。",
+        "页码和引文需PDF视觉复核。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_exact_founding_ceremony",
+      "question": "开国大典的地点和时间？",
+      "category": "exact_fact",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "founding_ceremony_1949",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "founding_ceremony_1949",
+          "description": "1949年10月1日下午3时开国大典在北京天安门广场举行",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 15,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "1949年10月1日下午3时，中华人民共和国中央人民政府成立典礼（即开国大典）在天安门 广场隆重举行。图为毛泽东庄严宣告：“中华人民共和国中央人民政府今天成立了！”",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            },
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 48,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "第一章 中华人民共和国的成立和巩固新生政权的斗争 1949年10月1日，庆祝中华人民共和国中央人民政府成立典礼在首 都北京隆重举行，史称“开国大典”。下午3时许，毛泽东主席在天安门 城楼上庄严宣告：“中华人民共和国中央人民政府今天成立了！”军乐 团高奏《义勇军进行曲》，广场中央升起第一面五星红旗。毛泽东宣 读中央人民政府公告之后，举行盛大的阅兵式。人民解放军受阅部队 以胜利之师的步伐通过天安门，新组建的人民空军飞行编队矫健地飞 越首都上空。傍晚，开始群众游行，工人、农民、学生、市民队伍高 举红旗，纵情欢呼人民共和国的诞生。当天，全国已经解放的各大城 市都举行了热烈的庆祝活动。1949年10月1日被确定为中华人民共和国 宣告成立的日",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "founding_time_place",
+          "claim": "开国大典于1949年10月1日下午3时在北京天安门广场举行",
+          "required": true,
+          "evidence_group_ids": [
+            "founding_ceremony_1949"
+          ]
+        },
+        {
+          "id": "founding_declaration",
+          "claim": "毛泽东在天安门城楼上宣告中华人民共和国中央人民政府成立",
+          "required": true,
+          "evidence_group_ids": [
+            "founding_ceremony_1949"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "开国大典在1949年9月21日举行",
+          "reason": "9月21日是中国人民政治协商会议第一届全体会议开幕；开国大典是10月1日。"
+        },
+        {
+          "claim": "开国大典在上午10时举行",
+          "reason": "语料记载为下午3时/3时许。"
+        },
+        {
+          "claim": "开国大典在中南海怀仁堂举行",
+          "reason": "语料记载典礼在天安门广场举行，毛泽东在天安门城楼宣告。"
+        }
+      ],
+      "reference_answer": "1949年10月1日下午3时，在北京天安门广场举行；毛泽东在天安门城楼上宣告中华人民共和国中央人民政府成立。",
+      "review_notes": [
+        "地点需区分天安门广场（典礼）与天安门城楼（毛泽东宣告位置）。",
+        "难度偏低，可作为低成本精确锚点。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "dev_semantic_double_hundred",
+      "question": "1956年党中央为什么提出“百花齐放、百家争鸣”方针？",
+      "category": "semantic_retrieval",
+      "answerability": "answerable",
+      "split": "development",
+      "topic_group": "double_hundred_1956",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "double_hundred_background",
+          "description": "科学文化领域受苏联学术批评中粗暴作风和教条主义影响",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 394,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "现代科学进军”号召的同时，党中央还提出“百花齐放、 百家争鸣”作为繁荣和发展社会主义科学文化事业的指导方针。新中国 成立后头几年，科学文化领域受到苏联学术批评中粗暴作风和教条主 义的影响，推崇一个学派、压制一个学派，乱贴政治标签等现象，在 一些学术领域比较严重。在生物学界，把苏联的米丘林学说 【19】、李森 科学说 【20】说成是“社会主义”的，而把西方的孟德尔—摩尔根学说 【21】说 成是“资本主义”的。在医药卫生界，批评“中医是封建医”，“西医是资 本主义医”。在文学艺术领域，清规戒律也不少，日丹诺夫 【22】有几 条，马林科夫 【23】有几条，要照抄。在社会科学其他领域，宗派主义的",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "double_hundred_purpose",
+          "description": "双百方针是繁荣和发展社会主义科学文化事业的指导方针",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 394,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "动。党同知识分子的关系有了进一步改善，知识分子投身社会主义建 设的积极性被调动起来，一个“向现代科学进军”的热潮很快兴起。 在发出“向现代科学进军”号召的同时，党中央还提出“百花齐放、 百家争鸣”作为繁荣和发展社会主义科学文化事业的指导方针。新中国 成立后头几年，科学文化领域受到苏联学术批评中粗暴作风和教条主 义的影响，推崇一个学派、压制一个学派，乱贴政治标签等现象，在 一些学术领域比较严重。在生物学界，把苏联的米丘林学说 【19】、李森 科学说 【20】说成是“社会主义”的，而把西方的孟德尔—摩尔根学说 【21】说 成是“资本主义”的。在医药卫生界，批评“中医是封建医”，“西医是资 本主义医”。在文学艺术领域，清规戒律也不少，日",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "double_hundred_proposal_1956",
+          "description": "1956年4月28日毛泽东提出、5月2日最高国务会议正式提出双百方针",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 395,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "的。”这出戏“为‘百花齐放，推陈出新’奠定了基础。” 【24】 4月28日，毛泽东在中央政治局扩大会议的总结讲话中指出：艺术 问题上的百花齐放，学术问题上的百家争鸣，我看应该成为我们的方 针。讲学术，这种学术也可以讲，那种学术也可以讲，不要拿一种学 术压倒一切。你讲的如果是真理，信的人势必就会越来越多。5月2 日，在最高国务会议第七次会议上，毛泽东正式提出了“百花齐放、百 家争鸣”的方针。他阐释说：现在春天来了嘛，一百种花都让它开放， 不要只让几种花开放，还有几种花不让它开放，这就叫百花齐放。百 家争鸣，是说春秋战国时代，二千年以前那个时候，有许多学派，诸 子百家，大家自由争论。现在我们也需要这个。在中华人民共和国宪 法范围之内，各种学术思想，正确的、错误的，让他们去说，不去干 涉他们。 5月26日，在中南海怀仁堂召开的知识界会议上，中央宣传部部长 陆定一作《百花齐放、百家争鸣》的报告，代表党中央对这一基本方 针作了详尽的阐述。陆",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            },
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 395,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "方 针。讲学术，这种学术也可以讲，那种学术也可以讲，不要拿一种学 术压倒一切。你讲的如果是真理，信的人势必就会越来越多。5月2 日，在最高国务会议第七次会议上，毛泽东正式提出了“百花齐放、百 家争鸣”的方针。他阐释说：现在春天来了嘛，一百种花都让它开放， 不要只让几种花开放，还有几种花不让它开放，这就叫百花齐放。百 家争鸣，是说春秋战国时代，二千年以前那个时候，有许多学派，诸 子百家，大家自由争论。现在我们也需要这个。在中华人民共和国宪 法范围之内，各种学术思想，正确的、错误的，让他们去说，不去干 涉他们。 5月26日，在中南海怀仁堂召开的知识界会议上，中央宣传部部长 陆定一作",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "double_hundred_background_fact",
+          "claim": "新中国成立后头几年，科学文化领域受苏联学术批评中粗暴作风和教条主义影响，存在推崇一个学派、压制另一个学派、乱贴政治标签等现象",
+          "required": true,
+          "evidence_group_ids": [
+            "double_hundred_background"
+          ]
+        },
+        {
+          "id": "double_hundred_purpose_fact",
+          "claim": "党中央提出“百花齐放、百家争鸣”作为繁荣和发展社会主义科学文化事业的指导方针",
+          "required": true,
+          "evidence_group_ids": [
+            "double_hundred_purpose"
+          ]
+        },
+        {
+          "id": "double_hundred_proposal_fact",
+          "claim": "1956年4月28日毛泽东在中央政治局扩大会议总结讲话中提出艺术上百花齐放、学术上百家争鸣；5月2日最高国务会议正式提出这一方针",
+          "required": true,
+          "evidence_group_ids": [
+            "double_hundred_proposal_1956"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "“百花齐放、百家争鸣”方针是在1957年反右运动中提出的",
+          "reason": "语料明确为1956年4月提出、5月2日正式提出。"
+        },
+        {
+          "claim": "“百花齐放、百家争鸣”只适用于文学艺术",
+          "reason": "语料明确为艺术问题上的百花齐放、学术问题上的百家争鸣。"
+        }
+      ],
+      "reference_answer": "新中国成立后头几年，科学文化领域受苏联学术批评中粗暴作风和教条主义影响，存在推崇一个学派、压制另一个学派、乱贴政治标签等问题。为繁荣和发展社会主义科学文化事业，党中央提出“百花齐放、百家争鸣”：艺术问题上的百花齐放，学术问题上的百家争鸣。1956年4月28日毛泽东在中央政治局扩大会议总结讲话中提出，5月2日最高国务会议正式提出。",
+      "review_notes": [
+        "题目只问为什么，评分主点放在原因；艺术/学术领域作为政策内容，不作为唯一得分点。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_semantic_angang_constitution",
+      "question": "20世纪60年代中国工业战线所说的“两参一改三结合”具体指什么？",
+      "category": "semantic_retrieval",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "angang_constitution_1960",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "angang_constitution_1960",
+          "description": "“两参一改三结合”的基本精神",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 670,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "定一 顶” 【297】的劳动制度。这些标准和制度，在全国工业学大庆的运动中被 推广开来，形成了工业战线上声势浩大的群众比学赶帮热潮，从而极 大地促进了生产。以“两参一改三结合”即工人参加管理，干部参加劳 动，改革不合理的规章制度，实行工人群众、技术人员、领导干部三 结合为基本精神的“鞍钢宪法”，体现了全心全意依靠工人阶级管理企 业和建设社会主义的思想。“鞍钢宪法”激发了中国工人阶级的主人翁 精神和非凡创造力。努力增加生产，不断进行技术革新和以厂为家， 成为那一时代工人阶级的风尚。在五六十年代，中国工人阶级中涌现 出许许多多的劳动模范和建设英雄。他们以朴素的劳动者姿态和高涨 的生产热情，为国家经济建设奉献力",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "angang_workers_management",
+          "claim": "工人参加管理",
+          "required": true,
+          "evidence_group_ids": [
+            "angang_constitution_1960"
+          ]
+        },
+        {
+          "id": "angang_cadres_labour",
+          "claim": "干部参加劳动",
+          "required": true,
+          "evidence_group_ids": [
+            "angang_constitution_1960"
+          ]
+        },
+        {
+          "id": "angang_rules_reform",
+          "claim": "改革不合理的规章制度",
+          "required": true,
+          "evidence_group_ids": [
+            "angang_constitution_1960"
+          ]
+        },
+        {
+          "id": "angang_three_way_combination",
+          "claim": "实行工人群众、技术人员、领导干部三结合",
+          "required": true,
+          "evidence_group_ids": [
+            "angang_constitution_1960"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "“两参”是干部参加管理、工人参加劳动",
+          "reason": "语料明确为工人参加管理、干部参加劳动；主体不能颠倒。"
+        },
+        {
+          "claim": "“三结合”是工人、农民、士兵三结合",
+          "reason": "语料明确为工人群众、技术人员、领导干部三结合。"
+        },
+        {
+          "claim": "“一改”是改革工资制度",
+          "reason": "语料明确为改革不合理的规章制度。"
+        }
+      ],
+      "reference_answer": "工人参加管理；干部参加劳动；改革不合理的规章制度；实行工人群众、技术人员、领导干部三结合。",
+      "review_notes": [
+        "四个要素需逐项匹配，主体不能颠倒。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "dev_multi_long_march_meetings",
+      "question": "梳理长征期间，召开的会议。",
+      "category": "multi_evidence",
+      "answerability": "answerable",
+      "split": "development",
+      "topic_group": "long_march_meetings_1934_1935",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "long_march_tongdao",
+          "description": "通道会议（中央负责人紧急会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 448,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "、李德不予采纳，而把希 望寄托在与红二、红六军团的会合上。 12 月 12 日 在湖南通道参加中共中央负责人的紧急会议， 讨论红军行动方向问题。李德坚持红军主力北上湘西与红二、红 六军团会合的原定计划。毛泽东从敌军重兵阻拦红军主力北上这 一情况出发，力主西进，向敌人兵力薄弱的贵州进军。王稼祥、 张闻天和周恩来等多数人赞成毛泽东的主张，秦邦宪和李德仍主",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_liping",
+          "description": "黎平会议（中央政治局会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 449,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "军阀王家烈的守军，攻占黎 平。十七日，毛泽东到达黎平县城。 12 月 18 日 出席在黎平举行的中共中央政治局会议，继续 讨论红军行动方针问题。秦邦宪、李德仍坚持由黎平北上湘西与 红二、六军团会合，创造新的根据地。毛泽东主张继续向贵州西 北进军，在川黔边建立根据地。经过激烈争论，王稼祥、张闻天 等多数人赞成毛泽东的意见，主持会议的周恩来决定采纳毛泽东 的意见，西进渡乌江北上。会议通过《中央政治局关于战略方针 之决定》，决定指出： “过去在湘西创立新的苏维埃根据地的决",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_houchang",
+          "description": "猴场会议（中央政治局会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 451,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "440 1935 年四十二岁 1 月 1 日 出席在猴场召开的中共中央政治局会议。会议 重申由毛泽东提出并经中央政治局黎平会议同意的在川黔边地 区建立新根据地的主张，作出《关于渡江后新的行动方针的决 定》。决定指出：首先向以遵义为中心的黔北地区、然后向川 南发展，是目前最中心的任务。“军委必须特别注意敌情的分 析研究，道路、敌情的侦察，抓住反攻的有利时机，",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_zunyi",
+          "description": "遵义会议（中央政治局扩大会议）",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 483,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "心、再 去川南创建根据地的决议，决定红军渡过长江在成都之西南或西北地 区建立根据地。会后，又根据敌情的变化，决定中央红军在川滇黔三 省广大地区创造新的根据地。 遵义会议改组了中央领导机构，选举毛泽东为中央政治局常委； 决定常委中再进行适当的分工；取消在长征前成立的“三人团”，仍由 最高军事首长朱德、周恩来为军事指挥者，而周恩来是党内委托的对 于指挥军事下最后决心的负责者。此后，在红军转战途中，2月5日在 川滇黔交界的一个鸡鸣三省的村子，中央政治局常委分工，根据毛泽 东的提议，决定由张闻天代替博古负中央总的责任（习惯上也称之为 总书记）；决定以毛泽东为周恩来在军事指挥上的帮助者，博古任总 政治部代理主任。3月4日，中革",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_zhaxi",
+          "description": "扎西中央负责人会议（含鸡鸣三省常委分工）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 456,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "1 9 3 5 年2 月 445 和各军团干部会议上传达决议。 2 月9 日 同军委纵队经大河滩到达威信县城扎西镇。在老 街江西会馆出席中央负责人会议，研究下一步进军方向和部队缩 编等问题。在会上提出回师东进、再渡赤水、重占遵义的方针·o 认为应利用敌人的错觉，寻找有利的战机，集中优势兵力，发扬 我军运动战的特长，主动地消灭敌人。为此提出轻装，精简机 构，充实连队。 2 月 10 日 中革军委发布各军整编的命令。中央红军在扎 西地区开始进行整编。全军除干部团，共编为十六个团。红一军 团缩编为两个师六个团",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_huili",
+          "description": "会理会议（中央政治局扩大会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 464,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "渡河 沿岸等地，又令薛岳、周浑元及滇军向金沙江边尾追，企图将中 央红军围歼千金沙江以北、大渡河以南、雅砦江以东地区。 5 月 12 日 同军委纵队到达四川会理城郊的铁厂。出席中 共中央政治局扩大会议（即会理会议）。会议统一对遵义会议以 ．来中央关于军事战略战术的认识，确定今后的行动方针。会议批 评了林彪提出的要毛泽东、朱德、．周恩来随军主持大计，由彭德 怀任前敌指挥的错误意见。毛泽东发言指出：党内对失去中央苏 区而缺乏胜利信心和存在怀疑不满情绪，是右倾思想的反映；改 变中央军事领导的意见，是违背遵义会议精神的。周恩来、朱德 等发言，支持毛泽东的意见。他们称赞毛泽",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_lianghekou",
+          "description": "两河口会议（中央政治局会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 469,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "请你再过细考 虑！”并请张国焘“立即赶来懋功，以便商决一切”。 6 月26 日 在懋功县的两河口出席中共中央政治局会议， 会议讨论红一、红四方面军会师后的战略方针问题。周恩来在会 上作报告，提出以运动战迅速攻打松潘胡宗南部，北上创造川陕 甘根据地的战略方针；并说两个方面军要统一指挥，集中于军 委。毛泽东发言同意周恩来的报告，并提出五点意见： （一）中 国红军要用全力到新的地区发展根据地。在川陕甘建立根据地， 可以把创造苏区运动放在更加巩固的基础上，这是向前的方针。 要对四",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_luhua",
+          "description": "芦花会议（中央政治局常委会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 472,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "三十军各一部攻占毛儿盖，红三、 红五军团进至芦花、党坝地区。 7 月 18 日 在芦花出席中共中央政治局常委会议，会议讨 论组织问题。会上，张国焘提出，要提拔新干部，有的“可到军 委＂。毛泽东说：提拔干部是需要的，．但不需要这么多人集中到 军委，下面需要人。目前必须抓紧战区的工作，迅速打击敌人。 至于一、四方面军分成几路，还在考虑中。会议为团结张国焘北 上，同意周恩来辞去红军总政治委员职务，决定由张国焘任红军 总政治委员，并为中革军委的总负责者；周恩来调中央常委工",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_shawu",
+          "description": "沙窝会议（中央政治局会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 474,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "内战，抗日救国，组织全国统一的 国防政府和抗日联军。 8 月4 日—6 日 出席在沙窝举行的中共中央政治局会议， 会议讨论红一、红四方面军会合后的形势和任务，并讨论组织问 题。毛泽东多次发言。关于形势和任务问题，发言说： （一）西 北地区进攻的敌人主要是蒋介石。蒋介石用了全部力量对付我 们，受了极大损失。从总的方面看，蒋介石的统治不是强了，而 是削弱了。 （二）西北地区的特点，是统治阶级最薄弱的一环， 帝国主义势力最弱的地方，少数民族最集中的地方，因靠近苏联 在政",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_shawu_standing",
+          "description": "沙窝中央政治局常委会议",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 476,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "受具体指 示。十八日，右路军先头部队从毛儿盖向班佑开进。 8 月 19 日 出席在沙窝召开的中共中央政治局常委会议， 研究常委分工等问题。会议决定，张闻天负责组织部工作，秦邦 宪负责宣传部工作，毛泽东负责军事工作；并决定由王稼祥负责 政治部工作，何凯丰负责少数民族委员会工作。会上，王稼祥提 出要同张国焘作斗争的问题。毛泽东说：在毛儿盖时已经说过， 斗争是需要的，但目前开展斗争是不适宜的。目前我们应采取教 育的方式。写文章，不指名，不引证。可指定专人搜集材料，研 究这个",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_maoergai",
+          "description": "毛儿盖会议（中央政治局会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 476,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "事日程。会议根据毛泽东的意见，决定常委会每周至 少召开一次。 8 月 20 日 出席在毛儿盖召开的中共中央政治局会议，会 议听取毛泽东关千夏祧战役后行动问题的报告。报告指出：我们 的行动方向，一是向东（陕西），一是向西（青海、新疆）。红军 主力应向东，向陕、甘边界发展，不应向黄河以西。目前我们的 根据地应以祧河流域为基础，将来向东发展，后方移至甘肃东北 与陕西交界地区。毛泽东作会议总结，进一步指出：向东还是向 西是一个关键问题，应采取积极向东发展的方针。夏祧战役应采 取由包座至眠州(1) 的路线，可集中三个军",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_axi",
+          "description": "阿西紧急会议",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 480,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "境危险，要赶快回去，务必提高警惕，以防意外。随即同张闻 天、！秦邦宪等紧急磋商，一致认为再继续说服等待张国焘率部北 上，不仅没有可能，而且会招致严重后果。当晚，在红三军驻地 阿西同张闻天、周恩来、秦邦宪、王稼祥召开紧急会议，决定迅 速脱离险区，率领红一、三军立即北上。并通知在俄界的林彪、 聂荣臻，行动方针有变，要一军在原地等待。 9 月 10 日 凌晨，率红三军向俄界进发，到达拉界。在离 阿西时，见到带领军委纵队赶来集中的叶剑英，告诉他情况紧 急，不能在此停留，应立即向俄界前进，与红一军会合。 同日 中共中央致电张国焘：“阅致徐、",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_ejie",
+          "description": "俄界会议（中央政治局扩大会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 481,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "令张总政委立即命令左路军向班佑、巴西开进，不得违 误。” 9 月 12 日 出席在俄界召开的中共中央政治局扩大会议， 作关于同红四方面军领导人张国焘的争论与目前行动方针的报 告，并作结论。报告说，中央常委决定的向北发展的战略方针， 请政治局批准。有同志反对这个方针，有他机会主义的方针，代 表是张国焘。中央同张国焘作过许多斗争，想了许多办法与他接 近，纠正其军阀主义倾向，但是没有结果。对千张国焘，要尽可 能做工作，争取他。最后作组织结论是必要的，但不应马上作。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_bangluozhen",
+          "description": "榜罗镇会议（中央政治局常委会议）",
+          "alternatives": [
+            {
+              "document_id": "mao_zedong_chronology_volume_1",
+              "pdf_page": 486,
+              "file_sha256": "47fe85f4b19b77943c395fd8664a98e881fd49212bc6ea217c27bff700eac3e6",
+              "quote": "1 9 3 5 年 9 月 · 475 （州）公路和平凉至宁夏的公路上布置封锁线。 9 月27 日 同陕甘支队到达通渭县榜罗镇。出席中共中央 政治局常委会议。根据最近了解到的情况，会议改变俄界会议关 于接近苏联建立根据地的决定，确定把中共中央和陕甘支队的落 脚点放在陕北，“在陕北保卫和扩大苏区”(1) 。二十八日，出席 陕甘支队连以上干部会议，作当前形势和任务报告，讲了五个问 题：（一）日本侵略北方的严重性； （二）陕北根据地和红军状 况；（三）北方可成为抗日新阵地的经济、政治条",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "long_march_wuqi",
+          "description": "吴起镇中央政治局会议",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 490,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "会议，正式决定前往 陕北，保卫和扩大根据地。会后，陕甘支队越过六盘山，于10月19日 抵达陕甘根据地的吴起镇（今吴旗）。10月22日，中央政治局召开会 议，指出历时一年的长途行军已经结束，今后的战略任务是保卫和扩 大西北的根据地，领导全国革命斗争，并以陕、甘、晋三省为发展的 主要区域。 红一方面军在历时一年的艰苦转战中，长驱二万五千里，纵横十 几个省，粉碎数十万敌军的围追堵截，战胜无数艰难险阻，实现了空 前的战略大转移，胜利地完成了震惊中外的长征。11月初，中共中央 和陕甘支队在甘泉地区同在陕甘根据地的红十",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "lm_tongdao",
+          "claim": "长征期间召开了通道会议（中央负责人紧急会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_tongdao"
+          ]
+        },
+        {
+          "id": "lm_liping",
+          "claim": "长征期间召开了黎平会议（中央政治局会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_liping"
+          ]
+        },
+        {
+          "id": "lm_houchang",
+          "claim": "长征期间召开了猴场会议（中央政治局会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_houchang"
+          ]
+        },
+        {
+          "id": "lm_zunyi",
+          "claim": "长征期间召开了遵义会议（中央政治局扩大会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_zunyi"
+          ]
+        },
+        {
+          "id": "lm_zhaxi",
+          "claim": "长征期间召开了扎西中央负责人会议",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_zhaxi"
+          ]
+        },
+        {
+          "id": "lm_huili",
+          "claim": "长征期间召开了会理会议（中央政治局扩大会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_huili"
+          ]
+        },
+        {
+          "id": "lm_lianghekou",
+          "claim": "长征期间召开了两河口会议（中央政治局会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_lianghekou"
+          ]
+        },
+        {
+          "id": "lm_luhua",
+          "claim": "长征期间召开了芦花会议（中央政治局常委会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_luhua"
+          ]
+        },
+        {
+          "id": "lm_shawu",
+          "claim": "长征期间召开了沙窝会议（中央政治局会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_shawu"
+          ]
+        },
+        {
+          "id": "lm_shawu_standing",
+          "claim": "长征期间召开了沙窝中央政治局常委会议",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_shawu_standing"
+          ]
+        },
+        {
+          "id": "lm_maoergai",
+          "claim": "长征期间召开了毛儿盖会议（中央政治局会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_maoergai"
+          ]
+        },
+        {
+          "id": "lm_axi",
+          "claim": "长征期间召开了阿西紧急会议",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_axi"
+          ]
+        },
+        {
+          "id": "lm_ejie",
+          "claim": "长征期间召开了俄界会议（中央政治局扩大会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_ejie"
+          ]
+        },
+        {
+          "id": "lm_bangluozhen",
+          "claim": "长征期间召开了榜罗镇会议（中央政治局常委会议）",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_bangluozhen"
+          ]
+        },
+        {
+          "id": "lm_wuqi",
+          "claim": "长征期间召开了吴起镇中央政治局会议",
+          "required": true,
+          "evidence_group_ids": [
+            "long_march_wuqi"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "长征期间只召开了遵义会议",
+          "reason": "语料还记载通道、黎平、猴场、会理、两河口、沙窝、毛儿盖、俄界、榜罗镇、吴起镇等会议。"
+        },
+        {
+          "claim": "通道会议在贵州黎平召开",
+          "reason": "通道会议在湖南通道；黎平会议在贵州黎平，二者是不同会议。"
+        },
+        {
+          "claim": "遵义会议在1935年10月召开",
+          "reason": "遵义会议在1935年1月；1935年10月是长征到达陕北前后。"
+        },
+        {
+          "claim": "榜罗镇会议决定南下川康",
+          "reason": "榜罗镇会议决定把落脚点放在陕北，保卫和扩大苏区。"
+        }
+      ],
+      "reference_answer": "以《中国共产党历史》第一卷和《毛泽东年谱》明确记载的中央政治局（扩大）会议、中央政治局常委会议、中央负责人会议为限，不声称穷尽。至少包括：通道会议（1934年12月12日，湖南通道）、黎平会议（1934年12月18日，贵州黎平）、猴场会议（1935年1月1日，贵州瓮安猴场）、遵义会议（1935年1月，贵州遵义）、扎西中央负责人会议（1935年2月，云南威信扎西）、会理会议（1935年5月12日，四川会理）、两河口会议（1935年6月26日，四川懋功两河口）、芦花会议（1935年7月18日，四川芦花）、沙窝会议（1935年8月4—6日，四川毛儿盖附近沙窝）、沙窝中央政治局常委会议（1935年8月19日）、毛儿盖会议（1935年8月20日）、阿西紧急会议（1935年9月9/10日，四川阿西）、俄界会议（1935年9月12日，甘肃迭部俄界）、榜罗镇会议（1935年9月27日，甘肃通渭榜罗镇）、吴起镇中央政治局会议（1935年10月22日）。",
+      "review_notes": [
+        "题目是开放枚举；口径限定为两书明确记载的会议，不声称穷尽。",
+        "15个必要事实，标注量较大；如需控制成本可改为‘战略转折会议’并缩到7个。",
+        "通道、猴场、扎西、吴起镇等为常用名，语料原文多用‘中央负责人紧急会议/中央政治局会议/中央负责人会议’等表述。",
+        "鸡鸣三省常委分工（1935年2月5日）可作为扎西会议簇的补充事实，当前未单列。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_multi_two_bombs_satellite",
+      "question": "梳理20世纪50—70年代中国“两弹一星”的主要节点。",
+      "category": "multi_evidence",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "two_bombs_satellite_1956_1970",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "two_bombs_plan_1956",
+          "description": "1956年制定科学技术发展远景规划，部署原子弹和导弹",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 651,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "一星”，重点突破国防尖端技术，作出了对中国安全和发展具有 战略意义的重大决策。 1956年，国家制定了科学技术发展的第一个远景规划，把原子能 的和平利用列为12项带有关键意义的重点任务的第一项，同时部署了 两个更大的项目：原子弹和导弹。4月，毛泽东在中央政治局扩大会议 上说：“我们现在已经比过去强，以后还要比现在强，不但要有更多的 飞机和大炮，而且还要有原子弹。在今天的世界上，我们要不受人家 欺负，就不能没有这个东西。” 【288】同月，周恩来主持中央军委会议， 听取钱学森关于发展导弹技术的规划设想。会后，成立了以聂荣臻为 主任的国防部航空工业委员会，负责导弹的",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "two_bombs_missile_1960",
+          "description": "1960年第一枚探空火箭和近程导弹发射成功",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 653,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "弹与导弹结合。在 导弹和喷气技术领域，经过仿制、改进到自行研制三个阶段的飞跃。 1960年，我国第一枚探空火箭和近程导弹发射成功。在近程导弹的研 制取得重大进展的同时，我国又开始自行设计和研制中近程地对地导 弹。1964年，中近程导弹发射成功。 人造卫星的研制也经过了艰苦的过程。度过三年严重困难时期之 后，中国科学院研制人造卫星的工作在各方面都有了突破和进展。 1965年，中央专门委员会原则批准中国科学院《关于发展我国人造卫 星工作规划方案建议》，该报告计划在19",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "two_bombs_atomic_1964",
+          "description": "1964年10月16日第一颗原子弹爆炸成功",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 653,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "力行、进行深入细致的思 想政治工作。这些都为这项伟大事业的成功奠定了坚实的基础。历史 将永远铭记他们为祖国立下的功勋。 1964年10月16日，我国成功爆炸第一颗原子弹，“东方巨响”震惊 了世界。这一成就集中代表我国科学技术当时所能达到的新水平，有 力地打破了超级大国的核垄断和核讹诈，提高了我国的国际地位。中 国政府发表声明：中国一贯主张全面禁止和彻底销毁核武器；中国进 行核试验，发展核武器，是被迫的，是为了防御，为了保卫中国人民 免受核威胁。中国政府郑重宣布，在任何时候，任何情况下，中国都 不",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "two_bombs_hydrogen_theory_1965",
+          "description": "1965年突破氢弹研制关键技术",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 653,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "会首先使用核武器。从1960年开始，我国科学家对氢弹理论的研究 逐步取得进展，到1965年，中国科学家突破了氢弹研制中的关键技 术，探索出一种新的制造氢弹的理论方案。 中央强调，两弹为主，导弹第一，要实现原子弹与导弹结合。在 导弹和喷气技术领域，经过仿制、改进到自行研制三个阶段的飞跃。 1960年，我国第一枚探空火箭和近程导弹发射成功。在近程导弹的研 制取得重大进展的同时，我国又开始自行设计和研制中近程地对地导 弹。1964年，中近程导弹发射成功。 人造卫星的研制也经过了艰苦的过程。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "two_bombs_hydrogen_1967",
+          "description": "1967年6月第一颗氢弹爆炸成功",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 919,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "取得若干重要成就。1966年10月我国第一次成功 地进行了发射导弹核武器的试验，1967年6月成功地爆炸了第一颗氢 弹，1969年9月首次成功地进行了地下核试验，1971年9月第一艘核潜 艇建成并试航成功。国防尖端技术研究方面取得的成就，增强了我国 的国防战略防御能力。1970年4月，我国成功发射了第一颗人造地球卫 星；翌年3月，又发射科学实验卫星“实践”一号。1971年9月，洲际火 箭首次飞行试验基本成功。我国第一颗返回式遥感人造地球卫星于",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "two_bombs_satellite_1970",
+          "description": "1970年4月24日第一颗人造地球卫星发射成功",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 41,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "时最大的铁路、公路两用桥——南京长江大桥全面建 成通车。图为南京长江大桥雄姿。 1970年4月24日，我国第一颗人造地球卫星发射成功。图为“东方红一号”卫星。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            },
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 919,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "建成并试航成功。国防尖端技术研究方面取得的成就，增强了我国 的国防战略防御能力。1970年4月，我国成功发射了第一颗人造地球卫 星；翌年3月，又发射科学实验卫星“实践”一号。1971年9月，洲际火 箭首次飞行试验基本成功。我国第一颗返回式遥感人造地球卫星于",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "two_bombs_plan_fact",
+          "claim": "1956年制定1956—1967年科学技术发展远景规划，把原子能列为重点，并部署原子弹和导弹",
+          "required": true,
+          "evidence_group_ids": [
+            "two_bombs_plan_1956"
+          ]
+        },
+        {
+          "id": "two_bombs_missile_fact",
+          "claim": "1960年第一枚探空火箭和近程导弹发射成功",
+          "required": true,
+          "evidence_group_ids": [
+            "two_bombs_missile_1960"
+          ]
+        },
+        {
+          "id": "two_bombs_atomic_fact",
+          "claim": "1964年10月16日第一颗原子弹爆炸成功",
+          "required": true,
+          "evidence_group_ids": [
+            "two_bombs_atomic_1964"
+          ]
+        },
+        {
+          "id": "two_bombs_hydrogen_theory_fact",
+          "claim": "1965年中国科学家突破氢弹研制中的关键技术",
+          "required": true,
+          "evidence_group_ids": [
+            "two_bombs_hydrogen_theory_1965"
+          ]
+        },
+        {
+          "id": "two_bombs_hydrogen_fact",
+          "claim": "1967年6月第一颗氢弹爆炸成功",
+          "required": true,
+          "evidence_group_ids": [
+            "two_bombs_hydrogen_1967"
+          ]
+        },
+        {
+          "id": "two_bombs_satellite_fact",
+          "claim": "1970年4月24日第一颗人造地球卫星“东方红一号”发射成功",
+          "required": true,
+          "evidence_group_ids": [
+            "two_bombs_satellite_1970"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "中国在1964年爆炸了第一颗氢弹",
+          "reason": "1964年10月16日是原子弹；第一颗氢弹是1967年6月。"
+        },
+        {
+          "claim": "中国在1967年爆炸了第一颗原子弹",
+          "reason": "第一颗原子弹是1964年10月16日；1967年6月是氢弹。"
+        },
+        {
+          "claim": "中国在1970年发射了第一枚近程导弹",
+          "reason": "1970年4月24日发射的是第一颗人造地球卫星；近程导弹是1960年。"
+        }
+      ],
+      "reference_answer": "1956年制定1956—1967年科学技术发展远景规划，把原子能列为重点，并部署原子弹和导弹；1960年第一枚探空火箭和近程导弹发射成功；1964年10月16日第一颗原子弹爆炸成功；1965年中国科学家突破氢弹研制中的关键技术；1967年6月第一颗氢弹爆炸成功；1970年4月24日第一颗人造地球卫星“东方红一号”发射成功。",
+      "review_notes": [
+        "1967年6月17日的具体日来自《毛泽东选集》相关注释；如只用语料页 p919，可写到1967年6月。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "dev_intersection_zhu_peng_command",
+      "question": "朱德和彭德怀是否都担任过八路军总指挥？",
+      "category": "intersection_hard_negative",
+      "answerability": "answerable",
+      "split": "development",
+      "topic_group": "eighth_route_army_command_1937",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "zhu_peng_eighth_route_1937",
+          "description": "1937年8月红军改编为八路军，朱德任总指挥、彭德怀任副总指挥",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 599,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "新华日报》。8月22日，国 民政府军事委员会发布命令，将红军改编为八路军(1)，任命朱德为总 指挥、彭德怀为副总指挥。共产党在坚持对红军的领导和实行独立自 主的原则下，也作了某些让步，如不设政治委员，将政治部改为政训 处等。8月25日，中共中央军委发布命令：红军改编为八路军，朱德任 总指挥，彭德怀任副总指挥，叶剑英任参谋长，左权任副参谋长，任 弼时任政治部主任，邓小平任政治部副主任。八路军全",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            },
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 599,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "员，将政治部改为政训 处等。8月25日，中共中央军委发布命令：红军改编为八路军，朱德任 总指挥，彭德怀任副总指挥，叶剑英任参谋长，左权任副参谋长，任 弼时任政治部主任，邓小平任政治部副主任。八路军全军约4.6万人， 下辖三个师：第一一五师以原红军第一方面军为主编成，师长林彪， 副师长聂荣臻，政训处主任罗荣桓，下辖第三四三旅（旅长陈光）、 第三四四旅（旅长徐海东）；第一二〇师以原红军第二方",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "zhu_de_commander",
+          "claim": "朱德任八路军总指挥",
+          "required": true,
+          "evidence_group_ids": [
+            "zhu_peng_eighth_route_1937"
+          ]
+        },
+        {
+          "id": "peng_dehuai_deputy",
+          "claim": "彭德怀任八路军副总指挥",
+          "required": true,
+          "evidence_group_ids": [
+            "zhu_peng_eighth_route_1937"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "彭德怀任八路军总指挥",
+          "reason": "语料明确朱德任总指挥，彭德怀任副总指挥。"
+        },
+        {
+          "claim": "朱德和彭德怀都担任过八路军总指挥",
+          "reason": "两人分别是总指挥、副总指挥，不是都任总指挥。"
+        },
+        {
+          "claim": "朱德任八路军副总指挥",
+          "reason": "朱德任总指挥；彭德怀任副总指挥。"
+        }
+      ],
+      "reference_answer": "不是。1937年8月红军改编为八路军时，朱德任总指挥，彭德怀任副总指挥。",
+      "review_notes": [
+        "正/副职区分是得分关键。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_intersection_mao_zhu_jinggangshan",
+      "question": "1928年4月朱德、陈毅率部与毛泽东领导的部队在井冈山会师后，合编成了什么部队？朱德和毛泽东分别担任什么职务？",
+      "category": "intersection_hard_negative",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "jinggangshan_meeting_1928",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "jinggangshan_meeting_1928",
+          "description": "1928年4月朱毛井冈山会师后合编为工农革命军第四军",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 330,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "往湘南支援暴动，结果使井冈山根据地被敌人占领一个多月。 1928年4月，朱德、陈毅率南昌起义保留下来的一小部分部队和湘 南起义农军1万余人陆续转移到井冈山地区，与毛泽东领导的部队在宁 冈砻市会师。会师后，毛泽东和朱德所率部队合编，成立工农革命军 第四军（后改称红军第四军），朱德任军长，毛泽东任党代表，王尔 琢任参谋长，下辖第十、第十一、第十二师（不久改编为四个团）。 在这期间，还召开第四军党的第一次代表大会，成立了第四军军委， 毛泽东任书记。毛泽东和朱德所率部队的会师，增强了井冈山地区工 农武装的力量，为进一步扩大革命根据地创造了条件。 5月，湘赣边界党的第一次代表大会在宁冈茅坪召开。会议总结井 冈山根据地创建以来的经验，明确回答了一些人提出的“红旗到底打得 多久”的疑问，指出革命根据地和红军能够长期存在并发展。会议选举 产生湘赣边界党的最高",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "jinggangshan_meeting_fact",
+          "claim": "1928年4月，朱德、陈毅率南昌起义保留的一部分部队和湘南起义农军与毛泽东领导的部队在宁冈砻市会师",
+          "required": true,
+          "evidence_group_ids": [
+            "jinggangshan_meeting_1928"
+          ]
+        },
+        {
+          "id": "jinggangshan_fourth_army",
+          "claim": "会师后合编为工农革命军第四军（后改称红军第四军）",
+          "required": true,
+          "evidence_group_ids": [
+            "jinggangshan_meeting_1928"
+          ]
+        },
+        {
+          "id": "jinggangshan_roles",
+          "claim": "朱德任军长，毛泽东任党代表",
+          "required": true,
+          "evidence_group_ids": [
+            "jinggangshan_meeting_1928"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "井冈山会师后合编为红五军",
+          "reason": "语料明确合编为工农革命军第四军（后改称红军第四军）；红五军是彭德怀、滕代远所部。"
+        },
+        {
+          "claim": "井冈山会师后朱德任党代表、毛泽东任军长",
+          "reason": "语料明确朱德任军长、毛泽东任党代表。"
+        },
+        {
+          "claim": "井冈山会师后成立了红一方面军",
+          "reason": "会师后成立的是工农革命军第四军；红一方面军是 later 的编制。"
+        }
+      ],
+      "reference_answer": "1928年4月，朱德、陈毅率南昌起义保留的一部分部队和湘南起义农军与毛泽东领导的部队在宁冈砻市会师。会师后合编为工农革命军第四军（后改称红军第四军），朱德任军长，毛泽东任党代表。",
+      "review_notes": [
+        "注意区分工农革命军第四军与红五军。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "dev_constraint_korean_war_decision",
+      "question": "1950年10月，中共中央围绕出兵朝鲜作出了什么决策？请按时间顺序说明。",
+      "category": "constraints_routing",
+      "answerability": "answerable",
+      "split": "development",
+      "topic_group": "korean_war_decision_1950",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "korean_war_decision_oct2",
+          "description": "10月2日毛泽东起草决定派遣志愿军入朝的长电",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 106,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "战，中共 中央的决策经历了一个从考虑出兵，到暂缓出兵，再到最终决定出兵 的过程。10月2日，毛泽东亲自草拟了一份长电报回复斯大林前一天的 来电，内容是决定派遣志愿军入朝作战，并说明援朝的必要性、初步 的战略设想和对参战前景的估计 【61】。然而，这份对志愿军入朝作战具 有重要指导意义的电报并未送交苏联方面。这是因为在当天下午召开 的书记处会议上，对出兵的问题未能取得一致意见，拟好的电稿被搁 置下来。会后，毛泽东召见苏联大使罗申，让他向斯大林转呈中共中 央书记处会议的意见：现在派遣志愿军援助朝鲜可能会承担极其严重 的后果，中共中央的许多同志",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "korean_war_decision_oct4_5",
+          "description": "10月4日至5日中央政治局扩大会议作出出兵决定",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 106,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "报。” 【62】由于事关重 大，他要求立即派遣周恩来和林彪赴苏直接同斯大林磋商。10月4日和 5日，中央政治局扩大会议在中南海颐年堂召开。会上充分发扬民主， 与会者经过慎重讨论，反复权衡利弊得失，最后取得一致的认识，作 出了派遣中国人民志愿军入朝作战进行抗美援朝、保家卫国的斗争的 决定。 毛泽东和中央政治局认为，尽管存在着严重困难，出兵还是必要 的。这不仅是因为，如果让美国侵略军占领整个朝鲜，强兵压到鸭绿 江边，我国将难以安定地从事建设，而且放任美国侵略军这样恣意践 踏世界和平、欺凌友邦，于中国、于东方各国都极为不利。我军出战 也",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "korean_war_order_oct8",
+          "description": "10月8日毛泽东发布命令组成中国人民志愿军",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 107,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "已定，因此现 在不是考虑出不出兵的问题，而是考虑出兵后如何去争取胜利的问 题。 10月8日，在美军越过三八线的第二天，中国人民革命军事委员会 主席毛泽东发布命令，将东北边防军组成中国人民志愿军，任命彭德 怀为中国人民志愿军司令员兼政治委员，待命出动；同时，电告金日 成：“根据目前形势我们决定派遣志愿军到朝鲜境内帮助你们反对侵略 者” 【65】。三八线是一条底线。毛泽东后来回顾说：“美帝国主义如果干 涉，不过三八线，我们不管，如果过三八线，我们一定过去打。” 【66】",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "korean_war_entry_oct19",
+          "description": "10月19日志愿军跨过鸭绿江入朝",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_2",
+              "pdf_page": 108,
+              "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+              "quote": "发迎击最凶恶敌人的战斗准备。 中国人民志愿军入朝作战和朝鲜战局的稳定 1950年10月19日，中国人民志愿军肩负着祖国人民的重托，在夜 幕的掩护下，按照预定计划，从安东（今辽宁丹东）、长甸河口、集 安（今属吉林）三个口岸，跨过鸭绿江，秘密进入朝鲜战场。从此， 开始了中国人民伟大的抗美援朝战争。 骄横的美帝国主义根本没有料到中国会出兵参战。志愿军入朝 时，由麦克阿瑟指挥的“联合国军”已进占平壤、元山一线，并分东西 两线以最快速度向朝中边境推进，形势非常严峻。鉴于志愿军隐蔽入 朝尚未被敌察觉，毛泽东、彭德怀当机立断，改变原定入朝",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "korean_oct2_telegram",
+          "claim": "10月2日，毛泽东起草决定派遣志愿军入朝作战的长电；当天书记处会议未取得一致意见，电稿被搁置",
+          "required": true,
+          "evidence_group_ids": [
+            "korean_war_decision_oct2"
+          ]
+        },
+        {
+          "id": "korean_oct4_5_decision",
+          "claim": "10月4日至5日，中央政治局扩大会议讨论并作出派遣中国人民志愿军入朝作战的决定",
+          "required": true,
+          "evidence_group_ids": [
+            "korean_war_decision_oct4_5"
+          ]
+        },
+        {
+          "id": "korean_oct8_order",
+          "claim": "10月8日，毛泽东发布命令，将东北边防军组成中国人民志愿军，任命彭德怀为司令员兼政治委员",
+          "required": true,
+          "evidence_group_ids": [
+            "korean_war_order_oct8"
+          ]
+        },
+        {
+          "id": "korean_oct19_entry",
+          "claim": "10月19日，志愿军从安东、长甸河口、集安跨过鸭绿江入朝",
+          "required": true,
+          "evidence_group_ids": [
+            "korean_war_entry_oct19"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "中共中央在1950年6月就决定出兵朝鲜",
+          "reason": "语料显示出兵决策发生在1950年10月。"
+        },
+        {
+          "claim": "10月19日志愿军入朝时才作出出兵决定",
+          "reason": "10月4日至5日政治局扩大会议已作出出兵决定，10月8日发布命令，10月19日入朝。"
+        },
+        {
+          "claim": "彭德怀任中国人民志愿军总参谋长",
+          "reason": "语料明确彭德怀任志愿军司令员兼政治委员。"
+        }
+      ],
+      "reference_answer": "10月2日，毛泽东起草决定派遣志愿军入朝作战的长电，但当天书记处会议未取得一致意见，电稿被搁置；10月4日至5日，中央政治局扩大会议讨论并作出派遣中国人民志愿军入朝作战的决定；10月8日，毛泽东发布命令，将东北边防军组成中国人民志愿军，任命彭德怀为司令员兼政治委员；10月19日，志愿军从安东、长甸河口、集安跨过鸭绿江入朝。",
+      "review_notes": [
+        "评分主点是时间顺序；不能把10月19日入朝当成决策日。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "holdout_constraint_nanchang_uprising_background",
+      "question": "只依据《中国共产党历史》第一卷，说明1927年南昌起义是在什么背景下发动的。",
+      "category": "constraints_routing",
+      "answerability": "answerable",
+      "split": "holdout",
+      "topic_group": "nanchang_uprising_1927",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [
+        {
+          "id": "nanchang_background_failure_1927",
+          "description": "大革命失败后的严峻形势和要不要坚持革命的问题",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 308,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "二、各地的武装起义 南昌起义 在革命遭受严重失败的极为严峻的形势下，要不要坚持革命？如 何坚持革命？这是摆在中国共产党面前的两个带根本性的问题。党以 武装起义的实际行动，对此作出了初步而又明确的回答。 为了使革命走向复兴，党领导人民进行艰苦卓绝的斗争。1927年7 月中旬，中共中央临时政治局常务委员会派遣李立三、邓中夏、谭平 山、恽代英等赴江西九江，准备组织中国共产党掌握和影响的国民革 命军中的一部分力量，联合第二方面军总指挥张发奎重回广东，以建 立新的革命根据地，实行土地革命。7月20日，因发现张",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "nanchang_background_jiujiang_1927",
+          "description": "1927年7月中旬派李立三、邓中夏、谭平山、恽代英等赴九江准备起义",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 308,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "走向复兴，党领导人民进行艰苦卓绝的斗争。1927年7 月中旬，中共中央临时政治局常务委员会派遣李立三、邓中夏、谭平 山、恽代英等赴江西九江，准备组织中国共产党掌握和影响的国民革 命军中的一部分力量，联合第二方面军总指挥张发奎重回广东，以建 立新的革命根据地，实行土地革命。7月20日，因发现张发奎已经站在 汪精卫一边，李立三等立即抛弃依赖张发奎的计划，提议独立发动反 对南京和武汉的国民党政府的军事行动，即南昌起义。中央临时政治 局常委会在获悉李立三等人的提议后，正式确定了在南昌举行武装起 义的部署。随后，向共产国际报告了起义的计划。",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "nanchang_background_independent_1927",
+          "description": "7月20日发现张发奎站在汪精卫一边，李立三等提议独立发动南昌起义",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 308,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "，以建 立新的革命根据地，实行土地革命。7月20日，因发现张发奎已经站在 汪精卫一边，李立三等立即抛弃依赖张发奎的计划，提议独立发动反 对南京和武汉的国民党政府的军事行动，即南昌起义。中央临时政治 局常委会在获悉李立三等人的提议后，正式确定了在南昌举行武装起 义的部署。随后，向共产国际报告了起义的计划。 这时，国民革命军第二方面军所辖的第十一军第二十四师是由共 产党人叶挺指挥的；第四军第二十五师第七十三、第七十五团是以北 伐战争时期的叶挺独立团为骨干编成的，第十师第三十团是为共产党",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "nanchang_background_front_committee_1927",
+          "description": "7月27日周恩来到南昌成立前委并决定7月30日起义",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 309,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "分，也 是举行南昌起义的主要军事力量。 7月27日，周恩来从武汉经九江到达南昌。根据中央的决定，中共 前敌委员会（简称前委）成立，由周恩来、李立三、恽代英、彭湃组 成，周恩来任书记。前委当即决定于7月30日起义。 正当起义准备工作紧张进行时，中共中央收到共产国际根据联共 （布）中央政治局决定发来的电报。电报指出：“如果有成功的把握， 我们认为你们的计划是可行的。”(2)中共中央分析形势后，认为南昌起 义有成功的把握，决定派中央临时政治局常委张国焘以中央代表身份 赴南昌，传达共产国际和中共中央的指示。7月30日晨，张国焘赶到南 昌。由于他仍对张发奎存有",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        },
+        {
+          "id": "nanchang_background_aug1_1927",
+          "description": "7月31日前委决定8月1日起义",
+          "alternatives": [
+            {
+              "document_id": "cpc_history_volume_1",
+              "pdf_page": 309,
+              "file_sha256": "717a24bcc6089f1cda30a6327f364dd450040e5120d9e25953a988a216758537",
+              "quote": "发奎存有幻想，所以主张一定要得到张发奎同意后 方能举行起义。这个意见被前委否决。7月31日，前委决定8月1日凌晨 举行起义。 8月1日凌晨，在以周恩来为首的前委领导下，贺龙、叶挺、朱 德、刘伯承等率领在党直接掌握和影响下的军队2万余人，举行南昌起 义。经过四个多小时的激烈战斗，起义军全歼守敌3000余人，占领南 昌城。聂荣臻、周士第在南昌附近的马回岭将第二十五师的大部分部 队也拉出",
+              "quote_normalization": "remove_whitespace_only",
+              "agent_verification": {
+                "reviewer": "agent:claude_code",
+                "verified_at": "2026-11-01T00:00:00+00:00",
+                "method": "processed_page_text_quote_check",
+                "pdf_visual_checked": false,
+                "human_approval": false
+              }
+            }
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "nanchang_failure_context",
+          "claim": "1927年大革命失败后，革命处于严重失败形势；中国共产党面临要不要坚持革命、如何坚持革命的问题",
+          "required": true,
+          "evidence_group_ids": [
+            "nanchang_background_failure_1927"
+          ]
+        },
+        {
+          "id": "nanchang_jiujiang_preparation",
+          "claim": "1927年7月中旬，中共中央临时政治局常委会派李立三、邓中夏、谭平山、恽代英等赴江西九江，准备组织党掌握和影响的国民革命军一部分，联合张发奎重回广东",
+          "required": true,
+          "evidence_group_ids": [
+            "nanchang_background_jiujiang_1927"
+          ]
+        },
+        {
+          "id": "nanchang_independent_decision",
+          "claim": "7月20日发现张发奎站在汪精卫一边后，李立三等提议独立发动反对南京和武汉国民党政府的军事行动，即南昌起义",
+          "required": true,
+          "evidence_group_ids": [
+            "nanchang_background_independent_1927"
+          ]
+        },
+        {
+          "id": "nanchang_front_committee",
+          "claim": "7月27日周恩来抵南昌成立前委，决定7月30日起义；后因张国焘主张等待张发奎同意被前委否决，7月31日决定8月1日起义",
+          "required": true,
+          "evidence_group_ids": [
+            "nanchang_background_front_committee_1927",
+            "nanchang_background_aug1_1927"
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        {
+          "claim": "南昌起义是在国共合作背景下由国民党领导的",
+          "reason": "语料显示起义是中国共产党在革命失败后独立发动的武装行动。"
+        },
+        {
+          "claim": "南昌起义最初决定在7月27日举行",
+          "reason": "7月27日前委成立后决定7月30日起义；后改为8月1日。"
+        },
+        {
+          "claim": "南昌起义由张发奎领导",
+          "reason": "发现张发奎站在汪精卫一边后，李立三等放弃依赖张发奎的计划，独立发动起义。"
+        }
+      ],
+      "reference_answer": "1927年大革命失败后，革命处于严重失败形势，中国共产党面临要不要坚持革命、如何坚持革命的问题。7月中旬，中共中央临时政治局常委会派李立三、邓中夏、谭平山、恽代英等赴江西九江，准备组织党掌握和影响的国民革命军一部分，联合张发奎重回广东。7月20日发现张发奎已站在汪精卫一边，李立三等提议独立发动反对南京和武汉国民党政府的军事行动，即南昌起义。7月27日周恩来抵南昌成立前委，决定7月30日起义；后因张国焘主张等待张发奎同意被前委否决，7月31日决定8月1日起义。",
+      "review_notes": [
+        "题目已加‘只依据《中国共产党历史》第一卷’的来源约束，保持在 constraints_routing。",
+        "答案重点是背景/原因，不展开起义战斗过程。"
+      ],
+      "judgments": []
+    },
+    {
+      "id": "dev_refusal_marriage_law_concubinage",
+      "question": "1950年《婚姻法》是否允许纳妾？",
+      "category": "refusal_boundary",
+      "answerability": "unanswerable",
+      "split": "development",
+      "topic_group": "marriage_law_1950",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [],
+      "facts": [],
+      "forbidden_claims": [
+        {
+          "claim": "1950年《婚姻法》允许纳妾",
+          "reason": "第二条规定禁止纳妾。"
+        },
+        {
+          "claim": "1950年《婚姻法》只禁止重婚，不禁止纳妾",
+          "reason": "第二条同时禁止重婚、纳妾、童养媳等。"
+        },
+        {
+          "claim": "1950年《婚姻法》没有涉及纳妾问题",
+          "reason": "第二条明确禁止纳妾。"
+        }
+      ],
+      "reference_answer": "不允许。1950年《婚姻法》第二条规定禁止重婚、纳妾、童养媳、干涉寡妇婚姻自由、借婚姻关系索取财物。",
+      "review_notes": [
+        "错误前提题；评分看是否识别并纠正‘允许纳妾’的前提。"
+      ],
+      "judgments": [],
+      "refusal_basis": {
+        "type": "false_premise",
+        "correct_claim": "1950年《婚姻法》第二条规定禁止重婚、纳妾、童养媳、干涉寡妇婚姻自由、借婚姻关系索取财物。",
+        "evidence": [
+          {
+            "document_id": "cpc_history_volume_2",
+            "pdf_page": 136,
+            "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+            "quote": "《婚姻法》开宗明义规定了两条基本原则：第一条，废除包办强 迫、男尊女卑、漠视子女利益的封建主义婚姻制度。实行男女婚姻自 由、一夫一妻、男女权利平等、保护妇女和子女合法利益的新民主主 义婚姻制度。第二条，禁止重婚、纳妾，禁止童养媳，禁止干涉寡妇 婚姻自由，禁止任何人借婚姻关系问题索取财物。这是对旧中国社会 盛行的包办婚姻和干涉婚姻自主的旧制度的彻底否定。依据上述原 则，《婚姻法》对有关婚姻关系的建立、夫妻间的权利和义务、父母 子女之间的关系、离婚、离婚后子女的抚养和教育、离婚后的财产和 生活等内容，作了具体的规定。 《婚姻法》以调整婚姻关系为主，同时也涉及作为社会细胞的",
+            "quote_normalization": "remove_whitespace_only",
+            "agent_verification": {
+              "reviewer": "agent:claude_code",
+              "verified_at": "2026-11-01T00:00:00+00:00",
+              "method": "processed_page_text_quote_check",
+              "pdf_visual_checked": false,
+              "human_approval": false
+            }
+          }
+        ]
+      },
+      "not_applicable_metrics": {
+        "recall": "拒答题没有正向证据分母，不按 0 分计算。",
+        "precision": "拒答题没有正向候选池，不按 0 分计算。",
+        "mrr": "拒答题没有正向排序分母，不按 0 分计算。",
+        "ndcg": "拒答题没有正向证据池，不按 0 分计算。"
+      }
+    },
+    {
+      "id": "holdout_refusal_un_seat_timing",
+      "question": "中国是在1972年尼克松访华之后才恢复联合国合法席位的吗？",
+      "category": "refusal_boundary",
+      "answerability": "unanswerable",
+      "split": "holdout",
+      "topic_group": "un_seat_1971",
+      "human_review": {
+        "status": "pending",
+        "reviewed_by": null,
+        "reviewed_at": null,
+        "notes": "待人工复核题目、证据、事实和拒答边界。",
+        "confirmations": {}
+      },
+      "evidence_groups": [],
+      "facts": [],
+      "forbidden_claims": [
+        {
+          "claim": "中国是在1972年尼克松访华之后才恢复联合国合法席位的",
+          "reason": "恢复席位是1971年10月25日；尼克松访华是1972年2月。"
+        },
+        {
+          "claim": "尼克松访华发生在1971年",
+          "reason": "语料明确尼克松访华是1972年2月。"
+        },
+        {
+          "claim": "中国在1972年恢复联合国合法席位",
+          "reason": "语料明确为1971年10月25日第26届联大2758号决议。"
+        }
+      ],
+      "reference_answer": "不是。1971年10月25日，第二十六届联合国大会通过2758号决议，恢复中华人民共和国在联合国的一切合法权利；尼克松访华是1972年2月。",
+      "review_notes": [
+        "时间先后错误前提；评分看是否纠正‘1972年之后才恢复’的表述。"
+      ],
+      "judgments": [],
+      "refusal_basis": {
+        "type": "false_premise",
+        "correct_claim": "1971年10月25日，第二十六届联合国大会通过2758号决议，恢复中华人民共和国在联合国的一切合法权利；尼克松访华是1972年2月。",
+        "evidence": [
+          {
+            "document_id": "cpc_history_volume_2",
+            "pdf_page": 43,
+            "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+            "quote": "1971年10月25日，第二十六届联合国大会以压倒多数票通过2758号决议，恢复中华人民共 和国在联合国的一切合法权利。左图为1971年11月15日，中国代表团首次出席联合国大会；右 图为五星红旗在联合国总部前升起。",
+            "quote_normalization": "remove_whitespace_only",
+            "agent_verification": {
+              "reviewer": "agent:claude_code",
+              "verified_at": "2026-11-01T00:00:00+00:00",
+              "method": "processed_page_text_quote_check",
+              "pdf_visual_checked": false,
+              "human_approval": false
+            }
+          },
+          {
+            "document_id": "cpc_history_volume_2",
+            "pdf_page": 848,
+            "file_sha256": "85d4304f4dab786cb88414700520754dd8b00150e8d24d7717346acc7b9a0b5e",
+            "quote": "关系新局面的出现 中华人民共和国恢复在联合国的合法席位 中美关系的转变给国际社会带来巨大冲击。第一个重大反响就是 第二十六届联合国大会不顾美国的阻挠，终于作出了恢复中华人民共 和国在联合国的一切合法权利的决议。 中国是1945年成立的联合国的创始会员国，也是联合国安全理事 会五个常任理事国之一。根据国际公认的原则，中华人民共和国成立 后，应由中国新政府指派代表参加联合国大会及其有关机构的工作， 把已经不能代表中国人民的所谓“中华民国”代表驱逐出联合国。但 是，主要由于美国政府的反对，中国在联合国的席位一直被台湾国民",
+            "quote_normalization": "remove_whitespace_only",
+            "agent_verification": {
+              "reviewer": "agent:claude_code",
+              "verified_at": "2026-11-01T00:00:00+00:00",
+              "method": "processed_page_text_quote_check",
+              "pdf_visual_checked": false,
+              "human_approval": false
+            }
+          }
+        ]
+      },
+      "not_applicable_metrics": {
+        "recall": "拒答题没有正向证据分母，不按 0 分计算。",
+        "precision": "拒答题没有正向候选池，不按 0 分计算。",
+        "mrr": "拒答题没有正向排序分母，不按 0 分计算。",
+        "ndcg": "拒答题没有正向证据池，不按 0 分计算。"
+      }
+    }
+  ]
+}
