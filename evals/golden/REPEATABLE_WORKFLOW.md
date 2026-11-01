@@ -8,11 +8,12 @@
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot collect `
   --dataset evals/golden/golden_dataset.json `
   --candidate-k 30 --top-k 20 --answer-top-k 10 `
-  --run-name golden20_r3_20261029 `
-  --output data/reports/golden20_r3_20261029/capture.json
+  --run-name golden32_rerun_20261101 `
+  --output data/reports/golden32_rerun_20261101/capture.json
 ```
 
 - 组件检索用原问题，不经过 LLM 规划。
+- 示例中的 `golden32_rerun_20261101` 只是新运行名；当前冻结基线是 `golden32_v1.2_20261101`，报告见 [observations/20261101_v1.2_unified_run/](observations/20261101_v1.2_unified_run/README.md)。
 - 需要真实模型时显式加 `--with-llm`，会外发题干和证据片段并产生费用。
 - 输出目录不能已存在；失败保留 `.partial.json`。
 - 采集记录数据集、源码、语料、索引身份和调用用量。
@@ -34,8 +35,8 @@ LLM 与 Agent 标签的复核记录见 [label_reviews/](label_reviews/)。复核
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot prepare-reviews `
   --dataset evals/golden/golden_dataset.json `
-  --capture data/reports/golden20_r3_20261029/capture.json `
-  --output-dir data/reports/golden20_r3_20261029/reviews
+  --capture data/reports/golden32_rerun_20261101/capture.json `
+  --output-dir data/reports/golden32_rerun_20261101/reviews
 ```
 
 生成 `index.html`、答案/过程复核模板、校准包和导出包。所有判断初始为 `unknown`，不会自动打分或批准。
@@ -45,9 +46,9 @@ LLM 与 Agent 标签的复核记录见 [label_reviews/](label_reviews/)。复核
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot import-reviews `
   --dataset evals/golden/golden_dataset.json `
-  --capture data/reports/golden20_r3_20261029/capture.json `
-  --bundle data/reports/golden20_r3_20261029/review-bundle.json `
-  --output-dir data/reports/golden20_r3_20261029/reviewed
+  --capture data/reports/golden32_rerun_20261101/capture.json `
+  --bundle data/reports/golden32_rerun_20261101/review-bundle.json `
+  --output-dir data/reports/golden32_rerun_20261101/reviewed
 ```
 
 ## 4. 评分
@@ -55,11 +56,11 @@ LLM 与 Agent 标签的复核记录见 [label_reviews/](label_reviews/)。复核
 ```powershell
 .\.venv\Scripts\python.exe -B -m history_agent.evaluation.pilot score `
   --dataset evals/golden/golden_dataset.json `
-  --capture data/reports/golden20_r3_20261029/capture.json `
+  --capture data/reports/golden32_rerun_20261101/capture.json `
   --ranking-pools evals/golden/ranking_pools.json `
-  --reviews-dir data/reports/golden20_r3_20261029/reviewed `
+  --reviews-dir data/reports/golden32_rerun_20261101/reviewed `
   --k-values 1 3 5 10 20 `
-  --output data/reports/golden20_r3_20261029/report.json
+  --output data/reports/golden32_rerun_20261101/report.json
 ```
 
 - 暂定分数允许 Agent 标签；正式分数只接受人工批准题目和人工标签/答案。
@@ -82,4 +83,4 @@ LLM 与 Agent 标签的复核记录见 [label_reviews/](label_reviews/)。复核
 - 不修改题目/事实/证据后复用旧 capture；必须重新采集。
 - 不把未标注候选当不相关。
 - 不把“已批准题目定义”解释为“候选/答案已批准”。
-- 逐题原文、事实和拒答边界见 [CASE_INVENTORY.md](CASE_INVENTORY.md)；答案复核口径见 [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md)。
+- 逐题原文、事实和拒答边界见 [DATASET.md](DATASET.md) 与 [CASE_INVENTORY_v1.2.md](CASE_INVENTORY_v1.2.md)；答案复核口径见 [ANSWER_REVIEW_CALIBRATION.md](ANSWER_REVIEW_CALIBRATION.md)。

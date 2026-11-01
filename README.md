@@ -156,11 +156,11 @@ HTTP 接口与命令行共用业务实现：
 
 ## 评测与开发检查
 
-当前评测集为 **20 题**（16 开发 + 4 保留，18 可答 + 2 拒答）：98 个必要事实、104 个证据组；20 题定义均已人工批准；18 道可答题都有固定池，182 条候选标签全部人工复核（178 通过、4 改判）。正式 Recall@10 覆盖 18 道可答题：62.6%、Precision@5 65.0%、MRR@10 0.971、nDCG@5 0.724（P/nDCG 16 题、MRR 17 题，Top5 含未标注页）；线上对齐 Recall@12 62.9%，Recall@20 67.0% 仅作诊断，Fact/Cit 仍为 0 题。总索引、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，逐题原文与状态见 [CASE_INVENTORY.md](evals/golden/CASE_INVENTORY.md)，当前重跑与逐题结果见 [2026-10-30 当前评测](evals/golden/observations/20261030_current_run/CASES.md)。 查询理解另有一层独立评测：30 条种子用例与规则/LLM 基线见 [查询理解基线](evals/query_understanding/BASELINE.md) 与 [实体索引 shadow](evals/query_understanding/ENTITY_LINKING.md)。
+当前评测集为 **Golden v1.2（32 题）**：22 开发 + 10 保留，28 可答 + 4 拒答；143 个必要事实、143 个证据组、301 条候选标签。32 题定义、28 个固定池和 301 条候选标签均已人工复核，冻结身份见 [RELEASE_v1.2.md](evals/golden/RELEASE_v1.2.md)。2026-11-01 统一 32 题基线（生产 LLM 管线）的必要证据组 Recall@10 为 **68.3%**（线上对齐 Recall@12 68.5%）、MRR@10 0.923、P@5 64.7%、nDCG@5 0.704；P/nDCG 只有 17 题可评，K=10/20 的 P/nDCG 仅长征题 1 题可评，不能当作全量成绩。答案与过程复核目前为 LLM judge provisional：必要事实覆盖 58/143、answer pass 11/32、过程 28 pass / 4 fail，12 条高风险结论仍待人工校准。总量、指标可计算性和缺口见 [DATASET.md](evals/golden/DATASET.md)，新增题逐题清单见 [CASE_INVENTORY_v1.2.md](evals/golden/CASE_INVENTORY_v1.2.md)，统一运行见 [2026-11-01 基线](evals/golden/observations/20261101_v1.2_unified_run/README.md) 与 [校准队列](evals/golden/observations/20261101_v1.2_unified_run/CALIBRATION_QUEUE.md)。查询理解另有一层独立评测：30 条种子用例与规则/LLM 基线见 [查询理解基线](evals/query_understanding/BASELINE.md) 与 [实体索引 shadow](evals/query_understanding/ENTITY_LINKING.md)。
 
-> 2026-10-31 关键词 tokenizer 已切换为 jieba search mode，并加入领域词典、查询端高 DF 泛词过滤和索引侧中文单字裁剪。上面的 62.6% 等正式成绩对应切换前的索引；同一 18 题、同一向量/RRF 管线的离线复跑为 Recall@10 61.9%、Recall@20 68.4%、P@5 68.6%（7 题）、MRR@10 0.969（16 题）、nDCG@5 0.753（7 题）。P/nDCG 的固定池仍是切换前候选，可评题数少，不能直接与旧数比较；详见 [关键词 jieba 基线](evals/KEYWORD_JIEBA_BASELINE_20261031.md)。
+> 历史成绩（20 题 v1.1）与 jieba tokenizer 切换实验保留在 [关键词 jieba 基线](evals/KEYWORD_JIEBA_BASELINE_20261031.md)；其分母和固定池与 v1.2 不同，不能直接与上面的 32 题指标比较。
 
-2026-10-29 的 [v6 真实模型观察](evals/golden/observations/20261029_v6_live/README.md) 仅作历史对照：其 v6 标注/协议文件已清理，答案未人工复核，不代表当前 20 题的正式成绩。仍待完成：20 题答案复核。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。
+2026-10-29 的 [v6 真实模型观察](evals/golden/observations/20261029_v6_live/README.md) 仅作历史对照：其 v6 标注/协议文件已清理，答案未人工复核，不代表当前 Golden v1.2 的成绩。候选等级、排序池和历史答案不会因题目批准自动升级，详见 [评测流程](evals/golden/REPEATABLE_WORKFLOW.md)。
 
 历史页级评测可通过 `eval retrieval`、`eval answers`、`eval comprehensive` 运行；旧 v1 `eval golden` 命令已随 v1 数据清理移除。真实模型调用需显式启用相应参数。
 
